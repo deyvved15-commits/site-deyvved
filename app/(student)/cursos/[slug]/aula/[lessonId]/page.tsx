@@ -1,0 +1,292 @@
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { notFound, redirect } from "next/navigation";
+import { getYoutubeId } from "@/lib/utils";
+import Link from "next/link";
+import ProgressButton from "@/components/student/progress-button";
+import LessonComments from "@/components/student/lesson-comments";
+import HtmlContent from "@/components/student/html-content";
+
+export default async function AulaPage({ params }: { params: Promise<{ slug: string; lessonId: string }> }) {
+  const session = await auth();
+  if (!session) return null;
+  const { slug, lessonId } = await params;
+
+  const course = await prisma.course.findUnique({
+    where: { slug },
+    include: {
+      modules: {
+        orderBy: { order: "asc" },
+        include: {
+          lessons: {
+            orderBy: { order: "asc" },
+            include: { progress: { where: { userId: session.user.id } } },
+          },
+        },
+      },
+    },
+  });
+  if (!course) notFound();
+
+  // Verifica matrícula e expiração
+  const enrollment = await prisma.enrollment.findUnique({
+    where: { userId_courseId: { userId: session.user.id, courseId: course.id } },
+  });
+  if (!enrollment) redirect("/dashboard");
+  if (enrollment.expiresAt && enrollment.expiresAt < new Date()) redirect(`/checkout/${course.id}?renovar=1`);
+
+  const allLessons = course.modules.flatMap(m => m.lessons);
+  const currentIndex = allLessons.findIndex(l => l.id === lessonId);
+  if (currentIndex === -1) notFound();
+
+  // Drip content check
+  const enrolledAt = enrollment.createdAt;
+  const daysSinceEnrollment = Math.floor((Date.now() - enrolledAt.getTime()) / 86400000);
+  const lesson = allLessons[currentIndex];
+
+  if (lesson.releaseAfterDays > daysSinceEnrollment) redirect(`/cursos/${slug}?bloqueada=1`);
+
+  const prev = allLessons[currentIndex - 1] ?? null;
+  const next = allLessons[currentIndex + 1] ?? null;
+  const ytId = getYoutubeId(lesson.youtubeUrl);
+  const isCompleted = lesson.progress[0]?.completed ?? false;
+
+  const done = allLessons.filter(l => l.progress[0]?.completed).length;
+  const total = allLessons.length;
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+
+  return (
+    <div style={{ display: "flex", height: "100%", background: "var(--navy-darkest)" }}>
+
+      {/* ── Main content ── */}
+      <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column" }}>
+
+        {/* Top bar */}
+        <div style={{
+          padding: "14px 28px",
+          borderBottom: "1px solid rgba(201,169,122,0.10)",
+          display: "flex", alignItems: "center", gap: 14,
+          background: "linear-gradient(135deg, rgba(201,169,122,0.03) 0%, transparent 100%)",
+          flexShrink: 0,
+        }}>
+          <Link href={`/cursos/${slug}`} style={{
+            display: "flex", alignItems: "center", gap: 7,
+            fontSize: 11, fontWeight: 500, letterSpacing: 1.5,
+            textTransform: "uppercase", color: "var(--gold)", textDecoration: "none",
+            transition: "color 0.2s",
+          }}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M19 12H5M12 5l-7 7 7 7"/>
+            </svg>
+            {course.title}
+          </Link>
+          <div style={{ flex: 1 }} />
+          <span style={{ fontSize: 11, color: "var(--text-muted)" }}>
+            Aula {currentIndex + 1} de {total}
+          </span>
+          <div style={{ width: 80 }}>
+            <div className="ka-progress-bar">
+              <div className="ka-progress-fill" style={{ width: `${pct}%` }} />
+            </div>
+          </div>
+          <span style={{ fontSize: 11, fontWeight: 700, color: "var(--gold)", fontFamily: "'Cinzel',serif" }}>{pct}%</span>
+        </div>
+
+        {/* Video player */}
+        <div style={{ padding: "24px 28px 0" }}>
+          <div style={{
+            borderRadius: 16, overflow: "hidden",
+            background: "#000",
+            border: "1px solid rgba(201,169,122,0.10)",
+            boxShadow: "0 20px 60px rgba(0,0,0,0.60)",
+            aspectRatio: "16/9",
+          }}>
+            {ytId ? (
+              <iframe
+                src={`https://www.youtube.com/embed/${ytId}?rel=0&modestbranding=1`}
+                style={{ width: "100%", height: "100%", display: "block" }}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            ) : (
+              <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 12 }}>
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ color: "rgba(201,169,122,0.20)" }}>
+                  <rect x="2" y="6" width="14" height="12" rx="2"/><path d="M22 8l-6 4 6 4V8z"/>
+                </svg>
+                <p style={{ fontSize: 13, color: "var(--text-muted)" }}>Vídeo não disponível</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Lesson info */}
+        <div style={{ padding: "20px 28px 0" }}>
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16, marginBottom: 10 }}>
+            <div>
+              <h1 style={{ fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 20, letterSpacing: 1.5, color: "var(--text-primary)", lineHeight: 1.3 }}>
+                {lesson.title}
+              </h1>
+              {lesson.duration && (
+                <p style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 4, display: "flex", alignItems: "center", gap: 5 }}>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                  </svg>
+                  {lesson.duration}
+                </p>
+              )}
+            </div>
+            <ProgressButton lessonId={lesson.id} completed={isCompleted} />
+          </div>
+
+          {lesson.description && (
+            <HtmlContent html={lesson.description} className="prose-lesson" style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.8, marginBottom: 20 }} />
+          )}
+        </div>
+
+        {/* Course material */}
+        {lesson.content && (
+          <div style={{ margin: "8px 28px 0" }}>
+            <div style={{
+              borderRadius: 16, overflow: "hidden",
+              background: "rgba(15,26,61,0.5)",
+              border: "1px solid rgba(201,169,122,0.12)",
+            }}>
+              <div style={{
+                padding: "11px 20px",
+                borderBottom: "1px solid rgba(201,169,122,0.08)",
+                background: "rgba(201,169,122,0.03)",
+                display: "flex", alignItems: "center", gap: 8,
+              }}>
+                <div style={{ width: 3, height: 14, background: "var(--gold)", borderRadius: 2, boxShadow: "0 0 6px var(--gold)" }} />
+                <span style={{ fontFamily: "'Cinzel',serif", fontSize: 10, fontWeight: 600, letterSpacing: 3, textTransform: "uppercase", color: "var(--gold)" }}>
+                  Material da Aula
+                </span>
+              </div>
+              <HtmlContent html={lesson.content} className="prose-lesson" style={{ padding: "20px 24px", color: "rgba(255,255,255,0.8)", lineHeight: 1.8, fontSize: 14 }} />
+            </div>
+          </div>
+        )}
+
+        {/* Comments */}
+        <LessonComments
+          lessonId={lesson.id}
+          userId={session.user.id}
+          isAdmin={session.user.role === "ADMIN"}
+        />
+
+        {/* Navigation */}
+        <div style={{
+          margin: "20px 28px 28px",
+          padding: "18px 20px",
+          borderRadius: 14,
+          background: "rgba(255,255,255,0.02)",
+          border: "1px solid rgba(201,169,122,0.08)",
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+        }}>
+          {prev ? (
+            <Link href={`/cursos/${slug}/aula/${prev.id}`} style={{
+              display: "flex", alignItems: "center", gap: 8,
+              fontSize: 12, color: "var(--text-muted)", textDecoration: "none",
+              fontWeight: 500, transition: "color 0.2s",
+            }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M19 12H5M12 5l-7 7 7 7"/>
+              </svg>
+              Anterior
+            </Link>
+          ) : <div />}
+          <div style={{ fontSize: 11, color: "var(--text-muted)", textAlign: "center" }}>
+            {currentIndex + 1} / {total}
+          </div>
+          {next ? (
+            <Link href={`/cursos/${slug}/aula/${next.id}`} style={{
+              display: "flex", alignItems: "center", gap: 8,
+              fontSize: 12, color: "var(--gold)", textDecoration: "none",
+              fontWeight: 600, letterSpacing: 0.5, transition: "color 0.2s",
+            }}>
+              Próxima
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </Link>
+          ) : (
+            <Link href={`/cursos/${slug}`} style={{
+              display: "flex", alignItems: "center", gap: 8,
+              fontSize: 12, color: "#6ee7b7", textDecoration: "none",
+              fontWeight: 600, transition: "color 0.2s",
+            }}>
+              ✓ Concluído
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </Link>
+          )}
+        </div>
+      </div>
+
+      {/* ── Lesson list sidebar ── */}
+      <aside className="ka-lesson-sidebar" style={{ width: 280, overflow: "hidden auto", flexShrink: 0 }}>
+        <div style={{
+          padding: "14px 16px",
+          borderBottom: "1px solid rgba(201,169,122,0.10)",
+          background: "rgba(201,169,122,0.02)",
+        }}>
+          <p style={{ fontFamily: "'Cinzel',serif", fontSize: 9, fontWeight: 600, letterSpacing: 4, textTransform: "uppercase", color: "var(--gold)" }}>
+            Conteúdo
+          </p>
+        </div>
+        <div style={{ paddingBottom: 16 }}>
+          {course.modules.map((mod) => (
+            <div key={mod.id}>
+              <p className="ka-lesson-module-title">{mod.title}</p>
+              {mod.lessons.map((l) => {
+                const active = l.id === lessonId;
+                const lDone = l.progress[0]?.completed;
+                const isLocked = l.releaseAfterDays > daysSinceEnrollment;
+                const daysLeft = l.releaseAfterDays - daysSinceEnrollment;
+
+                if (isLocked) {
+                  return (
+                    <div key={l.id} className="ka-lesson-item" style={{ opacity: 0.5, cursor: "default" }} title={`Disponível em ${daysLeft} dia${daysLeft !== 1 ? "s" : ""}`}>
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                      </svg>
+                      <span style={{ fontSize: 12, lineHeight: 1.4, color: "var(--text-muted)", fontFamily: "'Poppins',sans-serif" }}>
+                        {l.title}
+                        <span style={{ display: "block", fontSize: 9, color: "rgba(255,255,255,0.2)", marginTop: 1 }}>em {daysLeft}d</span>
+                      </span>
+                    </div>
+                  );
+                }
+
+                return (
+                  <Link key={l.id} href={`/cursos/${slug}/aula/${l.id}`}
+                    className={`ka-lesson-item${active ? " active" : ""}`}
+                    style={{ textDecoration: "none" }}>
+                    {lDone ? (
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6ee7b7" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+                      </svg>
+                    ) : (
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={active ? "var(--gold)" : "rgba(201,169,122,0.25)"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                        <circle cx="12" cy="12" r="10"/>
+                      </svg>
+                    )}
+                    <span style={{
+                      fontSize: 12, lineHeight: 1.4,
+                      color: active ? "var(--text-primary)" : "var(--text-secondary)",
+                      fontWeight: active ? 600 : 400,
+                      fontFamily: "'Poppins',sans-serif",
+                    }}>
+                      {l.title}
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+      </aside>
+    </div>
+  );
+}
