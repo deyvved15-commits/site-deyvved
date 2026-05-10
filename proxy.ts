@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const token = await getToken({
     req,
     secret: process.env.AUTH_SECRET,
@@ -13,22 +13,26 @@ export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const role = token?.role as string | undefined;
 
+  const redirectTo = (path: string) => {
+    const url = req.nextUrl.clone();
+    url.pathname = path;
+    return NextResponse.redirect(url);
+  };
+
   if (pathname === "/login" || pathname === "/cadastro") {
-    if (token) {
-      return NextResponse.redirect(new URL(role === "ADMIN" ? "/admin" : "/dashboard", req.url));
-    }
+    if (token) return redirectTo(role === "ADMIN" ? "/admin" : "/dashboard");
     return NextResponse.next();
   }
 
   if (pathname === "/") {
-    if (!token) return NextResponse.redirect(new URL("/login", req.url));
-    return NextResponse.redirect(new URL(role === "ADMIN" ? "/admin" : "/dashboard", req.url));
+    if (!token) return redirectTo("/login");
+    return redirectTo(role === "ADMIN" ? "/admin" : "/dashboard");
   }
 
-  if (!token) return NextResponse.redirect(new URL("/login", req.url));
+  if (!token) return redirectTo("/login");
 
   if (pathname.startsWith("/admin") && role !== "ADMIN") {
-    return NextResponse.redirect(new URL("/dashboard", req.url));
+    return redirectTo("/dashboard");
   }
 
   return NextResponse.next();
