@@ -1,0 +1,17 @@
+{
+  "name": "Kadima Academy",
+  "short_name": "Kadima",
+  "description": "Plataforma de Ensino Kadima Academy",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#060D1F",
+  "theme_color": "#C9A97A",
+  "icons": [
+    {
+      "src": "/icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
