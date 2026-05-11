@@ -300,48 +300,61 @@ export default function CourseEditor({ course: initial, teachers, isAdmin = true
 
                 <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 12 }}>
                   {mod.lessons.map((lesson, li) => (
-                    <div key={lesson.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 12px", borderRadius: 12, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.04)" }}>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <p style={{ fontSize: 13, fontWeight: 600 }}>{li + 1}. {lesson.title}</p>
-                        <div style={{ display: "flex", gap: 8 }}>
-                           {lesson.duration && <span style={{ fontSize: 11, color: "var(--text-muted)" }}>{lesson.duration}</span>}
-                           {lesson.attachments && lesson.attachments.length > 0 && <span style={{ fontSize: 9, color: "var(--gold)" }}>{lesson.attachments.length} anexo(s)</span>}
+                    <div key={lesson.id}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 12px", borderRadius: 12, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.04)" }}>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <p style={{ fontSize: 13, fontWeight: 600 }}>{li + 1}. {lesson.title}</p>
+                          <div style={{ display: "flex", gap: 8 }}>
+                             {lesson.duration && <span style={{ fontSize: 11, color: "var(--text-muted)" }}>{lesson.duration}</span>}
+                             {lesson.attachments && Array.isArray(lesson.attachments) && lesson.attachments.length > 0 && (
+                               <span style={{ fontSize: 9, color: "var(--gold)" }}>{lesson.attachments.length} anexo(s)</span>
+                             )}
+                          </div>
                         </div>
+                        <button onClick={() => startEditLesson(lesson)} style={S.btnEdit}><Pencil size={13} /></button>
+                        <button onClick={() => deleteLesson(mod.id, lesson.id)} style={S.btnRed}><Trash2 size={13} /></button>
                       </div>
-                      <button onClick={() => startEditLesson(lesson)} style={S.btnEdit}><Pencil size={13} /></button>
-                      <button onClick={() => deleteLesson(mod.id, lesson.id)} style={S.btnRed}><Trash2 size={13} /></button>
+
+                      {editingLesson === lesson.id && (
+                        <div style={{ background: "rgba(6,13,31,0.95)", border: "1px solid var(--gold)", borderRadius: 16, padding: 20, margin: "8px 0 16px", boxShadow: "0 8px 32px rgba(0,0,0,0.5)" }}>
+                          <p style={{ ...S.label, color: "var(--gold)" }}>Editando Aula: {lesson.title}</p>
+                          <div style={{ display: "grid", gap: 12 }}>
+                            <div style={S.field}>
+                              <label style={S.label}>Título</label>
+                              <input style={S.input} value={editLesson.title} onChange={e => setEditLesson(l => ({ ...l, title: e.target.value }))} />
+                            </div>
+                            <div style={S.field}>
+                              <label style={S.label}>URL YouTube</label>
+                              <input style={S.input} value={editLesson.youtubeUrl} onChange={e => setEditLesson(l => ({ ...l, youtubeUrl: e.target.value }))} />
+                            </div>
+                            <div style={S.field}>
+                              <label style={S.label}>Conteúdo (HTML)</label>
+                              <textarea style={S.textarea} value={editLesson.content || ""} onChange={e => setEditLesson(l => ({ ...l, content: e.target.value }))} rows={4} placeholder="HTML da apostila" />
+                            </div>
+                            
+                            {/* Anexos */}
+                            <div style={{ padding: "12px", background: "rgba(255,255,255,0.03)", borderRadius: 12, border: "1px solid rgba(201,169,122,0.15)" }}>
+                              <p style={{ ...S.label, fontSize: 9, marginBottom: 12 }}>Materiais de Apoio (Anexos)</p>
+                              {editLesson.attachments.map((at, i) => (
+                                <div key={i} style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+                                  <input style={{ ...S.input, flex: 1 }} value={at.title} onChange={e => setEditLesson(l => ({ ...l, attachments: l.attachments.map((a, j) => i === j ? { ...a, title: e.target.value } : a) }))} placeholder="Título do arquivo" />
+                                  <input style={{ ...S.input, flex: 2 }} value={at.url} onChange={e => setEditLesson(l => ({ ...l, attachments: l.attachments.map((a, j) => i === j ? { ...a, url: e.target.value } : a) }))} placeholder="URL do arquivo" />
+                                  <button onClick={() => setEditLesson(l => ({ ...l, attachments: l.attachments.filter((_, j) => i !== j) }))} style={S.btnRed}><Trash2 size={13} /></button>
+                                </div>
+                              ))}
+                              <button onClick={() => setEditLesson(l => ({ ...l, attachments: [...l.attachments, { title: "", url: "" }] }))} style={{ ...S.btnGold, width: "100%", marginTop: 4 }}>+ Adicionar Anexo</button>
+                            </div>
+
+                            <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+                              <button style={S.btnPrimary} onClick={() => saveEditLesson(mod.id, editingLesson)}>Salvar Alterações</button>
+                              <button style={S.btnGhost} onClick={() => setEditingLesson(null)}>Cancelar</button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
-
-                {editingLesson && (
-                  <div style={{ background: "rgba(6,13,31,0.8)", border: "1px solid var(--gold)", borderRadius: 16, padding: 20, marginBottom: 12 }}>
-                    <p style={S.label}>Editando Aula</p>
-                    <div style={{ display: "grid", gap: 12 }}>
-                      <input style={S.input} value={editLesson.title} onChange={e => setEditLesson(l => ({ ...l, title: e.target.value }))} />
-                      <input style={S.input} value={editLesson.youtubeUrl} onChange={e => setEditLesson(l => ({ ...l, youtubeUrl: e.target.value }))} />
-                      <textarea style={S.textarea} value={editLesson.content || ""} onChange={e => setEditLesson(l => ({ ...l, content: e.target.value }))} rows={4} placeholder="HTML da apostila" />
-                      
-                      {/* Anexos */}
-                      <div>
-                        <p style={{ ...S.label, fontSize: 8 }}>Anexos (PDFs, Apostilas)</p>
-                        {editLesson.attachments.map((at, i) => (
-                          <div key={i} style={{ display: "flex", gap: 8, marginBottom: 8 }}>
-                            <input style={S.input} value={at.title} onChange={e => setEditLesson(l => ({ ...l, attachments: l.attachments.map((a, j) => i === j ? { ...a, title: e.target.value } : a) }))} placeholder="Título do arquivo" />
-                            <input style={S.input} value={at.url} onChange={e => setEditLesson(l => ({ ...l, attachments: l.attachments.map((a, j) => i === j ? { ...a, url: e.target.value } : a) }))} placeholder="URL do arquivo" />
-                            <button onClick={() => setEditLesson(l => ({ ...l, attachments: l.attachments.filter((_, j) => i !== j) }))} style={S.btnRed}><Trash2 size={13} /></button>
-                          </div>
-                        ))}
-                        <button onClick={() => setEditLesson(l => ({ ...l, attachments: [...l.attachments, { title: "", url: "" }] }))} style={S.btnGold}>+ Adicionar Anexo</button>
-                      </div>
-
-                      <div style={{ display: "flex", gap: 8 }}>
-                        <button style={S.btnPrimary} onClick={() => saveEditLesson(mod.id, editingLesson)}>Salvar</button>
-                        <button style={S.btnGhost} onClick={() => setEditingLesson(null)}>Cancelar</button>
-                      </div>
-                    </div>
-                  </div>
-                )}
 
                 {!addingLesson && !editingLesson && (
                   <button onClick={() => setAddingLesson(mod.id)} style={{ ...S.btnGhost, width: "100%" }}>+ Nova Aula</button>
