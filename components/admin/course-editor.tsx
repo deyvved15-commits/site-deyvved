@@ -275,6 +275,9 @@ export default function CourseEditor({ course: initial, teachers, isAdmin = true
           <div key={mod.id} style={S.card}>
             <div onClick={() => toggleModule(mod.id)} style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 20px", cursor: "pointer", background: openModules[mod.id] ? "rgba(201,169,122,0.04)" : "transparent" }}>
               {openModules[mod.id] ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+              <div style={{ width: 32, height: 40, borderRadius: 6, background: "rgba(255,255,255,0.05)", overflow: "hidden", border: "1px solid rgba(201,169,122,0.15)", flexShrink: 0 }}>
+                {mod.thumbnail && <img src={getGoogleDriveImageUrl(mod.thumbnail)} style={{ width: "100%", height: "100%", objectFit: "cover" }} />}
+              </div>
               <span style={{ flex: 1, fontFamily: "'Cinzel',serif", fontWeight: 600, fontSize: 14 }}>{mod.title}</span>
               <button onClick={e => { e.stopPropagation(); deleteModule(mod.id); }} style={S.btnRed}><Trash2 size={13} /></button>
             </div>
