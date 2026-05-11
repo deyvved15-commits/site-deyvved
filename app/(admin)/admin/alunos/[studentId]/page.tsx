@@ -52,13 +52,13 @@ export default async function StudentProfilePage({ params }: { params: Promise<{
       </Link>
 
       {/* Profile hero */}
-      <div style={{ margin: "16px 44px 0" }}>
+      <div style={{ margin: "16px 20px 0" }}>
         <div style={{
-          borderRadius: 20, padding: "28px 32px",
+          borderRadius: 20, padding: "24px",
           background: "linear-gradient(135deg, var(--navy-card) 0%, var(--navy-card-2) 100%)",
           border: "1px solid rgba(201,169,122,0.14)",
           boxShadow: "0 16px 48px rgba(0,0,0,0.40)",
-          display: "flex", alignItems: "center", gap: 20,
+          display: "flex", flexWrap: "wrap", alignItems: "center", gap: 20,
         }}>
           <div style={{
             width: 64, height: 64, borderRadius: "50%", flexShrink: 0,
@@ -71,14 +71,14 @@ export default async function StudentProfilePage({ params }: { params: Promise<{
           }}>
             {initials}
           </div>
-          <div style={{ flex: 1 }}>
+          <div style={{ flex: 1, minWidth: "200px" }}>
             <div className="ka-page-eyebrow" style={{ marginBottom: 4 }}>Perfil do Aluno</div>
             <h1 style={{ fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 22, letterSpacing: 2, color: "var(--text-primary)", marginBottom: 4 }}>
               {student.name}
             </h1>
             <p style={{ fontSize: 13, color: "var(--text-muted)" }}>{student.email}</p>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0, width: "100%" }} className="md:w-auto">
             {notEnrolled.length > 0 && (
               <EnrollButton studentId={studentId} courses={notEnrolled} />
             )}
@@ -87,10 +87,10 @@ export default async function StudentProfilePage({ params }: { params: Promise<{
         </div>
       </div>
 
-      <div className="ka-section" style={{ padding: "24px 44px 44px" }}>
+      <div className="ka-section">
 
         {/* Info cards */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14, marginBottom: 28 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 14, marginBottom: 28 }}>
           {[
             { label: "Telefone", value: student.phone ?? "—" },
             { label: "Igreja / Org.", value: student.church ?? "—" },

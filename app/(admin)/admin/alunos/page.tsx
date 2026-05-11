@@ -12,28 +12,30 @@ export default async function AlunosPage() {
     <div style={{ minHeight: "100%", background: "linear-gradient(180deg, var(--navy-darkest) 0%, var(--navy-mid) 100%)" }}>
 
       {/* Header */}
-      <div className="ka-page-header" style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
+      <div className="ka-page-header" style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", flexWrap: "wrap", gap: 16 }}>
         <div>
           <div className="ka-page-eyebrow">Gestão</div>
           <h1 className="ka-page-title">Meus <span>Alunos</span></h1>
           <p className="ka-page-subtitle">{students.length} aluno{students.length !== 1 ? "s" : ""} cadastrado{students.length !== 1 ? "s" : ""}</p>
         </div>
-        <Link href="/admin/alunos/novo" style={{
-          display: "inline-flex", alignItems: "center", gap: 8,
-          padding: "10px 20px", borderRadius: 12,
-          background: "linear-gradient(135deg, var(--gold), var(--gold-deep))",
-          color: "var(--navy-darkest)", fontFamily: "'Cinzel',serif",
-          fontWeight: 700, fontSize: 11, letterSpacing: 2, textTransform: "uppercase",
-          textDecoration: "none", boxShadow: "0 4px 16px rgba(201,169,122,0.35)",
-        }}>
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-          </svg>
-          Cadastrar Aluno
-        </Link>
+        <div style={{ width: "100%" }} className="md:w-auto">
+          <Link href="/admin/alunos/novo" style={{
+            display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8,
+            padding: "12px 24px", borderRadius: 12, width: "100%",
+            background: "linear-gradient(135deg, var(--gold), var(--gold-deep))",
+            color: "var(--navy-darkest)", fontFamily: "'Cinzel',serif",
+            fontWeight: 700, fontSize: 11, letterSpacing: 2, textTransform: "uppercase",
+            textDecoration: "none", boxShadow: "0 4px 16px rgba(201,169,122,0.35)",
+          }}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            Cadastrar Aluno
+          </Link>
+        </div>
       </div>
 
-      <div className="ka-section" style={{ padding: "32px 44px 44px" }}>
+      <div className="ka-section">
         {students.length === 0 ? (
           <div style={{
             borderRadius: 20, padding: "56px 32px", textAlign: "center", maxWidth: 380,
@@ -74,52 +76,53 @@ export default async function AlunosPage() {
                 const initials = s.name?.split(" ").map(n => n[0]).slice(0, 2).join("").toUpperCase() ?? "?";
                 return (
                   <div key={s.id} style={{
-                    display: "flex", flexWrap: "wrap", alignItems: "center", padding: "20px 24px",
+                    display: "flex", flexWrap: "wrap", alignItems: "center", padding: "24px",
                     borderTop: i > 0 ? "1px solid rgba(201,169,122,0.06)" : "none",
-                    gap: 16, transition: "background 0.2s",
+                    gap: 20, transition: "background 0.2s",
                   }}
                   className="admin-row-hover">
                     
                     {/* Aluno info */}
-                    <div style={{ display: "flex", alignItems: "center", gap: 12, flex: 1, minWidth: "200px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 16, flex: 1, minWidth: "260px" }}>
                       <div style={{
-                        width: 44, height: 44, borderRadius: "50%", flexShrink: 0,
+                        width: 48, height: 48, borderRadius: "50%", flexShrink: 0,
                         background: "radial-gradient(circle at 30% 30%, var(--gold-bright), var(--gold) 50%, var(--gold-deep))",
                         display: "flex", alignItems: "center", justifyContent: "center",
-                        fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 14,
+                        fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 16,
                         color: "var(--navy-darkest)",
-                        boxShadow: "0 0 10px rgba(201,169,122,0.25)",
+                        boxShadow: "0 0 12px rgba(201,169,122,0.30)",
+                        border: "1.5px solid var(--gold-light)"
                       }}>
                         {initials}
                       </div>
                       <div style={{ minWidth: 0 }}>
-                        <span style={{ display: "block", fontSize: 15, fontWeight: 700, color: "var(--text-primary)", marginBottom: 2 }}>
+                        <span style={{ display: "block", fontSize: 16, fontWeight: 700, color: "var(--text-primary)", marginBottom: 2 }}>
                           {s.name}
                         </span>
-                        <span style={{ display: "block", fontSize: 11, color: "var(--text-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        <span style={{ display: "block", fontSize: 12, color: "var(--text-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                           {s.email}
                         </span>
                       </div>
                     </div>
 
                     {/* Meta info container */}
-                    <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 12, flex: 1.5, minWidth: "260px", justifyContent: "space-between" }}>
+                    <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-start", gap: 24, flex: 2, minWidth: "280px" }}>
                       
-                      <div style={{ minWidth: 80 }}>
-                        <p style={{ fontSize: 9, fontFamily: "'Cinzel',serif", color: "var(--gold)", letterSpacing: 1, marginBottom: 4 }}>Igreja</p>
-                        <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>{s.church ?? "—"}</span>
+                      <div style={{ minWidth: 100 }}>
+                        <p style={{ fontSize: 9, fontFamily: "'Cinzel',serif", color: "var(--gold)", letterSpacing: 2, textTransform: "uppercase", marginBottom: 6, fontWeight: 700 }}>Igreja</p>
+                        <span style={{ fontSize: 12, color: "var(--text-secondary)", fontWeight: 500 }}>{s.church ?? "—"}</span>
                       </div>
 
-                      <div style={{ flex: 1, minWidth: 120 }}>
-                        <p style={{ fontSize: 9, fontFamily: "'Cinzel',serif", color: "var(--gold)", letterSpacing: 1, marginBottom: 4 }}>Cursos</p>
-                        <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                      <div style={{ flex: 1, minWidth: 140 }}>
+                        <p style={{ fontSize: 9, fontFamily: "'Cinzel',serif", color: "var(--gold)", letterSpacing: 2, textTransform: "uppercase", marginBottom: 6, fontWeight: 700 }}>Cursos</p>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                           {s.enrollments.length === 0
-                            ? <span style={{ fontSize: 11, color: "var(--text-muted)" }}>Nenhum</span>
+                            ? <span style={{ fontSize: 12, color: "var(--text-muted)" }}>Nenhum</span>
                             : s.enrollments.map(e => (
                                 <span key={e.course.title} style={{
-                                  fontSize: 9, fontWeight: 700,
-                                  background: "rgba(201,169,122,0.08)", border: "1px solid var(--gold-20)",
-                                  color: "var(--gold)", padding: "2px 8px", borderRadius: 999,
+                                  fontSize: 10, fontWeight: 700,
+                                  background: "rgba(201,169,122,0.1)", border: "1px solid var(--gold-20)",
+                                  color: "var(--gold-light)", padding: "3px 10px", borderRadius: 8,
                                 }}>
                                   {e.course.title}
                                 </span>
@@ -127,19 +130,19 @@ export default async function AlunosPage() {
                         </div>
                       </div>
 
-                      <div style={{ minWidth: 80, textAlign: "right" }}>
-                        <p style={{ fontSize: 9, fontFamily: "'Cinzel',serif", color: "var(--gold)", letterSpacing: 1, marginBottom: 4 }}>Cadastro</p>
-                        <span style={{ fontSize: 11, color: "var(--text-muted)" }}>
+                      <div style={{ minWidth: 100 }} className="md:text-right">
+                        <p style={{ fontSize: 9, fontFamily: "'Cinzel',serif", color: "var(--gold)", letterSpacing: 2, textTransform: "uppercase", marginBottom: 6, fontWeight: 700 }}>Cadastro</p>
+                        <span style={{ fontSize: 12, color: "var(--text-muted)" }}>
                           {new Date(s.createdAt).toLocaleDateString("pt-BR")}
                         </span>
                       </div>
                     </div>
 
                     {/* Action */}
-                    <div style={{ width: "100%", display: "block" }} className="md:w-auto">
+                    <div style={{ width: "100%" }} className="lg:w-auto lg:ml-auto">
                       <Link href={`/admin/alunos/${s.id}`} style={{
-                        width: "100%", padding: "10px 14px", borderRadius: 10,
-                        background: "rgba(201,169,122,0.1)", border: "1px solid var(--gold-35)",
+                        width: "100%", padding: "12px 24px", borderRadius: 12,
+                        background: "rgba(201,169,122,0.05)", border: "1px solid var(--gold-35)",
                         color: "var(--gold-light)", fontSize: 11, fontWeight: 700,
                         letterSpacing: 2, textDecoration: "none", textTransform: "uppercase",
                         display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s"
