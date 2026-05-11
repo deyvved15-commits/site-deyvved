@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { Plus, MessageSquare, Clock, CheckCircle2, AlertCircle } from "lucide-react";
+import { Plus, MessageSquare, Clock, CheckCircle2, AlertCircle, ChevronRight } from "lucide-react";
 
 export default async function SupportPage() {
   const session = await auth();
