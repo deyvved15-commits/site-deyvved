@@ -281,6 +281,20 @@ export default function CourseEditor({ course: initial, teachers, isAdmin = true
 
             {openModules[mod.id] && (
               <div style={{ borderTop: "1px solid rgba(201,169,122,0.08)", padding: 20 }}>
+                {/* Capa do Módulo */}
+                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16, paddingBottom: 16, borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                  <span style={{ fontSize: 10, color: "rgba(201,169,122,0.5)", fontFamily: "'Cinzel',serif", letterSpacing: 2, textTransform: "uppercase", flexShrink: 0 }}>Capa</span>
+                  <input defaultValue={mod.thumbnail ?? ""} placeholder="URL da capa do módulo (800×1000px)"
+                    onBlur={async e => {
+                      const val = e.target.value.trim();
+                      if (val === (mod.thumbnail ?? "")) return;
+                      await fetch(`/api/courses/${course.id}/modules/${mod.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ thumbnail: val || null }) });
+                      setCourse(c => ({ ...c, modules: c.modules.map(m => m.id === mod.id ? { ...m, thumbnail: val || null } : m) }));
+                    }}
+                    style={{ flex: 1, background: "transparent", border: "none", borderBottom: "1px solid rgba(201,169,122,0.15)", padding: "4px 0", fontSize: 12, color: "rgba(255,255,255,0.6)", outline: "none", fontFamily: "'Poppins',sans-serif" }}
+                  />
+                </div>
+
                 <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 12 }}>
                   {mod.lessons.map((lesson, li) => (
                     <div key={lesson.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 12px", borderRadius: 12, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.04)" }}>
