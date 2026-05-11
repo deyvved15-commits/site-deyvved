@@ -5,6 +5,7 @@ import { getYoutubeId } from "@/lib/utils";
 import Link from "next/link";
 import ProgressButton from "@/components/student/progress-button";
 import LessonComments from "@/components/student/lesson-comments";
+import LessonRating from "@/components/student/lesson-rating";
 import HtmlContent from "@/components/student/html-content";
 
 export default async function AulaPage({ params }: { params: Promise<{ slug: string; lessonId: string }> }) {
@@ -20,7 +21,10 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
         include: {
           lessons: {
             orderBy: { order: "asc" },
-            include: { progress: { where: { userId: session.user.id } } },
+            include: { 
+              progress: { where: { userId: session.user.id } },
+              ratings: { where: { userId: session.user.id } }
+            },
           },
         },
       },
@@ -43,6 +47,7 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
   const enrolledAt = enrollment.createdAt;
   const daysSinceEnrollment = Math.floor((Date.now() - enrolledAt.getTime()) / 86400000);
   const lesson = allLessons[currentIndex];
+  const initialRating = (lesson as any).ratings[0]?.rating;
 
   if (lesson.releaseAfterDays > daysSinceEnrollment) redirect(`/cursos/${slug}?bloqueada=1`);
 
@@ -139,8 +144,10 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
           </div>
 
           {lesson.description && (
-            <HtmlContent html={lesson.description} className="prose-lesson" style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.8, marginBottom: 20 }} />
+            <HtmlContent html={lesson.description} className="prose-lesson" style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.8, marginBottom: 10 }} />
           )}
+
+          <LessonRating lessonId={lesson.id} initialRating={initialRating} />
         </div>
 
         {/* Course material */}

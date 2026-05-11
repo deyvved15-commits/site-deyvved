@@ -8,7 +8,7 @@ export default async function DashboardPage() {
   const session = await auth();
   if (!session) return null;
 
-  const [enrollments, otherCourses] = await Promise.all([
+  const [enrollments, otherCourses, achievements] = await Promise.all([
     prisma.enrollment.findMany({
       where: { userId: session.user.id },
       include: {
@@ -40,12 +40,41 @@ export default async function DashboardPage() {
       },
       orderBy: { order: "asc" },
     }),
+    prisma.userAchievement.findMany({
+      where: { userId: session.user.id },
+      include: { achievement: true },
+      orderBy: { awardedAt: "desc" }
+    })
   ]);
 
   return (
     <div style={{ minHeight: "100vh", background: "linear-gradient(180deg, var(--navy-darkest) 0%, var(--navy-mid) 100%)" }}>
       
       <HeroSection userName={session.user.name ?? "Aluno"} />
+
+      {/* ── Conquistas ── */}
+      {achievements.length > 0 && (
+        <section className="ka-section" style={{ padding: "0 44px 20px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+            <span style={{ fontSize: 10, fontFamily: "'Cinzel',serif", letterSpacing: 4, textTransform: "uppercase", color: "var(--gold)" }}>Suas Conquistas</span>
+          </div>
+          <div style={{ display: "flex", gap: 16, overflowX: "auto", paddingBottom: 10 }}>
+            {achievements.map(ua => (
+              <div key={ua.id} style={{ 
+                flexShrink: 0, padding: "12px 16px", background: "rgba(201,169,122,0.05)", 
+                border: "1px solid rgba(201,169,122,0.15)", borderRadius: 16, display: "flex", 
+                alignItems: "center", gap: 10 
+              }}>
+                <span style={{ fontSize: 20 }}>{ua.achievement.icon}</span>
+                <div>
+                  <p style={{ fontSize: 11, fontWeight: 700, margin: 0, color: "#fff" }}>{ua.achievement.title}</p>
+                  <p style={{ fontSize: 9, color: "var(--text-muted)", margin: 0 }}>{ua.achievement.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* ── Meus Cursos ── */}
       <section className="ka-section" style={{ position: "relative", zIndex: 1, padding: "38px 44px 44px" }}>
