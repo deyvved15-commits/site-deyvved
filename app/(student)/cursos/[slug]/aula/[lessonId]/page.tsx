@@ -124,6 +124,55 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
           </div>
         </div>
 
+        {/* Navigation - Moved below video */}
+        <div style={{
+          margin: "16px 28px 0",
+          padding: "14px 20px",
+          borderRadius: 14,
+          background: "rgba(201,169,122,0.05)",
+          border: "1px solid rgba(201,169,122,0.15)",
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+        }}>
+          {prev ? (
+            <Link href={`/cursos/${slug}/aula/${prev.id}`} style={{
+              display: "flex", alignItems: "center", gap: 8,
+              fontSize: 12, color: "var(--text-muted)", textDecoration: "none",
+              fontWeight: 500, transition: "color 0.2s",
+            }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M19 12H5M12 5l-7 7 7 7"/>
+              </svg>
+              Anterior
+            </Link>
+          ) : <div />}
+          <div style={{ fontSize: 11, color: "var(--text-muted)", textAlign: "center", letterSpacing: 1 }}>
+            {currentIndex + 1} / {total}
+          </div>
+          {next ? (
+            <Link href={`/cursos/${slug}/aula/${next.id}`} style={{
+              display: "flex", alignItems: "center", gap: 8,
+              fontSize: 12, color: "var(--gold)", textDecoration: "none",
+              fontWeight: 600, letterSpacing: 0.5, transition: "color 0.2s",
+            }}>
+              Próxima
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </Link>
+          ) : (
+            <Link href={`/cursos/${slug}`} style={{
+              display: "flex", alignItems: "center", gap: 8,
+              fontSize: 12, color: "#6ee7b7", textDecoration: "none",
+              fontWeight: 600, transition: "color 0.2s",
+            }}>
+              ✓ Concluído
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </Link>
+          )}
+        </div>
+
         {/* Lesson info */}
         <div style={{ padding: "20px 28px 0" }}>
           <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16, marginBottom: 10 }}>
@@ -208,62 +257,13 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
             </div>
           </div>
         )}
-
+        
         {/* Comments */}
         <LessonComments
           lessonId={lesson.id}
           userId={session.user.id}
           isAdmin={session.user.role === "ADMIN"}
         />
-
-        {/* Navigation */}
-        <div style={{
-          margin: "20px 28px 28px",
-          padding: "18px 20px",
-          borderRadius: 14,
-          background: "rgba(255,255,255,0.02)",
-          border: "1px solid rgba(201,169,122,0.08)",
-          display: "flex", alignItems: "center", justifyContent: "space-between",
-        }}>
-          {prev ? (
-            <Link href={`/cursos/${slug}/aula/${prev.id}`} style={{
-              display: "flex", alignItems: "center", gap: 8,
-              fontSize: 12, color: "var(--text-muted)", textDecoration: "none",
-              fontWeight: 500, transition: "color 0.2s",
-            }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M19 12H5M12 5l-7 7 7 7"/>
-              </svg>
-              Anterior
-            </Link>
-          ) : <div />}
-          <div style={{ fontSize: 11, color: "var(--text-muted)", textAlign: "center" }}>
-            {currentIndex + 1} / {total}
-          </div>
-          {next ? (
-            <Link href={`/cursos/${slug}/aula/${next.id}`} style={{
-              display: "flex", alignItems: "center", gap: 8,
-              fontSize: 12, color: "var(--gold)", textDecoration: "none",
-              fontWeight: 600, letterSpacing: 0.5, transition: "color 0.2s",
-            }}>
-              Próxima
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M5 12h14M12 5l7 7-7 7"/>
-              </svg>
-            </Link>
-          ) : (
-            <Link href={`/cursos/${slug}`} style={{
-              display: "flex", alignItems: "center", gap: 8,
-              fontSize: 12, color: "#6ee7b7", textDecoration: "none",
-              fontWeight: 600, transition: "color 0.2s",
-            }}>
-              ✓ Concluído
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M5 12h14M12 5l7 7-7 7"/>
-              </svg>
-            </Link>
-          )}
-        </div>
       </div>
 
       {/* ── Lesson list sidebar ── */}
