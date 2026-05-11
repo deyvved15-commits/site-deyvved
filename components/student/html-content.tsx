@@ -13,13 +13,13 @@ export default function HtmlContent({
 }) {
   const ref = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (!ref.current) return;
+  const isFullHtml = html.trim().toLowerCase().startsWith("<!doctype") || html.trim().toLowerCase().startsWith("<html");
 
-    // Reset DOM — força o browser a reprocessar o HTML do zero
+  useEffect(() => {
+    if (!ref.current || isFullHtml) return;
+
     ref.current.innerHTML = html;
 
-    // Re-executa <script> tags (navegação client-side não executa automaticamente)
     ref.current.querySelectorAll("script").forEach(oldScript => {
       const newScript = document.createElement("script");
       Array.from(oldScript.attributes).forEach(attr =>
@@ -28,7 +28,20 @@ export default function HtmlContent({
       newScript.textContent = oldScript.textContent;
       oldScript.parentNode?.replaceChild(newScript, oldScript);
     });
-  }, [html]);
+  }, [html, isFullHtml]);
+
+  if (isFullHtml) {
+    return (
+      <div className={className} style={{ ...style, width: "100%", borderRadius: 12, overflow: "hidden", border: "1px solid rgba(255,255,255,0.05)" }}>
+        <iframe
+          srcDoc={html}
+          title="Custom Content"
+          style={{ width: "100%", border: "none", minHeight: "500px" }}
+          sandbox="allow-scripts allow-popups allow-forms allow-modals"
+        />
+      </div>
+    );
+  }
 
   return <div ref={ref} className={className} style={style} />;
 }
