@@ -9,7 +9,7 @@ export default async function ProfessorDashboard() {
   const userId = session?.user.id;
   const userName = session?.user.name?.toUpperCase() || "";
 
-  const [courses, payments] = await Promise.all([
+  const [courses, payments, topLessons] = await Promise.all([
     prisma.course.findMany({
       where: { teacherId: userId },
       include: {
@@ -24,6 +24,15 @@ export default async function ProfessorDashboard() {
         status: "approved"
       },
       select: { commissionAmount: true }
+    }),
+    prisma.lesson.findMany({
+      where: { module: { course: { teacherId: userId } } },
+      include: {
+        _count: { select: { progress: { where: { completed: true } } } },
+        module: { select: { course: { select: { title: true } } } }
+      },
+      orderBy: { progress: { _count: "desc" } },
+      take: 5
     })
   ]);
 
@@ -32,17 +41,18 @@ export default async function ProfessorDashboard() {
 
   const stats = [
     {
-      label: "Cursos", value: courses.length, icon: <BookOpen size={18} />, color: "var(--gold)"
+      label: "Cursos", value: courses.length, icon: <BookOpen size={18} />, color: "var(--gold)", href: "/professor/cursos"
     },
     {
-      label: "Total Alunos", value: totalStudents, icon: <Users size={18} />, color: "#6ee7b7"
+      label: "Total Alunos", value: totalStudents, icon: <Users size={18} />, color: "#6ee7b7", href: "#"
     },
     {
       label: "Minhas Comissões", 
       value: `R$ ${totalCommission.toFixed(2).replace(".", ",")}`, 
       icon: <DollarSign size={18} />, 
       color: "#63B3ED",
-      isCurrency: true
+      isCurrency: true,
+      href: "/professor/financeiro"
     },
   ];
 
@@ -61,101 +71,149 @@ export default async function ProfessorDashboard() {
         {/* Stats Grid */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 32 }}>
           {stats.map((stat) => (
-            <div key={stat.label} style={{
-              borderRadius: 18, padding: "24px 24px 20px",
-              background: "linear-gradient(160deg, var(--navy-card) 0%, var(--navy-card-2) 100%)",
-              border: "1px solid rgba(201,169,122,0.12)",
-              boxShadow: "0 8px 32px rgba(0,0,0,0.35)",
-              transition: "all 0.3s cubic-bezier(0.4,0,0.2,1)",
-            }} className="admin-stat-card">
+            <Link key={stat.label} href={stat.href} style={{ textDecoration: "none" }}>
               <div style={{
-                width: 40, height: 40, borderRadius: 12, marginBottom: 18,
-                background: "linear-gradient(135deg, rgba(201,169,122,0.18), rgba(201,169,122,0.06))",
-                border: "1px solid var(--gold-20)",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                color: stat.color,
-                boxShadow: "0 0 14px rgba(201,169,122,0.12)",
-              }}>
-                {stat.icon}
+                borderRadius: 18, padding: "24px 24px 20px",
+                background: "linear-gradient(160deg, var(--navy-card) 0%, var(--navy-card-2) 100%)",
+                border: "1px solid rgba(201,169,122,0.12)",
+                boxShadow: "0 8px 32px rgba(0,0,0,0.35)",
+                transition: "all 0.3s cubic-bezier(0.4,0,0.2,1)",
+                cursor: "pointer",
+                height: "100%"
+              }} className="admin-stat-card">
+                <div style={{
+                  width: 40, height: 40, borderRadius: 12, marginBottom: 18,
+                  background: "linear-gradient(135deg, rgba(201,169,122,0.18), rgba(201,169,122,0.06))",
+                  border: "1px solid var(--gold-20)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  color: stat.color,
+                  boxShadow: "0 0 14px rgba(201,169,122,0.12)",
+                }}>
+                  {stat.icon}
+                </div>
+                <p style={{
+                  fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: stat.isCurrency ? 28 : 38,
+                  color: "white", lineHeight: 1, marginBottom: 6,
+                  letterSpacing: 1,
+                }}>
+                  {stat.value}
+                </p>
+                <p style={{
+                  fontFamily: "'Cinzel',serif", fontSize: 9, fontWeight: 600,
+                  letterSpacing: 4, textTransform: "uppercase", color: "var(--gold)",
+                }}>
+                  {stat.label}
+                </p>
               </div>
-              <p style={{
-                fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: stat.isCurrency ? 28 : 38,
-                color: "var(--text-primary)", lineHeight: 1, marginBottom: 6,
-                letterSpacing: 1,
-              }}>
-                {stat.value}
-              </p>
-              <p style={{
-                fontFamily: "'Cinzel',serif", fontSize: 9, fontWeight: 600,
-                letterSpacing: 4, textTransform: "uppercase", color: "var(--gold)",
-              }}>
-                {stat.label}
-              </p>
-            </div>
+            </Link>
           ))}
         </div>
 
-        {/* Section Title */}
-        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
-          <div style={{ width: 3, height: 16, background: "linear-gradient(180deg, var(--gold-light), var(--gold))", borderRadius: 2, boxShadow: "0 0 8px var(--gold)" }} />
-          <span style={{ fontFamily: "'Cinzel',serif", fontSize: 11, fontWeight: 600, letterSpacing: 3, textTransform: "uppercase", color: "var(--text-primary)" }}>
-            Meus Cursos
-          </span>
-        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: 24 }}>
+          {/* Column 1: Courses */}
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
+              <div style={{ width: 3, height: 16, background: "var(--gold)", borderRadius: 2 }} />
+              <span style={{ fontFamily: "'Cinzel',serif", fontSize: 11, fontWeight: 600, letterSpacing: 3, textTransform: "uppercase", color: "var(--text-primary)" }}>
+                Meus Cursos
+              </span>
+            </div>
 
-        {/* Courses List */}
-        <div style={{ 
-          borderRadius: 20, overflow: "hidden", 
-          background: "linear-gradient(160deg, var(--navy-card) 0%, var(--navy-card-2) 100%)",
-          border: "1px solid rgba(201,169,122,0.12)",
-          boxShadow: "0 8px 32px rgba(0,0,0,0.35)",
-        }}>
-          {courses.length === 0 ? (
-            <div style={{ padding: "48px 24px", textAlign: "center" }}>
-              <p style={{ fontSize: 13, color: "var(--text-muted)" }}>Você ainda não possui cursos associados.</p>
+            <div style={{ 
+              borderRadius: 20, overflow: "hidden", 
+              background: "linear-gradient(160deg, var(--navy-card) 0%, var(--navy-card-2) 100%)",
+              border: "1px solid rgba(201,169,122,0.12)",
+              boxShadow: "0 8px 32px rgba(0,0,0,0.35)",
+            }}>
+              {courses.length === 0 ? (
+                <div style={{ padding: "48px 24px", textAlign: "center" }}>
+                  <p style={{ fontSize: 13, color: "var(--text-muted)" }}>Você ainda não possui cursos associados.</p>
+                </div>
+              ) : (
+                <div>
+                  {courses.map((course, i) => (
+                    <Link key={course.id} href={`/professor/cursos/${course.id}`} style={{ textDecoration: "none" }}>
+                      <div style={{
+                        padding: "16px 24px",
+                        borderTop: i > 0 ? "1px solid rgba(201,169,122,0.06)" : "none",
+                        display: "flex", alignItems: "center", gap: 16,
+                        transition: "background 0.2s",
+                        cursor: "pointer",
+                      }} className="admin-row-hover">
+                        <div style={{ 
+                          width: 50, height: 50, borderRadius: 12, overflow: "hidden", flexShrink: 0,
+                          background: "rgba(201,169,122,0.05)", border: "1px solid rgba(201,169,122,0.15)",
+                          display: "flex", alignItems: "center", justifyContent: "center"
+                        }}>
+                          {course.thumbnail ? (
+                            <img src={getGoogleDriveImageUrl(course.thumbnail)} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                          ) : (
+                            <BookOpen size={20} color="var(--gold-light)" />
+                          )}
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <p style={{ fontSize: 14, fontWeight: 600, color: "var(--text-primary)", marginBottom: 2 }}>{course.title}</p>
+                          <p style={{ fontSize: 11, color: "var(--text-muted)" }}>{course._count.enrollments} alunos matriculados</p>
+                        </div>
+                        <div style={{ textAlign: "right" }}>
+                          <span style={{
+                            fontSize: 9, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase",
+                            color: "var(--gold)", fontFamily: "'Cinzel',serif",
+                            padding: "4px 10px", borderRadius: 8, background: "rgba(201,169,122,0.10)",
+                            border: "1px solid rgba(201,169,122,0.20)"
+                          }}>
+                            Editar
+                          </span>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
             </div>
-          ) : (
-            <div>
-              {courses.map((course, i) => (
-                <Link key={course.id} href={`/professor/cursos/${course.id}`} style={{ textDecoration: "none" }}>
-                  <div style={{
-                    padding: "16px 24px",
-                    borderTop: i > 0 ? "1px solid rgba(201,169,122,0.06)" : "none",
-                    display: "flex", alignItems: "center", gap: 16,
-                    transition: "background 0.2s",
-                    cursor: "pointer",
-                  }} className="admin-row-hover">
-                    <div style={{ 
-                      width: 60, height: 60, borderRadius: 14, overflow: "hidden", flexShrink: 0,
-                      background: "rgba(201,169,122,0.05)", border: "1px solid rgba(201,169,122,0.15)",
-                      display: "flex", alignItems: "center", justifyContent: "center"
-                    }}>
-                      {course.thumbnail ? (
-                        <img src={getGoogleDriveImageUrl(course.thumbnail)} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                      ) : (
-                        <BookOpen size={24} color="var(--gold-light)" />
-                      )}
-                    </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ fontSize: 15, fontWeight: 600, color: "var(--text-primary)", marginBottom: 2 }}>{course.title}</p>
-                      <p style={{ fontSize: 12, color: "var(--text-muted)" }}>{course._count.enrollments} alunos matriculados</p>
-                    </div>
-                    <div style={{ textAlign: "right" }}>
-                      <span style={{
-                        fontSize: 10, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase",
-                        color: "var(--gold)", fontFamily: "'Cinzel',serif",
-                        padding: "4px 12px", borderRadius: 8, background: "rgba(201,169,122,0.10)",
-                        border: "1px solid rgba(201,169,122,0.20)"
-                      }}>
-                        Editar Conteúdo
-                      </span>
-                    </div>
-                  </div>
-                </Link>
-              ))}
+          </div>
+
+          {/* Column 2: Metrics */}
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
+              <div style={{ width: 3, height: 16, background: "#6ee7b7", borderRadius: 2 }} />
+              <span style={{ fontFamily: "'Cinzel',serif", fontSize: 11, fontWeight: 600, letterSpacing: 3, textTransform: "uppercase", color: "var(--text-primary)" }}>
+                Engajamento (Top Aulas)
+              </span>
             </div>
-          )}
+
+            <div style={{ 
+              borderRadius: 20, padding: "16px 20px",
+              background: "linear-gradient(160deg, var(--navy-card) 0%, var(--navy-card-2) 100%)",
+              border: "1px solid rgba(201,169,122,0.12)",
+              boxShadow: "0 8px 32px rgba(0,0,0,0.35)",
+            }}>
+              {topLessons.length === 0 ? (
+                <p style={{ fontSize: 12, color: "var(--text-muted)", padding: "20px 0", textAlign: "center" }}>Nenhuma aula assistida ainda.</p>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                  {topLessons.map((l, i) => (
+                    <div key={l.id} style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                      <div style={{ fontSize: 12, fontWeight: 800, color: "rgba(255,255,255,0.15)", fontFamily: "'Cinzel',serif", width: 14 }}>{i + 1}</div>
+                      <div style={{ flex: 1 }}>
+                        <p style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)", marginBottom: 1 }}>{l.title}</p>
+                        <p style={{ fontSize: 10, color: "rgba(201,169,122,0.6)", textTransform: "uppercase", letterSpacing: 1 }}>{l.module.course.title}</p>
+                      </div>
+                      <div style={{ textAlign: "right" }}>
+                        <p style={{ fontSize: 14, fontWeight: 700, color: "#6ee7b7" }}>{l._count.progress}</p>
+                        <p style={{ fontSize: 8, color: "var(--text-muted)", textTransform: "uppercase" }}>conclusões</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
+      </div>
+    </div>
+  );
+}
       </div>
     </div>
   );

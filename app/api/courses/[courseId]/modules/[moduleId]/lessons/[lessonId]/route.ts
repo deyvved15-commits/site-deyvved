@@ -10,13 +10,23 @@ const schema = z.object({
   content: z.string().optional(),
   duration: z.string().optional(),
   releaseAfterDays: z.number().int().min(0).optional(),
+  attachments: z.any().optional(),
 });
 
-export async function PUT(req: NextRequest, { params }: { params: Promise<{ lessonId: string }> }) {
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ courseId: string; lessonId: string }> }) {
   const session = await auth();
-  if (!session || session.user.role !== "ADMIN")
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  
+  const { courseId, lessonId } = await params;
+  const course = await prisma.course.findUnique({ where: { id: courseId } });
+  if (!course) return NextResponse.json({ error: "Course not found" }, { status: 404 });
+
+  const isAdmin = session.user.role === "ADMIN";
+  const isTeacher = course.teacherId === session.user.id;
+
+  if (!isAdmin && !isTeacher) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  const { lessonId } = await params;
+  }
 
   const body = await req.json();
   const parsed = schema.safeParse(body);
@@ -26,11 +36,20 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ less
   return NextResponse.json(lesson);
 }
 
-export async function DELETE(_: NextRequest, { params }: { params: Promise<{ lessonId: string }> }) {
+export async function DELETE(_: NextRequest, { params }: { params: Promise<{ courseId: string; lessonId: string }> }) {
   const session = await auth();
-  if (!session || session.user.role !== "ADMIN")
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const { courseId, lessonId } = await params;
+  const course = await prisma.course.findUnique({ where: { id: courseId } });
+  if (!course) return NextResponse.json({ error: "Course not found" }, { status: 404 });
+
+  const isAdmin = session.user.role === "ADMIN";
+  const isTeacher = course.teacherId === session.user.id;
+
+  if (!isAdmin && !isTeacher) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  const { lessonId } = await params;
+  }
 
   await prisma.lesson.delete({ where: { id: lessonId } });
   return NextResponse.json({ ok: true });

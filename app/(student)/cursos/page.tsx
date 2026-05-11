@@ -2,11 +2,12 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { getGoogleDriveImageUrl } from "@/lib/utils";
-import CourseThumbnail from "@/components/student/course-thumbnail";
+import CategoryFilter from "@/components/student/category-filter";
 
-export default async function CursosPage() {
+export default async function CursosPage({ searchParams }: { searchParams: Promise<{ categoria?: string }> }) {
   const session = await auth();
   if (!session) return null;
+  const { categoria } = await searchParams;
 
   const enrollments = await prisma.enrollment.findMany({
     where: { userId: session.user.id },
@@ -27,6 +28,11 @@ export default async function CursosPage() {
     },
   });
 
+  const allCategories = Array.from(new Set(enrollments.map(e => e.course.category).filter(Boolean))) as string[];
+  const filteredEnrollments = categoria 
+    ? enrollments.filter(e => e.course.category === categoria)
+    : enrollments;
+
   return (
     <div style={{ minHeight: "100%", background: "linear-gradient(180deg, var(--navy-darkest) 0%, var(--navy-mid) 100%)" }}>
 
@@ -37,11 +43,12 @@ export default async function CursosPage() {
         <p className="ka-page-subtitle">
           {enrollments.length === 0
             ? "Nenhum curso matriculado ainda"
-            : `${enrollments.length} curso${enrollments.length > 1 ? "s" : ""} matriculado${enrollments.length > 1 ? "s" : ""}`}
+            : `${filteredEnrollments.length} curso${filteredEnrollments.length > 1 ? "s" : ""} encontrado${filteredEnrollments.length > 1 ? "s" : ""}`}
         </p>
       </div>
 
-      <div className="ka-section" style={{ padding: "36px 44px 44px" }}>
+      <div className="ka-section" style={{ padding: "0 44px 44px" }}>
+        {allCategories.length > 0 && <CategoryFilter categories={allCategories} />}
         {enrollments.length === 0 ? (
           <div style={{
             borderRadius: 20, padding: "56px 32px", textAlign: "center", maxWidth: 380,
@@ -58,7 +65,7 @@ export default async function CursosPage() {
           </div>
         ) : (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(250px, 280px))", gap: 24 }}>
-            {enrollments.map(({ course }) => {
+            {filteredEnrollments.map(({ course }) => {
               const allLessons = course.modules.flatMap(m => m.lessons);
               const done = allLessons.filter(l => l.progress[0]?.completed).length;
               const total = allLessons.length;

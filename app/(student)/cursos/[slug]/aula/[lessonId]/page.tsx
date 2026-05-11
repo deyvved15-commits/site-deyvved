@@ -167,6 +167,41 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
           </div>
         )}
 
+        {/* Downloads */}
+        {lesson.attachments && Array.isArray(lesson.attachments) && lesson.attachments.length > 0 && (
+          <div style={{ margin: "16px 28px 0" }}>
+            <div style={{
+              borderRadius: 16, overflow: "hidden",
+              background: "linear-gradient(135deg, rgba(201,169,122,0.10) 0%, rgba(201,169,122,0.02) 100%)",
+              border: "1px solid rgba(201,169,122,0.20)",
+              padding: "16px 20px"
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                <span style={{ fontFamily: "'Cinzel',serif", fontSize: 10, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--gold)" }}>
+                  Arquivos e Downloads
+                </span>
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 10 }}>
+                {(lesson.attachments as { title: string; url: string }[]).map((at, i) => (
+                  <a key={i} href={at.url} target="_blank" rel="noopener noreferrer" style={{
+                    display: "flex", alignItems: "center", gap: 10, padding: "10px 14px",
+                    background: "rgba(255,255,255,0.05)", borderRadius: 10, border: "1px solid rgba(255,255,255,0.08)",
+                    color: "white", textDecoration: "none", fontSize: 12, transition: "all 0.2s"
+                  }} onMouseEnter={e => { e.currentTarget.style.background = "rgba(201,169,122,0.15)"; e.currentTarget.style.borderColor = "var(--gold)"; }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+                    </svg>
+                    <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{at.title || "Arquivo"}</span>
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Comments */}
         <LessonComments
           lessonId={lesson.id}

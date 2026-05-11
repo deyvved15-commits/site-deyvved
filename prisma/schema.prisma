@@ -99,6 +99,7 @@ model Course {
   teacherId            String?
   commissionPercentage Float   @default(0)
   teacher              User?   @relation("CourseTeacher", fields: [teacherId], references: [id])
+  category             String?
 
   modules     Module[]
   enrollments Enrollment[]
@@ -129,6 +130,7 @@ model Lesson {
   order            Int      @default(0)
   releaseAfterDays Int      @default(0)
   moduleId         String
+  attachments      Json?    @default("[]")
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 

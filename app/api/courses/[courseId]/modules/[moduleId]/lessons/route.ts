@@ -14,9 +14,18 @@ const schema = z.object({
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ courseId: string; moduleId: string }> }) {
   const session = await auth();
-  if (!session || session.user.role !== "ADMIN")
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const { courseId, moduleId } = await params;
+  const course = await prisma.course.findUnique({ where: { id: courseId } });
+  if (!course) return NextResponse.json({ error: "Course not found" }, { status: 404 });
+
+  const isAdmin = session.user.role === "ADMIN";
+  const isTeacher = course.teacherId === session.user.id;
+
+  if (!isAdmin && !isTeacher) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  const { moduleId } = await params;
+  }
 
   const body = await req.json();
   const parsed = schema.safeParse(body);
