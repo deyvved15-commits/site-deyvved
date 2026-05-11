@@ -13,7 +13,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tic
   const ticket = await prisma.ticket.findUnique({ where: { id: ticketId } });
   if (!ticket) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  const isAdmin = session.user.role === "ADMIN";
+  const isAdmin = session.user.role === "ADMIN" || session.user.role === "TEACHER";
   const isOwner = ticket.userId === session.user.id;
 
   if (!isAdmin && !isOwner) {

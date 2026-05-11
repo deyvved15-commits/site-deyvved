@@ -3,22 +3,41 @@ import { prisma } from "@/lib/prisma";
 import { notFound, redirect } from "next/navigation";
 import { Download, Award, ShieldCheck, Printer } from "lucide-react";
 
-export default async function CertificatePage({ params }: { params: Promise<{ courseId: string }> }) {
+export default async function CertificatePage({ 
+  params, 
+  searchParams 
+}: { 
+  params: Promise<{ courseId: string }>,
+  searchParams: Promise<{ userId?: string }>
+}) {
   const session = await auth();
   if (!session) return null;
   const { courseId } = await params;
+  const { userId: queryUserId } = await searchParams;
+
+  // Se for admin ou professor, pode visualizar certificado de outros alunos (Segunda Via)
+  let targetUserId = session.user.id;
+  if (queryUserId && (session.user.role === "ADMIN" || session.user.role === "TEACHER")) {
+    targetUserId = queryUserId;
+  }
 
   const course = await prisma.course.findUnique({
     where: { id: courseId },
     include: {
       modules: {
-        include: { lessons: { include: { progress: { where: { userId: session.user.id } } } } }
+        include: { lessons: { include: { progress: { where: { userId: targetUserId } } } } }
       },
       teacher: true
     }
   });
 
   if (!course) notFound();
+  
+  // Para aluno comum, verifica se ele é o dono ou se tem permissão
+  if (session.user.role === "STUDENT" && targetUserId !== session.user.id) {
+    redirect("/dashboard");
+  }
+
   if (!course.hasCertificate || course.paymentType !== "ONE_TIME") redirect("/dashboard");
 
   const allLessons = course.modules.flatMap(m => m.lessons);
@@ -28,14 +47,17 @@ export default async function CertificatePage({ params }: { params: Promise<{ co
 
   if (!isComplete) redirect(`/cursos/${course.slug}`);
 
+  const targetUser = await prisma.user.findUnique({ where: { id: targetUserId }, select: { name: true } });
+  if (!targetUser) notFound();
+
   // Registra a emissão se não existir
   let certificate = await prisma.certificate.findUnique({
-    where: { userId_courseId: { userId: session.user.id, courseId: course.id } }
+    where: { userId_courseId: { userId: targetUserId, courseId: course.id } }
   });
 
   if (!certificate) {
     certificate = await prisma.certificate.create({
-      data: { userId: session.user.id, courseId: course.id }
+      data: { userId: targetUserId, courseId: course.id }
     });
   }
 
@@ -102,7 +124,7 @@ export default async function CertificatePage({ params }: { params: Promise<{ co
         <div style={{ flex: 1 }}>
           <p style={{ fontSize: 18, color: "#666", fontStyle: "italic", marginBottom: 10 }}>Certificamos que</p>
           <h2 style={{ fontFamily: "'Cinzel',serif", fontSize: 36, fontWeight: 800, margin: "0 0 20px", color: "#000", borderBottom: "2px solid #eee", display: "inline-block", padding: "0 40px 10px" }}>
-            {session.user.name?.toUpperCase()}
+            {targetUser.name?.toUpperCase()}
           </h2>
           <p style={{ fontSize: 18, color: "#666", lineHeight: 1.6, maxWidth: 600, margin: "20px auto" }}>
             concluiu com aproveitamento o curso de formação em
