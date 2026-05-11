@@ -88,42 +88,44 @@ export default function ProfessorSidebar({ user }: { user: { name?: string | nul
         </div>
 
         {/* Nav */}
-        <nav style={{ flex: 1, padding: "20px 16px", display: "flex", flexDirection: "column", gap: 8, position: "relative", zIndex: 1 }}>
-          {links.map(({ href, label, icon, exact }) => {
-            const active = exact ? pathname === href : pathname.startsWith(href);
-            return (
-              <Link key={href} href={href}
-                style={{
-                  display: "flex", alignItems: "center", gap: 12,
-                  padding: "11px 16px", borderRadius: 12,
-                  fontSize: 14, fontWeight: 500,
-                  textDecoration: "none",
-                  transition: "all 0.2s",
-                  ...(active ? {
-                    background: "linear-gradient(135deg, rgba(201,169,122,0.20), rgba(201,169,122,0.08))",
-                    border: "1px solid rgba(201,169,122,0.30)",
-                    color: "#E8D5A8",
-                    boxShadow: "0 2px 16px rgba(201,169,122,0.12)",
-                  } : {
-                    background: "rgba(255,255,255,0.03)",
-                    border: "1px solid rgba(255,255,255,0.06)",
-                    color: "rgba(255,255,255,0.45)",
-                  }),
-                }}
-              >
-                <div style={{
-                  width: 32, height: 32, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-                  ...(active ? { background: "rgba(201,169,122,0.20)", boxShadow: "0 0 12px rgba(201,169,122,0.20)" } : { background: "rgba(255,255,255,0.05)" }),
-                  color: active ? "#C9A97A" : "inherit"
-                }}>
-                  {icon}
-                </div>
-                <span>{label}</span>
-                {active && <div style={{ marginLeft: "auto", width: 6, height: 6, borderRadius: "50%", background: "#C9A97A", boxShadow: "0 0 6px #C9A97A" }} />}
-              </Link>
-            );
-          })}
-        </nav>
+        <div style={{ flex: 1, overflowY: "auto", padding: "20px 16px", position: "relative", zIndex: 1 }} className="ka-sidebar-nav-scroll">
+          <nav style={{ display: "flex", flexDirection: "column", gap: 8, paddingBottom: 20 }}>
+            {links.map(({ href, label, icon, exact }) => {
+              const active = exact ? pathname === href : pathname.startsWith(href);
+              return (
+                <Link key={href} href={href}
+                  style={{
+                    display: "flex", alignItems: "center", gap: 12,
+                    padding: "11px 16px", borderRadius: 12,
+                    fontSize: 14, fontWeight: 500,
+                    textDecoration: "none",
+                    transition: "all 0.2s",
+                    ...(active ? {
+                      background: "linear-gradient(135deg, rgba(201,169,122,0.20), rgba(201,169,122,0.08))",
+                      border: "1px solid rgba(201,169,122,0.30)",
+                      color: "#E8D5A8",
+                      boxShadow: "0 2px 16px rgba(201,169,122,0.12)",
+                    } : {
+                      background: "rgba(255,255,255,0.03)",
+                      border: "1px solid rgba(255,255,255,0.06)",
+                      color: "rgba(255,255,255,0.45)",
+                    }),
+                  }}
+                >
+                  <div style={{
+                    width: 32, height: 32, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+                    ...(active ? { background: "rgba(201,169,122,0.20)", boxShadow: "0 0 12px rgba(201,169,122,0.20)" } : { background: "rgba(255,255,255,0.05)" }),
+                    color: active ? "#C9A97A" : "inherit"
+                  }}>
+                    {icon}
+                  </div>
+                  <span>{label}</span>
+                  {active && <div style={{ marginLeft: "auto", width: 6, height: 6, borderRadius: "50%", background: "#C9A97A", boxShadow: "0 0 6px #C9A97A" }} />}
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
 
         <div style={{ margin: "0 16px", height: 1, background: "linear-gradient(90deg, transparent, rgba(201,169,122,0.12), transparent)", position: "relative", zIndex: 1 }} />
 
