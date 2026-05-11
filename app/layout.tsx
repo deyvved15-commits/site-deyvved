@@ -23,10 +23,16 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
   themeColor: "#060D1F",
   icons: {
-    icon: "/icon.png",
+    icon: "/icon-192.png",
     apple: "/apple-icon.png",
-  }
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Kadima Academy",
+  },
 };
+
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
