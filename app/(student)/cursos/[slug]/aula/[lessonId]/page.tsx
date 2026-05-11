@@ -278,6 +278,7 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
           </p>
         </div>
         <div style={{ paddingBottom: 16 }}>
+          {course.modules.map((mod) => (
             <div key={mod.id}>
               <div style={{ 
                 display: "flex", alignItems: "center", gap: 10, padding: "16px 16px 8px" 
