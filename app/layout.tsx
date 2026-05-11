@@ -22,8 +22,8 @@ export const metadata: Metadata = {
   description: "Plataforma de ensino teológico da Kadima Academy",
   manifest: "/manifest.json",
   icons: {
-    icon: "/icon.png",
-    apple: "/apple-icon.png",
+    icon: "/icon.png?v=1",
+    apple: "/apple-icon.png?v=1",
   }
 };
 
