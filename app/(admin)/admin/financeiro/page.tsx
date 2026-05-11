@@ -36,7 +36,33 @@ export default async function FinanceiroPage({
     prisma.payment.aggregate({ where: { status: "approved" }, _sum: { amount: true } }),
     prisma.payment.aggregate({ where: { status: "approved", createdAt: { gte: startOfMonth } }, _sum: { amount: true } }),
     prisma.payment.count(),
+    prisma.user.findMany({
+      where: { role: "TEACHER" },
+      select: {
+        id: true,
+        name: true,
+        taughtCourses: {
+          select: {
+            id: true,
+            payments: {
+              where: { status: "approved" },
+              select: { commissionAmount: true }
+            }
+          }
+        }
+      }
+    }),
+    prisma.payment.aggregate({ where: { status: "approved" }, _sum: { commissionAmount: true } }),
   ]);
+
+  const teacherCommissions = teachers.map(t => {
+    const total = t.taughtCourses.reduce((sum, course) => {
+      return sum + course.payments.reduce((pSum, p) => pSum + (p.commissionAmount ?? 0), 0);
+    }, 0);
+    return { ...t, totalCommission: total };
+  }).filter(t => t.totalCommission > 0);
+
+  const totalComissoes = totalCommissions._sum.commissionAmount ?? 0;
 
   const totalReceita   = totalApproved._sum.amount ?? 0;
   const mesReceita     = monthApproved._sum.amount ?? 0;
@@ -69,7 +95,7 @@ export default async function FinanceiroPage({
       <div style={{ padding: "0 44px 48px" }}>
 
         {/* KPI cards */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 28 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 28 }}>
           {[
             {
               eyebrow: "Receita do Mês",
@@ -82,6 +108,12 @@ export default async function FinanceiroPage({
               value: fmt(totalReceita),
               sub: "Todos os tempos",
               accent: "#C9A97A",
+            },
+            {
+              eyebrow: "Comissões",
+              value: fmt(totalComissoes),
+              sub: "Total a pagar",
+              accent: "#63B3ED",
             },
             {
               eyebrow: "Pendentes",
@@ -213,6 +245,48 @@ export default async function FinanceiroPage({
             </div>
           )}
         </div>
+
+        {/* Professores e Comissões */}
+        {teacherCommissions.length > 0 && (
+          <div style={{ marginTop: 44 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
+              <div style={{ width: 3, height: 18, background: "linear-gradient(180deg, #63B3ED, #3182CE)", borderRadius: 2, boxShadow: "0 0 8px rgba(99,179,237,0.5)" }} />
+              <h2 style={{ fontFamily: "'Cinzel',serif", fontWeight: 600, fontSize: 13, letterSpacing: 3, textTransform: "uppercase", color: "var(--text-primary)" }}>
+                Comissões por Professor
+              </h2>
+            </div>
+
+            <div style={{ borderRadius: 20, overflow: "hidden", border: "1px solid rgba(99,179,237,0.12)", boxShadow: "0 8px 32px rgba(0,0,0,0.35)" }}>
+              <div style={{
+                display: "grid", gridTemplateColumns: "1fr 200px 100px",
+                padding: "12px 24px", gap: 12,
+                background: "rgba(99,179,237,0.04)",
+                borderBottom: "1px solid rgba(99,179,237,0.10)",
+              }}>
+                {["Professor", "Total em Comissões", ""].map(h => (
+                  <span key={h} style={{ fontFamily: "'Cinzel',serif", fontSize: 9, fontWeight: 600, letterSpacing: 3, textTransform: "uppercase", color: "#63B3ED" }}>
+                    {h}
+                  </span>
+                ))}
+              </div>
+              <div style={{ background: "linear-gradient(160deg, var(--navy-card) 0%, var(--navy-card-2) 100%)" }}>
+                {teacherCommissions.map((tc, i) => (
+                  <div key={tc.id} style={{
+                    display: "grid", gridTemplateColumns: "1fr 200px 100px",
+                    padding: "14px 24px", gap: 12, alignItems: "center",
+                    borderTop: i > 0 ? "1px solid rgba(99,179,237,0.06)" : "none",
+                  }}>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)" }}>{tc.name}</span>
+                    <span style={{ fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 15, color: "#6ee7b7" }}>{fmt(tc.totalCommission)}</span>
+                    <Link href={`/admin/professores/${tc.id}`} style={{
+                      fontSize: 10, color: "rgba(255,255,255,0.4)", textDecoration: "none", textAlign: "right"
+                    }}>Ver Detalhes</Link>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
 
       </div>
     </div>

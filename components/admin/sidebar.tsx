@@ -40,6 +40,16 @@ const links = [
     ),
   },
   {
+    href: "/admin/professores", label: "Professores",
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M2 21v-2a4 4 0 0 1 4-4h12a4 4 0 0 1 4 4v2"/>
+        <circle cx="12" cy="7" r="4"/>
+        <path d="M12 11v2m0 4v.01"/>
+      </svg>
+    ),
+  },
+  {
     href: "/admin/ao-vivo", label: "Ao Vivo",
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

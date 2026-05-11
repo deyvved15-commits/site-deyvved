@@ -10,6 +10,8 @@ const updateSchema = z.object({
   price: z.number().positive().nullable().optional(),
   paymentType: z.enum(["ONE_TIME", "MONTHLY"]).optional(),
   published: z.boolean().optional(),
+  teacherId: z.string().nullable().optional(),
+  commissionPercentage: z.number().min(0).max(100).optional(),
 });
 
 export async function GET(_: NextRequest, { params }: { params: Promise<{ courseId: string }> }) {

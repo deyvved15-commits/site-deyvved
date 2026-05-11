@@ -67,6 +67,16 @@ export async function POST(req: NextRequest) {
     const [userId, courseId] = externalRef.split(":");
     if (!userId || !courseId) return NextResponse.json({ ok: true });
 
+    const course = await prisma.course.findUnique({ 
+      where: { id: courseId }, 
+      select: { title: true, paymentType: true, price: true, commissionPercentage: true } 
+    });
+
+    const amount = mpData.transaction_amount ?? course?.price ?? 0;
+    const commissionAmount = (status === "approved" && course?.commissionPercentage)
+      ? (amount * course.commissionPercentage) / 100
+      : null;
+
     await prisma.payment.updateMany({
       where: {
         userId,
@@ -76,14 +86,12 @@ export async function POST(req: NextRequest) {
       data: {
         status: status ?? "pending",
         mpPaymentId: paymentId,
+        commissionAmount,
       },
     });
 
     if (status === "approved") {
-      const [course, user] = await Promise.all([
-        prisma.course.findUnique({ where: { id: courseId }, select: { title: true, paymentType: true, price: true } }),
-        prisma.user.findUnique({ where: { id: userId }, select: { name: true, email: true } }),
-      ]);
+      const user = await prisma.user.findUnique({ where: { id: userId }, select: { name: true, email: true } });
 
       const expiresAt = course?.paymentType === "MONTHLY"
         ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)

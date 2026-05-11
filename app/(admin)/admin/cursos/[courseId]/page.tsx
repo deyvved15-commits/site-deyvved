@@ -6,15 +6,22 @@ import CourseEditor from "@/components/admin/course-editor";
 export default async function EditCursoPage({ params }: { params: Promise<{ courseId: string }> }) {
   const { courseId } = await params;
 
-  const course = await prisma.course.findUnique({
-    where: { id: courseId },
-    include: {
-      modules: {
-        orderBy: { order: "asc" },
-        include: { lessons: { orderBy: { order: "asc" } } },
+  const [course, teachers] = await Promise.all([
+    prisma.course.findUnique({
+      where: { id: courseId },
+      include: {
+        modules: {
+          orderBy: { order: "asc" },
+          include: { lessons: { orderBy: { order: "asc" } } },
+        },
       },
-    },
-  });
+    }),
+    prisma.user.findMany({
+      where: { role: "TEACHER" },
+      select: { id: true, name: true },
+      orderBy: { name: "asc" },
+    }),
+  ]);
   if (!course) notFound();
 
   return (
@@ -26,7 +33,7 @@ export default async function EditCursoPage({ params }: { params: Promise<{ cour
         Cursos
       </Link>
       <div className="ka-section" style={{ padding: "16px 44px 44px" }}>
-        <CourseEditor course={course} />
+        <CourseEditor course={course as any} teachers={teachers} />
       </div>
     </div>
   );

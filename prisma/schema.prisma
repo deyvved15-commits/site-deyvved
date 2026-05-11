@@ -13,6 +13,7 @@ datasource db {
 enum Role {
   ADMIN
   STUDENT
+  TEACHER
 }
 
 enum PaymentType {
@@ -77,6 +78,7 @@ model User {
   liveAttendance LiveAttendance[]
   payments       Payment[]
   comments       Comment[]
+  taughtCourses  Course[]         @relation("CourseTeacher")
 }
 
 // ── LMS ───────────────────────────────────────────────────────
@@ -93,6 +95,10 @@ model Course {
   order       Int         @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  teacherId            String?
+  commissionPercentage Float   @default(0)
+  teacher              User?   @relation("CourseTeacher", fields: [teacherId], references: [id])
 
   modules     Module[]
   enrollments Enrollment[]
@@ -166,6 +172,7 @@ model Payment {
   status          String   @default("pending") // pending | approved | rejected | cancelled
   mpPaymentId     String?
   mpPreferenceId  String?
+  commissionAmount Float?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
