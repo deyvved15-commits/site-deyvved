@@ -1,14 +1,19 @@
 "use client";
 
 import { useState } from "react";
+import { getGoogleDriveImageUrl } from "@/lib/utils";
 
 export default function LessonThumbnail({ src }: { src?: string | null }) {
   const [error, setError] = useState(false);
 
-  if (src && !error) {
+  const imageUrl = src?.includes("drive.google.com")
+    ? getGoogleDriveImageUrl(src)
+    : src;
+
+  if (imageUrl && !error) {
     return (
       <img
-        src={src}
+        src={imageUrl}
         alt=""
         style={{ width: 32, height: 32, borderRadius: 8, objectFit: "cover", border: "1px solid rgba(201,169,122,0.2)" }}
         onError={() => setError(true)}
