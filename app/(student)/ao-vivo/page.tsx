@@ -35,6 +35,12 @@ export default async function AoVivoPage() {
           <h1 className="ka-page-title" style={{ fontSize: 22 }}>
             {activeSession ? <><span>{activeSession.title}</span></> : <>Aula ao <span>Vivo</span></>}
           </h1>
+          <p style={{ fontSize: 11, color: "var(--gold-light)", opacity: 0.8, letterSpacing: 1, marginTop: 4, display: "flex", alignItems: "center", gap: 6 }}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+            Sextas-feiras, às 19h30
+          </p>
         </div>
         {activeSession && (
           <div className="ka-live-indicator" style={{ background: "linear-gradient(135deg, rgba(52,211,153,0.15), rgba(52,211,153,0.08))", border: "1px solid rgba(52,211,153,0.30)", color: "#6ee7b7", boxShadow: "0 0 16px rgba(52,211,153,0.25)" }}>
