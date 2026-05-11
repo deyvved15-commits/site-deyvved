@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 
 export default async function AdminDashboard() {
-  const [totalCourses, totalStudents, totalLessons, recentStudents] = await Promise.all([
+  const [totalCourses, totalStudents, totalLessons, recentStudents, openTickets, churnCount] = await Promise.all([
     prisma.course.count(),
     prisma.user.count({ where: { role: "STUDENT" } }),
     prisma.lesson.count(),
@@ -12,6 +12,8 @@ export default async function AdminDashboard() {
       take: 5,
       select: { id: true, name: true, email: true, createdAt: true, church: true, enrollments: { select: { courseId: true } } },
     }),
+    prisma.ticket.count({ where: { status: { in: ["open", "in_progress"] } } }),
+    prisma.user.count({ where: { role: "STUDENT", active: false } }),
   ]);
 
   const stats = [
@@ -43,7 +45,7 @@ export default async function AdminDashboard() {
       ),
     },
     {
-      label: "Chamados", value: "Suporte", href: "/admin/tickets",
+      label: "Chamados", value: openTickets || 0, href: "/admin/tickets",
       icon: (
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
@@ -51,7 +53,7 @@ export default async function AdminDashboard() {
       ),
     },
     {
-      label: "Churn", value: "Evasão", href: "/admin/churn",
+      label: "Churn", value: churnCount || 0, href: "/admin/churn",
       icon: (
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M23 18l-9-9-7 7-4-4"/>
