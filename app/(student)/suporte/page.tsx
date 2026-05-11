@@ -21,24 +21,43 @@ export default async function SupportPage() {
   };
 
   return (
-    <div style={{ minHeight: "100%", padding: "44px", background: "linear-gradient(180deg, var(--navy-darkest) 0%, var(--navy-mid) 100%)" }}>
-      <div style={{ maxWidth: 1000, margin: "0 auto" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 32 }}>
+    <div style={{ minHeight: "100%", padding: "44px", background: "linear-gradient(180deg, var(--navy-darkest) 0%, var(--navy-mid) 100%)", position: "relative", overflow: "hidden" }}>
+      {/* Decorative Rings (Branding Book Style) */}
+      <div style={{ position: "absolute", width: 600, height: 600, border: "1px solid rgba(201,169,122,0.05)", borderRadius: "50%", top: -200, right: -200, pointerEvents: "none" }} />
+      <div style={{ position: "absolute", width: 400, height: 400, border: "1px solid rgba(201,169,122,0.03)", borderRadius: "50%", bottom: -100, left: -100, pointerEvents: "none" }} />
+
+      <div style={{ maxWidth: 1000, margin: "0 auto", position: "relative", zIndex: 1 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 48 }}>
           <div>
-            <h1 style={{ fontFamily: "'Cinzel',serif", fontSize: 24, fontWeight: 700, letterSpacing: 2, color: "var(--text-primary)", margin: 0 }}>
-              Central de <span style={{ color: "var(--gold)" }}>Suporte</span>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
+              <MessageSquare size={18} color="var(--gold)" />
+              <span style={{ fontSize: 10, fontFamily: "'Cinzel',serif", letterSpacing: 4, textTransform: "uppercase", color: "var(--gold)" }}>Central de Ajuda</span>
+            </div>
+            <h1 style={{ fontFamily: "'Cinzel',serif", fontSize: 32, fontWeight: 700, letterSpacing: 2, color: "var(--white)", margin: 0 }}>
+              Suporte ao <span style={{ color: "var(--gold)" }}>Aluno</span>
             </h1>
-            <p style={{ fontSize: 14, color: "var(--text-muted)", marginTop: 4 }}>Como podemos te ajudar hoje?</p>
+            <div style={{ width: 60, height: 2, background: "linear-gradient(90deg, var(--gold), transparent)", marginTop: 16 }} />
           </div>
           <Link href="/suporte/novo" style={{
-            display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 24px",
-            background: "var(--gold)", color: "#060D1F", borderRadius: 12,
-            fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 12, textDecoration: "none",
-            boxShadow: "0 8px 24px rgba(201,169,122,0.25)"
-          }}>
-            <Plus size={16} /> Abrir Novo Chamado
+            display: "inline-flex", alignItems: "center", gap: 8, padding: "14px 28px",
+            background: "rgba(201,169,122,0.1)", border: "1px solid var(--gold)", 
+            color: "var(--gold)", borderRadius: 12,
+            fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 13, textDecoration: "none",
+            boxShadow: "0 8px 24px rgba(201,169,122,0.15)",
+            transition: "all 0.3s ease"
+          }} className="btn-gold-hover">
+            <Plus size={18} /> Abrir Chamado
           </Link>
         </div>
+
+        <style>{`
+          .btn-gold-hover:hover {
+            background: var(--gold) !important;
+            color: var(--navy-darkest) !important;
+            box-shadow: 0 12px 30px rgba(201,169,122,0.4) !important;
+            transform: translateY(-2px);
+          }
+        `}</style>
 
         {tickets.length === 0 ? (
           <div style={{ 

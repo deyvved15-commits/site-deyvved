@@ -278,9 +278,15 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
           </p>
         </div>
         <div style={{ paddingBottom: 16 }}>
-          {course.modules.map((mod) => (
             <div key={mod.id}>
-              <p className="ka-lesson-module-title">{mod.title}</p>
+              <div style={{ 
+                display: "flex", alignItems: "center", gap: 10, padding: "16px 16px 8px" 
+              }}>
+                {mod.thumbnail && (
+                  <img src={mod.thumbnail} alt="" style={{ width: 32, height: 32, borderRadius: 8, objectFit: "cover", border: "1px solid rgba(201,169,122,0.2)" }} />
+                )}
+                <p className="ka-lesson-module-title" style={{ padding: 0, margin: 0 }}>{mod.title}</p>
+              </div>
               {mod.lessons.map((l) => {
                 const active = l.id === lessonId;
                 const lDone = l.progress[0]?.completed;

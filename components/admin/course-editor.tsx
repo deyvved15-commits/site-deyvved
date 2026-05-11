@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getYoutubeId, getGoogleDriveImageUrl } from "@/lib/utils";
-import { Plus, Trash2, ChevronDown, ChevronRight, Eye, EyeOff, Pencil, X, Check } from "lucide-react";
+import { Plus, Trash2, ChevronDown, ChevronRight, Eye, EyeOff, Pencil, X, Check, Clock } from "lucide-react";
 
 type Lesson = { id: string; title: string; youtubeUrl: string; duration: string | null; content: string | null; order: number; releaseAfterDays: number; attachments?: { title: string; url: string }[] };
 type Module = { id: string; title: string; thumbnail: string | null; order: number; lessons: Lesson[] };
@@ -310,18 +310,36 @@ export default function CourseEditor({ course: initial, teachers, isAdmin = true
                 <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 12 }}>
                   {mod.lessons.map((lesson, li) => (
                     <div key={lesson.id}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 12px", borderRadius: 12, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.04)" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 12px", borderRadius: 12, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.04)", transition: "all 0.2s" }} className="lesson-row">
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <p style={{ fontSize: 13, fontWeight: 600 }}>{li + 1}. {lesson.title}</p>
-                          <div style={{ display: "flex", gap: 8 }}>
-                             {lesson.duration && <span style={{ fontSize: 11, color: "var(--text-muted)" }}>{lesson.duration}</span>}
+                          <p style={{ fontSize: 13, fontWeight: 600, margin: 0, color: editingLesson === lesson.id ? "var(--gold-light)" : "#fff" }}>{li + 1}. {lesson.title}</p>
+                          <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 4 }}>
+                             {lesson.duration && <span style={{ fontSize: 10, color: "var(--text-muted)", display: "flex", alignItems: "center", gap: 4 }}><Clock size={10} /> {lesson.duration}</span>}
                              {lesson.attachments && Array.isArray(lesson.attachments) && lesson.attachments.length > 0 && (
-                               <span style={{ fontSize: 9, color: "var(--gold)" }}>{lesson.attachments.length} anexo(s)</span>
+                               <span style={{ fontSize: 9, color: "var(--gold-light)", background: "rgba(201,169,122,0.1)", padding: "2px 6px", borderRadius: 4 }}>{lesson.attachments.length} anexo(s)</span>
                              )}
                           </div>
                         </div>
-                        <button onClick={() => startEditLesson(lesson)} style={S.btnEdit}><Pencil size={13} /></button>
-                        <button onClick={() => deleteLesson(mod.id, lesson.id)} style={S.btnRed}><Trash2 size={13} /></button>
+                        <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                          <button onClick={() => {
+                            if (li === 0) return;
+                            const newLessons = [...mod.lessons];
+                            [newLessons[li - 1], newLessons[li]] = [newLessons[li], newLessons[li - 1]];
+                            setCourse(c => ({ ...c, modules: c.modules.map(m => m.id === mod.id ? { ...m, lessons: newLessons } : m) }));
+                          }} style={{ ...S.btnEdit, opacity: li === 0 ? 0.2 : 0.6 }} title="Subir"><ChevronDown size={14} style={{ transform: "rotate(180deg)" }} /></button>
+                          
+                          <button onClick={() => {
+                            if (li === mod.lessons.length - 1) return;
+                            const newLessons = [...mod.lessons];
+                            [newLessons[li + 1], newLessons[li]] = [newLessons[li], newLessons[li + 1]];
+                            setCourse(c => ({ ...c, modules: c.modules.map(m => m.id === mod.id ? { ...m, lessons: newLessons } : m) }));
+                          }} style={{ ...S.btnEdit, opacity: li === mod.lessons.length - 1 ? 0.2 : 0.6 }} title="Descer"><ChevronDown size={14} /></button>
+
+                          <div style={{ width: 1, height: 16, background: "rgba(255,255,255,0.08)", margin: "0 4px" }} />
+                          
+                          <button onClick={() => startEditLesson(lesson)} style={{ ...S.btnEdit, color: editingLesson === lesson.id ? "var(--gold)" : "rgba(255,255,255,0.4)" }}><Pencil size={13} /></button>
+                          <button onClick={() => deleteLesson(mod.id, lesson.id)} style={S.btnRed}><Trash2 size={13} /></button>
+                        </div>
                       </div>
 
                       {editingLesson === lesson.id && (
