@@ -153,43 +153,50 @@ export default async function AdminDashboard() {
                 return (
                   <Link key={s.id} href={`/admin/alunos/${s.id}`} style={{ textDecoration: "none" }}>
                     <div style={{
-                      padding: "14px 24px",
+                      padding: "16px 24px",
                       borderTop: i > 0 ? "1px solid rgba(201,169,122,0.06)" : "none",
                       display: "flex", alignItems: "center", gap: 14,
+                      flexWrap: "wrap",
                       transition: "background 0.2s",
                       cursor: "pointer",
                     }}
                     className="admin-row-hover">
                       <div style={{
-                        width: 36, height: 36, borderRadius: "50%", flexShrink: 0,
+                        width: 44, height: 44, borderRadius: "50%", flexShrink: 0,
                         background: "radial-gradient(circle at 30% 30%, var(--gold-bright), var(--gold) 50%, var(--gold-deep))",
                         display: "flex", alignItems: "center", justifyContent: "center",
-                        fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 12,
+                        fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 14,
                         color: "var(--navy-darkest)",
                         boxShadow: "0 0 12px rgba(201,169,122,0.30)",
                       }}>
                         {initials}
                       </div>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <p style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)", marginBottom: 2 }}>{s.name}</p>
+                      
+                      <div style={{ flex: 1, minWidth: "150px" }}>
+                        <p style={{ fontSize: 14, fontWeight: 700, color: "var(--text-primary)", marginBottom: 2 }}>{s.name}</p>
                         <p style={{ fontSize: 11, color: "var(--text-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.email}</p>
                       </div>
-                      {s.church && (
-                        <span style={{
-                          fontSize: 10, fontWeight: 600, letterSpacing: 1,
-                          background: "rgba(201,169,122,0.08)", border: "1px solid var(--gold-20)",
-                          color: "var(--gold)", padding: "3px 10px", borderRadius: 999, flexShrink: 0,
-                        }}>
-                          {s.church}
-                        </span>
-                      )}
-                      <div style={{ textAlign: "right", flexShrink: 0 }}>
-                        <p style={{ fontSize: 12, fontWeight: 700, color: "var(--gold-light)", fontFamily: "'Cinzel',serif" }}>
-                          {s.enrollments.length} curso{s.enrollments.length !== 1 ? "s" : ""}
-                        </p>
-                        <p style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 2 }}>
-                          {new Date(s.createdAt).toLocaleDateString("pt-BR")}
-                        </p>
+
+                      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 10, flex: 1, minWidth: "200px", justifyContent: "space-between" }}>
+                        {s.church ? (
+                          <span style={{
+                            fontSize: 10, fontWeight: 600, letterSpacing: 1,
+                            background: "rgba(201,169,122,0.08)", border: "1px solid var(--gold-20)",
+                            color: "var(--gold)", padding: "4px 12px", borderRadius: 999,
+                            whiteSpace: "nowrap", maxWidth: "160px", overflow: "hidden", textOverflow: "ellipsis"
+                          }}>
+                            {s.church}
+                          </span>
+                        ) : <div />}
+
+                        <div style={{ textAlign: "right" }}>
+                          <p style={{ fontSize: 12, fontWeight: 700, color: "var(--gold-light)", fontFamily: "'Cinzel',serif", whiteSpace: "nowrap" }}>
+                            {s.enrollments.length} curso{s.enrollments.length !== 1 ? "s" : ""}
+                          </p>
+                          <p style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 2 }}>
+                            {new Date(s.createdAt).toLocaleDateString("pt-BR")}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </Link>

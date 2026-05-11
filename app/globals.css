@@ -592,13 +592,19 @@ body {
   backdrop-filter: blur(20px);
   z-index: 100;
   align-items: center;
-  justify-content: space-around;
-  padding: 0 8px;
+  justify-content: flex-start;
+  padding: 0 4px;
   box-shadow: 0 -4px 24px rgba(0,0,0,0.50);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.ka-mobile-nav::-webkit-scrollbar {
+  display: none;
 }
 .ka-mobile-nav-btn {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 4px; flex: 1; height: 100%;
+  gap: 4px; flex-shrink: 0; min-width: 72px; height: 100%;
   text-decoration: none; cursor: pointer;
   color: rgba(255,255,255,0.30);
   font-family: 'Poppins', sans-serif;
