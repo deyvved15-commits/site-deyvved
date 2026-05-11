@@ -101,6 +101,20 @@ body {
   animation: shimmer 2s infinite;
 }
 
+.ka-sidebar-nav-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+.ka-sidebar-nav-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.ka-sidebar-nav-scroll::-webkit-scrollbar-thumb {
+  background: rgba(201,169,122,0.2);
+  border-radius: 10px;
+}
+.ka-sidebar-nav-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(201,169,122,0.4);
+}
+
 /* ── Sidebar ── */
 .ka-sidebar {
   width: 240px;

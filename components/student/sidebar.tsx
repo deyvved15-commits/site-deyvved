@@ -93,25 +93,27 @@ export default function StudentSidebar({ user }: { user: { name?: string | null;
         <div className="ka-divider" />
 
         {/* Nav */}
-        <nav style={{ flex: 1, padding: "0 14px", display: "flex", flexDirection: "column", gap: 8 }}>
-          {links.map(({ href, label, icon, exact, live }) => {
-            const active = exact ? pathname === href : pathname.startsWith(href);
-            return (
-              <Link key={href} href={href} className={`ka-nav-btn${active ? " active" : ""}`}>
-                <span style={{ color: active ? "var(--gold-bright)" : "var(--gold-light)", opacity: active ? 1 : 0.85, flexShrink: 0 }}>
-                  {icon}
-                </span>
-                <span>{label}</span>
-                {live && (
-                  <span className="ka-live-badge">
-                    <span className="ka-live-dot" />
-                    AO VIVO
+        <div style={{ flex: 1, overflowY: "auto", overflowX: "hidden", padding: "0 14px" }} className="ka-sidebar-nav-scroll">
+          <nav style={{ display: "flex", flexDirection: "column", gap: 8, paddingBottom: 20 }}>
+            {links.map(({ href, label, icon, exact, live }) => {
+              const active = exact ? pathname === href : pathname.startsWith(href);
+              return (
+                <Link key={href} href={href} className={`ka-nav-btn${active ? " active" : ""}`}>
+                  <span style={{ color: active ? "var(--gold-bright)" : "var(--gold-light)", opacity: active ? 1 : 0.85, flexShrink: 0 }}>
+                    {icon}
                   </span>
-                )}
-              </Link>
-            );
-          })}
-        </nav>
+                  <span>{label}</span>
+                  {live && (
+                    <span className="ka-live-badge">
+                      <span className="ka-live-dot" />
+                      AO VIVO
+                    </span>
+                  )}
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
 
         {/* Footer */}
         <div style={{ padding: 16, borderTop: "1px solid rgba(201,169,122,0.10)", background: "linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.30) 100%)" }}>
