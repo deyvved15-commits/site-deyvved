@@ -23,7 +23,7 @@ export default async function FinanceiroPage({
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-  const [payments, totalApproved, monthApproved, totalCount] = await Promise.all([
+  const [payments, totalApproved, monthApproved, totalCount, teachers, totalCommissions] = await Promise.all([
     prisma.payment.findMany({
       where: filterStatus ? { status: filterStatus } : undefined,
       orderBy: { createdAt: "desc" },
