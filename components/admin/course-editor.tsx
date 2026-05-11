@@ -14,7 +14,7 @@ type Course = { id: string; title: string; description: string | null; thumbnail
 const textareaClass = "w-full bg-[rgba(255,255,255,0.04)] border border-[rgba(201,169,122,0.18)] rounded-xl px-4 py-3 text-sm text-white placeholder-[rgba(255,255,255,0.2)] outline-none resize-none focus:border-[rgba(201,169,122,0.5)] focus:bg-[rgba(255,255,255,0.06)] transition-all";
 const labelClass = "text-[10px] tracking-[3px] uppercase text-[rgba(201,169,122,0.7)] font-medium mb-2 block";
 
-export default function CourseEditor({ course: initial, teachers }: { course: Course, teachers: { id: string; name: string }[] }) {
+export default function CourseEditor({ course: initial, teachers, isAdmin = true }: { course: Course, teachers: { id: string; name: string }[], isAdmin?: boolean }) {
   const router = useRouter();
   const [course, setCourse] = useState(initial);
   const [saving, setSaving] = useState(false);
@@ -223,37 +223,39 @@ export default function CourseEditor({ course: initial, teachers }: { course: Co
             </div>
           </div>
 
-          {/* Professor + Comissão */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-            <div style={S.field}>
-              <label style={S.label}>Professor Responsável</label>
-              <select 
-                value={course.teacherId || ""} 
-                onChange={e => setCourse(c => ({ ...c, teacherId: e.target.value || null }))} 
-                style={{ ...S.input, cursor: "pointer", appearance: "none" as const }}
-              >
-                <option value="" style={{ background: "#0F1A3D" }}>Nenhum professor selecionado</option>
-                {teachers.map(t => (
-                  <option key={t.id} value={t.id} style={{ background: "#0F1A3D" }}>{t.name}</option>
-                ))}
-              </select>
-            </div>
-            <div style={S.field}>
-              <label style={S.label}>Comissão do Professor (%)</label>
-              <div style={{ position: "relative" }}>
-                <input 
-                  type="number" 
-                  min="0" 
-                  max="100" 
-                  value={course.commissionPercentage} 
-                  onChange={e => setCourse(c => ({ ...c, commissionPercentage: parseFloat(e.target.value) || 0 }))} 
-                  placeholder="0" 
-                  style={{ ...S.input, paddingRight: 36 }} 
-                />
-                <span style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", fontSize: 12, color: "rgba(201,169,122,0.6)", fontFamily: "'Poppins',sans-serif", pointerEvents: "none" }}>%</span>
+          {/* Professor + Comissão (Apenas Admin) */}
+          {isAdmin && (
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+              <div style={S.field}>
+                <label style={S.label}>Professor Responsável</label>
+                <select 
+                  value={course.teacherId || ""} 
+                  onChange={e => setCourse(c => ({ ...c, teacherId: e.target.value || null }))} 
+                  style={{ ...S.input, cursor: "pointer", appearance: "none" as const }}
+                >
+                  <option value="" style={{ background: "#0F1A3D" }}>Nenhum professor selecionado</option>
+                  {teachers.map(t => (
+                    <option key={t.id} value={t.id} style={{ background: "#0F1A3D" }}>{t.name}</option>
+                  ))}
+                </select>
+              </div>
+              <div style={S.field}>
+                <label style={S.label}>Comissão do Professor (%)</label>
+                <div style={{ position: "relative" }}>
+                  <input 
+                    type="number" 
+                    min="0" 
+                    max="100" 
+                    value={course.commissionPercentage} 
+                    onChange={e => setCourse(c => ({ ...c, commissionPercentage: parseFloat(e.target.value) || 0 }))} 
+                    placeholder="0" 
+                    style={{ ...S.input, paddingRight: 36 }} 
+                  />
+                  <span style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", fontSize: 12, color: "rgba(201,169,122,0.6)", fontFamily: "'Poppins',sans-serif", pointerEvents: "none" }}>%</span>
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
 

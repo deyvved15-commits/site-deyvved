@@ -21,18 +21,28 @@ export async function proxy(req: NextRequest) {
     };
 
     if (pathname === "/login" || pathname === "/cadastro") {
-      if (token) return redirectTo(role === "ADMIN" ? "/admin" : "/dashboard");
+      if (token) {
+        if (role === "ADMIN") return redirectTo("/admin");
+        if (role === "TEACHER") return redirectTo("/professor");
+        return redirectTo("/dashboard");
+      }
       return NextResponse.next();
     }
 
     if (pathname === "/") {
       if (!token) return redirectTo("/login");
-      return redirectTo(role === "ADMIN" ? "/admin" : "/dashboard");
+      if (role === "ADMIN") return redirectTo("/admin");
+      if (role === "TEACHER") return redirectTo("/professor");
+      return redirectTo("/dashboard");
     }
 
     if (!token) return redirectTo("/login");
 
     if (pathname.startsWith("/admin") && role !== "ADMIN") {
+      return redirectTo("/dashboard");
+    }
+
+    if (pathname.startsWith("/professor") && role !== "TEACHER" && role !== "ADMIN") {
       return redirectTo("/dashboard");
     }
 
