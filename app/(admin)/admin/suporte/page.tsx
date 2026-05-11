@@ -19,21 +19,18 @@ export default async function AdminSupportPage() {
   };
 
   return (
-    <div style={{ minHeight: "100%", padding: "44px", background: "linear-gradient(180deg, var(--navy-darkest) 0%, var(--navy-mid) 100%)", position: "relative", overflow: "hidden" }}>
-      {/* Decorative Rings */}
-      <div style={{ position: "absolute", width: 600, height: 600, border: "1px solid rgba(201,169,122,0.05)", borderRadius: "50%", top: -200, right: -200, pointerEvents: "none" }} />
-
-      <div style={{ maxWidth: 1000, margin: "0 auto", position: "relative", zIndex: 1 }}>
-        <div style={{ marginBottom: 48 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
-            <MessageSquare size={18} color="var(--gold)" />
-            <span style={{ fontSize: 10, fontFamily: "'Cinzel',serif", letterSpacing: 4, textTransform: "uppercase", color: "var(--gold)" }}>Gestão de Suporte</span>
-          </div>
-          <h1 style={{ fontFamily: "'Cinzel',serif", fontSize: 32, fontWeight: 700, letterSpacing: 2, color: "var(--white)", margin: 0 }}>
-            Chamados de <span style={{ color: "var(--gold)" }}>Suporte</span>
-          </h1>
-          <div style={{ width: 60, height: 2, background: "linear-gradient(90deg, var(--gold), transparent)", marginTop: 16 }} />
+    <div style={{ minHeight: "100%", background: "linear-gradient(180deg, var(--navy-darkest) 0%, var(--navy-mid) 100%)" }}>
+      {/* Header */}
+      <div className="ka-page-header">
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
+          <MessageSquare size={14} color="var(--gold)" />
+          <span className="ka-page-eyebrow" style={{ margin: 0 }}>Gestão de Suporte</span>
         </div>
+        <h1 className="ka-page-title">Chamados de <span>Suporte</span></h1>
+        <p className="ka-page-subtitle">Gerencie as solicitações e dúvidas dos alunos</p>
+      </div>
+
+      <div className="ka-section">
 
         {tickets.length === 0 ? (
           <div style={{ 
@@ -51,30 +48,30 @@ export default async function AdminSupportPage() {
                 <Link key={ticket.id} href={`/admin/suporte/${ticket.id}`} style={{ textDecoration: "none" }}>
                   <div style={{ 
                     background: "rgba(15,26,61,0.6)", border: "1px solid rgba(201,169,122,0.12)", 
-                    borderRadius: 20, padding: "20px 24px", display: "flex", alignItems: "center", 
-                    justifyContent: "space-between", transition: "all 0.2s", cursor: "pointer"
+                    borderRadius: 20, padding: "20px 24px", display: "flex", flexWrap: "wrap", alignItems: "center", 
+                    justifyContent: "space-between", transition: "all 0.2s", cursor: "pointer", gap: 16
                   }} className="ka-ticket-card">
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
-                         <h3 style={{ fontSize: 16, fontWeight: 600, color: "#fff", margin: 0 }}>{ticket.subject}</h3>
-                         <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 10, color: status.color, background: "rgba(255,255,255,0.05)", padding: "2px 8px", borderRadius: 4 }}>
+                    <div style={{ flex: 1, minWidth: "240px" }}>
+                      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 10, marginBottom: 12 }}>
+                         <h3 style={{ fontSize: 16, fontWeight: 700, color: "#fff", margin: 0 }}>{ticket.subject}</h3>
+                         <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 10, color: status.color, background: "rgba(255,255,255,0.05)", border: `1px solid ${status.color}30`, padding: "4px 10px", borderRadius: 6, fontWeight: 700, fontFamily: "'Cinzel',serif", textTransform: "uppercase" }}>
                             {status.icon} {status.label}
                          </div>
                       </div>
                       
-                      <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: "var(--text-muted)" }}>
-                          <User size={12} /> {ticket.user.name}
+                      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 20 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: "var(--text-secondary)" }}>
+                          <User size={14} color="var(--gold)" /> {ticket.user.name}
                         </div>
-                        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.3)" }}>
-                          {new Date(ticket.updatedAt).toLocaleDateString("pt-BR")}
+                        <div style={{ fontSize: 11, color: "var(--text-muted)", display: "flex", alignItems: "center", gap: 6 }}>
+                          <Clock size={12} /> {new Date(ticket.updatedAt).toLocaleDateString("pt-BR")}
                         </div>
-                        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", display: "flex", alignItems: "center", gap: 4 }}>
-                          <MessageSquare size={10} /> {ticket._count.messages}
+                        <div style={{ fontSize: 11, color: "var(--gold-light)", display: "flex", alignItems: "center", gap: 6, fontWeight: 600 }}>
+                          <MessageSquare size={12} /> {ticket._count.messages} mensagem{ticket._count.messages !== 1 ? "s" : ""}
                         </div>
                       </div>
                     </div>
-                    <div style={{ color: "var(--gold)", opacity: 0.5 }}>
+                    <div style={{ color: "var(--gold)", opacity: 0.5 }} className="hidden md:block">
                       <ChevronRight size={20} />
                     </div>
                   </div>

@@ -95,7 +95,7 @@ export default async function FinanceiroPage({
       <div style={{ padding: "0 44px 48px" }}>
 
         {/* KPI cards */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 28 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16, marginBottom: 28 }}>
           {[
             {
               eyebrow: "Receita do Mês",
@@ -126,7 +126,7 @@ export default async function FinanceiroPage({
               <p style={{ fontFamily: "'Cinzel',serif", fontSize: 9, fontWeight: 600, letterSpacing: 3, textTransform: "uppercase", color: accent, marginBottom: 10 }}>
                 {eyebrow}
               </p>
-              <p style={{ fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 30, color: "var(--text-primary)", letterSpacing: 1, marginBottom: 4 }}>
+              <p style={{ fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 28, color: "var(--text-primary)", letterSpacing: 1, marginBottom: 4 }}>
                 {value}
               </p>
               <p style={{ fontSize: 11, color: "var(--text-muted)" }}>{sub}</p>
@@ -167,13 +167,13 @@ export default async function FinanceiroPage({
         {/* Table */}
         <div style={{ borderRadius: 20, overflow: "hidden", border: "1px solid rgba(201,169,122,0.12)", boxShadow: "0 8px 32px rgba(0,0,0,0.35)" }}>
 
-          {/* Table header */}
+          {/* Table header - Hidden on mobile */}
           <div style={{
             display: "grid", gridTemplateColumns: "1fr 1.4fr 100px 110px 90px",
             padding: "12px 24px", gap: 12,
             background: "rgba(201,169,122,0.04)",
             borderBottom: "1px solid rgba(201,169,122,0.10)",
-          }}>
+          }} className="hidden md:grid">
             {["Aluno", "Curso", "Valor", "Status", "Data"].map(h => (
               <span key={h} style={{ fontFamily: "'Cinzel',serif", fontSize: 9, fontWeight: 600, letterSpacing: 3, textTransform: "uppercase", color: "var(--gold)" }}>
                 {h}
@@ -193,17 +193,17 @@ export default async function FinanceiroPage({
                   <div
                     key={p.id}
                     style={{
-                      display: "grid", gridTemplateColumns: "1fr 1.4fr 100px 110px 90px",
-                      padding: "14px 24px", gap: 12, alignItems: "center",
+                      display: "flex", flexWrap: "wrap",
+                      padding: "16px 24px", gap: 16, alignItems: "center",
                       borderTop: i > 0 ? "1px solid rgba(201,169,122,0.06)" : "none",
                       transition: "background 0.15s",
                     }}
                     className="admin-row-hover"
                   >
                     {/* Aluno */}
-                    <div style={{ minWidth: 0 }}>
+                    <div style={{ flex: 1, minWidth: "180px" }}>
                       <Link href={`/admin/alunos/${p.user.id}`} style={{ textDecoration: "none" }}>
-                        <p style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        <p style={{ fontSize: 14, fontWeight: 700, color: "var(--text-primary)", marginBottom: 2 }}>
                           {p.user.name}
                         </p>
                         <p style={{ fontSize: 11, color: "var(--text-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
@@ -213,32 +213,44 @@ export default async function FinanceiroPage({
                     </div>
 
                     {/* Curso */}
-                    <p style={{ fontSize: 12, color: "var(--text-secondary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                      {p.course.title}
-                    </p>
+                    <div style={{ flex: 1.2, minWidth: "200px" }}>
+                      <p style={{ fontSize: 9, fontFamily: "'Cinzel',serif", color: "var(--gold)", letterSpacing: 1, marginBottom: 4 }}>Curso</p>
+                      <p style={{ fontSize: 12, color: "var(--text-secondary)", fontWeight: 500 }}>
+                        {p.course.title}
+                      </p>
+                    </div>
 
-                    {/* Valor */}
-                    <p style={{ fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 14, color: "var(--gold-light)" }}>
-                      {fmt(p.amount)}
-                    </p>
+                    {/* Valor e Status container */}
+                    <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 16, flex: 1, minWidth: "240px", justifyContent: "space-between" }}>
+                      <div>
+                        <p style={{ fontSize: 9, fontFamily: "'Cinzel',serif", color: "var(--gold)", letterSpacing: 1, marginBottom: 4 }}>Valor</p>
+                        <p style={{ fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 15, color: "var(--gold-light)" }}>
+                          {fmt(p.amount)}
+                        </p>
+                      </div>
 
-                    {/* Status */}
-                    <span style={{
-                      display: "inline-flex", alignItems: "center", gap: 6,
-                      padding: "4px 10px", borderRadius: 999,
-                      background: s.bg, color: s.color,
-                      fontSize: 10, fontWeight: 600, letterSpacing: 1,
-                      fontFamily: "'Cinzel',serif", textTransform: "uppercase",
-                      width: "fit-content",
-                    }}>
-                      <span style={{ width: 5, height: 5, borderRadius: "50%", background: s.color, flexShrink: 0 }} />
-                      {s.label}
-                    </span>
+                      <div>
+                        <p style={{ fontSize: 9, fontFamily: "'Cinzel',serif", color: "var(--gold)", letterSpacing: 1, marginBottom: 4 }}>Status</p>
+                        <span style={{
+                          display: "inline-flex", alignItems: "center", gap: 6,
+                          padding: "4px 12px", borderRadius: 999,
+                          background: s.bg, color: s.color,
+                          fontSize: 9, fontWeight: 700, letterSpacing: 1,
+                          fontFamily: "'Cinzel',serif", textTransform: "uppercase",
+                          border: `1px solid ${s.color}20`,
+                        }}>
+                          <span style={{ width: 5, height: 5, borderRadius: "50%", background: s.color, flexShrink: 0 }} />
+                          {s.label}
+                        </span>
+                      </div>
 
-                    {/* Data */}
-                    <p style={{ fontSize: 11, color: "var(--text-muted)", whiteSpace: "nowrap" }}>
-                      {new Date(p.createdAt).toLocaleDateString("pt-BR")}
-                    </p>
+                      <div style={{ textAlign: "right" }}>
+                        <p style={{ fontSize: 9, fontFamily: "'Cinzel',serif", color: "var(--gold)", letterSpacing: 1, marginBottom: 4 }}>Data</p>
+                        <p style={{ fontSize: 11, color: "var(--text-muted)", whiteSpace: "nowrap" }}>
+                          {new Date(p.createdAt).toLocaleDateString("pt-BR")}
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 );
               })}

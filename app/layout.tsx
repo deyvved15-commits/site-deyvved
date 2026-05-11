@@ -21,9 +21,10 @@ export const metadata: Metadata = {
   title: "Kadima Academy — Escola Teológica Online",
   description: "Plataforma de ensino teológico da Kadima Academy",
   manifest: "/manifest.json",
+  themeColor: "#060D1F",
   icons: {
-    icon: "/icon.png?v=1",
-    apple: "/apple-icon.png?v=1",
+    icon: "/icon.png",
+    apple: "/apple-icon.png",
   }
 };
 

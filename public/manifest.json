@@ -1,24 +1,26 @@
 {
-  "id": "kadima-academy-pwa",
+  "id": "kadima-academy-pwa-v1",
   "name": "Kadima Academy",
   "short_name": "Kadima",
   "description": "Plataforma de Ensino Kadima Academy",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#060D1F",
-  "theme_color": "#C9A97A",
+  "theme_color": "#060D1F",
   "icons": [
     {
       "src": "/icon.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "any maskable"
     },
     {
       "src": "/icon.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "maskable"
+      "purpose": "any maskable"
     }
   ]
 }

@@ -54,13 +54,13 @@ export default async function AlunosPage() {
             border: "1px solid rgba(201,169,122,0.12)",
             boxShadow: "0 8px 32px rgba(0,0,0,0.35)",
           }}>
-            {/* Table head */}
+            {/* Table head - Hidden on mobile */}
             <div style={{
-              display: "grid", gridTemplateColumns: "2fr 2fr 1fr 2fr 1fr 80px",
+              display: "grid", gridTemplateColumns: "1.5fr 1.5fr 1fr 1.5fr 1fr 80px",
               padding: "12px 24px",
               borderBottom: "1px solid rgba(201,169,122,0.10)",
               background: "rgba(201,169,122,0.03)",
-            }}>
+            }} className="hidden md:grid">
               {["Aluno", "E-mail", "Igreja", "Cursos", "Cadastro", ""].map(h => (
                 <span key={h} style={{ fontFamily: "'Cinzel',serif", fontSize: 9, fontWeight: 600, letterSpacing: 3, textTransform: "uppercase", color: "var(--gold)" }}>
                   {h}
@@ -69,63 +69,88 @@ export default async function AlunosPage() {
             </div>
 
             {/* Rows */}
-            {students.map((s, i) => {
-              const initials = s.name?.split(" ").map(n => n[0]).slice(0, 2).join("").toUpperCase() ?? "?";
-              return (
-                <div key={s.id} style={{
-                  display: "grid", gridTemplateColumns: "2fr 2fr 1fr 2fr 1fr 80px",
-                  alignItems: "center", padding: "14px 24px",
-                  borderTop: i > 0 ? "1px solid rgba(201,169,122,0.06)" : "none",
-                  transition: "background 0.2s",
-                }}
-                className="admin-row-hover">
-                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                    <div style={{
-                      width: 34, height: 34, borderRadius: "50%", flexShrink: 0,
-                      background: "radial-gradient(circle at 30% 30%, var(--gold-bright), var(--gold) 50%, var(--gold-deep))",
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 11,
-                      color: "var(--navy-darkest)",
-                      boxShadow: "0 0 10px rgba(201,169,122,0.25)",
-                    }}>
-                      {initials}
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              {students.map((s, i) => {
+                const initials = s.name?.split(" ").map(n => n[0]).slice(0, 2).join("").toUpperCase() ?? "?";
+                return (
+                  <div key={s.id} style={{
+                    display: "flex", flexWrap: "wrap", alignItems: "center", padding: "20px 24px",
+                    borderTop: i > 0 ? "1px solid rgba(201,169,122,0.06)" : "none",
+                    gap: 16, transition: "background 0.2s",
+                  }}
+                  className="admin-row-hover">
+                    
+                    {/* Aluno info */}
+                    <div style={{ display: "flex", alignItems: "center", gap: 12, flex: 1, minWidth: "200px" }}>
+                      <div style={{
+                        width: 44, height: 44, borderRadius: "50%", flexShrink: 0,
+                        background: "radial-gradient(circle at 30% 30%, var(--gold-bright), var(--gold) 50%, var(--gold-deep))",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 14,
+                        color: "var(--navy-darkest)",
+                        boxShadow: "0 0 10px rgba(201,169,122,0.25)",
+                      }}>
+                        {initials}
+                      </div>
+                      <div style={{ minWidth: 0 }}>
+                        <span style={{ display: "block", fontSize: 15, fontWeight: 700, color: "var(--text-primary)", marginBottom: 2 }}>
+                          {s.name}
+                        </span>
+                        <span style={{ display: "block", fontSize: 11, color: "var(--text-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                          {s.email}
+                        </span>
+                      </div>
                     </div>
-                    <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                      {s.name}
-                    </span>
+
+                    {/* Meta info container */}
+                    <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 12, flex: 1.5, minWidth: "260px", justifyContent: "space-between" }}>
+                      
+                      <div style={{ minWidth: 80 }}>
+                        <p style={{ fontSize: 9, fontFamily: "'Cinzel',serif", color: "var(--gold)", letterSpacing: 1, marginBottom: 4 }}>Igreja</p>
+                        <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>{s.church ?? "—"}</span>
+                      </div>
+
+                      <div style={{ flex: 1, minWidth: 120 }}>
+                        <p style={{ fontSize: 9, fontFamily: "'Cinzel',serif", color: "var(--gold)", letterSpacing: 1, marginBottom: 4 }}>Cursos</p>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                          {s.enrollments.length === 0
+                            ? <span style={{ fontSize: 11, color: "var(--text-muted)" }}>Nenhum</span>
+                            : s.enrollments.map(e => (
+                                <span key={e.course.title} style={{
+                                  fontSize: 9, fontWeight: 700,
+                                  background: "rgba(201,169,122,0.08)", border: "1px solid var(--gold-20)",
+                                  color: "var(--gold)", padding: "2px 8px", borderRadius: 999,
+                                }}>
+                                  {e.course.title}
+                                </span>
+                              ))}
+                        </div>
+                      </div>
+
+                      <div style={{ minWidth: 80, textAlign: "right" }}>
+                        <p style={{ fontSize: 9, fontFamily: "'Cinzel',serif", color: "var(--gold)", letterSpacing: 1, marginBottom: 4 }}>Cadastro</p>
+                        <span style={{ fontSize: 11, color: "var(--text-muted)" }}>
+                          {new Date(s.createdAt).toLocaleDateString("pt-BR")}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Action */}
+                    <div style={{ width: "100%", display: "block" }} className="md:w-auto">
+                      <Link href={`/admin/alunos/${s.id}`} style={{
+                        width: "100%", padding: "10px 14px", borderRadius: 10,
+                        background: "rgba(201,169,122,0.1)", border: "1px solid var(--gold-35)",
+                        color: "var(--gold-light)", fontSize: 11, fontWeight: 700,
+                        letterSpacing: 2, textDecoration: "none", textTransform: "uppercase",
+                        display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s"
+                      }} className="btn-gold-hover">
+                        Gerenciar Aluno
+                      </Link>
+                    </div>
                   </div>
-                  <span style={{ fontSize: 12, color: "var(--text-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", paddingRight: 8 }}>
-                    {s.email}
-                  </span>
-                  <span style={{ fontSize: 12, color: "var(--text-muted)" }}>{s.church ?? "—"}</span>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
-                    {s.enrollments.length === 0
-                      ? <span style={{ fontSize: 11, color: "var(--text-muted)" }}>—</span>
-                      : s.enrollments.map(e => (
-                          <span key={e.course.title} style={{
-                            fontSize: 10, fontWeight: 600,
-                            background: "rgba(201,169,122,0.08)", border: "1px solid var(--gold-20)",
-                            color: "var(--gold)", padding: "2px 8px", borderRadius: 999,
-                          }}>
-                            {e.course.title}
-                          </span>
-                        ))}
-                  </div>
-                  <span style={{ fontSize: 11, color: "var(--text-muted)" }}>
-                    {new Date(s.createdAt).toLocaleDateString("pt-BR")}
-                  </span>
-                  <Link href={`/admin/alunos/${s.id}`} style={{
-                    padding: "6px 14px", borderRadius: 8,
-                    background: "rgba(201,169,122,0.08)", border: "1px solid var(--gold-20)",
-                    color: "var(--gold-light)", fontSize: 11, fontWeight: 600,
-                    letterSpacing: 1, textDecoration: "none",
-                    display: "inline-block", textAlign: "center",
-                  }}>
-                    Ver
-                  </Link>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         )}
       </div>
