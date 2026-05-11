@@ -13,6 +13,7 @@ const updateSchema = z.object({
   category: z.string().nullable().optional(),
   teacherId: z.string().nullable().optional(),
   commissionPercentage: z.number().min(0).max(100).optional(),
+  hasCertificate: z.boolean().optional(),
 });
 
 export async function GET(_: NextRequest, { params }: { params: Promise<{ courseId: string }> }) {

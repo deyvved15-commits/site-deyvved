@@ -35,7 +35,7 @@ export default async function CursoPage({ params }: { params: Promise<{ slug: st
   const totalDone = allLessons.filter(l => l.progress[0]?.completed).length;
   const total = allLessons.length;
   const coursePct = total > 0 ? Math.round((totalDone / total) * 100) : 0;
-  const isConcluded = total > 0 && totalDone === total && course.paymentType === "ONE_TIME";
+  const isConcluded = total > 0 && totalDone === total && course.paymentType === "ONE_TIME" && course.hasCertificate;
 
   return (
     <div style={{ minHeight: "100%", background: "linear-gradient(180deg, var(--navy-darkest) 0%, var(--navy-mid) 100%)" }}>

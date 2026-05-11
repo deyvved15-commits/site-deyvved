@@ -79,6 +79,7 @@ model User {
   payments       Payment[]
   comments       Comment[]
   taughtCourses  Course[]         @relation("CourseTeacher")
+  certificates   Certificate[]
 }
 
 // ── LMS ───────────────────────────────────────────────────────
@@ -100,10 +101,24 @@ model Course {
   commissionPercentage Float   @default(0)
   teacher              User?   @relation("CourseTeacher", fields: [teacherId], references: [id])
   category             String?
+  hasCertificate       Boolean @default(false)
 
-  modules     Module[]
-  enrollments Enrollment[]
-  payments    Payment[]
+  modules      Module[]
+  enrollments  Enrollment[]
+  payments     Payment[]
+  certificates Certificate[]
+}
+
+model Certificate {
+  id        String   @id @default(cuid())
+  userId    String
+  courseId  String
+  issuedAt  DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
 }
 
 model Module {

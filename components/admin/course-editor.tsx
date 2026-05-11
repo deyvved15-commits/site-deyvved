@@ -231,6 +231,14 @@ export default function CourseEditor({ course: initial, teachers, isAdmin = true
             </div>
           </div>
 
+          <div style={{ ...S.field, flexDirection: "row", alignItems: "center", gap: 10, padding: "12px 16px", background: "rgba(201,169,122,0.05)", borderRadius: 14, border: "1px solid rgba(201,169,122,0.15)" }}>
+            <input type="checkbox" id="hasCertificate" checked={course.hasCertificate} onChange={e => setCourse(c => ({ ...c, hasCertificate: e.target.checked }))} style={{ width: 18, height: 18, cursor: "pointer", accentColor: "var(--gold)" }} />
+            <div>
+              <label htmlFor="hasCertificate" style={{ ...S.label, cursor: "pointer", fontSize: 11, display: "block", marginBottom: 2 }}>Oferecer Certificado de Conclusão</label>
+              <p style={{ fontSize: 9, color: "var(--text-muted)", margin: 0 }}>Válido apenas para cursos de pagamento único com 100% de progresso.</p>
+            </div>
+          </div>
+
           {isAdmin && (
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
               <div style={S.field}>
