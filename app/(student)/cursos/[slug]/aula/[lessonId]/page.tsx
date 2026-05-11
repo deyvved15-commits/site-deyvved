@@ -283,8 +283,21 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
               <div style={{ 
                 display: "flex", alignItems: "center", gap: 10, padding: "16px 16px 8px" 
               }}>
-                {mod.thumbnail && (
-                  <img src={mod.thumbnail} alt="" style={{ width: 32, height: 32, borderRadius: 8, objectFit: "cover", border: "1px solid rgba(201,169,122,0.2)" }} />
+                {mod.thumbnail ? (
+                  <img 
+                    src={mod.thumbnail} 
+                    alt="" 
+                    style={{ width: 32, height: 32, borderRadius: 8, objectFit: "cover", border: "1px solid rgba(201,169,122,0.2)" }}
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none';
+                    }}
+                  />
+                ) : (
+                  <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(201,169,122,0.1)", border: "1px solid rgba(201,169,122,0.15)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.4 }}>
+                      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                    </svg>
+                  </div>
                 )}
                 <p className="ka-lesson-module-title" style={{ padding: 0, margin: 0 }}>{mod.title}</p>
               </div>
