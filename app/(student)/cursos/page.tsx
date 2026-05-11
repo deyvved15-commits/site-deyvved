@@ -29,9 +29,9 @@ export default async function CursosPage({ searchParams }: { searchParams: Promi
     },
   });
 
-  const allCategories = Array.from(new Set(enrollments.map(e => e.course.category).filter(Boolean))) as string[];
+  const allCategories = Array.from(new Set(enrollments.map(e => e.course?.category).filter(Boolean))) as string[];
   const filteredEnrollments = categoria 
-    ? enrollments.filter(e => e.course.category === categoria)
+    ? enrollments.filter(e => e.course?.category === categoria)
     : enrollments;
 
   return (
@@ -67,7 +67,8 @@ export default async function CursosPage({ searchParams }: { searchParams: Promi
         ) : (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(250px, 280px))", gap: 24 }}>
             {filteredEnrollments.map(({ course }) => {
-              const allLessons = course.modules.flatMap(m => m.lessons);
+              if (!course) return null;
+              const allLessons = course.modules?.flatMap(m => m.lessons) ?? [];
               const done = allLessons.filter(l => l.progress[0]?.completed).length;
               const total = allLessons.length;
               const pct = total > 0 ? Math.round((done / total) * 100) : 0;

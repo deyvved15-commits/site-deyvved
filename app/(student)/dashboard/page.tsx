@@ -104,7 +104,7 @@ export default async function DashboardPage() {
         ) : (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(250px, 280px))", gap: 24 }}>
             {enrollments.map(({ course, expiresAt }) => (
-              <CourseCard key={course.id} course={course} isEnrolled={true} expiresAt={expiresAt} />
+              course ? <CourseCard key={course.id} course={course} isEnrolled={true} expiresAt={expiresAt} /> : null
             ))}
           </div>
         )}
