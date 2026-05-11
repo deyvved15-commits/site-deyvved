@@ -40,9 +40,9 @@ export default async function TeacherFormadosPage() {
               <div key={g.id} style={{ 
                 background: "linear-gradient(160deg, var(--navy-card) 0%, var(--navy-card-2) 100%)", 
                 border: "1px solid rgba(201,169,122,0.15)", borderRadius: 20, padding: "20px 24px",
-                display: "flex", alignItems: "center", justifyContent: "space-between", gap: 20
+                display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 20
               }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 16, flex: 1 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 16, flex: 1, minWidth: "240px" }}>
                   <div style={{ 
                     width: 48, height: 48, borderRadius: "50%", background: "rgba(201,169,122,0.1)", 
                     display: "flex", alignItems: "center", justifyContent: "center", color: "var(--gold)" 
@@ -55,7 +55,7 @@ export default async function TeacherFormadosPage() {
                   </div>
                 </div>
 
-                <div style={{ flex: 1 }}>
+                <div style={{ flex: 1, minWidth: "240px" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
                     <BookOpen size={14} color="var(--gold)" />
                     <span style={{ fontSize: 13, fontWeight: 600, color: "var(--gold-light)" }}>{g.course.title}</span>
@@ -63,14 +63,17 @@ export default async function TeacherFormadosPage() {
                   <p style={{ fontSize: 11, color: "var(--text-muted)" }}>Formado em {new Date(g.issuedAt).toLocaleDateString("pt-BR")}</p>
                 </div>
 
-                <Link href={`/certificado/${g.courseId}?userId=${g.userId}`} target="_blank" style={{
-                  display: "flex", alignItems: "center", gap: 8, padding: "10px 20px",
-                  background: "rgba(201,169,122,0.1)", border: "1px solid var(--gold)",
-                  color: "var(--gold)", borderRadius: 12, textDecoration: "none",
-                  fontSize: 12, fontWeight: 700, fontFamily: "'Cinzel',serif", transition: "all 0.2s"
-                }} className="btn-gold-hover">
-                  <Download size={16} /> Segunda Via
-                </Link>
+                <div style={{ width: "100%" }} className="md:w-auto">
+                  <Link href={`/certificado/${g.courseId}?userId=${g.userId}`} target="_blank" style={{
+                    display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "12px 24px",
+                    background: "rgba(201,169,122,0.1)", border: "1px solid var(--gold)",
+                    color: "var(--gold)", borderRadius: 12, textDecoration: "none",
+                    fontSize: 12, fontWeight: 700, fontFamily: "'Cinzel',serif", transition: "all 0.2s",
+                    width: "100%"
+                  }} className="btn-gold-hover">
+                    <Download size={16} /> Segunda Via
+                  </Link>
+                </div>
               </div>
             ))}
           </div>

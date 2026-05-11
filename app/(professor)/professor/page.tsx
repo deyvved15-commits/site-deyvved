@@ -66,10 +66,10 @@ export default async function ProfessorDashboard() {
         <p className="ka-page-subtitle">Gerencie seus cursos e acompanhe seus resultados.</p>
       </div>
 
-      <div className="ka-section" style={{ padding: "32px 44px 44px" }}>
+      <div className="ka-section">
         
         {/* Stats Grid */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 32 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16, marginBottom: 32 }}>
           {stats.map((stat) => (
             <Link key={stat.label} href={stat.href} style={{ textDecoration: "none" }}>
               <div style={{
@@ -109,7 +109,7 @@ export default async function ProfessorDashboard() {
           ))}
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: 24 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 24 }}>
           {/* Column 1: Courses */}
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
@@ -134,14 +134,14 @@ export default async function ProfessorDashboard() {
                   {courses.map((course, i) => (
                     <Link key={course.id} href={`/professor/cursos/${course.id}`} style={{ textDecoration: "none" }}>
                       <div style={{
-                        padding: "16px 24px",
+                        padding: "20px 24px",
                         borderTop: i > 0 ? "1px solid rgba(201,169,122,0.06)" : "none",
-                        display: "flex", alignItems: "center", gap: 16,
+                        display: "flex", flexWrap: "wrap", alignItems: "center", gap: 16,
                         transition: "background 0.2s",
                         cursor: "pointer",
                       }} className="admin-row-hover">
                         <div style={{ 
-                          width: 50, height: 50, borderRadius: 12, overflow: "hidden", flexShrink: 0,
+                          width: 48, height: 48, borderRadius: 12, overflow: "hidden", flexShrink: 0,
                           background: "rgba(201,169,122,0.05)", border: "1px solid rgba(201,169,122,0.15)",
                           display: "flex", alignItems: "center", justifyContent: "center"
                         }}>
@@ -151,16 +151,16 @@ export default async function ProfessorDashboard() {
                             <BookOpen size={20} color="var(--gold-light)" />
                           )}
                         </div>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <p style={{ fontSize: 14, fontWeight: 600, color: "var(--text-primary)", marginBottom: 2 }}>{course.title}</p>
+                        <div style={{ flex: 1, minWidth: "180px" }}>
+                          <p style={{ fontSize: 14, fontWeight: 700, color: "var(--text-primary)", marginBottom: 2 }}>{course.title}</p>
                           <p style={{ fontSize: 11, color: "var(--text-muted)" }}>{course._count.enrollments} alunos matriculados</p>
                         </div>
-                        <div style={{ textAlign: "right" }}>
+                        <div style={{ textAlign: "right", minWidth: 80 }} className="md:w-auto w-full">
                           <span style={{
                             fontSize: 9, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase",
                             color: "var(--gold)", fontFamily: "'Cinzel',serif",
-                            padding: "4px 10px", borderRadius: 8, background: "rgba(201,169,122,0.10)",
-                            border: "1px solid rgba(201,169,122,0.20)"
+                            padding: "6px 14px", borderRadius: 8, background: "rgba(201,169,122,0.10)",
+                            border: "1px solid rgba(201,169,122,0.20)", display: "inline-flex", width: "100%", justifyContent: "center"
                           }}>
                             Editar
                           </span>

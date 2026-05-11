@@ -28,7 +28,7 @@ export default async function ProfessorCursosPage() {
         <p className="ka-page-subtitle">Você possui {courses.length} curso{courses.length !== 1 ? "s" : ""} sob sua responsabilidade.</p>
       </div>
 
-      <div className="ka-section" style={{ padding: "32px 44px 44px" }}>
+      <div className="ka-section">
         
         <div style={{ 
           borderRadius: 20, overflow: "hidden", 
@@ -41,42 +41,49 @@ export default async function ProfessorCursosPage() {
               <p style={{ fontSize: 13, color: "var(--text-muted)" }}>Nenhum curso associado encontrado.</p>
             </div>
           ) : (
-            <div>
+            <div style={{ display: "flex", flexDirection: "column" }}>
               {courses.map((course, i) => (
                 <Link key={course.id} href={`/professor/cursos/${course.id}`} style={{ textDecoration: "none" }}>
                   <div style={{
-                    padding: "18px 24px",
+                    padding: "24px",
                     borderTop: i > 0 ? "1px solid rgba(201,169,122,0.06)" : "none",
-                    display: "flex", alignItems: "center", gap: 20,
+                    display: "flex", flexWrap: "wrap", alignItems: "center", gap: 20,
                     transition: "background 0.2s",
                     cursor: "pointer",
                   }} className="admin-row-hover">
                     <div style={{ 
-                      width: 60, height: 60, borderRadius: 14, overflow: "hidden", flexShrink: 0,
+                      width: 70, height: 70, borderRadius: 16, overflow: "hidden", flexShrink: 0,
                       background: "rgba(201,169,122,0.05)", border: "1px solid rgba(201,169,122,0.15)",
                       display: "flex", alignItems: "center", justifyContent: "center"
                     }}>
                       {course.thumbnail ? (
                         <img src={getGoogleDriveImageUrl(course.thumbnail)} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                       ) : (
-                        <BookOpen size={24} color="var(--gold-light)" />
+                        <BookOpen size={28} color="var(--gold-light)" />
                       )}
                     </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ fontSize: 17, fontWeight: 600, color: "var(--text-primary)", marginBottom: 4 }}>{course.title}</p>
-                      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                        <p style={{ fontSize: 12, color: "var(--text-muted)" }}>{course._count.enrollments} alunos matriculados</p>
-                        <span style={{ width: 4, height: 4, borderRadius: "50%", background: "rgba(255,255,255,0.1)" }} />
-                        <p style={{ fontSize: 12, color: "var(--text-muted)" }}>Criado em {new Date(course.createdAt).toLocaleDateString("pt-BR")}</p>
+                    <div style={{ flex: 1, minWidth: "220px" }}>
+                      <p style={{ fontSize: 18, fontWeight: 700, color: "var(--text-primary)", marginBottom: 8, fontFamily: "'Cinzel',serif" }}>{course.title}</p>
+                      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 12 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                          <Users size={12} color="var(--gold)" />
+                          <p style={{ fontSize: 12, color: "var(--text-secondary)", fontWeight: 500 }}>{course._count.enrollments} alunos</p>
+                        </div>
+                        <span style={{ width: 4, height: 4, borderRadius: "50%", background: "rgba(255,255,255,0.1)" }} className="hidden sm:block" />
+                        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                          <Clock size={12} color="var(--text-muted)" />
+                          <p style={{ fontSize: 12, color: "var(--text-muted)" }}>{new Date(course.createdAt).toLocaleDateString("pt-BR")}</p>
+                        </div>
                       </div>
                     </div>
-                    <div style={{ textAlign: "right" }}>
+                    <div style={{ width: "100%", display: "block" }} className="md:w-auto">
                       <span style={{
-                        fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase",
+                        width: "100%", display: "inline-flex", justifyContent: "center",
+                        fontSize: 10, fontWeight: 700, letterSpacing: 3, textTransform: "uppercase",
                         color: "var(--gold)", fontFamily: "'Cinzel',serif",
-                        padding: "6px 16px", borderRadius: 10, background: "rgba(201,169,122,0.10)",
-                        border: "1px solid rgba(201,169,122,0.25)"
-                      }}>
+                        padding: "12px 20px", borderRadius: 12, background: "rgba(201,169,122,0.10)",
+                        border: "1px solid rgba(201,169,122,0.25)", transition: "all 0.2s"
+                      }} className="btn-gold-hover">
                         Gerenciar Conteúdo
                       </span>
                     </div>
