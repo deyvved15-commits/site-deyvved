@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { BookOpen } from "lucide-react";
+import { getGoogleDriveImageUrl } from "@/lib/utils";
 
 export default async function ProfessorCursosPage() {
   const session = await auth();
@@ -56,7 +57,7 @@ export default async function ProfessorCursosPage() {
                       display: "flex", alignItems: "center", justifyContent: "center"
                     }}>
                       {course.thumbnail ? (
-                        <img src={course.thumbnail} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        <img src={getGoogleDriveImageUrl(course.thumbnail)} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                       ) : (
                         <BookOpen size={24} color="var(--gold-light)" />
                       )}

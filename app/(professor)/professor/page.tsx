@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { BookOpen, DollarSign, Users } from "lucide-react";
+import { getGoogleDriveImageUrl } from "@/lib/utils";
 
 export default async function ProfessorDashboard() {
   const session = await auth();
@@ -125,14 +126,14 @@ export default async function ProfessorDashboard() {
                     cursor: "pointer",
                   }} className="admin-row-hover">
                     <div style={{ 
-                      width: 48, height: 48, borderRadius: 12, overflow: "hidden", flexShrink: 0,
+                      width: 60, height: 60, borderRadius: 14, overflow: "hidden", flexShrink: 0,
                       background: "rgba(201,169,122,0.05)", border: "1px solid rgba(201,169,122,0.15)",
                       display: "flex", alignItems: "center", justifyContent: "center"
                     }}>
                       {course.thumbnail ? (
-                        <img src={course.thumbnail} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        <img src={getGoogleDriveImageUrl(course.thumbnail)} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                       ) : (
-                        <BookOpen size={20} color="var(--gold-light)" />
+                        <BookOpen size={24} color="var(--gold-light)" />
                       )}
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
