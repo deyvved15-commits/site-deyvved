@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { getGoogleDriveImageUrl } from "@/lib/utils";
+import CourseThumbnail from "@/components/student/course-thumbnail";
 import CategoryFilter from "@/components/student/category-filter";
 
 export default async function CursosPage({ searchParams }: { searchParams: Promise<{ categoria?: string }> }) {
