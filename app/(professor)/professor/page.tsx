@@ -214,7 +214,3 @@ export default async function ProfessorDashboard() {
     </div>
   );
 }
-      </div>
-    </div>
-  );
-}
