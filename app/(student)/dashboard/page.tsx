@@ -3,12 +3,13 @@ import { prisma } from "@/lib/prisma";
 import HeroSection from "@/components/student/hero-section";
 import SectionHeader from "@/components/student/section-header";
 import CourseCard from "@/components/student/course-card";
+import { calcStreak } from "@/lib/streak";
 
 export default async function DashboardPage() {
   const session = await auth();
   if (!session) return null;
 
-  const [enrollments, otherCourses, achievements] = await Promise.all([
+  const [enrollments, otherCourses, achievements, progressData] = await Promise.all([
     prisma.enrollment.findMany({
       where: { userId: session.user.id },
       include: {
@@ -44,13 +45,19 @@ export default async function DashboardPage() {
       where: { userId: session.user.id },
       include: { achievement: true },
       orderBy: { awardedAt: "desc" }
-    })
+    }),
+    prisma.lessonProgress.findMany({
+      where: { userId: session.user.id, completed: true },
+      select: { completedAt: true },
+    }),
   ]);
+
+  const streak = calcStreak(progressData.map(p => p.completedAt));
 
   return (
     <div style={{ minHeight: "100vh", background: "linear-gradient(180deg, var(--navy-darkest) 0%, var(--navy-mid) 100%)" }}>
       
-      <HeroSection userName={session.user.name ?? "Aluno"} />
+      <HeroSection userName={session.user.name ?? "Aluno"} streak={streak} />
 
       {/* ── Conquistas ── */}
       {achievements.length > 0 && (

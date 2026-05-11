@@ -2,9 +2,10 @@ import Image from "next/image";
 
 interface HeroSectionProps {
   userName: string;
+  streak?: number;
 }
 
-export default function HeroSection({ userName }: HeroSectionProps) {
+export default function HeroSection({ userName, streak = 0 }: HeroSectionProps) {
   const firstName = userName.split(" ")[0] ?? "Aluno";
 
   return (
@@ -16,44 +17,62 @@ export default function HeroSection({ userName }: HeroSectionProps) {
 
       <div style={{ position: "relative", zIndex: 2, textAlign: "center", padding: "0 20px" }}>
         <div className="ka-hero-logo">
-          <Image 
-            src="/logo-nova.png" 
-            alt="Kadima Academy" 
-            width={68} 
+          <Image
+            src="/logo-nova.png"
+            alt="Kadima Academy"
+            width={68}
             height={68}
-            style={{ borderRadius: "50%", objectFit: "contain", position: "relative", zIndex: 1 }} 
+            style={{ borderRadius: "50%", objectFit: "contain", position: "relative", zIndex: 1 }}
           />
         </div>
-        <h1 style={{ 
-          fontFamily: "'Cinzel',serif", 
-          fontWeight: 700, 
-          fontSize: 36, 
-          letterSpacing: 8, 
-          color: "var(--text-primary)", 
-          marginBottom: 14, 
-          textShadow: "0 2px 20px rgba(201,169,122,0.40)" 
+        <h1 style={{
+          fontFamily: "'Cinzel',serif",
+          fontWeight: 700,
+          fontSize: 36,
+          letterSpacing: 8,
+          color: "var(--text-primary)",
+          marginBottom: 14,
+          textShadow: "0 2px 20px rgba(201,169,122,0.40)"
         }}>
           KADIMA ACADEMY
         </h1>
-        
+
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 14, marginBottom: 10 }}>
           <span style={{ width: 60, height: 1, background: "linear-gradient(90deg, transparent, var(--gold) 50%, transparent)" }} />
-          <span style={{ 
-            fontFamily: "'Cinzel',serif", 
-            fontWeight: 500, 
-            fontSize: 11, 
-            letterSpacing: 5, 
-            color: "var(--gold-light)", 
-            textTransform: "uppercase" 
+          <span style={{
+            fontFamily: "'Cinzel',serif",
+            fontWeight: 500,
+            fontSize: 11,
+            letterSpacing: 5,
+            color: "var(--gold-light)",
+            textTransform: "uppercase"
           }}>
             Sua área de membros
           </span>
           <span style={{ width: 60, height: 1, background: "linear-gradient(90deg, var(--gold), transparent 50%, transparent)" }} />
         </div>
-        
+
         <p style={{ fontFamily: "'Poppins',sans-serif", fontSize: 15, fontWeight: 300, color: "var(--text-secondary)", letterSpacing: 1 }}>
           Bem-vindo, <strong style={{ fontWeight: 600, color: "var(--gold-light)" }}>{firstName}</strong>
         </p>
+
+        {streak > 0 && (
+          <div style={{
+            display: "inline-flex", alignItems: "center", gap: 8, marginTop: 16,
+            padding: "8px 20px", borderRadius: 40,
+            background: "linear-gradient(135deg, rgba(201,169,122,0.15) 0%, rgba(201,169,122,0.05) 100%)",
+            border: "1px solid rgba(201,169,122,0.30)",
+            backdropFilter: "blur(8px)",
+          }}>
+            <span style={{ fontSize: 18 }}>🔥</span>
+            <span style={{ fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 15, color: "var(--gold-bright)" }}>
+              {streak} {streak === 1 ? "dia" : "dias"}
+            </span>
+            <span style={{ fontSize: 11, color: "var(--text-muted)", letterSpacing: 1 }}>de sequência</span>
+            {streak >= 7 && <span style={{ fontSize: 14 }}>⚡</span>}
+            {streak >= 30 && <span style={{ fontSize: 14 }}>👑</span>}
+          </div>
+        )}
       </div>
     </section>
   );
