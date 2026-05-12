@@ -78,7 +78,7 @@ export default async function StudentProfilePage({ params }: { params: Promise<{
             </h1>
             <p style={{ fontSize: 13, color: "var(--text-muted)" }}>{student.email}</p>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0, width: "100%" }} className="md:w-auto">
+          <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0, marginLeft: "auto", justifyContent: "flex-end" }} className="w-full md:w-auto">
             {notEnrolled.length > 0 && (
               <EnrollButton studentId={studentId} courses={notEnrolled} />
             )}

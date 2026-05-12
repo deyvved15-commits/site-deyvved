@@ -1,5 +1,7 @@
 "use client";
 
+import { useState, useEffect } from "react";
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
@@ -94,40 +96,89 @@ const links = [
 
 export default function AdminSidebar({ user }: { user: { name?: string | null; email?: string | null } }) {
   const pathname = usePathname();
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const initials = user.name?.split(" ").map(n => n[0]).slice(0, 2).join("").toUpperCase() ?? "A";
+
+  // Load collapse state from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem("sidebar-collapsed");
+    if (saved === "true") setIsCollapsed(true);
+  }, []);
+
+  const toggleCollapse = () => {
+    const newState = !isCollapsed;
+    setIsCollapsed(newState);
+    localStorage.setItem("sidebar-collapsed", String(newState));
+  };
 
   return (
     <>
       {/* ── Desktop Sidebar ── */}
       <aside
-        className="ka-sidebar"
+        className={`ka-sidebar ${isCollapsed ? "collapsed" : ""}`}
         style={{
+          width: isCollapsed ? 80 : 240,
           background: "linear-gradient(180deg, #060D1F 0%, #0A1530 60%, #060D1F 100%)",
           borderRight: "1px solid rgba(201,169,122,0.12)",
+          transition: "width 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+          overflow: "hidden",
         }}
       >
+        {/* Toggle Button */}
+        <button
+          onClick={toggleCollapse}
+          style={{
+            position: "absolute",
+            top: 20,
+            right: isCollapsed ? "50%" : 12,
+            transform: isCollapsed ? "translateX(50%)" : "none",
+            zIndex: 10,
+            width: 28,
+            height: 28,
+            borderRadius: "50%",
+            background: "rgba(201,169,122,0.15)",
+            border: "1px solid rgba(201,169,122,0.3)",
+            color: "var(--gold)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
+            transition: "all 0.3s",
+          }}
+          title={isCollapsed ? "Expandir" : "Recolher"}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+            style={{ transform: isCollapsed ? "rotate(180deg)" : "none", transition: "transform 0.3s" }}>
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+        </button>
         <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: "linear-gradient(90deg, transparent, #C9A97A, transparent)" }} />
 
         {/* Logo */}
-        <div style={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center", paddingTop: 32, paddingBottom: 20, paddingLeft: 24, paddingRight: 24, borderBottom: "1px solid rgba(201,169,122,0.10)" }}>
-          <div style={{ position: "absolute", top: 16, left: "50%", transform: "translateX(-50%)", width: 144, height: 144, borderRadius: "50%", background: "radial-gradient(circle, rgba(201,169,122,0.15) 0%, transparent 70%)", pointerEvents: "none" }} />
+        <div style={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center", paddingTop: 32, paddingBottom: 20, paddingLeft: isCollapsed ? 12 : 24, paddingRight: isCollapsed ? 12 : 24, borderBottom: "1px solid rgba(201,169,122,0.10)", transition: "padding 0.3s" }}>
+          <div style={{ position: "absolute", top: 16, left: "50%", transform: "translateX(-50%)", width: isCollapsed ? 60 : 144, height: isCollapsed ? 60 : 144, borderRadius: "50%", background: "radial-gradient(circle, rgba(201,169,122,0.15) 0%, transparent 70%)", pointerEvents: "none", transition: "all 0.3s" }} />
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logo-nova.png" alt="Kadima Academy"
-            style={{ width: 80, height: 80, objectFit: "contain", position: "relative", zIndex: 1, marginBottom: 12, filter: "drop-shadow(0 0 24px rgba(201,169,122,0.50))" }} />
-          <p style={{ fontFamily: "'Cinzel',serif", fontSize: 14, fontWeight: 700, letterSpacing: 4, textTransform: "uppercase", color: "var(--text-primary)", position: "relative", zIndex: 1 }}>
-            Kadima
-          </p>
-          <p style={{ fontFamily: "'Cinzel',serif", fontSize: 10, letterSpacing: 3, textTransform: "uppercase", color: "#C9A97A", marginTop: 2, position: "relative", zIndex: 1 }}>
-            Academy
-          </p>
-          <span style={{
-            marginTop: 10, fontSize: 9, fontWeight: 700, padding: "3px 12px", borderRadius: 999,
-            letterSpacing: 2, textTransform: "uppercase",
-            background: "rgba(201,169,122,0.10)", color: "#C9A97A", border: "1px solid rgba(201,169,122,0.25)",
-            position: "relative", zIndex: 1,
-          }}>
-            Administrador
-          </span>
+            style={{ width: isCollapsed ? 40 : 80, height: isCollapsed ? 40 : 80, objectFit: "contain", position: "relative", zIndex: 1, marginBottom: isCollapsed ? 0 : 12, filter: "drop-shadow(0 0 24px rgba(201,169,122,0.50))", transition: "all 0.3s" }} />
+          
+          {!isCollapsed && (
+            <>
+              <p style={{ fontFamily: "'Cinzel',serif", fontSize: 14, fontWeight: 700, letterSpacing: 4, textTransform: "uppercase", color: "var(--text-primary)", position: "relative", zIndex: 1 }}>
+                Kadima
+              </p>
+              <p style={{ fontFamily: "'Cinzel',serif", fontSize: 10, letterSpacing: 3, textTransform: "uppercase", color: "#C9A97A", marginTop: 2, position: "relative", zIndex: 1 }}>
+                Academy
+              </p>
+              <span style={{
+                marginTop: 10, fontSize: 9, fontWeight: 700, padding: "3px 12px", borderRadius: 999,
+                letterSpacing: 2, textTransform: "uppercase",
+                background: "rgba(201,169,122,0.10)", color: "#C9A97A", border: "1px solid rgba(201,169,122,0.25)",
+                position: "relative", zIndex: 1,
+              }}>
+                Administrador
+              </span>
+            </>
+          )}
         </div>
 
         {/* Nav */}
@@ -137,12 +188,14 @@ export default function AdminSidebar({ user }: { user: { name?: string | null; e
               const active = exact ? pathname === href : pathname.startsWith(href);
               return (
                 <Link key={href} href={href}
+                  title={isCollapsed ? label : ""}
                   style={{
                     display: "flex", alignItems: "center", gap: 12,
-                    padding: "11px 16px", borderRadius: 12,
+                    padding: isCollapsed ? "11px" : "11px 16px", borderRadius: 12,
                     fontSize: 14, fontWeight: 500,
                     textDecoration: "none",
                     transition: "all 0.2s",
+                    justifyContent: isCollapsed ? "center" : "flex-start",
                     ...(active ? {
                       background: "linear-gradient(135deg, rgba(201,169,122,0.20), rgba(201,169,122,0.08))",
                       border: "1px solid rgba(201,169,122,0.30)",
@@ -161,8 +214,8 @@ export default function AdminSidebar({ user }: { user: { name?: string | null; e
                   }}>
                     {icon}
                   </div>
-                  <span>{label}</span>
-                  {active && <div style={{ marginLeft: "auto", width: 6, height: 6, borderRadius: "50%", background: "#C9A97A", boxShadow: "0 0 6px #C9A97A" }} />}
+                  {!isCollapsed && <span>{label}</span>}
+                  {active && !isCollapsed && <div style={{ marginLeft: "auto", width: 6, height: 6, borderRadius: "50%", background: "#C9A97A", boxShadow: "0 0 6px #C9A97A" }} />}
                 </Link>
               );
             })}
@@ -173,27 +226,35 @@ export default function AdminSidebar({ user }: { user: { name?: string | null; e
 
         {/* User */}
         <div style={{ padding: 16, position: "relative", zIndex: 1 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 12px", borderRadius: 12, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
+          <div style={{
+            display: "flex", alignItems: "center", gap: 12, padding: "10px 12px", borderRadius: 12,
+            background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)",
+            justifyContent: isCollapsed ? "center" : "flex-start",
+          }}>
             <div style={{ width: 36, height: 36, borderRadius: "50%", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, background: "linear-gradient(135deg, #C9A97A, #9A7A50)", color: "#060D1F" }}>
               {initials}
             </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ fontSize: 12, fontWeight: 600, color: "var(--text-primary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{user.name}</p>
-              <p style={{ fontSize: 10, color: "rgba(255,255,255,0.30)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{user.email}</p>
-            </div>
-            <button
-              onClick={() => signOut({ callbackUrl: "/login" })}
-              title="Sair"
-              style={{ flexShrink: 0, padding: 6, borderRadius: 8, border: "none", background: "none", cursor: "pointer", color: "rgba(255,255,255,0.20)", transition: "all 0.2s" }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = "#ef4444"; (e.currentTarget as HTMLElement).style.background = "rgba(239,68,68,0.10)"; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.20)"; (e.currentTarget as HTMLElement).style.background = "transparent"; }}
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                <polyline points="16 17 21 12 16 7"/>
-                <line x1="21" y1="12" x2="9" y2="12"/>
-              </svg>
-            </button>
+            {!isCollapsed && (
+              <>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontSize: 12, fontWeight: 600, color: "var(--text-primary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{user.name}</p>
+                  <p style={{ fontSize: 10, color: "rgba(255,255,255,0.30)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{user.email}</p>
+                </div>
+                <button
+                  onClick={() => signOut({ callbackUrl: "/login" })}
+                  title="Sair"
+                  style={{ flexShrink: 0, padding: 6, borderRadius: 8, border: "none", background: "none", cursor: "pointer", color: "rgba(255,255,255,0.20)", transition: "all 0.2s" }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = "#ef4444"; (e.currentTarget as HTMLElement).style.background = "rgba(239,68,68,0.10)"; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.20)"; (e.currentTarget as HTMLElement).style.background = "transparent"; }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                    <polyline points="16 17 21 12 16 7"/>
+                    <line x1="21" y1="12" x2="9" y2="12"/>
+                  </svg>
+                </button>
+              </>
+            )}
           </div>
         </div>
       </aside>
