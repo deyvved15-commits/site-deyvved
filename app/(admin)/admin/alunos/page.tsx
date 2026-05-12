@@ -1,9 +1,21 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import { Suspense } from "react";
+import SearchInput from "@/components/ui/search-input";
 
-export default async function AlunosPage() {
+export default async function AlunosPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
+  const { q } = await searchParams;
   const students = await prisma.user.findMany({
-    where: { role: "STUDENT" },
+    where: {
+      role: "STUDENT",
+      ...(q ? {
+        OR: [
+          { name: { contains: q, mode: "insensitive" } },
+          { email: { contains: q, mode: "insensitive" } },
+          { church: { contains: q, mode: "insensitive" } },
+        ],
+      } : {}),
+    },
     orderBy: { createdAt: "desc" },
     include: { enrollments: { include: { course: { select: { title: true } } } } },
   });
@@ -18,7 +30,8 @@ export default async function AlunosPage() {
           <h1 className="ka-page-title">Meus <span>Alunos</span></h1>
           <p className="ka-page-subtitle">{students.length} aluno{students.length !== 1 ? "s" : ""} cadastrado{students.length !== 1 ? "s" : ""}</p>
         </div>
-        <div style={{ width: "100%" }} className="md:w-auto">
+        <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+          <Suspense><SearchInput placeholder="Buscar por nome, e-mail ou igreja..." /></Suspense>
           <Link href="/admin/alunos/novo" style={{
             display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8,
             padding: "12px 24px", borderRadius: 12, width: "100%",

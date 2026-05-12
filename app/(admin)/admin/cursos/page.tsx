@@ -1,10 +1,14 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import { Suspense } from "react";
 import DeleteCourseButton from "@/components/admin/delete-course-button";
 import { getGoogleDriveImageUrl } from "@/lib/utils";
+import SearchInput from "@/components/ui/search-input";
 
-export default async function CursosPage() {
+export default async function CursosPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
+  const { q } = await searchParams;
   const courses = await prisma.course.findMany({
+    where: q ? { title: { contains: q, mode: "insensitive" } } : {},
     orderBy: { order: "asc" },
     include: {
       _count: { select: { enrollments: true } },
@@ -16,13 +20,15 @@ export default async function CursosPage() {
     <div style={{ minHeight: "100%", background: "linear-gradient(180deg, var(--navy-darkest) 0%, var(--navy-mid) 100%)" }}>
 
       {/* Header */}
-      <div className="ka-page-header" style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
+      <div className="ka-page-header" style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", flexWrap: "wrap", gap: 16 }}>
         <div>
           <div className="ka-page-eyebrow">Gestão</div>
           <h1 className="ka-page-title">Meus <span>Cursos</span></h1>
           <p className="ka-page-subtitle">{courses.length} curso{courses.length !== 1 ? "s" : ""} cadastrado{courses.length !== 1 ? "s" : ""}</p>
         </div>
-        <Link href="/admin/cursos/novo" style={{
+        <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+          <Suspense><SearchInput placeholder="Buscar curso..." /></Suspense>
+          <Link href="/admin/cursos/novo" style={{
           display: "inline-flex", alignItems: "center", gap: 8,
           padding: "10px 20px", borderRadius: 12,
           background: "linear-gradient(135deg, var(--gold), var(--gold-deep))",
@@ -36,6 +42,7 @@ export default async function CursosPage() {
           </svg>
           Novo Curso
         </Link>
+        </div>
       </div>
 
       <div className="ka-section" style={{ padding: "32px 44px 44px" }}>

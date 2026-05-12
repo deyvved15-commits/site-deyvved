@@ -46,6 +46,8 @@ export async function proxy(req: NextRequest) {
       return redirectTo("/dashboard");
     }
 
+    if (pathname.startsWith("/curso/")) return NextResponse.next();
+
     return NextResponse.next();
   } catch {
     const url = req.nextUrl.clone();
