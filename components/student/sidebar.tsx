@@ -88,6 +88,15 @@ export default function StudentSidebar({ user, streak = 0 }: { user: { name?: st
           <div style={{ fontFamily: "'Cinzel',serif", fontWeight: 500, fontSize: 11, letterSpacing: 6, color: "var(--gold-light)", textTransform: "uppercase" }}>
             Academy
           </div>
+
+          {streak > 0 && (
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 5, marginTop: 10, padding: "4px 12px", borderRadius: 20, background: "rgba(201,169,122,0.08)", border: "1px solid rgba(201,169,122,0.18)" }}>
+              <span style={{ fontSize: 13 }}>🔥</span>
+              <span style={{ fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 12, color: "var(--gold-bright)" }}>
+                {streak} {streak === 1 ? "dia" : "dias"}
+              </span>
+            </div>
+          )}
         </div>
 
         <div className="ka-divider" />
@@ -114,21 +123,6 @@ export default function StudentSidebar({ user, streak = 0 }: { user: { name?: st
             })}
           </nav>
         </div>
-
-        {/* Streak */}
-        {streak > 0 && (
-          <div style={{ margin: "0 14px 12px", padding: "10px 14px", borderRadius: 14, background: "linear-gradient(135deg, rgba(201,169,122,0.10) 0%, rgba(201,169,122,0.04) 100%)", border: "1px solid rgba(201,169,122,0.20)", display: "flex", alignItems: "center", gap: 10 }}>
-            <span style={{ fontSize: 22, lineHeight: 1 }}>🔥</span>
-            <div>
-              <div style={{ fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 18, color: "var(--gold-bright)", lineHeight: 1 }}>
-                {streak} {streak === 1 ? "dia" : "dias"}
-              </div>
-              <div style={{ fontSize: 9, color: "var(--text-muted)", letterSpacing: 1.5, textTransform: "uppercase", marginTop: 2 }}>
-                Sequência de estudos
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Footer */}
         <div style={{ padding: 16, borderTop: "1px solid rgba(201,169,122,0.10)", background: "linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.30) 100%)" }}>
