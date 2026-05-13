@@ -26,10 +26,14 @@ export default async function CursoPage({ params }: { params: Promise<{ slug: st
   });
   if (!course) notFound();
 
+  const isTeacherOfCourse = course.teacherId === session.user.id;
   const enrollment = await prisma.enrollment.findUnique({
     where: { userId_courseId: { userId: session.user.id, courseId: course.id } },
   });
-  if (!enrollment) redirect("/dashboard");
+  
+  if (!enrollment && !isTeacherOfCourse && session.user.role !== "ADMIN") {
+    redirect("/dashboard");
+  }
 
   const allLessons = course.modules.flatMap(m => m.lessons);
   const totalDone = allLessons.filter(l => l.progress[0]?.completed).length;

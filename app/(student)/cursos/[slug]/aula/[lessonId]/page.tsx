@@ -34,23 +34,31 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
   if (!course) notFound();
 
   // Verifica matrícula e expiração
+  const isTeacher = course.teacherId === session.user.id;
+  const isAdmin = session.user.role === "ADMIN";
   const enrollment = await prisma.enrollment.findUnique({
     where: { userId_courseId: { userId: session.user.id, courseId: course.id } },
   });
-  if (!enrollment) redirect("/dashboard");
-  if (enrollment.expiresAt && enrollment.expiresAt < new Date()) redirect(`/checkout/${course.id}?renovar=1`);
+
+  if (!enrollment && !isTeacher && !isAdmin) redirect("/dashboard");
+  
+  if (enrollment && enrollment.expiresAt && enrollment.expiresAt < new Date()) {
+    redirect(`/checkout/${course.id}?renovar=1`);
+  }
 
   const allLessons = course.modules.flatMap(m => m.lessons);
   const currentIndex = allLessons.findIndex(l => l.id === lessonId);
   if (currentIndex === -1) notFound();
 
   // Drip content check
-  const enrolledAt = enrollment.createdAt;
+  const enrolledAt = enrollment?.createdAt ?? new Date(2000, 0, 1);
   const daysSinceEnrollment = Math.floor((Date.now() - enrolledAt.getTime()) / 86400000);
   const lesson = allLessons[currentIndex];
   const initialRating = (lesson as any).ratings[0]?.rating;
 
-  if (lesson.releaseAfterDays > daysSinceEnrollment) redirect(`/cursos/${slug}?bloqueada=1`);
+  if (!isTeacher && !isAdmin && lesson.releaseAfterDays > daysSinceEnrollment) {
+    redirect(`/cursos/${slug}?bloqueada=1`);
+  }
 
   const prev = allLessons[currentIndex - 1] ?? null;
   const next = allLessons[currentIndex + 1] ?? null;

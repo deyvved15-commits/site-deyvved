@@ -10,29 +10,50 @@ export default async function CursosPage({ searchParams }: { searchParams: Promi
   if (!session) return null;
   const { categoria } = await searchParams;
 
-  const enrollments = await prisma.enrollment.findMany({
-    where: { userId: session.user.id },
-    include: {
-      course: {
-        include: {
-          modules: {
-            orderBy: { order: "asc" },
-            include: {
-              lessons: {
-                orderBy: { order: "asc" },
-                include: { progress: { where: { userId: session.user.id } } },
+  const [enrollments, taughtCourses] = await Promise.all([
+    prisma.enrollment.findMany({
+      where: { userId: session.user.id },
+      include: {
+        course: {
+          include: {
+            modules: {
+              orderBy: { order: "asc" },
+              include: {
+                lessons: {
+                  orderBy: { order: "asc" },
+                  include: { progress: { where: { userId: session.user.id } } },
+                },
               },
             },
           },
         },
       },
-    },
-  });
+    }),
+    prisma.course.findMany({
+      where: { teacherId: session.user.id },
+      include: {
+        modules: {
+          orderBy: { order: "asc" },
+          include: {
+            lessons: {
+              orderBy: { order: "asc" },
+              include: { progress: { where: { userId: session.user.id } } },
+            },
+          },
+        },
+      },
+    }),
+  ]);
 
-  const allCategories = Array.from(new Set(enrollments.map(e => e.course?.category).filter(Boolean))) as string[];
-  const filteredEnrollments = categoria 
-    ? enrollments.filter(e => e.course?.category === categoria)
-    : enrollments;
+  const combinedCourses = [
+    ...enrollments.map(e => e.course),
+    ...taughtCourses.filter(tc => !enrollments.some(e => e.courseId === tc.id))
+  ].filter(Boolean);
+
+  const allCategories = Array.from(new Set(combinedCourses.map(c => (c as any).category).filter(Boolean))) as string[];
+  const filteredCourses = categoria 
+    ? combinedCourses.filter(c => (c as any).category === categoria)
+    : combinedCourses;
 
   return (
     <div style={{ minHeight: "100%", background: "linear-gradient(180deg, var(--navy-darkest) 0%, var(--navy-mid) 100%)" }}>
@@ -42,15 +63,15 @@ export default async function CursosPage({ searchParams }: { searchParams: Promi
         <div className="ka-page-eyebrow">Minha Jornada</div>
         <h1 className="ka-page-title">Meus <span>Cursos</span></h1>
         <p className="ka-page-subtitle">
-          {enrollments.length === 0
+          {combinedCourses.length === 0
             ? "Nenhum curso matriculado ainda"
-            : `${filteredEnrollments.length} curso${filteredEnrollments.length > 1 ? "s" : ""} encontrado${filteredEnrollments.length > 1 ? "s" : ""}`}
+            : `${filteredCourses.length} curso${filteredCourses.length > 1 ? "s" : ""} encontrado${filteredCourses.length > 1 ? "s" : ""}`}
         </p>
       </div>
 
       <div className="ka-section" style={{ padding: "0 44px 44px" }}>
         {allCategories.length > 0 && <CategoryFilter categories={allCategories} />}
-        {enrollments.length === 0 ? (
+        {combinedCourses.length === 0 ? (
           <div style={{
             borderRadius: 20, padding: "56px 32px", textAlign: "center", maxWidth: 380,
             background: "linear-gradient(160deg, var(--navy-card) 0%, var(--navy-card-2) 100%)",
@@ -66,7 +87,7 @@ export default async function CursosPage({ searchParams }: { searchParams: Promi
           </div>
         ) : (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(250px, 280px))", gap: 24 }}>
-            {filteredEnrollments.map(({ course }) => {
+            {filteredCourses.map((course: any) => {
               if (!course) return null;
               const allLessons = course.modules?.flatMap(m => m.lessons) ?? [];
               const done = allLessons.filter(l => l.progress[0]?.completed).length;

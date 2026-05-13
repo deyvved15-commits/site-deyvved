@@ -9,7 +9,7 @@ export default async function DashboardPage() {
   const session = await auth();
   if (!session) return null;
 
-  const [enrollments, otherCourses, achievements, progressData] = await Promise.all([
+  const [enrollments, taughtCourses, otherCourses, achievements, progressData] = await Promise.all([
     prisma.enrollment.findMany({
       where: { userId: session.user.id },
       include: {
@@ -26,9 +26,21 @@ export default async function DashboardPage() {
       orderBy: { createdAt: "asc" },
     }),
     prisma.course.findMany({
+      where: { teacherId: session.user.id },
+      include: {
+        modules: {
+          include: {
+            lessons: { include: { progress: { where: { userId: session.user.id } } } },
+          },
+        },
+      },
+      orderBy: { order: "asc" },
+    }),
+    prisma.course.findMany({
       where: {
         published: true,
         enrollments: { none: { userId: session.user.id } },
+        teacherId: { not: session.user.id },
       },
       select: {
         id: true,
@@ -51,6 +63,11 @@ export default async function DashboardPage() {
       select: { completedAt: true },
     }),
   ]);
+
+  const combinedCourses = [
+    ...enrollments.map(e => ({ course: e.course, expiresAt: e.expiresAt, isTeacher: false })),
+    ...taughtCourses.filter(tc => !enrollments.some(e => e.courseId === tc.id)).map(tc => ({ course: tc, expiresAt: null, isTeacher: true }))
+  ];
 
   const streak = calcStreak(progressData.map(p => p.completedAt));
 
@@ -96,7 +113,7 @@ export default async function DashboardPage() {
           } 
         />
 
-        {enrollments.length === 0 ? (
+        {combinedCourses.length === 0 ? (
           <div style={{ 
             borderRadius: 20, padding: "56px 32px", textAlign: "center", maxWidth: 380, 
             background: "linear-gradient(160deg, var(--navy-card) 0%, var(--navy-card-2) 100%)", 
@@ -110,7 +127,7 @@ export default async function DashboardPage() {
           </div>
         ) : (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(250px, 280px))", gap: 24 }}>
-            {enrollments.map(({ course, expiresAt }) => (
+            {combinedCourses.map(({ course, expiresAt }) => (
               course ? <CourseCard key={course.id} course={course} isEnrolled={true} expiresAt={expiresAt} /> : null
             ))}
           </div>
