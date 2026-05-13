@@ -8,7 +8,7 @@ import { getYoutubeId, getGoogleDriveImageUrl } from "@/lib/utils";
 import { Plus, Trash2, ChevronDown, ChevronRight, Eye, EyeOff, Pencil, X, Check, Clock } from "lucide-react";
 
 type Lesson = { id: string; title: string; youtubeUrl: string; duration: string | null; content: string | null; order: number; releaseAfterDays: number; attachments?: { title: string; url: string }[] };
-type Module = { id: string; title: string; thumbnail: string | null; order: number; lessons: Lesson[] };
+type Module = { id: string; title: string; description: string | null; thumbnail: string | null; order: number; lessons: Lesson[] };
 type Course = { id: string; title: string; description: string | null; thumbnail: string | null; price: number | null; paymentType: "ONE_TIME" | "MONTHLY"; published: boolean; category: string | null; modules: Module[]; teacherId: string | null; commissionPercentage: number; hasCertificate: boolean };
 
 const textareaClass = "w-full bg-[rgba(255,255,255,0.04)] border border-[rgba(201,169,122,0.18)] rounded-xl px-4 py-3 text-sm text-white placeholder-[rgba(255,255,255,0.2)] outline-none resize-none focus:border-[rgba(201,169,122,0.5)] focus:bg-[rgba(255,255,255,0.06)] transition-all";
