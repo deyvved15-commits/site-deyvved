@@ -117,7 +117,7 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
           }}>
             {ytId ? (
               <iframe
-                src={`https://www.youtube.com/embed/${ytId}?rel=0&modestbranding=1&controls=0&disablekb=1`}
+                src={`https://www.youtube.com/embed/${ytId}?rel=0&modestbranding=1`}
                 style={{ width: "100%", height: "100%", display: "block" }}
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
