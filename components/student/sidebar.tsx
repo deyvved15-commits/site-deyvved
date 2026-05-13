@@ -67,9 +67,31 @@ const links = [
   },
 ];
 
-export default function StudentSidebar({ user, streak = 0 }: { user: { name?: string | null; email?: string | null }; streak?: number }) {
+export default function StudentSidebar({ user, streak = 0 }: { user: { name?: string | null; email?: string | null; role?: string }; streak?: number }) {
   const pathname = usePathname();
   const initials = user.name?.split(" ").map(n => n[0]).slice(0, 2).join("").toUpperCase() ?? "A";
+  
+  const allLinks = [...links];
+  if (user.role === "ADMIN") {
+    allLinks.push({
+      href: "/admin", label: "Administração",
+      icon: (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+          <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+        </svg>
+      ),
+    });
+  } else if (user.role === "TEACHER") {
+    allLinks.push({
+      href: "/professor", label: "Área do Professor",
+      icon: (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+      ),
+    });
+  }
 
   return (
     <>
@@ -104,7 +126,7 @@ export default function StudentSidebar({ user, streak = 0 }: { user: { name?: st
         {/* Nav */}
         <div style={{ flex: 1, overflowY: "auto", overflowX: "hidden", padding: "0 14px" }} className="ka-sidebar-nav-scroll">
           <nav style={{ display: "flex", flexDirection: "column", gap: 8, paddingBottom: 20 }}>
-            {links.map(({ href, label, icon, exact, live }) => {
+            {allLinks.map(({ href, label, icon, exact, live }) => {
               const active = exact ? pathname === href : pathname.startsWith(href);
               return (
                 <Link key={href} href={href} className={`ka-nav-btn${active ? " active" : ""}`}>
@@ -158,7 +180,7 @@ export default function StudentSidebar({ user, streak = 0 }: { user: { name?: st
 
       {/* ── Mobile Bottom Nav ── */}
       <nav className="ka-mobile-nav">
-        {links.map(({ href, label, icon, exact, live }) => {
+        {allLinks.map(({ href, label, icon, exact, live }) => {
           const active = exact ? pathname === href : pathname.startsWith(href);
           return (
             <Link key={href} href={href} className={`ka-mobile-nav-btn${active ? " active" : ""}`}>

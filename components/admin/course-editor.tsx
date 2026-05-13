@@ -354,7 +354,16 @@ export default function CourseEditor({ course: initial, teachers, isAdmin = true
               
               {editingModule === mod.id ? (
                 <div style={{ flex: 1, display: "flex", gap: 8, alignItems: "center" }} onClick={e => e.stopPropagation()}>
-                  <input style={{ ...S.input, padding: "4px 12px", fontSize: 14 }} value={editModuleTitle} onChange={e => setEditModuleTitle(e.target.value)} autoFocus />
+                  <input 
+                    style={{ ...S.input, padding: "4px 12px", fontSize: 14 }} 
+                    value={editModuleTitle} 
+                    onChange={e => setEditModuleTitle(e.target.value)} 
+                    onKeyDown={e => {
+                      if (e.key === "Enter") saveEditModule(mod.id);
+                      if (e.key === "Escape") setEditingModule(null);
+                    }}
+                    autoFocus 
+                  />
                   <button onClick={() => saveEditModule(mod.id)} style={{ ...S.btnEdit, color: "#6ee7b7" }}><Check size={16} /></button>
                   <button onClick={() => setEditingModule(null)} style={{ ...S.btnEdit, color: "#fca5a5" }}><X size={16} /></button>
                 </div>
@@ -384,6 +393,20 @@ export default function CourseEditor({ course: initial, teachers, isAdmin = true
                       setCourse(c => ({ ...c, modules: c.modules.map(m => m.id === mod.id ? { ...m, thumbnail: val || null } : m) }));
                     }}
                     style={{ flex: 1, background: "transparent", border: "none", borderBottom: "1px solid rgba(201,169,122,0.15)", padding: "4px 0", fontSize: 12, color: "rgba(255,255,255,0.6)", outline: "none", fontFamily: "'Poppins',sans-serif" }}
+                  />
+                </div>
+
+                {/* Descrição do Módulo */}
+                <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16, paddingBottom: 16, borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                  <span style={{ fontSize: 10, color: "rgba(201,169,122,0.5)", fontFamily: "'Cinzel',serif", letterSpacing: 2, textTransform: "uppercase" }}>Descrição</span>
+                  <textarea defaultValue={mod.description ?? ""} placeholder="Breve descrição do módulo..."
+                    onBlur={async e => {
+                      const val = e.target.value.trim();
+                      if (val === (mod.description ?? "")) return;
+                      await fetch(`/api/courses/${course.id}/modules/${mod.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ description: val || null }) });
+                      setCourse(c => ({ ...c, modules: c.modules.map(m => m.id === mod.id ? { ...m, description: val || null } : m) }));
+                    }}
+                    style={{ ...S.textarea, background: "transparent", border: "1px solid rgba(201,169,122,0.1)", minHeight: 60, fontSize: 12 }}
                   />
                 </div>
 
