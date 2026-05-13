@@ -204,7 +204,9 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
                 </div>
               )}
             </div>
-            <ProgressButton lessonId={lesson.id} completed={isCompleted} />
+            <div style={{ marginRight: 44 }}>
+              <ProgressButton lessonId={lesson.id} completed={isCompleted} />
+            </div>
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
