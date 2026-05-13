@@ -11,6 +11,7 @@ const schema = z.object({
   duration: z.string().optional(),
   releaseAfterDays: z.number().int().min(0).optional(),
   attachments: z.any().optional(),
+  order: z.number().int().optional(),
 });
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ courseId: string; lessonId: string }> }) {
