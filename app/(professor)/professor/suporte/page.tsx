@@ -9,9 +9,13 @@ export default async function TeacherSupportPage() {
   if (!session || session.user.role !== "TEACHER") redirect("/login");
 
   const tickets = await prisma.ticket.findMany({
+    where: session.user.role === "ADMIN" 
+      ? {} 
+      : { course: { teacherId: session.user.id } },
     orderBy: { updatedAt: "desc" },
     include: { 
       user: { select: { name: true, email: true } },
+      course: { select: { title: true } },
       _count: { select: { messages: true } } 
     }
   });
@@ -60,10 +64,14 @@ export default async function TeacherSupportPage() {
                          </div>
                       </div>
                       
-                      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 20 }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: "var(--text-secondary)" }}>
                           <User size={14} color="var(--gold)" /> {ticket.user.name}
                         </div>
+                        {ticket.course && (
+                          <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: "rgba(255,255,255,0.4)", background: "rgba(255,255,255,0.03)", padding: "4px 10px", borderRadius: 6 }}>
+                             <span style={{ fontSize: 10, color: "var(--gold-light)", fontFamily: "'Cinzel',serif", fontWeight: 600 }}>CURSO:</span> {ticket.course.title}
+                          </div>
+                        )}
                         <div style={{ fontSize: 11, color: "var(--text-muted)", display: "flex", alignItems: "center", gap: 6 }}>
                           <Clock size={12} /> {new Date(ticket.updatedAt).toLocaleDateString("pt-BR")}
                         </div>

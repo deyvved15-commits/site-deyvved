@@ -357,10 +357,32 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
                   </Link>
                 );
               })}
-            </div>
           ))}
         </div>
+
+        {/* Support CTA */}
+        <div style={{ padding: "20px 16px", marginTop: "auto", borderTop: "1px solid rgba(201,169,122,0.1)" }}>
+          <Link href={`/suporte/novo?courseId=${course.id}`} style={{
+            display: "flex", alignItems: "center", gap: 10, padding: "12px", borderRadius: 12,
+            background: "rgba(201,169,122,0.08)", border: "1px solid rgba(201,169,122,0.2)",
+            textDecoration: "none", color: "var(--gold-light)", transition: "all 0.2s"
+          }} className="hover-gold-cta">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <div style={{ minWidth: 0 }}>
+              <p style={{ fontSize: 11, fontWeight: 700, margin: 0, fontFamily: "'Cinzel',serif", textTransform: "uppercase", letterSpacing: 1 }}>Dúvidas?</p>
+              <p style={{ fontSize: 9, color: "rgba(255,255,255,0.4)", margin: 0 }}>Fale com o professor</p>
+            </div>
+          </Link>
+        </div>
       </aside>
+
+      <style>{`
+        .hover-gold-cta:hover {
+          background: rgba(201,169,122,0.15) !important;
+          border-color: var(--gold) !important;
+          transform: translateY(-1px);
+        }
+      `}</style>
     </div>
   );
 }

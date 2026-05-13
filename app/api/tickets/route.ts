@@ -18,15 +18,13 @@ export async function POST(req: NextRequest) {
   const session = await auth();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { subject, message, priority } = await req.json();
-
-  if (!subject || !message) {
-    return NextResponse.json({ error: "Missing fields" }, { status: 400 });
-  }
+  const { subject, message, priority, courseId } = await req.json();
+  if (!subject || !message) return NextResponse.json({ error: "Missing fields" }, { status: 400 });
 
   const ticket = await prisma.ticket.create({
     data: {
       userId: session.user.id,
+      courseId: courseId || null,
       subject,
       priority: priority || "medium",
       messages: {
