@@ -27,6 +27,8 @@ export default function CourseEditor({ course: initial, teachers, isAdmin = true
   const [editingLesson, setEditingLesson] = useState<string | null>(null);
   const [editLesson, setEditLesson] = useState({ title: "", youtubeUrl: "", duration: "", content: "", releaseAfterDays: 0, attachments: [] as { title: string; url: string }[] });
   const [editSaving, setEditSaving] = useState(false);
+  const [editingModule, setEditingModule] = useState<string | null>(null);
+  const [editModuleTitle, setEditModuleTitle] = useState("");
 
   async function saveCourse() {
     setSaving(true);
@@ -112,6 +114,68 @@ export default function CourseEditor({ course: initial, teachers, isAdmin = true
     setCourse(c => ({ ...c, modules: c.modules.map(m => m.id === moduleId ? { ...m, lessons: m.lessons.map(l => l.id === lessonId ? { ...l, ...updated } : l) } : m) }));
     setEditingLesson(null);
     setEditSaving(false);
+  }
+
+  async function saveEditModule(moduleId: string) {
+    if (!editModuleTitle.trim()) return;
+    const res = await fetch(`/api/courses/${course.id}/modules/${moduleId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: editModuleTitle }),
+    });
+    if (res.ok) {
+      setCourse(c => ({ ...c, modules: c.modules.map(m => m.id === moduleId ? { ...m, title: editModuleTitle } : m) }));
+      setEditingModule(null);
+    }
+  }
+
+  async function moveModule(index: number, direction: 'up' | 'down') {
+    const newModules = [...course.modules];
+    const otherIndex = direction === 'up' ? index - 1 : index + 1;
+    if (otherIndex < 0 || otherIndex >= newModules.length) return;
+
+    [newModules[index], newModules[otherIndex]] = [newModules[otherIndex], newModules[index]];
+    setCourse(c => ({ ...c, modules: newModules }));
+
+    await Promise.all([
+      fetch(`/api/courses/${course.id}/modules/${newModules[index].id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ order: index }),
+      }),
+      fetch(`/api/courses/${course.id}/modules/${newModules[otherIndex].id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ order: otherIndex }),
+      })
+    ]);
+  }
+
+  async function moveLesson(modId: string, index: number, direction: 'up' | 'down') {
+    const mod = course.modules.find(m => m.id === modId);
+    if (!mod) return;
+    const newLessons = [...mod.lessons];
+    const otherIndex = direction === 'up' ? index - 1 : index + 1;
+    if (otherIndex < 0 || otherIndex >= newLessons.length) return;
+
+    [newLessons[index], newLessons[otherIndex]] = [newLessons[otherIndex], newLessons[index]];
+    setCourse(c => ({
+      ...c,
+      modules: c.modules.map(m => m.id === modId ? { ...m, lessons: newLessons } : m)
+    }));
+
+    await Promise.all([
+      fetch(`/api/courses/${course.id}/modules/${modId}/lessons/${newLessons[index].id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ order: index }),
+      }),
+      fetch(`/api/courses/${course.id}/modules/${modId}/lessons/${newLessons[otherIndex].id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ order: otherIndex }),
+      })
+    ]);
   }
 
   function toggleModule(id: string) {
@@ -287,8 +351,24 @@ export default function CourseEditor({ course: initial, teachers, isAdmin = true
               <div style={{ width: 32, height: 40, borderRadius: 6, background: "rgba(255,255,255,0.05)", overflow: "hidden", border: "1px solid rgba(201,169,122,0.15)", flexShrink: 0 }}>
                 {mod.thumbnail && <img src={getGoogleDriveImageUrl(mod.thumbnail)} style={{ width: "100%", height: "100%", objectFit: "cover" }} />}
               </div>
-              <span style={{ flex: 1, fontFamily: "'Cinzel',serif", fontWeight: 600, fontSize: 14 }}>{mod.title}</span>
-              <button onClick={e => { e.stopPropagation(); deleteModule(mod.id); }} style={S.btnRed}><Trash2 size={13} /></button>
+              
+              {editingModule === mod.id ? (
+                <div style={{ flex: 1, display: "flex", gap: 8, alignItems: "center" }} onClick={e => e.stopPropagation()}>
+                  <input style={{ ...S.input, padding: "4px 12px", fontSize: 14 }} value={editModuleTitle} onChange={e => setEditModuleTitle(e.target.value)} autoFocus />
+                  <button onClick={() => saveEditModule(mod.id)} style={{ ...S.btnEdit, color: "#6ee7b7" }}><Check size={16} /></button>
+                  <button onClick={() => setEditingModule(null)} style={{ ...S.btnEdit, color: "#fca5a5" }}><X size={16} /></button>
+                </div>
+              ) : (
+                <span style={{ flex: 1, fontFamily: "'Cinzel',serif", fontWeight: 600, fontSize: 14 }}>{mod.title}</span>
+              )}
+
+              <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                <button onClick={e => { e.stopPropagation(); moveModule(mi, 'up'); }} style={{ ...S.btnEdit, opacity: mi === 0 ? 0.2 : 0.6 }} title="Subir"><ChevronDown size={14} style={{ transform: "rotate(180deg)" }} /></button>
+                <button onClick={e => { e.stopPropagation(); moveModule(mi, 'down'); }} style={{ ...S.btnEdit, opacity: mi === course.modules.length - 1 ? 0.2 : 0.6 }} title="Descer"><ChevronDown size={14} /></button>
+                <div style={{ width: 1, height: 16, background: "rgba(255,255,255,0.08)", margin: "0 4px" }} />
+                <button onClick={e => { e.stopPropagation(); setEditingModule(mod.id); setEditModuleTitle(mod.title); }} style={S.btnEdit}><Pencil size={13} /></button>
+                <button onClick={e => { e.stopPropagation(); deleteModule(mod.id); }} style={S.btnRed}><Trash2 size={13} /></button>
+              </div>
             </div>
 
             {openModules[mod.id] && (
@@ -321,19 +401,8 @@ export default function CourseEditor({ course: initial, teachers, isAdmin = true
                           </div>
                         </div>
                         <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                          <button onClick={() => {
-                            if (li === 0) return;
-                            const newLessons = [...mod.lessons];
-                            [newLessons[li - 1], newLessons[li]] = [newLessons[li], newLessons[li - 1]];
-                            setCourse(c => ({ ...c, modules: c.modules.map(m => m.id === mod.id ? { ...m, lessons: newLessons } : m) }));
-                          }} style={{ ...S.btnEdit, opacity: li === 0 ? 0.2 : 0.6 }} title="Subir"><ChevronDown size={14} style={{ transform: "rotate(180deg)" }} /></button>
-                          
-                          <button onClick={() => {
-                            if (li === mod.lessons.length - 1) return;
-                            const newLessons = [...mod.lessons];
-                            [newLessons[li + 1], newLessons[li]] = [newLessons[li], newLessons[li + 1]];
-                            setCourse(c => ({ ...c, modules: c.modules.map(m => m.id === mod.id ? { ...m, lessons: newLessons } : m) }));
-                          }} style={{ ...S.btnEdit, opacity: li === mod.lessons.length - 1 ? 0.2 : 0.6 }} title="Descer"><ChevronDown size={14} /></button>
+                          <button onClick={() => moveLesson(mod.id, li, 'up')} style={{ ...S.btnEdit, opacity: li === 0 ? 0.2 : 0.6 }} title="Subir"><ChevronDown size={14} style={{ transform: "rotate(180deg)" }} /></button>
+                          <button onClick={() => moveLesson(mod.id, li, 'down')} style={{ ...S.btnEdit, opacity: li === mod.lessons.length - 1 ? 0.2 : 0.6 }} title="Descer"><ChevronDown size={14} /></button>
 
                           <div style={{ width: 1, height: 16, background: "rgba(255,255,255,0.08)", margin: "0 4px" }} />
                           
