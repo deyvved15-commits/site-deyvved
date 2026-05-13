@@ -130,6 +130,7 @@ model Module {
   title       String
   description String?
   thumbnail   String?
+  isBonus     Boolean  @default(false)
   order       Int      @default(0)
   courseId    String
   createdAt   DateTime @default(now())

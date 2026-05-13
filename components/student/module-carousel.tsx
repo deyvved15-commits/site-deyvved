@@ -98,6 +98,17 @@ export default function ModuleCarousel({ modules, slug }: ModuleCarouselProps) {
                   </div>
                 )}
                 <div className="ka-progress-badge">{pct}%</div>
+                {mod.isBonus && (
+                  <div style={{
+                    position: "absolute", top: 10, left: 10,
+                    background: "linear-gradient(135deg, var(--gold-bright), var(--gold))",
+                    borderRadius: 8, padding: "3px 10px", fontSize: 9, fontWeight: 800,
+                    color: "var(--navy-darkest)", letterSpacing: 1, textTransform: "uppercase",
+                    zIndex: 5, boxShadow: "0 0 10px rgba(201,169,122,0.3)"
+                  }}>
+                    Bônus
+                  </div>
+                )}
                 {nextLesson && (
                   <Link href={`/cursos/${slug}/aula/${nextLesson.id}`} className="ka-play-overlay">
                     <div className="ka-play-circle">

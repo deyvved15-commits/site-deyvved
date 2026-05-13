@@ -47,6 +47,9 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
   }
 
   const allLessons = course.modules.flatMap(m => m.lessons);
+  const mainModules = course.modules.filter(m => !m.isBonus);
+  const mainLessons = mainModules.flatMap(m => m.lessons);
+
   const currentIndex = allLessons.findIndex(l => l.id === lessonId);
   if (currentIndex === -1) notFound();
 
@@ -65,8 +68,8 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
   const ytId = getYoutubeId(lesson.youtubeUrl);
   const isCompleted = lesson.progress[0]?.completed ?? false;
 
-  const done = allLessons.filter(l => l.progress[0]?.completed).length;
-  const total = allLessons.length;
+  const done = mainLessons.filter(l => l.progress[0]?.completed).length;
+  const total = mainLessons.length;
   const pct = total > 0 ? Math.round((done / total) * 100) : 0;
 
   return (
