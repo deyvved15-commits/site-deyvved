@@ -133,79 +133,91 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
           </div>
         </div>
 
-        {/* Navigation - Moved below video */}
+        {/* ── Navigation Bar ── */}
         <div style={{
           margin: "16px 28px 0",
-          padding: "14px 20px",
-          borderRadius: 14,
-          background: "rgba(201,169,122,0.05)",
+          padding: "16px 24px",
+          borderRadius: 20,
+          background: "linear-gradient(135deg, rgba(201,169,122,0.08) 0%, rgba(201,169,122,0.03) 100%)",
           border: "1px solid rgba(201,169,122,0.15)",
+          backdropFilter: "blur(10px)",
           display: "flex", alignItems: "center", justifyContent: "space-between",
+          boxShadow: "0 8px 32px rgba(0,0,0,0.25)",
         }}>
           {prev ? (
             <Link href={`/cursos/${slug}/aula/${prev.id}`} style={{
-              display: "flex", alignItems: "center", gap: 8,
-              fontSize: 12, color: "var(--text-muted)", textDecoration: "none",
-              fontWeight: 500, transition: "color 0.2s",
+              display: "flex", alignItems: "center", gap: 10,
+              fontSize: 11, color: "var(--text-muted)", textDecoration: "none",
+              fontFamily: "'Cinzel',serif", fontWeight: 700, letterSpacing: 1.5,
+              transition: "all 0.2s",
             }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M19 12H5M12 5l-7 7 7 7"/>
               </svg>
               Anterior
             </Link>
           ) : <div />}
-          <div style={{ fontSize: 11, color: "var(--text-muted)", textAlign: "center", letterSpacing: 1 }}>
-            {currentIndex + 1} / {total}
+          
+          <div style={{ fontFamily: "'Cinzel',serif", fontSize: 12, color: "var(--gold-light)", fontWeight: 700, letterSpacing: 2 }}>
+            {currentIndex + 1} <span style={{ opacity: 0.4, margin: "0 4px" }}>/</span> {total}
           </div>
+
           {next ? (
             <Link href={`/cursos/${slug}/aula/${next.id}`} style={{
-              display: "flex", alignItems: "center", gap: 8,
-              fontSize: 12, color: "var(--gold)", textDecoration: "none",
-              fontWeight: 600, letterSpacing: 0.5, transition: "color 0.2s",
+              display: "flex", alignItems: "center", gap: 10,
+              fontSize: 11, color: "var(--gold)", textDecoration: "none",
+              fontFamily: "'Cinzel',serif", fontWeight: 700, letterSpacing: 1.5,
+              transition: "all 0.2s",
             }}>
               Próxima
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M5 12h14M12 5l7 7-7 7"/>
               </svg>
             </Link>
           ) : (
             <Link href={`/cursos/${slug}`} style={{
               display: "flex", alignItems: "center", gap: 8,
-              fontSize: 12, color: "#6ee7b7", textDecoration: "none",
-              fontWeight: 600, transition: "color 0.2s",
+              fontSize: 11, color: "#6ee7b7", textDecoration: "none",
+              fontFamily: "'Cinzel',serif", fontWeight: 700, letterSpacing: 1.5,
             }}>
-              ✓ Concluído
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M5 12h14M12 5l7 7-7 7"/>
-              </svg>
+              ✓ Finalizar
             </Link>
           )}
         </div>
 
-        {/* Lesson info */}
-        <div style={{ padding: "20px 28px 0" }}>
-          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16, marginBottom: 10 }}>
-            <div>
-              <h1 style={{ fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 20, letterSpacing: 1.5, color: "var(--text-primary)", lineHeight: 1.3 }}>
+        {/* ── Lesson info ── */}
+        <div style={{ padding: "32px 28px 40px" }}>
+          <div style={{ 
+            display: "flex", alignItems: "center", justifyContent: "space-between", gap: 24, 
+            marginBottom: 24, paddingBottom: 24, borderBottom: "1px solid rgba(201,169,122,0.12)" 
+          }}>
+            <div style={{ flex: 1 }}>
+              <h1 style={{ fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 24, letterSpacing: 2, color: "var(--text-primary)", lineHeight: 1.2, textTransform: "uppercase" }}>
                 {lesson.title}
               </h1>
               {lesson.duration && (
-                <p style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 4, display: "flex", alignItems: "center", gap: 5 }}>
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-                  </svg>
-                  {lesson.duration}
-                </p>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 8 }}>
+                   <div style={{ width: 4, height: 4, borderRadius: "50%", background: "var(--gold)", boxShadow: "0 0 6px var(--gold)" }} />
+                   <p style={{ fontSize: 10, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 1.5, fontFamily: "'Cinzel',serif" }}>
+                     Duração: {lesson.duration}
+                   </p>
+                </div>
               )}
             </div>
             <ProgressButton lessonId={lesson.id} completed={isCompleted} />
           </div>
 
-          {lesson.description && (
-            <HtmlContent html={lesson.description} className="prose-lesson" style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.8, marginBottom: 10 }} />
-          )}
-
-          <LessonRating lessonId={lesson.id} initialRating={initialRating} />
+          <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
+            {lesson.description && (
+              <div style={{ flex: 1 }}>
+                <HtmlContent html={lesson.description} className="prose-lesson" style={{ fontSize: 14, color: "var(--text-secondary)", lineHeight: 1.8 }} />
+              </div>
+            )}
+            
+            <div style={{ maxWidth: 450 }}>
+              <LessonRating lessonId={lesson.id} initialRating={initialRating} />
+            </div>
+          </div>
         </div>
 
         {/* Course material */}

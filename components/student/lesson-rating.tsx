@@ -30,11 +30,26 @@ export default function LessonRating({ lessonId, initialRating }: { lessonId: st
   }
 
   return (
-    <div style={{ marginTop: 24, padding: "20px 24px", background: "rgba(255,255,255,0.02)", borderRadius: 16, border: "1px solid rgba(201,169,122,0.1)" }}>
-      <p style={{ fontFamily: "'Cinzel',serif", fontSize: 10, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--gold)", marginBottom: 12 }}>
-        O que achou desta aula?
-      </p>
-      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+    <div style={{ 
+      marginTop: 8, 
+      padding: "24px", 
+      background: "rgba(201,169,122,0.03)", 
+      borderRadius: 20, 
+      border: "1px solid rgba(201,169,122,0.12)",
+      display: "flex",
+      flexDirection: "column",
+      gap: 16
+    }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+        </svg>
+        <p style={{ fontFamily: "'Cinzel',serif", fontSize: 10, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--gold)", margin: 0 }}>
+          O que achou desta aula?
+        </p>
+      </div>
+      
+      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         {[1, 2, 3, 4, 5].map((star) => (
           <button
             key={star}
@@ -44,18 +59,28 @@ export default function LessonRating({ lessonId, initialRating }: { lessonId: st
             disabled={loading}
             style={{ 
               background: "none", border: "none", padding: 0, cursor: "pointer", 
-              color: (hover || rating) >= star ? "var(--gold)" : "rgba(255,255,255,0.1)",
-              transition: "transform 0.1s ease",
-              transform: hover === star ? "scale(1.2)" : "scale(1)"
+              color: (hover || rating) >= star ? "var(--gold)" : "rgba(255,255,255,0.2)",
+              transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+              transform: hover === star ? "scale(1.2)" : "scale(1)",
+              filter: (hover || rating) >= star ? "drop-shadow(0 0 8px rgba(201,169,122,0.3))" : "none"
             }}
           >
-            <Star size={24} fill={(hover || rating) >= star ? "var(--gold)" : "none"} strokeWidth={1.5} />
+            <Star 
+              size={28} 
+              fill={(hover || rating) >= star ? "var(--gold)" : "rgba(255,255,255,0.05)"} 
+              strokeWidth={1.5} 
+            />
           </button>
         ))}
         {sent && (
-          <span style={{ marginLeft: 12, fontSize: 11, color: "#6ee7b7", fontWeight: 600, textTransform: "uppercase", letterSpacing: 1 }}>
-            Obrigado pelo feedback!
-          </span>
+          <div style={{ 
+            marginLeft: 12, padding: "4px 12px", borderRadius: 8, 
+            background: "rgba(110,231,183,0.1)", border: "1px solid rgba(110,231,183,0.2)"
+          }}>
+            <span style={{ fontSize: 10, color: "#6ee7b7", fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.5, fontFamily: "'Cinzel',serif" }}>
+              Avaliado com sucesso
+            </span>
+          </div>
         )}
       </div>
     </div>

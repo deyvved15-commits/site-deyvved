@@ -26,14 +26,23 @@ export default function ProgressButton({ lessonId, completed: initial }: { lesso
   return (
     <Button
       variant={completed ? "ghost" : "gold"}
-      size="sm"
+      size="md"
       loading={loading}
       onClick={toggle}
       className="shrink-0"
+      style={{ fontFamily: "'Cinzel',serif", fontSize: 10, letterSpacing: 1.5, textTransform: "uppercase" }}
     >
-      {completed
-        ? <><CheckCircle size={14} className="text-emerald-400" /> Concluída</>
-        : <><Circle size={14} /> Marcar como concluída</>}
+      {completed ? (
+        <>
+          <CheckCircle size={14} style={{ color: "#6ee7b7" }} />
+          Concluída
+        </>
+      ) : (
+        <>
+          <Circle size={14} />
+          Marcar como concluída
+        </>
+      )}
     </Button>
   );
 }
