@@ -31,7 +31,7 @@ export default function ProgressButton({ lessonId, completed: initial }: { lesso
       loading={loading}
       onClick={toggle}
       className={cn(
-        "shrink-0 group transition-all duration-300 relative overflow-hidden px-4 sm:px-6 h-[52px]",
+        "shrink-0 group transition-all duration-300 relative overflow-hidden px-8 sm:px-12 h-[52px]",
         completed 
           ? "bg-emerald-500/5 border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/10" 
           : "bg-[rgba(201,169,122,0.03)] border-[rgba(201,169,122,0.15)] text-[#C9A97A] hover:bg-[rgba(201,169,122,0.08)]"

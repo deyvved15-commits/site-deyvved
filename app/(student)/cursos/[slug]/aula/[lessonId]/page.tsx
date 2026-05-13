@@ -222,7 +222,7 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
 
         {/* Course material */}
         {lesson.content && (
-          <div style={{ margin: "8px 28px 0" }}>
+          <div style={{ margin: "16px 28px 0" }}>
             <div style={{
               borderRadius: 16, overflow: "hidden",
               background: "rgba(15,26,61,0.5)",
@@ -246,7 +246,7 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
 
         {/* Downloads */}
         {lesson.attachments && Array.isArray(lesson.attachments) && lesson.attachments.length > 0 && (
-          <div style={{ margin: "16px 28px 0" }}>
+          <div style={{ margin: "24px 28px 0" }}>
             <div style={{
               borderRadius: 16, overflow: "hidden",
               background: "linear-gradient(135deg, rgba(201,169,122,0.10) 0%, rgba(201,169,122,0.02) 100%)",
