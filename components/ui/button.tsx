@@ -8,7 +8,11 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = "gold", size = "md", loading, children, disabled, ...props }, ref) => {
+  ({ className, variant = "gold", size = "md", loading, children, disabled, style, ...props }, ref) => {
+    const variantStyle = variant === "gold" ? {
+      background: "linear-gradient(135deg, #D4B483 0%, #C9A97A 50%, #B8924A 100%)",
+    } : {};
+
     return (
       <button
         ref={ref}
@@ -23,9 +27,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           size === "lg" && "px-8 py-3.5 text-base",
           className
         )}
-        style={variant === "gold" ? {
-          background: "linear-gradient(135deg, #D4B483 0%, #C9A97A 50%, #B8924A 100%)",
-        } : undefined}
+        style={{ ...variantStyle, ...style }}
         {...props}
       >
         {loading && (
