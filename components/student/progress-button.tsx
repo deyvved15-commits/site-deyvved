@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { CheckCircle, Circle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export default function ProgressButton({ lessonId, completed: initial }: { lessonId: string; completed: boolean }) {
   const router = useRouter();
@@ -29,31 +30,26 @@ export default function ProgressButton({ lessonId, completed: initial }: { lesso
       size="md"
       loading={loading}
       onClick={toggle}
-      className="shrink-0 group relative overflow-hidden"
+      className={cn(
+        "shrink-0 group transition-all duration-300",
+        completed ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 px-3 sm:px-5" : "px-3 sm:px-5"
+      )}
       style={{ 
         fontFamily: "'Cinzel',serif", 
         fontSize: 10, 
         letterSpacing: 2, 
         textTransform: "uppercase",
-        minWidth: 180,
-        transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-        ...(completed ? {
-          background: "linear-gradient(135deg, rgba(110,231,183,0.1) 0%, rgba(16,185,129,0.05) 100%)",
-          borderColor: "rgba(110,231,183,0.3)",
-          color: "#6ee7b7",
-          boxShadow: "0 4px 12px rgba(16,185,129,0.1)"
-        } : {})
       }}
     >
       {completed ? (
         <>
-          <CheckCircle size={14} className="transition-all duration-300 group-hover:scale-110" style={{ filter: "drop-shadow(0 0 4px rgba(110,231,183,0.5))" }} />
-          Aula Assistida
+          <CheckCircle size={16} className="transition-all group-hover:scale-110" style={{ filter: "drop-shadow(0 0 4px rgba(110,231,183,0.5))" }} />
+          <span className="hidden sm:inline">Aula Assistida</span>
         </>
       ) : (
         <>
-          <Circle size={14} className="transition-all duration-300 group-hover:rotate-90 group-hover:scale-110" />
-          Marcar como Assistida
+          <Circle size={16} className="transition-all group-hover:rotate-90 group-hover:scale-110" />
+          <span className="hidden sm:inline">Marcar como Assistida</span>
         </>
       )}
     </Button>
