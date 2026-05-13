@@ -89,11 +89,11 @@ export default async function CursosPage({ searchParams }: { searchParams: Promi
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(250px, 280px))", gap: 24 }}>
             {filteredCourses.map((course: any) => {
               if (!course) return null;
-              const allLessons = course.modules?.flatMap(m => m.lessons) ?? [];
-              const done = allLessons.filter(l => l.progress[0]?.completed).length;
+              const allLessons = course.modules?.flatMap((m: any) => m.lessons) ?? [];
+              const done = allLessons.filter((l: any) => l.progress[0]?.completed).length;
               const total = allLessons.length;
               const pct = total > 0 ? Math.round((done / total) * 100) : 0;
-              const nextLesson = allLessons.find(l => !l.progress[0]?.completed) ?? allLessons[0];
+              const nextLesson = allLessons.find((l: any) => !l.progress[0]?.completed) ?? allLessons[0];
               const thumbnailUrl = course.thumbnail?.includes("drive.google.com")
                 ? getGoogleDriveImageUrl(course.thumbnail)
                 : course.thumbnail;
