@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 const S = {
@@ -23,7 +23,21 @@ export default function NovoCursoPage() {
     thumbnail: "",
     price: "",
     paymentType: "ONE_TIME",
+    teacherId: "",
+    commissionPercentage: "0",
   });
+  const [teachers, setTeachers] = useState<{ id: string; name: string }[]>([]);
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    fetch("/api/teachers")
+      .then(res => res.json())
+      .then(data => {
+        setTeachers(data);
+        const tId = searchParams.get("teacherId");
+        if (tId) setForm(f => ({ ...f, teacherId: tId }));
+      });
+  }, [searchParams]);
 
   function set(k: string, v: string) { setForm(f => ({ ...f, [k]: v })); }
 
@@ -40,6 +54,8 @@ export default function NovoCursoPage() {
         thumbnail: form.thumbnail || undefined,
         price: form.price ? parseFloat(form.price) : undefined,
         paymentType: form.paymentType,
+        teacherId: form.teacherId || undefined,
+        commissionPercentage: form.commissionPercentage ? parseFloat(form.commissionPercentage) : undefined,
       }),
     });
     const data = await res.json();
@@ -121,6 +137,23 @@ export default function NovoCursoPage() {
                   <option value="ONE_TIME" style={{ background: "#0F1A3D" }}>Pagamento Único</option>
                   <option value="MONTHLY" style={{ background: "#0F1A3D" }}>Mensalidade (30 dias)</option>
                 </select>
+              </div>
+            </div>
+
+            {/* Professor + Comissão */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+              <div style={S.field}>
+                <label style={S.label}>Professor Responsável</label>
+                <select value={form.teacherId} onChange={e => set("teacherId", e.target.value)}
+                  style={{ ...S.input, cursor: "pointer", appearance: "none" as const }}>
+                  <option value="" style={{ background: "#0F1A3D" }}>Selecione um professor</option>
+                  {teachers.map(t => (<option key={t.id} value={t.id} style={{ background: "#0F1A3D" }}>{t.name}</option>))}
+                </select>
+              </div>
+              <div style={S.field}>
+                <label style={S.label}>Comissão (%)</label>
+                <input type="number" min="0" max="100" style={S.input}
+                  value={form.commissionPercentage} onChange={e => set("commissionPercentage", e.target.value)} placeholder="0" />
               </div>
             </div>
 

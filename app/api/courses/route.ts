@@ -10,6 +10,8 @@ const createSchema = z.object({
   thumbnail: z.string().optional(),
   price: z.number().positive().optional(),
   paymentType: z.enum(["ONE_TIME", "MONTHLY"]).optional(),
+  teacherId: z.string().optional(),
+  commissionPercentage: z.number().min(0).max(100).optional(),
 });
 
 export async function GET() {
@@ -36,11 +38,20 @@ export async function POST(req: NextRequest) {
   const parsed = createSchema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
 
-  const { title, description, thumbnail, price, paymentType } = parsed.data;
+  const { title, description, thumbnail, price, paymentType, teacherId, commissionPercentage } = parsed.data;
   const slug = slugify(title);
 
   const course = await prisma.course.create({
-    data: { title, slug, description, thumbnail: thumbnail || null, price: price ?? null, paymentType: paymentType ?? "ONE_TIME" },
+    data: { 
+      title, 
+      slug, 
+      description, 
+      thumbnail: thumbnail || null, 
+      price: price ?? null, 
+      paymentType: paymentType ?? "ONE_TIME",
+      teacherId: teacherId || null,
+      commissionPercentage: commissionPercentage ?? 0,
+    },
   });
 
   return NextResponse.json(course, { status: 201 });

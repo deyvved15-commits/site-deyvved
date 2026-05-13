@@ -62,6 +62,23 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
             </h1>
             <p style={{ fontSize: 13, color: "var(--text-muted)" }}>{teacher.email}</p>
           </div>
+          <div style={{ display: "flex", gap: 12 }}>
+            <Link 
+              href={`/admin/cursos/novo?teacherId=${teacherId}`}
+              style={{
+                display: "inline-flex", alignItems: "center", gap: 7, padding: "10px 22px", borderRadius: 12,
+                background: "linear-gradient(135deg, var(--gold), var(--gold-deep))", border: "none",
+                color: "var(--navy-darkest)", fontSize: 11, fontFamily: "'Cinzel',serif", fontWeight: 700,
+                letterSpacing: 1.5, textTransform: "uppercase", cursor: "pointer", textDecoration: "none",
+                boxShadow: "0 4px 16px rgba(201,169,122,0.25)"
+              }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+              Criar Curso
+            </Link>
+          </div>
         </div>
       </div>
 
