@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { getGoogleDriveImageUrl } from "@/lib/utils";
 import CourseThumbnail from "@/components/student/course-thumbnail";
+import ModuleCarousel from "@/components/student/module-carousel";
 
 export default async function CursoPage({ params }: { params: Promise<{ slug: string }> }) {
   const session = await auth();
@@ -136,70 +137,7 @@ export default async function CursoPage({ params }: { params: Promise<{ slug: st
             <p style={{ fontSize: 14, color: "var(--text-muted)" }}>Nenhum módulo disponível ainda.</p>
           </div>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(250px, 280px))", gap: 24 }}>
-            {course.modules.map((mod) => {
-              const modLessons = mod.lessons;
-              const modDone = modLessons.filter(l => l.progress[0]?.completed).length;
-              const modTotal = modLessons.length;
-              const pct = modTotal > 0 ? Math.round((modDone / modTotal) * 100) : 0;
-              const nextLesson = modLessons.find(l => !l.progress[0]?.completed) ?? modLessons[0];
-              const thumbUrl = mod.thumbnail?.includes("drive.google.com")
-                ? getGoogleDriveImageUrl(mod.thumbnail)
-                : mod.thumbnail;
-              const label = pct > 0 && pct < 100 ? "Continuar" : pct === 100 ? "Rever" : "Começar";
-
-              return (
-                <article key={mod.id} className="ka-card">
-                  {/* Thumbnail */}
-                  <div className="ka-thumb">
-                    {thumbUrl && <CourseThumbnail src={thumbUrl} alt={mod.title} />}
-                    {!thumbUrl && (
-                      <div className="ka-thumb-mark">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
-                          <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
-                        </svg>
-                      </div>
-                    )}
-                    <div className="ka-progress-badge">{pct}%</div>
-                    {nextLesson && (
-                      <Link href={`/cursos/${slug}/aula/${nextLesson.id}`} className="ka-play-overlay">
-                        <div className="ka-play-circle">
-                          <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M8 5v14l11-7z"/>
-                          </svg>
-                        </div>
-                      </Link>
-                    )}
-                  </div>
-
-                  {/* Body */}
-                  <div style={{ padding: "18px 20px 20px" }}>
-                    <h3 style={{ fontFamily: "'Cinzel',serif", fontWeight: 600, fontSize: 15, letterSpacing: 1.2, color: "var(--text-primary)", marginBottom: 5, lineHeight: 1.3 }}>
-                      {mod.title}
-                    </h3>
-                    <div style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
-                      <span style={{ width: 4, height: 4, borderRadius: "50%", background: "var(--gold)", boxShadow: "0 0 4px var(--gold)", flexShrink: 0 }} />
-                      {modDone}/{modTotal} aula{modTotal !== 1 ? "s" : ""} concluída{modDone !== 1 ? "s" : ""}
-                    </div>
-                    <div className="ka-progress-bar" style={{ marginBottom: 14 }}>
-                      <div className="ka-progress-fill" style={{ width: `${pct}%` }} />
-                    </div>
-                    {nextLesson ? (
-                      <Link href={`/cursos/${slug}/aula/${nextLesson.id}`} className="ka-continue-btn">
-                        {label}
-                        <span>→</span>
-                      </Link>
-                    ) : (
-                      <div className="ka-continue-btn" style={{ opacity: 0.4, cursor: "default" }}>
-                        Sem aulas
-                      </div>
-                    )}
-                  </div>
-                </article>
-              );
-            })}
-          </div>
+          <ModuleCarousel modules={course.modules} slug={slug} />
         )}
       </section>
     </div>
