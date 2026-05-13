@@ -42,6 +42,8 @@ export default function ProgressButton({ lessonId, completed: initial }: { lesso
         letterSpacing: 2, 
         textTransform: "uppercase",
         borderRadius: "12px",
+        paddingLeft: 40,
+        paddingRight: 40,
       }}
     >
       {/* ── Vertical Indicator ── */}
