@@ -58,12 +58,13 @@ export default async function TeacherSupportPage() {
                   }} className="ka-ticket-card">
                     <div style={{ flex: 1, minWidth: "240px" }}>
                       <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 10, marginBottom: 12 }}>
-                         <h3 style={{ fontSize: 16, fontWeight: 700, color: "#fff", margin: 0 }}>{ticket.subject}</h3>
-                         <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 10, color: status.color, background: "rgba(255,255,255,0.05)", border: `1px solid ${status.color}30`, padding: "4px 10px", borderRadius: 6, fontWeight: 700, fontFamily: "'Cinzel',serif", textTransform: "uppercase" }}>
-                            {status.icon} {status.label}
-                         </div>
+                        <h3 style={{ fontSize: 16, fontWeight: 700, color: "#fff", margin: 0 }}>{ticket.subject}</h3>
+                        <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 10, color: status.color, background: "rgba(255,255,255,0.05)", border: `1px solid ${status.color}30`, padding: "4px 10px", borderRadius: 6, fontWeight: 700, fontFamily: "'Cinzel',serif", textTransform: "uppercase" }}>
+                          {status.icon} {status.label}
+                        </div>
                       </div>
                       
+                      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 20 }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: "var(--text-secondary)" }}>
                           <User size={14} color="var(--gold)" /> {ticket.user.name}
                         </div>

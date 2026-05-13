@@ -357,6 +357,7 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
                   </Link>
                 );
               })}
+            </div>
           ))}
         </div>
 
