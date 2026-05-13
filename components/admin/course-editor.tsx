@@ -8,7 +8,7 @@ import { getYoutubeId, getGoogleDriveImageUrl } from "@/lib/utils";
 import { Plus, Trash2, ChevronDown, ChevronRight, Eye, EyeOff, Pencil, X, Check, Clock } from "lucide-react";
 
 type Lesson = { id: string; title: string; youtubeUrl: string; duration: string | null; content: string | null; order: number; releaseAfterDays: number; attachments?: { title: string; url: string }[] };
-type Module = { id: string; title: string; description: string | null; thumbnail: string | null; order: number; lessons: Lesson[] };
+type Module = { id: string; title: string; description: string | null; thumbnail: string | null; isBonus: boolean; order: number; lessons: Lesson[] };
 type Course = { id: string; title: string; description: string | null; thumbnail: string | null; price: number | null; paymentType: "ONE_TIME" | "MONTHLY"; published: boolean; category: string | null; modules: Module[]; teacherId: string | null; commissionPercentage: number; hasCertificate: boolean };
 
 const textareaClass = "w-full bg-[rgba(255,255,255,0.04)] border border-[rgba(201,169,122,0.18)] rounded-xl px-4 py-3 text-sm text-white placeholder-[rgba(255,255,255,0.2)] outline-none resize-none focus:border-[rgba(201,169,122,0.5)] focus:bg-[rgba(255,255,255,0.06)] transition-all";
@@ -21,6 +21,7 @@ export default function CourseEditor({ course: initial, teachers, isAdmin = true
   const [openModules, setOpenModules] = useState<Record<string, boolean>>({});
   const [newModuleTitle, setNewModuleTitle] = useState("");
   const [newModuleThumbnail, setNewModuleThumbnail] = useState("");
+  const [newModuleIsBonus, setNewModuleIsBonus] = useState(false);
   const [addingModule, setAddingModule] = useState(false);
   const [addingLesson, setAddingLesson] = useState<string | null>(null);
   const [newLesson, setNewLesson] = useState({ title: "", youtubeUrl: "", duration: "", content: "", releaseAfterDays: 0, attachments: [] as { title: string; url: string }[] });
@@ -57,12 +58,13 @@ export default function CourseEditor({ course: initial, teachers, isAdmin = true
     const res = await fetch(`/api/courses/${course.id}/modules`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title: newModuleTitle, thumbnail: newModuleThumbnail || undefined }),
+      body: JSON.stringify({ title: newModuleTitle, thumbnail: newModuleThumbnail || undefined, isBonus: newModuleIsBonus }),
     });
     const mod = await res.json();
     setCourse(c => ({ ...c, modules: [...c.modules, { ...mod, lessons: [] }] }));
     setNewModuleTitle("");
     setNewModuleThumbnail("");
+    setNewModuleIsBonus(false);
     setAddingModule(false);
   }
 
@@ -335,6 +337,10 @@ export default function CourseEditor({ course: initial, teachers, isAdmin = true
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             <input value={newModuleTitle} onChange={e => setNewModuleTitle(e.target.value)} placeholder="Nome do módulo" style={S.input} />
             <input value={newModuleThumbnail} onChange={e => setNewModuleThumbnail(e.target.value)} placeholder="URL da capa" style={S.input} />
+            <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 0" }}>
+              <input type="checkbox" id="newModBonus" checked={newModuleIsBonus} onChange={e => setNewModuleIsBonus(e.target.checked)} style={{ width: 16, height: 16, cursor: "pointer", accentColor: "var(--gold)" }} />
+              <label htmlFor="newModBonus" style={{ ...S.label, margin: 0, cursor: "pointer", textTransform: "none", fontSize: 12 }}>Este é um módulo bônus (não conta para progresso)</label>
+            </div>
             <div style={{ display: "flex", gap: 8 }}>
               <button style={S.btnPrimary} onClick={addModule}>Adicionar</button>
               <button style={S.btnGhost} onClick={() => setAddingModule(false)}>Cancelar</button>
@@ -368,7 +374,16 @@ export default function CourseEditor({ course: initial, teachers, isAdmin = true
                   <button onClick={() => setEditingModule(null)} style={{ ...S.btnEdit, color: "#fca5a5" }}><X size={16} /></button>
                 </div>
               ) : (
-                <span style={{ flex: 1, fontFamily: "'Cinzel',serif", fontWeight: 600, fontSize: 14 }}>{mod.title}</span>
+                <div style={{ flex: 1, display: "flex", alignItems: "center", gap: 10 }}>
+                  <span style={{ fontFamily: "'Cinzel',serif", fontWeight: 600, fontSize: 14 }}>{mod.title}</span>
+                  {mod.isBonus && (
+                    <span style={{ 
+                      fontSize: 8, fontWeight: 800, color: "var(--navy-darkest)", 
+                      background: "var(--gold)", padding: "2px 6px", borderRadius: 4, 
+                      letterSpacing: 1, textTransform: "uppercase" 
+                    }}>Bônus</span>
+                  )}
+                </div>
               )}
 
               <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
@@ -382,6 +397,24 @@ export default function CourseEditor({ course: initial, teachers, isAdmin = true
 
             {openModules[mod.id] && (
               <div style={{ borderTop: "1px solid rgba(201,169,122,0.08)", padding: 20 }}>
+                {/* Configurações do Módulo */}
+                <div style={{ display: "flex", alignItems: "center", gap: 24, marginBottom: 16, paddingBottom: 16, borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <input 
+                      type="checkbox" 
+                      id={`bonus-${mod.id}`} 
+                      checked={mod.isBonus} 
+                      onChange={async e => {
+                        const val = e.target.checked;
+                        await fetch(`/api/courses/${course.id}/modules/${mod.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ isBonus: val }) });
+                        setCourse(c => ({ ...c, modules: c.modules.map(m => m.id === mod.id ? { ...m, isBonus: val } : m) }));
+                      }} 
+                      style={{ width: 16, height: 16, cursor: "pointer", accentColor: "var(--gold)" }} 
+                    />
+                    <label htmlFor={`bonus-${mod.id}`} style={{ ...S.label, margin: 0, cursor: "pointer", textTransform: "none", fontSize: 11 }}>Módulo Bônus</label>
+                  </div>
+                </div>
+
                 {/* Capa do Módulo */}
                 <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16, paddingBottom: 16, borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
                   <span style={{ fontSize: 10, color: "rgba(201,169,122,0.5)", fontFamily: "'Cinzel',serif", letterSpacing: 2, textTransform: "uppercase", flexShrink: 0 }}>Capa</span>
