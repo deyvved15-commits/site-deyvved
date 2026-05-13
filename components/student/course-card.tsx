@@ -25,6 +25,11 @@ export default function CourseCard({ course, isEnrolled, expiresAt }: CourseCard
     const pct = total > 0 ? Math.round((done / total) * 100) : 0;
     const nextLesson = allLessons.find((l: any) => !l.progress[0]?.completed) ?? allLessons[0];
     const label = pct > 0 && pct < 100 ? "Continuar" : pct === 100 ? "Rever" : "Começar";
+    const destination = course.modules?.length > 1 
+      ? `/cursos/${course.slug}` 
+      : nextLesson 
+        ? `/cursos/${course.slug}/aula/${nextLesson.id}` 
+        : `/cursos/${course.slug}`;
 
     return (
       <article className="ka-card" style={isExpired ? { opacity: 0.7 } : undefined}>
@@ -47,8 +52,8 @@ export default function CourseCard({ course, isEnrolled, expiresAt }: CourseCard
               Expirado
             </div>
           )}
-          {!isExpired && nextLesson && (
-            <Link href={`/cursos/${course.slug}/aula/${nextLesson.id}`} className="ka-play-overlay">
+          {!isExpired && (
+            <Link href={destination} className="ka-play-overlay">
               <div className="ka-play-circle">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
               </div>
@@ -90,12 +95,10 @@ export default function CourseCard({ course, isEnrolled, expiresAt }: CourseCard
             }}>
               Renovar Acesso
             </Link>
-          ) : nextLesson ? (
-            <Link href={`/cursos/${course.slug}/aula/${nextLesson.id}`} className="ka-continue-btn">
-              {label} <span>→</span>
-            </Link>
           ) : (
-            <Link href={`/cursos/${course.slug}`} className="ka-continue-btn">Ver Curso →</Link>
+            <Link href={destination} className="ka-continue-btn">
+              {course.modules?.length > 1 ? "Ver Módulos" : label} <span>→</span>
+            </Link>
           )}
         </div>
       </article>

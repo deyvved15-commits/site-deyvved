@@ -4,6 +4,7 @@ import Link from "next/link";
 import { getGoogleDriveImageUrl } from "@/lib/utils";
 import CourseThumbnail from "@/components/student/course-thumbnail";
 import CategoryFilter from "@/components/student/category-filter";
+import CourseCard from "@/components/student/course-card";
 
 export default async function CursosPage({ searchParams }: { searchParams: Promise<{ categoria?: string }> }) {
   const session = await auth();
@@ -86,66 +87,15 @@ export default async function CursosPage({ searchParams }: { searchParams: Promi
             <p style={{ fontSize: 12, color: "var(--text-muted)", lineHeight: 1.6 }}>Entre em contato com a administração para se matricular.</p>
           </div>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(250px, 280px))", gap: 24 }}>
-            {filteredCourses.map((course: any) => {
-              if (!course) return null;
-              const allLessons = course.modules?.flatMap((m: any) => m.lessons) ?? [];
-              const done = allLessons.filter((l: any) => l.progress[0]?.completed).length;
-              const total = allLessons.length;
-              const pct = total > 0 ? Math.round((done / total) * 100) : 0;
-              const nextLesson = allLessons.find((l: any) => !l.progress[0]?.completed) ?? allLessons[0];
-              const thumbnailUrl = course.thumbnail?.includes("drive.google.com")
-                ? getGoogleDriveImageUrl(course.thumbnail)
-                : course.thumbnail;
-              const label = pct > 0 && pct < 100 ? "Continuar" : pct === 100 ? "Rever" : "Começar";
-
-              return (
-                <article key={course.id} className="ka-card">
-                  <div className="ka-thumb">
-                    {thumbnailUrl && <CourseThumbnail src={thumbnailUrl} alt={course.title} />}
-                    <div className="ka-thumb-mark">
-                      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M2 6.5C2 5.67 2.67 5 3.5 5H8c1.66 0 3 1.34 3 3v12c0-1.1-.9-2-2-2H3.5c-.83 0-1.5-.67-1.5-1.5v-10z"/>
-                        <path d="M22 6.5C22 5.67 21.33 5 20.5 5H16c-1.66 0-3 1.34-3 3v12c0-1.1.9-2 2-2h5.5c.83 0 1.5-.67 1.5-1.5v-10z"/>
-                      </svg>
-                    </div>
-                    <div className="ka-progress-badge">{pct}%</div>
-                    {nextLesson && (
-                      <Link href={`/cursos/${course.slug}/aula/${nextLesson.id}`} className="ka-play-overlay">
-                        <div className="ka-play-circle">
-                          <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M8 5v14l11-7z"/>
-                          </svg>
-                        </div>
-                      </Link>
-                    )}
-                  </div>
-
-                  <div style={{ padding: "20px 22px 22px" }}>
-                    <h3 style={{ fontFamily: "'Cinzel',serif", fontWeight: 600, fontSize: 16, letterSpacing: 1.5, color: "var(--text-primary)", marginBottom: 6, lineHeight: 1.3 }}>
-                      {course.title}
-                    </h3>
-                    <div style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 14, display: "flex", alignItems: "center", gap: 6 }}>
-                      <span style={{ width: 4, height: 4, borderRadius: "50%", background: "var(--gold)", boxShadow: "0 0 4px var(--gold)", flexShrink: 0 }} />
-                      {done}/{total} aula{total !== 1 ? "s" : ""} concluída{done !== 1 ? "s" : ""}
-                    </div>
-                    <div className="ka-progress-bar" style={{ marginBottom: 16 }}>
-                      <div className="ka-progress-fill" style={{ width: `${pct}%` }} />
-                    </div>
-                    {nextLesson ? (
-                      <Link href={`/cursos/${course.slug}/aula/${nextLesson.id}`} className="ka-continue-btn">
-                        {label}
-                        <span style={{ transition: "transform 0.2s" }}>→</span>
-                      </Link>
-                    ) : (
-                      <Link href={`/cursos/${course.slug}`} className="ka-continue-btn">
-                        Ver Curso →
-                      </Link>
-                    )}
-                  </div>
-                </article>
-              );
-            })}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 32 }}>
+            {filteredCourses.map((course: any) => (
+              <CourseCard 
+                key={course.id} 
+                course={course} 
+                isEnrolled={true} 
+                expiresAt={enrollments.find(e => e.courseId === course.id)?.expiresAt}
+              />
+            ))}
           </div>
         )}
       </div>
