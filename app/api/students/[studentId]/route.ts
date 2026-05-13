@@ -2,6 +2,30 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: Promise<{ studentId: string }> }
+) {
+  const session = await auth();
+  if (!session || session.user.role !== "ADMIN")
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
+  const { studentId } = await params;
+  const body = await req.json();
+  const { role } = body;
+
+  if (!role || !["STUDENT", "TEACHER", "ADMIN"].includes(role)) {
+    return NextResponse.json({ error: "Role inválida" }, { status: 400 });
+  }
+
+  const user = await prisma.user.update({
+    where: { id: studentId },
+    data: { role },
+  });
+
+  return NextResponse.json(user);
+}
+
 export async function DELETE(
   _req: NextRequest,
   { params }: { params: Promise<{ studentId: string }> }

@@ -4,6 +4,7 @@ import Link from "next/link";
 import EnrollButton from "@/components/admin/enroll-button";
 import UnenrollButton from "@/components/admin/unenroll-button";
 import DeleteStudentButton from "@/components/admin/delete-student-button";
+import PromoteStudentButton from "@/components/admin/promote-student-button";
 
 export default async function StudentProfilePage({ params }: { params: Promise<{ studentId: string }> }) {
   const { studentId } = await params;
@@ -82,6 +83,7 @@ export default async function StudentProfilePage({ params }: { params: Promise<{
             {notEnrolled.length > 0 && (
               <EnrollButton studentId={studentId} courses={notEnrolled} />
             )}
+            <PromoteStudentButton studentId={studentId} studentName={student.name} currentRole={student.role} />
             <DeleteStudentButton studentId={studentId} studentName={student.name} />
           </div>
         </div>
