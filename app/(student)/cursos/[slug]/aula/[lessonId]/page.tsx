@@ -46,9 +46,10 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
     redirect(`/checkout/${course.id}?renovar=1`);
   }
 
-  const allLessons = course.modules.flatMap(m => m.lessons);
-  const mainModules = course.modules.filter(m => !m.isBonus);
-  const mainLessons = mainModules.flatMap(m => m.lessons);
+  const modules = course.modules || [];
+  const allLessons = modules.flatMap(m => m.lessons || []);
+  const mainModules = modules.filter(m => !m.isBonus);
+  const mainLessons = mainModules.flatMap(m => m.lessons || []);
 
   const currentIndex = allLessons.findIndex(l => l.id === lessonId);
   if (currentIndex === -1) notFound();

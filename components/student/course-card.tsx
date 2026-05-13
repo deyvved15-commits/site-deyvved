@@ -19,14 +19,15 @@ export default function CourseCard({ course, isEnrolled, expiresAt }: CourseCard
     : course.thumbnail;
 
   if (isEnrolled) {
-    const mainModules = course.modules.filter((m: any) => !m.isBonus);
-    const allLessons = mainModules.flatMap((m: any) => m.lessons);
-    const done = allLessons.filter((l: any) => l.progress[0]?.completed).length;
+    const modules = course.modules || [];
+    const mainModules = modules.filter((m: any) => !m.isBonus);
+    const allLessons = mainModules.flatMap((m: any) => m.lessons || []);
+    const done = allLessons.filter((l: any) => l.progress?.[0]?.completed).length;
     const total = allLessons.length;
     const pct = total > 0 ? Math.round((done / total) * 100) : 0;
-    const nextLesson = course.modules.flatMap((m: any) => m.lessons).find((l: any) => !l.progress[0]?.completed) ?? allLessons[0];
+    const nextLesson = modules.flatMap((m: any) => m.lessons || []).find((l: any) => l.progress?.[0]?.completed === false) || allLessons[0];
     const label = pct > 0 && pct < 100 ? "Continuar" : pct === 100 ? "Rever" : "Começar";
-    const destination = course.modules?.length > 1 
+    const destination = modules.length > 1 
       ? `/cursos/${course.slug}` 
       : nextLesson 
         ? `/cursos/${course.slug}/aula/${nextLesson.id}` 

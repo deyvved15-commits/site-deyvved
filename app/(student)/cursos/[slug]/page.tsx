@@ -36,9 +36,10 @@ export default async function CursoPage({ params }: { params: Promise<{ slug: st
     redirect("/dashboard");
   }
 
-  const mainModules = course.modules.filter(m => !m.isBonus);
-  const allLessons = mainModules.flatMap(m => m.lessons);
-  const totalDone = allLessons.filter(l => l.progress[0]?.completed).length;
+  const modules = course.modules || [];
+  const mainModules = modules.filter(m => !m.isBonus);
+  const allLessons = mainModules.flatMap(m => m.lessons || []);
+  const totalDone = allLessons.filter(l => l.progress?.[0]?.completed).length;
   const total = allLessons.length;
   const coursePct = total > 0 ? Math.round((totalDone / total) * 100) : 0;
   const isConcluded = total > 0 && totalDone === total && course.paymentType === "ONE_TIME" && course.hasCertificate;
