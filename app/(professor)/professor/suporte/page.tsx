@@ -6,10 +6,13 @@ import { MessageSquare, Clock, CheckCircle2, AlertCircle, ChevronRight, User } f
 
 export default async function TeacherSupportPage() {
   const session = await auth();
-  if (!session || session.user.role !== "TEACHER") redirect("/login");
+  if (!session) redirect("/login");
+  
+  const role = session.user.role;
+  if (role !== "TEACHER" && role !== "ADMIN") redirect("/login");
 
   const tickets = await prisma.ticket.findMany({
-    where: session.user.role === "ADMIN" 
+    where: role === "ADMIN" 
       ? {} 
       : { course: { teacherId: session.user.id } },
     orderBy: { updatedAt: "desc" },
