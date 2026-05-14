@@ -27,7 +27,6 @@ export default async function CertificatePage({
       modules: {
         include: { lessons: { include: { progress: { where: { userId: targetUserId } } } } }
       },
-      teacher: false,
       teachers: true
     }
   });
