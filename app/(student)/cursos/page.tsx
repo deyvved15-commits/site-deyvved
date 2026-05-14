@@ -5,6 +5,7 @@ import { getGoogleDriveImageUrl } from "@/lib/utils";
 import CourseThumbnail from "@/components/student/course-thumbnail";
 import CategoryFilter from "@/components/student/category-filter";
 import CourseCard from "@/components/student/course-card";
+import SectionHeader from "@/components/student/section-header";
 
 export default async function CursosPage({ searchParams }: { searchParams: Promise<{ categoria?: string }> }) {
   const session = await auth();
