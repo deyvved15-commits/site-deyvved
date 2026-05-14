@@ -72,6 +72,7 @@ model User {
   referralsMade   Referral[]
   walletHistory   WalletTransaction[]
   notifications   Notification[]
+  productPurchases ProductPurchase[]
 }
 
 model Course {
@@ -371,6 +372,39 @@ model Notification {
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Product {
+  id            String            @id @default(cuid())
+  title         String
+  description   String?
+  price         Float
+  type          ProductType       @default(EBOOK)
+  thumbnail     String?
+  fileUrl       String?           // URL para download (ex: Drive ou S3)
+  published     Boolean           @default(false)
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  purchases     ProductPurchase[]
+}
+
+model ProductPurchase {
+  id        String   @id @default(cuid())
+  userId    String
+  productId String
+  amount    Float
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+}
+
+enum ProductType {
+  EBOOK
+  FILE
+  AUDIO
+  VIDEO
 }
 
 enum DiscountType {

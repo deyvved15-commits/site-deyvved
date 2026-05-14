@@ -64,28 +64,48 @@ export async function POST(req: NextRequest) {
 
     if (!externalRef) return NextResponse.json({ ok: true });
 
-    // Formato: userId:courseId:affiliateId:walletAmount:couponId
+    // Formato: userId:courseId:affiliateId:walletAmount:couponId:productId
     const parts = externalRef.split(":");
     const userId = parts[0];
-    const courseId = parts[1];
+    const courseId = parts[1] !== "none" ? parts[1] : null;
     const affiliateId = parts[2] && parts[2] !== "none" ? parts[2] : null;
     const walletAmountUsed = parts[3] ? parseFloat(parts[3]) : 0;
     const couponId = parts[4] && parts[4] !== "none" ? parts[4] : null;
+    const productId = parts[5] && parts[5] !== "none" ? parts[5] : null;
 
-    if (!userId || !courseId) return NextResponse.json({ ok: true });
+    if (!userId || (!courseId && !productId)) return NextResponse.json({ ok: true });
 
-    const course = await prisma.course.findUnique({ 
-      where: { id: courseId }, 
-      include: { 
-        teachers: { select: { teacherId: true, commissionPercentage: true } } 
-      } 
-    });
+    let itemTitle = "";
+    let itemPrice = 0;
+    let teachers: any[] = [];
+    let affiliatePercentage = 0;
+    let paymentType = "ONE_TIME";
 
-    const amount = mpData.transaction_amount ?? course?.price ?? 0;
-    const fullAmount = amount + walletAmountUsed; // Valor real do curso
+    if (courseId) {
+      const course = await prisma.course.findUnique({ 
+        where: { id: courseId }, 
+        include: { teachers: { select: { teacherId: true, commissionPercentage: true } } } 
+      });
+      if (course) {
+        itemTitle = course.title;
+        itemPrice = course.price ?? 0;
+        teachers = course.teachers;
+        affiliatePercentage = course.affiliatePercentage;
+        paymentType = course.paymentType;
+      }
+    } else if (productId) {
+      const product = await prisma.product.findUnique({ where: { id: productId } });
+      if (product) {
+        itemTitle = product.title;
+        itemPrice = product.price;
+      }
+    }
+
+    const amount = mpData.transaction_amount ?? itemPrice;
+    const fullAmount = amount + walletAmountUsed;
     
     // Calculate total commission sum
-    const totalCommissionPercentage = course?.teachers.reduce((acc, t) => acc + t.commissionPercentage, 0) || 0;
+    const totalCommissionPercentage = teachers.reduce((acc, t) => acc + t.commissionPercentage, 0) || 0;
     const totalCommissionAmount = (status === "approved" && totalCommissionPercentage > 0)
       ? (fullAmount * totalCommissionPercentage) / 100
       : null;
@@ -93,8 +113,8 @@ export async function POST(req: NextRequest) {
     await prisma.payment.updateMany({
       where: {
         userId,
-        courseId,
-        ...(preferenceId ? { mpPreferenceId: preferenceId } : { status: "pending" }),
+        ...(courseId ? { courseId } : { productId }),
+        ...(preferenceId ? { externalReference: preferenceId } : { status: "pending" }),
       },
       data: {
         status: status ?? "pending",
@@ -103,29 +123,29 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // If approved, handle teacher individual earnings
-    if (status === "approved" && course) {
-      // Find the payment record(s) we just updated to get the IDs
+    // If approved, handle earnings and enrollments
+    if (status === "approved") {
       const updatedPayments = await prisma.payment.findMany({
         where: { mpPaymentId: paymentId, status: "approved" },
         select: { id: true }
       });
 
-      for (const p of updatedPayments) {
-        // Create individual earnings for each teacher
-        await prisma.teacherEarning.createMany({
-          data: course.teachers.filter(t => t.commissionPercentage > 0).map(t => ({
-            teacherId: t.teacherId,
-            paymentId: p.id,
-            amount: (fullAmount * t.commissionPercentage) / 100
-          }))
-        });
+      // Earnings for teachers (only for courses)
+      if (courseId && teachers.length > 0) {
+        for (const p of updatedPayments) {
+          await prisma.teacherEarning.createMany({
+            data: teachers.filter(t => t.commissionPercentage > 0).map(t => ({
+              teacherId: t.teacherId,
+              paymentId: p.id,
+              amount: (fullAmount * t.commissionPercentage) / 100
+            }))
+          });
+        }
       }
 
-      // ── Afiliado: creditar comissão ──
-      if (affiliateId && course.affiliatePercentage > 0) {
-        const commission = (fullAmount * course.affiliatePercentage) / 100;
-        
+      // ── Afiliado: creditar comissão (se for curso) ──
+      if (courseId && affiliateId && affiliatePercentage > 0) {
+        const commission = (fullAmount * affiliatePercentage) / 100;
         await prisma.$transaction([
           prisma.referral.upsert({
             where: { buyerId_courseId: { buyerId: userId, courseId } },
@@ -137,10 +157,7 @@ export async function POST(req: NextRequest) {
               amount: commission,
               status: "credited",
             },
-            update: {
-              amount: { increment: commission },
-              status: "credited",
-            },
+            update: { amount: { increment: commission }, status: "credited" },
           }),
           prisma.user.update({
             where: { id: affiliateId },
@@ -150,47 +167,54 @@ export async function POST(req: NextRequest) {
             data: {
               userId: affiliateId,
               amount: commission,
-              type: "affiliate_commission",
-              description: `Comissão: ${course.title}`,
+              type: "COMMISSION",
+              description: `Comissão: ${itemTitle}`,
             },
           }),
         ]);
       }
-    }
 
-    if (status === "approved") {
       // ── Cupom: incrementar uso ──
       if (couponId) {
         await prisma.coupon.update({
           where: { id: couponId },
           data: { usedCount: { increment: 1 } }
-        }).catch(err => console.error("[webhook/coupon]", err));
+        }).catch(() => {});
       }
+
+      // ── Liberação de Acesso ──
+      if (courseId) {
+        const expiresAt = paymentType === "MONTHLY"
+          ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+          : null;
+
+        await prisma.enrollment.upsert({
+          where: { userId_courseId: { userId, courseId } },
+          create: { userId, courseId, expiresAt },
+          update: { expiresAt },
+        });
+      } else if (productId) {
+        await prisma.productPurchase.upsert({
+          where: { userId_productId: { userId, productId } },
+          create: { userId, productId, amount: fullAmount },
+          update: { amount: fullAmount }
+        });
+      }
+
+      // Email de confirmação
       const user = await prisma.user.findUnique({ where: { id: userId }, select: { name: true, email: true } });
-
-      const expiresAt = course?.paymentType === "MONTHLY"
-        ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
-        : null;
-
-      await prisma.enrollment.upsert({
-        where: { userId_courseId: { userId, courseId } },
-        create: { userId, courseId, expiresAt },
-        update: { expiresAt },
-      });
-
-      // Email de confirmação de pagamento
-      if (user?.email && course) {
+      if (user?.email && itemTitle) {
         getResend().emails.send({
           from: FROM_EMAIL,
           to: user.email,
-          subject: `Pagamento confirmado — ${course.title}`,
+          subject: `Pagamento confirmado — ${itemTitle}`,
           html: emailConfirmacaoPagamento({
             name: user.name ?? "Aluno",
-            courseName: course.title,
-            amount: mpData.transaction_amount ?? course.price ?? 0,
-            isMonthly: course.paymentType === "MONTHLY",
+            courseName: itemTitle,
+            amount: amount,
+            isMonthly: paymentType === "MONTHLY",
           }),
-        }).catch(err => console.error("[email/pagamento]", err));
+        }).catch(() => {});
       }
     }
 

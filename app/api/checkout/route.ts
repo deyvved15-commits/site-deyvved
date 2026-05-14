@@ -7,7 +7,7 @@ import { cookies } from "next/headers";
 export async function POST(req: NextRequest) {
   let session = await auth();
   const body = await req.json();
-  const { courseId, walletAmount: rawWalletAmount, userData, couponId } = body;
+  const { courseId, productId, walletAmount: rawWalletAmount, userData, couponId } = body;
 
   // Se não estiver logado, tenta criar conta ou logar
   if (!session) {
@@ -36,19 +36,43 @@ export async function POST(req: NextRequest) {
     session = { user: { id: user.id, email: user.email, name: user.name, role: user.role } } as any;
   }
 
-  if (!courseId) return NextResponse.json({ error: "courseId obrigatório" }, { status: 400 });
+  if (!courseId && !productId) return NextResponse.json({ error: "courseId ou productId obrigatório" }, { status: 400 });
 
-  const course = await prisma.course.findUnique({ where: { id: courseId } });
-  if (!course || !course.published) return NextResponse.json({ error: "Curso não encontrado" }, { status: 404 });
-  if (!course.price || course.price <= 0) return NextResponse.json({ error: "Curso sem preço definido" }, { status: 400 });
+  let itemTitle = "";
+  let itemPrice = 0;
+  let itemId = "";
+  let itemType: "COURSE" | "PRODUCT" = "COURSE";
 
-  // Verifica matrícula existente
-  const existing = await prisma.enrollment.findUnique({
-    where: { userId_courseId: { userId: session!.user.id, courseId } },
-  });
-  if (existing) {
-    const isActive = !existing.expiresAt || existing.expiresAt > new Date();
-    if (isActive) return NextResponse.json({ error: "Já matriculado" }, { status: 400 });
+  if (courseId) {
+    const course = await prisma.course.findUnique({ where: { id: courseId } });
+    if (!course || !course.published) return NextResponse.json({ error: "Curso não encontrado" }, { status: 404 });
+    if (!course.price || course.price <= 0) return NextResponse.json({ error: "Curso sem preço definido" }, { status: 400 });
+    itemTitle = course.title;
+    itemPrice = course.price;
+    itemId = course.id;
+    itemType = "COURSE";
+
+    // Verifica matrícula existente
+    const existing = await prisma.enrollment.findUnique({
+      where: { userId_courseId: { userId: session!.user.id, courseId } },
+    });
+    if (existing) {
+      const isActive = !existing.expiresAt || existing.expiresAt > new Date();
+      if (isActive) return NextResponse.json({ error: "Já matriculado" }, { status: 400 });
+    }
+  } else if (productId) {
+    const product = await prisma.product.findUnique({ where: { id: productId } });
+    if (!product || !product.published) return NextResponse.json({ error: "Produto não encontrado" }, { status: 404 });
+    itemTitle = product.title;
+    itemPrice = product.price;
+    itemId = product.id;
+    itemType = "PRODUCT";
+
+    // Verifica se já comprou
+    const existing = await prisma.productPurchase.findUnique({
+      where: { userId_productId: { userId: session!.user.id, productId } },
+    });
+    if (existing) return NextResponse.json({ error: "Você já adquiriu este produto" }, { status: 400 });
   }
 
   // Ler cookie de afiliado
@@ -82,12 +106,12 @@ export async function POST(req: NextRequest) {
       if (!isExpired && !isUsageLimitReached) {
         validCouponId = coupon.id;
         couponDiscount = coupon.discountType === "PERCENTAGE"
-          ? (course.price * coupon.discountValue) / 100
+          ? (itemPrice * coupon.discountValue) / 100
           : coupon.discountValue;
       }
     }
   }
-
+  
   // Calcula uso da carteira
   const user = await prisma.user.findUnique({
     where: { id: session!.user.id },
@@ -96,7 +120,7 @@ export async function POST(req: NextRequest) {
   const availableBalance = user?.walletBalance ?? 0;
   
   // O desconto do cupom é aplicado primeiro sobre o preço original
-  const priceAfterCoupon = Math.max(0, course.price - couponDiscount);
+  const priceAfterCoupon = Math.max(0, itemPrice - couponDiscount);
 
   const walletAmount = Math.min(
     Math.max(0, Number(rawWalletAmount) || 0),
@@ -106,7 +130,7 @@ export async function POST(req: NextRequest) {
   
   const amountToPay = Math.max(0, priceAfterCoupon - walletAmount);
 
-  // Se o saldo + cupom cobre 100% do curso
+  // Se o saldo + cupom cobre 100% do item
   if (amountToPay <= 0) {
     // Se usou cupom, incrementa uso
     if (validCouponId) {
@@ -116,81 +140,97 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Debita carteira
-    await prisma.$transaction([
-      prisma.user.update({
-        where: { id: session!.user.id },
-        data: { walletBalance: { decrement: walletAmount } },
-      }),
-      prisma.walletTransaction.create({
-        data: {
-          userId: session!.user.id,
-          amount: -walletAmount,
-          type: "course_purchase",
-          description: `Compra do curso: ${course.title}`,
-        },
-      }),
-      prisma.payment.create({
-        data: {
-          userId: session!.user.id,
-          courseId,
-          couponId: validCouponId,
-          amount: course.price,
-          status: "approved",
-          commissionAmount: null,
-        },
-      }),
-      prisma.enrollment.upsert({
-        where: { userId_courseId: { userId: session!.user.id, courseId } },
-        create: {
-          userId: session!.user.id,
-          courseId,
-          expiresAt: course.paymentType === "MONTHLY"
-            ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
-            : null,
-        },
-        update: {
-          expiresAt: course.paymentType === "MONTHLY"
-            ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
-            : null,
-        },
-      }),
-    ]);
+    // Debita carteira e registra acesso/compra
+    await prisma.$transaction(async (tx) => {
+      if (walletAmount > 0) {
+        await tx.user.update({
+          where: { id: session!.user.id },
+          data: { walletBalance: { decrement: walletAmount } },
+        });
 
-    // Credita afiliado se houver
-    if (affiliateId && course.affiliatePercentage > 0) {
-      const commission = (course.price * course.affiliatePercentage) / 100;
-      await prisma.$transaction([
-        prisma.referral.upsert({
-          where: { buyerId_courseId: { buyerId: session!.user.id, courseId } },
+        await tx.walletTransaction.create({
+          data: {
+            userId: session!.user.id,
+            amount: -walletAmount,
+            type: "PURCHASE",
+            description: `Compra: ${itemTitle}`,
+          },
+        });
+      }
+
+      await tx.payment.create({
+        data: {
+          userId: session!.user.id,
+          courseId: courseId || null,
+          couponId: validCouponId,
+          amount: itemPrice,
+          walletUsed: walletAmount,
+          method: "WALLET",
+          status: "approved",
+          externalReference: `wallet_${Date.now()}`,
+        },
+      });
+
+      if (itemType === "COURSE" && courseId) {
+        const course = await tx.course.findUnique({ where: { id: courseId } });
+        await tx.enrollment.upsert({
+          where: { userId_courseId: { userId: session!.user.id, courseId } },
           create: {
-            referrerId: affiliateId,
-            buyerId: session!.user.id,
+            userId: session!.user.id,
             courseId,
-            amount: commission,
-            status: "credited",
+            expiresAt: course?.paymentType === "MONTHLY"
+              ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+              : null,
           },
           update: {
-            amount: commission,
-            status: "credited",
+            expiresAt: course?.paymentType === "MONTHLY"
+              ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+              : null,
           },
-        }),
-        prisma.user.update({
-          where: { id: affiliateId },
-          data: { walletBalance: { increment: commission } },
-        }),
-        prisma.walletTransaction.create({
-          data: {
-            userId: affiliateId,
-            amount: commission,
-            type: "affiliate_commission",
-            description: `Comissão: ${course.title}`,
-          },
-        }),
-      ]);
-    }
+        });
 
-    return NextResponse.json({ paid: true, redirectUrl: `/checkout/sucesso?courseId=${courseId}` });
+        // Credita afiliado se houver curso
+        if (affiliateId && course && course.affiliatePercentage > 0) {
+          const commission = (course.price * course.affiliatePercentage) / 100;
+          await tx.referral.upsert({
+            where: { buyerId_courseId: { buyerId: session!.user.id, courseId } },
+            create: {
+              referrerId: affiliateId,
+              buyerId: session!.user.id,
+              courseId,
+              amount: commission,
+              status: "credited",
+            },
+            update: { amount: commission, status: "credited" },
+          });
+          await tx.user.update({
+            where: { id: affiliateId },
+            data: { walletBalance: { increment: commission } },
+          });
+          await tx.walletTransaction.create({
+            data: {
+              userId: affiliateId,
+              amount: commission,
+              type: "COMMISSION",
+              description: `Comissão: ${course.title}`,
+            },
+          });
+        }
+      } else if (itemType === "PRODUCT" && productId) {
+        await tx.productPurchase.create({
+          data: {
+            userId: session!.user.id,
+            productId,
+            amount: 0,
+          }
+        });
+      }
+    });
+
+    return NextResponse.json({ 
+      paid: true, 
+      redirectUrl: itemType === "COURSE" ? `/checkout/sucesso?courseId=${courseId}` : "/loja" 
+    });
   }
 
   // Pagamento via Mercado Pago (valor restante)
@@ -199,8 +239,8 @@ export async function POST(req: NextRequest) {
   const preference = await mpPreference.create({
     body: {
       items: [{
-        id: course.id,
-        title: course.title,
+        id: itemId,
+        title: itemTitle,
         quantity: 1,
         unit_price: amountToPay,
         currency_id: "BRL",
@@ -210,17 +250,13 @@ export async function POST(req: NextRequest) {
         name: session!.user.name ?? undefined,
       },
       back_urls: {
-        success: `${baseUrl}/checkout/sucesso?courseId=${courseId}`,
-        failure: `${baseUrl}/checkout/falha?courseId=${courseId}`,
-        pending: `${baseUrl}/checkout/pendente?courseId=${courseId}`,
+        success: `${baseUrl}/checkout/sucesso?${itemType === 'COURSE' ? 'courseId='+courseId : 'productId='+productId}`,
+        failure: `${baseUrl}/checkout/falha?${itemType === 'COURSE' ? 'courseId='+courseId : 'productId='+productId}`,
+        pending: `${baseUrl}/checkout/pendente?${itemType === 'COURSE' ? 'courseId='+courseId : 'productId='+productId}`,
       },
       auto_return: "approved",
       notification_url: `${baseUrl}/api/webhooks/mercadopago`,
-      payment_methods: {
-        installments: 12,
-        default_installments: 1,
-      },
-      external_reference: `${session!.user.id}:${courseId}:${affiliateId ?? "none"}:${walletAmount}:${validCouponId ?? "none"}`,
+      external_reference: `${session!.user.id}:${courseId ?? "none"}:${affiliateId ?? "none"}:${walletAmount}:${validCouponId ?? "none"}:${productId ?? "none"}`,
       statement_descriptor: "KADIMA ACADEMY",
     },
   });
@@ -229,17 +265,10 @@ export async function POST(req: NextRequest) {
   await prisma.payment.create({
     data: {
       userId: session!.user.id,
-      courseId,
+      courseId: courseId || null,
       couponId: validCouponId,
       amount: amountToPay,
       status: "pending",
-      mpPreferenceId: preference.id ?? null,
-    },
-  });
-
-  // Debita carteira se usou saldo parcial
-  if (walletAmount > 0) {
-    await prisma.$transaction([
       prisma.user.update({
         where: { id: session!.user.id },
         data: { walletBalance: { decrement: walletAmount } },
