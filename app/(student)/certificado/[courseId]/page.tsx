@@ -27,7 +27,7 @@ export default async function CertificatePage({
       modules: {
         include: { lessons: { include: { progress: { where: { userId: targetUserId } } } } }
       },
-      teachers: true
+      teachers: { include: { teacher: { select: { name: true } } } }
     }
   });
 
@@ -67,7 +67,7 @@ export default async function CertificatePage({
     year: "numeric"
   });
 
-  const teacherNames = course.teachers.map(t => t.name).join(", ");
+  const teacherNames = course.teachers.map(ct => ct.teacher.name).join(", ");
 
   return (
     <div style={{ minHeight: "100vh", background: "#050A1F", padding: "40px 20px", display: "flex", flexDirection: "column", alignItems: "center" }}>
