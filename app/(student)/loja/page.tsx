@@ -7,18 +7,33 @@ export default async function MarketplacePage() {
   const session = await auth();
   if (!session) return null;
 
-  const [products, purchases] = await Promise.all([
-    prisma.product.findMany({
-      where: { published: true },
-      orderBy: { createdAt: "desc" },
-    }),
-    prisma.productPurchase.findMany({
-      where: { userId: session.user.id },
-      select: { productId: true },
-    })
-  ]);
+  let products: any[] = [];
+  let purchasedIds = new Set<string>();
 
-  const purchasedIds = new Set(purchases.map(p => p.productId));
+  try {
+    const [dbProducts, purchases] = await Promise.all([
+      prisma.product.findMany({
+        where: { published: true },
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.productPurchase.findMany({
+        where: { userId: session.user.id },
+        select: { productId: true },
+      })
+    ]);
+    products = dbProducts;
+    purchasedIds = new Set(purchases.map(p => p.productId));
+  } catch (error) {
+    console.error("Erro ao carregar loja:", error);
+    return (
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--navy-darkest)", color: "white", padding: 20 }}>
+        <div style={{ textAlign: "center" }}>
+          <h1 style={{ fontFamily: "'Cinzel',serif", color: "var(--gold)" }}>Sistema em Manutenção</h1>
+          <p style={{ marginTop: 10 }}>Estamos preparando a loja para você. Por favor, tente novamente em instantes.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ minHeight: "100vh", background: "linear-gradient(180deg, var(--navy-darkest) 0%, var(--navy-mid) 100%)" }}>

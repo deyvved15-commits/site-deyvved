@@ -2,10 +2,11 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 
 export default async function AdminDashboard() {
-  const [totalCourses, totalStudents, totalLessons, recentStudents, openTickets, churnCount] = await Promise.all([
+  const [totalCourses, totalStudents, totalLessons, totalProducts, recentStudents, openTickets, churnCount] = await Promise.all([
     prisma.course.count(),
     prisma.user.count({ where: { role: "STUDENT" } }),
     prisma.lesson.count(),
+    prisma.product.count(),
     prisma.user.findMany({
       where: { role: "STUDENT" },
       orderBy: { createdAt: "desc" },
@@ -23,6 +24,14 @@ export default async function AdminDashboard() {
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v18H6.5a2.5 2.5 0 0 0 0 5H20"/>
           <path d="M8 7h8M8 11h6"/>
+        </svg>
+      ),
+    },
+    {
+      label: "Produtos", value: totalProducts || 0, href: "/admin/produtos",
+      icon: (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/>
         </svg>
       ),
     },
