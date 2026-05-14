@@ -93,7 +93,7 @@ export default async function ProfessorFinanceiro() {
                   <tr key={e.id} style={{ borderBottom: i < earnings.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
                     <td style={{ padding: "16px 24px", color: "var(--text-muted)" }}>{new Date(e.createdAt).toLocaleDateString("pt-BR")}</td>
                     <td style={{ padding: "16px 24px", fontWeight: 500, color: "white" }}>{e.payment.user.name}</td>
-                    <td style={{ padding: "16px 24px", color: "var(--text-secondary)" }}>{e.payment.course.title}</td>
+                    <td style={{ padding: "16px 24px", color: "var(--text-secondary)" }}>{e.payment.course?.title || "Curso removido"}</td>
                     <td style={{ padding: "16px 24px", textAlign: "right", color: "var(--text-muted)" }}>R$ {e.payment.amount.toFixed(2)}</td>
                     <td style={{ padding: "16px 24px", textAlign: "right", fontWeight: 700, color: "#6ee7b7" }}>+ R$ {e.amount.toFixed(2)}</td>
                   </tr>
