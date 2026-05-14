@@ -9,7 +9,7 @@ import { Plus, Trash2, ChevronDown, ChevronRight, Eye, EyeOff, Pencil, X, Check,
 
 type Lesson = { id: string; title: string; youtubeUrl: string; duration: string | null; content: string | null; order: number; releaseAfterDays: number; attachments?: { title: string; url: string }[] };
 type Module = { id: string; title: string; description: string | null; thumbnail: string | null; isBonus: boolean; order: number; lessons: Lesson[] };
-type Course = { id: string; title: string; description: string | null; thumbnail: string | null; price: number | null; paymentType: "ONE_TIME" | "MONTHLY"; published: boolean; category: string | null; modules: Module[]; teachers: { id: string; name: string }[]; commissionPercentage: number; hasCertificate: boolean };
+type Course = { id: string; title: string; description: string | null; thumbnail: string | null; price: number | null; paymentType: "ONE_TIME" | "MONTHLY"; published: boolean; category: string | null; modules: Module[]; teachers: { teacherId: string; commissionPercentage: number; teacher: { id: string; name: string } }[]; hasCertificate: boolean };
 
 const textareaClass = "w-full bg-[rgba(255,255,255,0.04)] border border-[rgba(201,169,122,0.18)] rounded-xl px-4 py-3 text-sm text-white placeholder-[rgba(255,255,255,0.2)] outline-none resize-none focus:border-[rgba(201,169,122,0.5)] focus:bg-[rgba(255,255,255,0.06)] transition-all";
 const labelClass = "text-[10px] tracking-[3px] uppercase text-[rgba(201,169,122,0.7)] font-medium mb-2 block";
@@ -44,8 +44,10 @@ export default function CourseEditor({ course: initial, teachers: allTeachers, i
         paymentType: course.paymentType, 
         published: course.published,
         category: course.category,
-        teacherIds: course.teachers.map(t => t.id),
-        commissionPercentage: course.commissionPercentage,
+        teachers: course.teachers.map(t => ({
+          teacherId: t.teacherId,
+          commissionPercentage: t.commissionPercentage
+        })),
         hasCertificate: course.hasCertificate
       }),
     });
@@ -307,41 +309,63 @@ export default function CourseEditor({ course: initial, teachers: allTeachers, i
           </div>
 
           {isAdmin && (
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-              <div className="ka-field" style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                <label className="ka-label">Professores Associados</label>
-                <div style={{ 
-                  display: "flex", flexDirection: "column", gap: 8, padding: "12px 16px",
-                  background: "rgba(255,255,255,0.03)", border: "1px solid rgba(201,169,122,0.15)", borderRadius: 12,
-                  maxHeight: 180, overflowY: "auto" 
-                }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              <div className="ka-field">
+                <label className="ka-label">Professores e Comissões</label>
+                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                   {allTeachers.map(t => {
-                    const isSelected = course.teachers.some(ct => ct.id === t.id);
+                    const assoc = course.teachers.find(ct => ct.teacherId === t.id);
+                    const isSelected = !!assoc;
                     return (
-                      <label key={t.id} style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontSize: 13, color: isSelected ? "var(--gold)" : "rgba(255,255,255,0.6)" }}>
-                        <input 
-                          type="checkbox" 
-                          checked={isSelected}
-                          onChange={e => {
-                            const checked = e.target.checked;
-                            setCourse(c => ({
-                              ...c,
-                              teachers: checked 
-                                ? [...c.teachers, t]
-                                : c.teachers.filter(ct => ct.id !== t.id)
-                            }));
-                          }}
-                          style={{ width: 16, height: 16, accentColor: "var(--gold)" }}
-                        />
-                        {t.name}
-                      </label>
+                      <div key={t.id} style={{ 
+                        display: "flex", alignItems: "center", gap: 16, padding: "12px 16px",
+                        background: isSelected ? "rgba(201,169,122,0.08)" : "rgba(255,255,255,0.02)",
+                        border: `1px solid ${isSelected ? "var(--gold-35)" : "rgba(255,255,255,0.05)"}`,
+                        borderRadius: 14, transition: "all 0.2s"
+                      }}>
+                        <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", flex: 1, fontSize: 13, color: isSelected ? "var(--gold)" : "rgba(255,255,255,0.6)" }}>
+                          <input 
+                            type="checkbox" 
+                            checked={isSelected}
+                            onChange={e => {
+                              const checked = e.target.checked;
+                              setCourse(c => ({
+                                ...c,
+                                teachers: checked 
+                                  ? [...c.teachers, { teacherId: t.id, commissionPercentage: 0, teacher: t }]
+                                  : c.teachers.filter(ct => ct.teacherId !== t.id)
+                              }));
+                            }}
+                            style={{ width: 16, height: 16, accentColor: "var(--gold)" }}
+                          />
+                          {t.name}
+                        </label>
+                        
+                        {isSelected && (
+                          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                            <span style={{ fontSize: 10, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 1 }}>Comissão:</span>
+                            <div style={{ position: "relative", width: 80 }}>
+                              <input 
+                                type="number" min="0" max="100" 
+                                value={assoc.commissionPercentage} 
+                                onChange={e => {
+                                  const val = parseFloat(e.target.value) || 0;
+                                  setCourse(c => ({
+                                    ...c,
+                                    teachers: c.teachers.map(ct => ct.teacherId === t.id ? { ...ct, commissionPercentage: val } : ct)
+                                  }));
+                                }}
+                                className="ka-input"
+                                style={{ padding: "6px 28px 6px 10px", textAlign: "right", fontSize: 12 }} 
+                              />
+                              <span style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", fontSize: 11, color: "var(--gold)", pointerEvents: "none" }}>%</span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     );
                   })}
                 </div>
-              </div>
-              <div className="ka-field" style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                <label className="ka-label">Comissão Global (%)</label>
-                <input type="number" min="0" max="100" value={course.commissionPercentage} onChange={e => setCourse(c => ({ ...c, commissionPercentage: parseFloat(e.target.value) || 0 }))} className="ka-input" />
               </div>
             </div>
           )}

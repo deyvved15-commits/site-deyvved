@@ -10,11 +10,14 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
     where: { id: teacherId },
     include: {
       taughtCourses: {
-        select: {
-          id: true,
-          title: true,
-          commissionPercentage: true,
-          _count: { select: { enrollments: true } }
+        include: {
+          course: {
+            select: {
+              id: true,
+              title: true,
+              _count: { select: { enrollments: true } }
+            }
+          }
         }
       }
     }
@@ -113,8 +116,8 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
             </div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-              {teacher.taughtCourses.map((course) => (
-                <div key={course.id} style={{
+              {teacher.taughtCourses.map((ct) => (
+                <div key={ct.id} style={{
                   borderRadius: 16, padding: "20px",
                   background: "linear-gradient(160deg, var(--navy-card) 0%, var(--navy-card-2) 100%)",
                   border: "1px solid rgba(201,169,122,0.10)",
@@ -122,16 +125,16 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
                 }}>
                   <div>
                     <h3 style={{ fontFamily: "'Cinzel',serif", fontWeight: 600, fontSize: 14, color: "var(--text-primary)", marginBottom: 4 }}>
-                      {course.title}
+                      {ct.course.title}
                     </h3>
                     <p style={{ fontSize: 12, color: "var(--text-muted)" }}>
-                      {course._count.enrollments} alunos matriculados
+                      {ct.course._count.enrollments} alunos matriculados
                     </p>
                   </div>
                   <div style={{ textAlign: "right" }}>
                     <p style={{ fontFamily: "'Cinzel',serif", fontSize: 10, color: "var(--gold)", marginBottom: 2 }}>Comissão</p>
                     <p style={{ fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 18, color: "var(--gold-light)" }}>
-                      {course.commissionPercentage}%
+                      {ct.commissionPercentage}%
                     </p>
                   </div>
                 </div>

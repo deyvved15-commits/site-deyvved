@@ -69,12 +69,17 @@ export async function POST(req: NextRequest) {
 
     const course = await prisma.course.findUnique({ 
       where: { id: courseId }, 
-      select: { title: true, paymentType: true, price: true, commissionPercentage: true } 
+      include: { 
+        teachers: { select: { teacherId: true, commissionPercentage: true } } 
+      } 
     });
 
     const amount = mpData.transaction_amount ?? course?.price ?? 0;
-    const commissionAmount = (status === "approved" && course?.commissionPercentage)
-      ? (amount * course.commissionPercentage) / 100
+    
+    // Calculate total commission sum
+    const totalCommissionPercentage = course?.teachers.reduce((acc, t) => acc + t.commissionPercentage, 0) || 0;
+    const totalCommissionAmount = (status === "approved" && totalCommissionPercentage > 0)
+      ? (amount * totalCommissionPercentage) / 100
       : null;
 
     await prisma.payment.updateMany({
@@ -86,9 +91,29 @@ export async function POST(req: NextRequest) {
       data: {
         status: status ?? "pending",
         mpPaymentId: paymentId,
-        commissionAmount,
+        commissionAmount: totalCommissionAmount,
       },
     });
+
+    // If approved, handle teacher individual earnings
+    if (status === "approved" && course) {
+      // Find the payment record(s) we just updated to get the IDs
+      const updatedPayments = await prisma.payment.findMany({
+        where: { mpPaymentId: paymentId, status: "approved" },
+        select: { id: true }
+      });
+
+      for (const p of updatedPayments) {
+        // Create individual earnings for each teacher
+        await prisma.teacherEarning.createMany({
+          data: course.teachers.filter(t => t.commissionPercentage > 0).map(t => ({
+            teacherId: t.teacherId,
+            paymentId: p.id,
+            amount: (amount * t.commissionPercentage) / 100
+          }))
+        });
+      }
+    }
 
     if (status === "approved") {
       const user = await prisma.user.findUnique({ where: { id: userId }, select: { name: true, email: true } });

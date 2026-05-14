@@ -23,8 +23,7 @@ export default function NovoCursoPage() {
     thumbnail: "",
     price: "",
     paymentType: "ONE_TIME",
-    teacherIds: [] as string[],
-    commissionPercentage: "0",
+    teachers: [] as { teacherId: string; commissionPercentage: number; name: string }[],
   });
   const [teachers, setTeachers] = useState<{ id: string; name: string }[]>([]);
   const searchParams = useSearchParams();
@@ -35,7 +34,10 @@ export default function NovoCursoPage() {
       .then(data => {
         setTeachers(data);
         const tId = searchParams.get("teacherId");
-        if (tId) setForm(f => ({ ...f, teacherIds: [tId] }));
+        if (tId) {
+          const t = data.find((x: any) => x.id === tId);
+          if (t) setForm(f => ({ ...f, teachers: [{ teacherId: tId, commissionPercentage: 0, name: t.name }] }));
+        }
       });
   }, [searchParams]);
 
@@ -54,8 +56,10 @@ export default function NovoCursoPage() {
         thumbnail: form.thumbnail || undefined,
         price: form.price ? parseFloat(form.price) : undefined,
         paymentType: form.paymentType,
-        teacherIds: form.teacherIds,
-        commissionPercentage: form.commissionPercentage ? parseFloat(form.commissionPercentage) : undefined,
+        teachers: form.teachers.map(t => ({
+          teacherId: t.teacherId,
+          commissionPercentage: t.commissionPercentage
+        })),
       }),
     });
     const data = await res.json();
@@ -140,41 +144,56 @@ export default function NovoCursoPage() {
               </div>
             </div>
 
-            {/* Professor + Comissão */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-              <div style={S.field}>
-                <label style={S.label}>Professores Associados</label>
-                <div style={{ 
-                  display: "flex", flexDirection: "column", gap: 8, padding: "12px 16px",
-                  background: "rgba(255,255,255,0.03)", border: "1px solid rgba(201,169,122,0.15)", borderRadius: 12,
-                  maxHeight: 160, overflowY: "auto" 
-                }}>
-                  {teachers.map(t => {
-                    const isSelected = form.teacherIds.includes(t.id);
-                    return (
-                      <label key={t.id} style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontSize: 13, color: isSelected ? "var(--gold)" : "rgba(255,255,255,0.6)" }}>
+            {/* Professores e Comissões */}
+            <div className="ka-field">
+              <label style={S.label}>Professores e Comissões</label>
+              <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 8 }}>
+                {teachers.map(t => {
+                  const assoc = form.teachers.find(ct => ct.teacherId === t.id);
+                  const isSelected = !!assoc;
+                  return (
+                    <div key={t.id} style={{ 
+                      display: "flex", alignItems: "center", gap: 16, padding: "12px 16px",
+                      background: isSelected ? "rgba(201,169,122,0.08)" : "rgba(255,255,255,0.02)",
+                      border: `1px solid ${isSelected ? "var(--gold-35)" : "rgba(255,255,255,0.05)"}`,
+                      borderRadius: 14, transition: "all 0.2s"
+                    }}>
+                      <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", flex: 1, fontSize: 13, color: isSelected ? "var(--gold)" : "rgba(255,255,255,0.6)" }}>
                         <input 
                           type="checkbox" 
                           checked={isSelected}
                           onChange={e => {
                             const checked = e.target.checked;
-                            set("teacherIds", checked 
-                              ? [...form.teacherIds, t.id]
-                              : form.teacherIds.filter(id => id !== t.id)
+                            set("teachers", checked 
+                              ? [...form.teachers, { teacherId: t.id, commissionPercentage: 0, name: t.name }]
+                              : form.teachers.filter(ct => ct.teacherId !== t.id)
                             );
                           }}
                           style={{ width: 16, height: 16, accentColor: "var(--gold)" }}
                         />
                         {t.name}
                       </label>
-                    );
-                  })}
-                </div>
-              </div>
-              <div style={S.field}>
-                <label style={S.label}>Comissão Global (%)</label>
-                <input type="number" min="0" max="100" style={S.input}
-                  value={form.commissionPercentage} onChange={e => set("commissionPercentage", e.target.value)} placeholder="0" />
+                      
+                      {isSelected && (
+                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                          <span style={{ fontSize: 10, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 1 }}>Comissão:</span>
+                          <div style={{ position: "relative", width: 80 }}>
+                            <input 
+                              type="number" min="0" max="100" 
+                              value={assoc.commissionPercentage} 
+                              onChange={e => {
+                                const val = parseFloat(e.target.value) || 0;
+                                set("teachers", form.teachers.map(ct => ct.teacherId === t.id ? { ...ct, commissionPercentage: val } : ct));
+                              }}
+                              style={{ ...S.input, padding: "6px 28px 6px 10px", textAlign: "right", fontSize: 12 }} 
+                            />
+                            <span style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", fontSize: 11, color: "var(--gold)", pointerEvents: "none" }}>%</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
 

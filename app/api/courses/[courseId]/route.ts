@@ -11,8 +11,10 @@ const updateSchema = z.object({
   paymentType: z.enum(["ONE_TIME", "MONTHLY"]).optional(),
   published: z.boolean().optional(),
   category: z.string().nullable().optional(),
-  teacherIds: z.array(z.string()).optional(),
-  commissionPercentage: z.number().min(0).max(100).optional(),
+  teachers: z.array(z.object({
+    teacherId: z.string(),
+    commissionPercentage: z.number().min(0).max(100)
+  })).optional(),
   hasCertificate: z.boolean().optional(),
 });
 
@@ -24,7 +26,11 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ course
   const course = await prisma.course.findUnique({
     where: { id: courseId },
     include: {
-      teachers: { select: { id: true, name: true } },
+      teachers: {
+        include: {
+          teacher: { select: { id: true, name: true } }
+        }
+      },
       modules: {
         orderBy: { order: "asc" },
         include: { lessons: { orderBy: { order: "asc" } } },
@@ -47,7 +53,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ cour
   if (!currentCourse) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const isAdmin = session.user.role === "ADMIN";
-  const isTeacher = currentCourse.teachers.some(t => t.id === session.user.id);
+  const isTeacher = currentCourse.teachers.some(t => t.teacherId === session.user.id);
 
   if (!isAdmin && !isTeacher) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -59,23 +65,34 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ cour
 
   const data: any = { ...parsed.data };
 
-  // Safety: Only admin can change teacher or commission
+  // Safety: Only admin can change teachers or commission
   if (!isAdmin) {
-    delete data.teacherIds;
-    delete data.commissionPercentage;
+    delete data.teachers;
   }
 
-  if (data.teacherIds) {
-    data.teachers = {
-      set: data.teacherIds.map((id: string) => ({ id }))
-    };
-    delete data.teacherIds;
+  if (data.teachers) {
+    // Delete old associations
+    await prisma.courseTeacher.deleteMany({ where: { courseId } });
+    
+    // Create new ones
+    await prisma.courseTeacher.createMany({
+      data: data.teachers.map((t: any) => ({
+        courseId,
+        teacherId: t.teacherId,
+        commissionPercentage: t.commissionPercentage
+      }))
+    });
+    delete data.teachers;
   }
 
   const course = await prisma.course.update({ 
     where: { id: courseId }, 
     data,
-    include: { teachers: { select: { id: true, name: true } } }
+    include: { 
+      teachers: { 
+        include: { teacher: { select: { id: true, name: true } } } 
+      } 
+    }
   });
   return NextResponse.json(course);
 }

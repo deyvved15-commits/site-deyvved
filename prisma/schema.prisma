@@ -56,7 +56,7 @@ model User {
   accounts       Account[]
   certificates   Certificate[]
   comments       Comment[]
-  taughtCourses  Course[]          @relation("CourseTeachers")
+  taughtCourses  CourseTeacher[]
   enrollments    Enrollment[]
   progress       LessonProgress[]
   ratings        LessonRating[]
@@ -66,6 +66,7 @@ model User {
   tickets        Ticket[]
   ticketMessages TicketMessage[]
   achievements   UserAchievement[]
+  earnings       TeacherEarning[]
 }
 
 model Course {
@@ -80,15 +81,26 @@ model Course {
   order                Int           @default(0)
   createdAt            DateTime      @default(now())
   updatedAt            DateTime      @updatedAt
-  commissionPercentage Float         @default(0)
   category             String?
   hasCertificate       Boolean       @default(false)
   certificates         Certificate[]
-  teachers             User[]        @relation("CourseTeachers")
+  teachers             CourseTeacher[]
   enrollments          Enrollment[]
   modules              Module[]
   payments             Payment[]
   tickets              Ticket[]
+}
+
+model CourseTeacher {
+  id                   String @id @default(cuid())
+  courseId             String
+  teacherId            String
+  commissionPercentage Float  @default(0)
+
+  course  Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  teacher User   @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+
+  @@unique([courseId, teacherId])
 }
 
 model Certificate {
@@ -185,7 +197,8 @@ model Payment {
   updatedAt        DateTime @updatedAt
   commissionAmount Float?
   course           Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  teacherEarnings  TeacherEarning[]
 }
 
 model Comment {
@@ -279,4 +292,15 @@ enum Role {
 enum PaymentType {
   ONE_TIME
   MONTHLY
+}
+
+model TeacherEarning {
+  id        String   @id @default(cuid())
+  teacherId String
+  paymentId String
+  amount    Float
+  createdAt DateTime @default(now())
+
+  teacher User    @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  payment Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
 }

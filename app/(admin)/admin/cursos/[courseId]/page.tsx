@@ -10,7 +10,11 @@ export default async function EditCursoPage({ params }: { params: Promise<{ cour
     prisma.course.findUnique({
       where: { id: courseId },
       include: {
-        teachers: { select: { id: true, name: true } },
+        teachers: {
+          include: {
+            teacher: { select: { id: true, name: true } }
+          }
+        },
         modules: {
           orderBy: { order: "asc" },
           include: { lessons: { orderBy: { order: "asc" } } },
@@ -18,7 +22,7 @@ export default async function EditCursoPage({ params }: { params: Promise<{ cour
       },
     }),
     prisma.user.findMany({
-      where: { role: "TEACHER" },
+      where: { role: { in: ["TEACHER", "ADMIN"] } },
       select: { id: true, name: true },
       orderBy: { name: "asc" },
     }),
