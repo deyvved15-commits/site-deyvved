@@ -21,13 +21,13 @@ export default async function SupportPage() {
   };
 
   return (
-    <div style={{ minHeight: "100%", padding: "44px", background: "linear-gradient(180deg, var(--navy-darkest) 0%, var(--navy-mid) 100%)", position: "relative", overflow: "hidden" }}>
+    <div className="ka-support-page" style={{ minHeight: "100%", padding: "44px", background: "linear-gradient(180deg, var(--navy-darkest) 0%, var(--navy-mid) 100%)", position: "relative", overflow: "hidden" }}>
       {/* Decorative Rings (Branding Book Style) */}
       <div style={{ position: "absolute", width: 600, height: 600, border: "1px solid rgba(201,169,122,0.05)", borderRadius: "50%", top: -200, right: -200, pointerEvents: "none" }} />
       <div style={{ position: "absolute", width: 400, height: 400, border: "1px solid rgba(201,169,122,0.03)", borderRadius: "50%", bottom: -100, left: -100, pointerEvents: "none" }} />
 
       <div style={{ maxWidth: 1000, margin: "0 auto", position: "relative", zIndex: 1 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 48 }}>
+        <div className="ka-support-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 48, gap: 24, flexWrap: "wrap" }}>
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
               <MessageSquare size={18} color="var(--gold)" />
@@ -51,6 +51,16 @@ export default async function SupportPage() {
         </div>
 
         <style>{`
+          @media (max-width: 768px) {
+            .ka-support-page { padding: 24px 16px !important; }
+            .ka-support-header { flex-direction: column !important; align-items: center !important; text-align: center !important; }
+            .ka-support-header div:first-child { display: flex; flex-direction: column; align-items: center; }
+            .ka-support-header h1 { font-size: 24px !important; }
+            .ka-support-header a { width: 100%; justify-content: center; }
+            .ka-ticket-card { padding: 16px !important; }
+            .ka-ticket-card h3 { font-size: 14px !important; }
+            .ka-ticket-card div[style*="display: flex"] { flex-wrap: wrap !important; gap: 8px !important; }
+          }
           .btn-gold-hover:hover {
             background: var(--gold) !important;
             color: var(--navy-darkest) !important;

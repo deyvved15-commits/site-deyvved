@@ -67,17 +67,14 @@ export default async function ProfessorFinanceiro() {
         </div>
 
         {/* Sales List */}
-        <div style={{ 
-          borderRadius: 20, overflow: "hidden", 
-          background: "linear-gradient(160deg, var(--navy-card) 0%, var(--navy-card-2) 100%)",
-          border: "1px solid rgba(201,169,122,0.12)",
-          boxShadow: "0 8px 32px rgba(0,0,0,0.35)",
-        }}>
-          {earnings.length === 0 ? (
-            <div style={{ padding: "48px 24px", textAlign: "center" }}>
-              <p style={{ fontSize: 13, color: "var(--text-muted)" }}>Nenhuma venda registrada ainda.</p>
-            </div>
-          ) : (
+        <div>
+          {/* Desktop Table */}
+          <div className="ka-table-desktop" style={{ 
+            borderRadius: 20, overflow: "hidden", 
+            background: "linear-gradient(160deg, var(--navy-card) 0%, var(--navy-card-2) 100%)",
+            border: "1px solid rgba(201,169,122,0.12)",
+            boxShadow: "0 8px 32px rgba(0,0,0,0.35)",
+          }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
               <thead>
                 <tr style={{ background: "rgba(255,255,255,0.02)", borderBottom: "1px solid rgba(201,169,122,0.08)" }}>
@@ -100,6 +97,32 @@ export default async function ProfessorFinanceiro() {
                 ))}
               </tbody>
             </table>
+          </div>
+
+          {/* Mobile Card List */}
+          <div className="ka-card-list-mobile" style={{ display: "none" }}>
+            {earnings.map((e) => (
+              <div key={e.id} style={{ 
+                background: "linear-gradient(160deg, var(--navy-card) 0%, var(--navy-card-2) 100%)",
+                border: "1px solid rgba(201,169,122,0.15)", borderRadius: 16, padding: "20px"
+              }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12 }}>
+                  <span style={{ fontSize: 10, color: "var(--text-muted)", fontFamily: "'Cinzel',serif" }}>{new Date(e.createdAt).toLocaleDateString("pt-BR")}</span>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: "#6ee7b7" }}>+ R$ {e.amount.toFixed(2)}</span>
+                </div>
+                <p style={{ fontSize: 14, fontWeight: 700, color: "white", marginBottom: 4 }}>{e.payment.user.name}</p>
+                <p style={{ fontSize: 12, color: "var(--text-secondary)", marginBottom: 8 }}>{e.payment.course?.title || "Curso removido"}</p>
+                <div style={{ paddingTop: 10, borderTop: "1px solid rgba(255,255,255,0.05)", fontSize: 11, color: "var(--text-muted)" }}>
+                  Valor da venda: R$ {e.payment.amount.toFixed(2)}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {earnings.length === 0 && (
+            <div style={{ padding: "48px 24px", textAlign: "center" }}>
+              <p style={{ fontSize: 13, color: "var(--text-muted)" }}>Nenhuma venda registrada ainda.</p>
+            </div>
           )}
         </div>
       </div>

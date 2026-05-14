@@ -771,13 +771,26 @@ body {
 /* Section padding helper — use className="ka-section" on page content wrappers */
 .ka-section { padding: 32px 44px 44px; }
 
-@media (max-width: 768px) {
-  .ka-section { padding: 16px 16px 24px !important; }
+/* Responsive Table Wrapper */
+.ka-table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
 
-  /* Card grid responsive */
-  .ka-section .ka-card, .ka-card {
-    /* cards already auto-fill — just ensure grid works on mobile */
-  }
+@media (max-width: 768px) {
+  .ka-section { padding: 20px 16px 32px !important; }
+  
+  /* Hide desktop table elements */
+  .ka-table-desktop { display: none !important; }
+  
+  /* Show mobile card list instead */
+  .ka-card-list-mobile { display: flex !important; flex-direction: column; gap: 12px; }
+
+  /* Adjust page headers for mobile */
+  .ka-page-header { padding: 20px 16px 16px !important; }
+  .ka-page-header::before { left: 16px !important; right: 16px !important; }
+  .ka-page-title { font-size: 20px !important; }
 
   /* Hero title scaling */
   .ka-hero h1 { font-size: 22px !important; letter-spacing: 4px !important; }

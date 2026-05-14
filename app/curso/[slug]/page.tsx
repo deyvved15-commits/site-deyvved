@@ -72,7 +72,7 @@ export default async function CursoPublicoPage({ params, searchParams }: { param
       </nav>
 
       {/* HERO */}
-      <section style={{
+      <section className="ka-hero-public" style={{
         background: "linear-gradient(140deg, #060D1F 0%, #0F1A3D 50%, #060D1F 100%)",
         borderBottom: "1px solid rgba(201,169,122,0.12)",
         padding: "64px 40px",
@@ -85,7 +85,7 @@ export default async function CursoPublicoPage({ params, searchParams }: { param
               {course.category}
             </span>
           )}
-          <h1 style={{ fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 38, letterSpacing: 2, color: "#fff", margin: "12px 0 20px", lineHeight: 1.2 }}>
+          <h1 className="ka-public-title" style={{ fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 38, letterSpacing: 2, color: "#fff", margin: "12px 0 20px", lineHeight: 1.2 }}>
             {course.title}
           </h1>
           {course.description && (
@@ -141,14 +141,14 @@ export default async function CursoPublicoPage({ params, searchParams }: { param
 
         {/* Thumbnail */}
         {thumbUrl && (
-          <div style={{ width: 200, height: 250, borderRadius: 20, overflow: "hidden", border: "1px solid rgba(201,169,122,0.20)", boxShadow: "0 24px 60px rgba(0,0,0,0.5)", flexShrink: 0 }}>
+          <div className="ka-public-thumb-container" style={{ width: 200, height: 250, borderRadius: 20, overflow: "hidden", border: "1px solid rgba(201,169,122,0.20)", boxShadow: "0 24px 60px rgba(0,0,0,0.5)", flexShrink: 0 }}>
             <img src={thumbUrl} alt={course.title} style={{ width: "100%", height: "100%", objectFit: "contain", background: "#0A1129" }} />
           </div>
         )}
       </section>
 
       {/* MÓDULOS */}
-      <section style={{ maxWidth: 1100, margin: "0 auto", padding: "56px 40px" }}>
+      <section className="ka-public-modules" style={{ maxWidth: 1100, margin: "0 auto", padding: "56px 40px" }}>
         <h2 style={{ fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 22, letterSpacing: 3, color: "#fff", marginBottom: 28, textTransform: "uppercase" }}>
           Conteúdo do <span style={{ color: "#C9A97A" }}>Curso</span>
         </h2>
@@ -203,6 +203,25 @@ export default async function CursoPublicoPage({ params, searchParams }: { param
           </div>
         )}
       </section>
+
+      <style>{`
+        @media (max-width: 768px) {
+          nav { padding: 14px 20px !important; }
+          .ka-hero-public { 
+            padding: 40px 20px !important; 
+            grid-template-columns: 1fr !important; 
+            gap: 32px !important;
+            text-align: center !important;
+          }
+          .ka-public-title { font-size: 28px !important; }
+          .ka-hero-public div:first-child { display: flex; flexDirection: column; align-items: center; }
+          .ka-hero-public div[style*="display: flex; gap: 24"] { justify-content: center !important; }
+          .ka-hero-public div[style*="display: flex; gap: 12"] { justify-content: center !important; }
+          .ka-public-thumb-container { margin: 0 auto !important; order: -1 !important; }
+          .ka-public-modules { padding: 40px 20px !important; }
+          .ka-public-modules h2 { font-size: 18px !important; text-align: center !important; }
+        }
+      `}</style>
     </>
   );
 }

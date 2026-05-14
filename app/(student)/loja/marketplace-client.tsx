@@ -41,20 +41,20 @@ export default function MarketplaceClient({
     <div className="ka-section" style={{ padding: "0 44px 44px" }}>
       
       {/* Search & Tabs Bar */}
-      <div className="ka-admin-actions" style={{ marginBottom: 48, background: "rgba(201,169,122,0.03)", padding: 24, borderRadius: 24, border: "1px solid rgba(201,169,122,0.1)" }}>
+      <div className="ka-marketplace-actions" style={{ marginBottom: 48, background: "rgba(201,169,122,0.03)", padding: 24, borderRadius: 24, border: "1px solid rgba(201,169,122,0.1)", display: "flex", gap: 20, alignItems: "center" }}>
         <div className="ka-search-container" style={{ maxWidth: "100%", flex: 2 }}>
           <Search className="ka-search-icon" size={20} />
           <input
             type="text"
-            placeholder="O que você deseja aprender hoje? (Busque por cursos, e-books, temas...)"
+            placeholder="O que você deseja aprender?"
             className="ka-search-input"
-            style={{ height: 52, fontSize: 15 }}
+            style={{ height: 52, fontSize: 14 }}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
 
-        <div style={{ display: "flex", gap: 12, flex: 1, justifyContent: "flex-end" }}>
+        <div className="ka-marketplace-tabs" style={{ display: "flex", gap: 12, flex: 1, justifyContent: "flex-end", flexWrap: "wrap" }}>
           {[
             { id: "all", label: "Tudo", icon: <Star size={16} /> },
             { id: "courses", label: "Cursos", icon: <BookOpen size={16} /> },
@@ -72,14 +72,36 @@ export default function MarketplaceClient({
                 color: activeTab === tab.id ? "var(--navy-darkest)" : "var(--text-muted)",
                 border: "1px solid",
                 borderColor: activeTab === tab.id ? "var(--gold)" : "rgba(201,169,122,0.2)",
-                boxShadow: activeTab === tab.id ? "0 8px 20px rgba(201,169,122,0.3)" : "none"
+                boxShadow: activeTab === tab.id ? "0 8px 20px rgba(201,169,122,0.3)" : "none",
+                whiteSpace: "nowrap"
               }}
             >
               {tab.icon}
-              {tab.label}
+              <span className="tab-label">{tab.label}</span>
             </button>
           ))}
         </div>
+
+        <style>{`
+          @media (max-width: 768px) {
+            .ka-marketplace-actions { 
+              flex-direction: column !important; 
+              padding: 16px !important; 
+              gap: 16px !important; 
+              margin-bottom: 32px !important;
+            }
+            .ka-search-container { width: 100% !important; }
+            .ka-marketplace-tabs { 
+              width: 100% !important; 
+              justify-content: center !important; 
+            }
+            .ka-marketplace-tabs button { flex: 1; justify-content: center; padding: 10px !important; }
+            .ka-marketplace-tabs .tab-label { display: none; }
+          }
+          @media (max-width: 480px) {
+             .ka-marketplace-tabs .tab-label { display: none; }
+          }
+        `}</style>
       </div>
 
       {!hasResults ? (

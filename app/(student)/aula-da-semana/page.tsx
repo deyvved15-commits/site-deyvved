@@ -55,7 +55,7 @@ export default async function AulaDaSemanaPage() {
       </div>
 
       {/* ── Conteúdo ── */}
-      <div style={{ padding: "28px 44px 44px", maxWidth: 900 }}>
+      <div style={{ padding: "28px 44px 44px", width: "100%" }}>
 
         {/* Vídeo */}
         {ytId ? (
