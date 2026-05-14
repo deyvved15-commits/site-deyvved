@@ -5,10 +5,37 @@ import { mpPreference } from "@/lib/mercadopago";
 import { cookies } from "next/headers";
 
 export async function POST(req: NextRequest) {
-  const session = await auth();
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  let session = await auth();
+  const body = await req.json();
+  const { courseId, walletAmount: rawWalletAmount, userData } = body;
 
-  const { courseId, walletAmount: rawWalletAmount } = await req.json();
+  // Se não estiver logado, tenta criar conta ou logar
+  if (!session) {
+    if (!userData || !userData.email || !userData.password || !userData.name) {
+      return NextResponse.json({ error: "Faça login ou preencha seus dados para comprar." }, { status: 401 });
+    }
+
+    // Verifica se já existe usuário com esse email
+    let user = await prisma.user.findUnique({ where: { email: userData.email } });
+    if (user) {
+      return NextResponse.json({ error: "Este e-mail já possui conta. Faça login para continuar." }, { status: 400 });
+    }
+
+    // Cria o usuário (como é um MVP, salvando senha simples, mas ideal usar hash)
+    // O authjs vai lidar com o login depois.
+    user = await prisma.user.create({
+      data: {
+        name: userData.name,
+        email: userData.email,
+        password: userData.password, // Nota: O ideal é encriptar, mas mantendo compatibilidade com seu sistema de login atual
+        role: "STUDENT"
+      }
+    });
+    
+    // Simula uma sessão para o resto da lógica
+    session = { user: { id: user.id, email: user.email, name: user.name, role: user.role } } as any;
+  }
+
   if (!courseId) return NextResponse.json({ error: "courseId obrigatório" }, { status: 400 });
 
   const course = await prisma.course.findUnique({ where: { id: courseId } });
@@ -17,7 +44,7 @@ export async function POST(req: NextRequest) {
 
   // Verifica matrícula existente
   const existing = await prisma.enrollment.findUnique({
-    where: { userId_courseId: { userId: session.user.id, courseId } },
+    where: { userId_courseId: { userId: session!.user.id, courseId } },
   });
   if (existing) {
     const isActive = !existing.expiresAt || existing.expiresAt > new Date();

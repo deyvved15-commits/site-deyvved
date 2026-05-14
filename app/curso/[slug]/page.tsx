@@ -35,9 +35,7 @@ export default async function CursoPublicoPage({ params, searchParams }: { param
 
   const ctaHref = enrollment
     ? `/cursos/${slug}`
-    : session
-    ? `/checkout/${course.id}`
-    : `/login?callbackUrl=/curso/${slug}`;
+    : `/checkout/${course.id}`;
 
   const ctaLabel = enrollment ? "Acessar Curso" : "Matricular-se";
 

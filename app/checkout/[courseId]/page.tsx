@@ -23,22 +23,33 @@ export default function CheckoutPage({ params, searchParams }: { params: Promise
   const [isRenewal, setIsRenewal] = useState(false);
   const [walletBalance, setWalletBalance] = useState(0);
   const [useWallet, setUseWallet] = useState(false);
+  const [session, setSession] = useState<any>(null);
+  const [userData, setUserData] = useState({ name: "", email: "", password: "" });
 
   useEffect(() => {
     Promise.all([params, searchParams]).then(([p, sp]) => {
       setCourseId(p.courseId);
       setIsRenewal(sp.renovar === "1");
+      
+      // Buscar curso
       fetch(`/api/courses/${p.courseId}/public`)
         .then(r => r.json())
         .then(setCourse)
         .catch(() => setError("Curso não encontrado."));
-    });
 
-    // Buscar saldo da carteira
-    fetch("/api/affiliate/wallet")
-      .then(r => r.json())
-      .then(data => setWalletBalance(data.balance ?? 0))
-      .catch(() => {});
+      // Buscar sessão
+      fetch("/api/auth/session")
+        .then(r => r.json())
+        .then(s => {
+          if (s && Object.keys(s).length > 0) setSession(s);
+        });
+
+      // Buscar saldo da carteira (só funciona se logado)
+      fetch("/api/affiliate/wallet")
+        .then(r => r.json())
+        .then(data => setWalletBalance(data.balance ?? 0))
+        .catch(() => {});
+    });
   }, [params, searchParams]);
 
   const walletAmount = useWallet ? Math.min(walletBalance, course?.price ?? 0) : 0;
@@ -47,10 +58,24 @@ export default function CheckoutPage({ params, searchParams }: { params: Promise
   async function handleCheckout() {
     setLoading(true);
     setError("");
+
+    // Validação básica para convidados
+    if (!session) {
+      if (!userData.name || !userData.email || !userData.password) {
+        setError("Por favor, preencha todos os campos para criar sua conta.");
+        setLoading(false);
+        return;
+      }
+    }
+
     const res = await fetch("/api/checkout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ courseId, walletAmount: useWallet ? walletAmount : 0 }),
+      body: JSON.stringify({ 
+        courseId, 
+        walletAmount: useWallet ? walletAmount : 0,
+        userData: !session ? userData : null 
+      }),
     });
     const data = await res.json();
     if (!res.ok) { setError(data.error ?? "Erro ao iniciar pagamento."); setLoading(false); return; }
@@ -121,20 +146,34 @@ export default function CheckoutPage({ params, searchParams }: { params: Promise
                 {course.title}
               </h1>
 
-              {course.description && (
-                <div className="prose-lesson" style={{ fontSize: 13, color: "var(--text-muted)", lineHeight: 1.7, marginBottom: 16 }}
-                  dangerouslySetInnerHTML={{ __html: course.description }}
-                />
+              {/* Se não estiver logado, pede os dados */}
+              {!session && (
+                <div style={{ marginBottom: 24, padding: "20px", background: "rgba(201,169,122,0.05)", borderRadius: 16, border: "1px solid rgba(201,169,122,0.15)" }}>
+                  <p style={{ fontFamily: "'Cinzel',serif", fontSize: 10, letterSpacing: 2, color: "var(--gold)", marginBottom: 16, textTransform: "uppercase", fontWeight: 700 }}>
+                    Crie sua conta para acessar
+                  </p>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                    <input 
+                      type="text" placeholder="Nome Completo" 
+                      value={userData.name} onChange={e => setUserData({...userData, name: e.target.value})}
+                      style={{ width: "100%", background: "rgba(0,0,0,0.2)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, padding: "10px 14px", color: "white", fontSize: 13 }}
+                    />
+                    <input 
+                      type="email" placeholder="E-mail" 
+                      value={userData.email} onChange={e => setUserData({...userData, email: e.target.value})}
+                      style={{ width: "100%", background: "rgba(0,0,0,0.2)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, padding: "10px 14px", color: "white", fontSize: 13 }}
+                    />
+                    <input 
+                      type="password" placeholder="Crie uma Senha" 
+                      value={userData.password} onChange={e => setUserData({...userData, password: e.target.value})}
+                      style={{ width: "100%", background: "rgba(0,0,0,0.2)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, padding: "10px 14px", color: "white", fontSize: 13 }}
+                    />
+                    <p style={{ fontSize: 9, color: "var(--text-muted)", margin: 0 }}>
+                      Já tem conta? <Link href="/login" style={{ color: "var(--gold)", textDecoration: "none" }}>Faça login aqui</Link>
+                    </p>
+                  </div>
+                </div>
               )}
-
-              <div style={{ display: "flex", gap: 16, marginBottom: 24 }}>
-                <span style={{ fontSize: 11, color: "var(--text-muted)" }}>
-                  📚 {course._count.modules} módulo{course._count.modules !== 1 ? "s" : ""}
-                </span>
-                <span style={{ fontSize: 11, color: "var(--text-muted)" }}>
-                  👥 {course._count.enrollments} aluno{course._count.enrollments !== 1 ? "s" : ""}
-                </span>
-              </div>
 
               {/* Price */}
               <div style={{
