@@ -29,8 +29,9 @@ export default async function FinanceiroPage({
       orderBy: { createdAt: "desc" },
       take: 100,
       include: {
-        user:   { select: { id: true, name: true, email: true } },
-        course: { select: { id: true, title: true } },
+        user:    { select: { id: true, name: true, email: true } },
+        course:  { select: { id: true, title: true } },
+        product: { select: { id: true, title: true } },
       },
     }),
     prisma.payment.aggregate({ where: { status: "approved" }, _sum: { amount: true } }),
@@ -166,7 +167,7 @@ export default async function FinanceiroPage({
             background: "rgba(201,169,122,0.04)",
             borderBottom: "1px solid rgba(201,169,122,0.10)",
           }} className="hidden md:grid">
-            {["Aluno", "Curso", "Valor", "Status", "Data"].map(h => (
+            {["Aluno", "Item", "Valor", "Status", "Data"].map(h => (
               <span key={h} style={{ fontFamily: "'Cinzel',serif", fontSize: 9, fontWeight: 600, letterSpacing: 3, textTransform: "uppercase", color: "var(--gold)" }}>
                 {h}
               </span>
@@ -204,11 +205,13 @@ export default async function FinanceiroPage({
                       </Link>
                     </div>
 
-                    {/* Curso */}
+                    {/* Item (Curso ou Produto) */}
                     <div style={{ flex: 1.2, minWidth: "200px" }}>
-                      <p style={{ fontSize: 9, fontFamily: "'Cinzel',serif", color: "var(--gold)", letterSpacing: 1, marginBottom: 4 }}>Curso</p>
+                      <p style={{ fontSize: 9, fontFamily: "'Cinzel',serif", color: "var(--gold)", letterSpacing: 1, marginBottom: 4 }}>
+                        {p.courseId ? "Curso" : "Produto"}
+                      </p>
                       <p style={{ fontSize: 12, color: "var(--text-secondary)", fontWeight: 500 }}>
-                        {p.course.title}
+                        {p.course?.title || p.product?.title || "Item removido"}
                       </p>
                     </div>
 
