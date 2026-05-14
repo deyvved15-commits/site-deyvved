@@ -71,6 +71,7 @@ model User {
   earnings        TeacherEarning[]
   referralsMade   Referral[]
   walletHistory   WalletTransaction[]
+  notifications   Notification[]
 }
 
 model Course {
@@ -358,6 +359,18 @@ model Coupon {
   updatedAt     DateTime     @updatedAt
 
   payments      Payment[]
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  message   String
+  type      String   // "NEW_LESSON", "SUPPORT_REPLY", "SYSTEM"
+  link      String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum DiscountType {

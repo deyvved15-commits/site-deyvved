@@ -35,6 +35,19 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tic
       where: { id: ticketId },
       data: { status: "resolved" } // Or keep as in_progress
     });
+
+    // Notificar o aluno
+    if (ticket.userId !== session.user.id) {
+      await prisma.notification.create({
+        data: {
+          userId: ticket.userId,
+          title: "Novo retorno no suporte",
+          message: `Você recebeu uma resposta no seu ticket: "${ticket.subject}"`,
+          type: "SUPPORT_REPLY",
+          link: `/suporte/${ticketId}`
+        }
+      });
+    }
   } else {
     await prisma.ticket.update({
       where: { id: ticketId },

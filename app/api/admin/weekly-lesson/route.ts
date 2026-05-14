@@ -27,5 +27,23 @@ export async function PUT(req: NextRequest) {
     create: { id: "weekly", ...parsed.data },
   });
 
+  // Notificar todos os alunos ativos sobre a nova aula da semana
+  const users = await prisma.user.findMany({
+    where: { role: "STUDENT", active: true },
+    select: { id: true }
+  });
+
+  if (users.length > 0) {
+    await prisma.notification.createMany({
+      data: users.map(u => ({
+        userId: u.id,
+        title: "✨ Aula da Semana Atualizada!",
+        message: "A nova aula gratuita da semana já está disponível para você assistir.",
+        type: "NEW_LESSON",
+        link: "/aula-da-semana"
+      }))
+    });
+  }
+
   return NextResponse.json(data);
 }

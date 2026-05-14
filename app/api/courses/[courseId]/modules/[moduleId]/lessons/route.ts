@@ -38,5 +38,26 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ cou
   const lesson = await prisma.lesson.create({
     data: { ...parsed.data, moduleId, order: count },
   });
+
+  // Notificar alunos matriculados (se o curso estiver publicado)
+  if (course.published) {
+    const enrollments = await prisma.enrollment.findMany({
+      where: { courseId: course.id },
+      select: { userId: true }
+    });
+
+    if (enrollments.length > 0) {
+      await prisma.notification.createMany({
+        data: enrollments.map(e => ({
+          userId: e.userId,
+          title: "Nova aula disponível!",
+          message: `Uma nova aula "${lesson.title}" foi adicionada ao curso ${course.title}.`,
+          type: "NEW_LESSON",
+          link: `/cursos/${course.slug}`
+        }))
+      });
+    }
+  }
+
   return NextResponse.json(lesson, { status: 201 });
 }

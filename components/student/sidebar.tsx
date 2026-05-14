@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
+import NotificationBell from "./notification-bell";
 
 const links = [
   {
@@ -125,13 +126,18 @@ export default function StudentSidebar({ user, streak = 0 }: { user: { name?: st
     <>
       {/* ── Desktop Sidebar ── */}
       <aside className="ka-sidebar">
-        {/* Logo */}
-        <div style={{ padding: "28px 20px 20px", textAlign: "center" }}>
-          <div className="ka-logo-ring" style={{ color: "var(--navy-darkest)" }}>
+        {/* Logo & Notifications */}
+        <div style={{ padding: "20px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{ width: 40 }} /> {/* Spacer */}
+          <div className="ka-logo-ring" style={{ color: "var(--navy-darkest)", margin: 0, width: 60, height: 60 }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/logo-nova.png" alt="Kadima Academy"
-              style={{ width: 52, height: 52, borderRadius: "50%", objectFit: "contain" }} />
+              style={{ width: 38, height: 38, borderRadius: "50%", objectFit: "contain" }} />
           </div>
+          <NotificationBell />
+        </div>
+
+        <div style={{ textAlign: "center", paddingBottom: 20 }}>
           <div style={{ fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 22, letterSpacing: 4, color: "var(--text-primary)", marginBottom: 2 }}>
             KADIMA
           </div>
