@@ -23,9 +23,16 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
     }
   });
 
-  if (!teacher || teacher.role !== "TEACHER") notFound();
+  if (!teacher || (teacher.role !== "TEACHER" && teacher.role !== "ADMIN")) notFound();
 
-  const initials = teacher.name?.split(" ").map(n => n[0]).slice(0, 2).join("").toUpperCase() ?? "?";
+  const initials = (teacher.name || "?")
+    .trim()
+    .split(/\s+/)
+    .map(n => n[0])
+    .filter(Boolean)
+    .slice(0, 2)
+    .join("")
+    .toUpperCase() || "?";
 
   return (
     <div style={{ minHeight: "100%", background: "linear-gradient(180deg, var(--navy-darkest) 0%, var(--navy-mid) 100%)" }}>
