@@ -12,15 +12,31 @@ export async function PATCH(
 
   const { studentId } = await params;
   const body = await req.json();
-  const { role } = body;
+  const { role, password } = body;
 
-  if (!role || !["STUDENT", "TEACHER", "ADMIN"].includes(role)) {
-    return NextResponse.json({ error: "Role inválida" }, { status: 400 });
+  const data: any = {};
+  if (role) {
+    if (!["STUDENT", "TEACHER", "ADMIN"].includes(role)) {
+      return NextResponse.json({ error: "Role inválida" }, { status: 400 });
+    }
+    data.role = role;
+  }
+
+  if (password) {
+    if (password.length < 6) {
+      return NextResponse.json({ error: "A senha deve ter pelo menos 6 caracteres" }, { status: 400 });
+    }
+    const bcrypt = await import("bcryptjs");
+    data.password = await bcrypt.hash(password, 12);
+  }
+
+  if (Object.keys(data).length === 0) {
+    return NextResponse.json({ error: "Nenhum dado para atualizar" }, { status: 400 });
   }
 
   const user = await prisma.user.update({
     where: { id: studentId },
-    data: { role },
+    data,
   });
 
   return NextResponse.json(user);
