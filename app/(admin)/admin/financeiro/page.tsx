@@ -37,18 +37,12 @@ export default async function FinanceiroPage({
     prisma.payment.aggregate({ where: { status: "approved", createdAt: { gte: startOfMonth } }, _sum: { amount: true } }),
     prisma.payment.count(),
     prisma.user.findMany({
-      where: { role: "TEACHER" },
+      where: { role: { in: ["TEACHER", "ADMIN"] } },
       select: {
         id: true,
         name: true,
-        taughtCourses: {
-          select: {
-            id: true,
-            payments: {
-              where: { status: "approved" },
-              select: { commissionAmount: true }
-            }
-          }
+        earnings: {
+          select: { amount: true }
         }
       }
     }),
@@ -56,9 +50,7 @@ export default async function FinanceiroPage({
   ]);
 
   const teacherCommissions = teachers.map(t => {
-    const total = t.taughtCourses.reduce((sum, course) => {
-      return sum + course.payments.reduce((pSum, p) => pSum + (p.commissionAmount ?? 0), 0);
-    }, 0);
+    const total = t.earnings.reduce((sum, e) => sum + e.amount, 0);
     return { ...t, totalCommission: total };
   }).filter(t => t.totalCommission > 0);
 

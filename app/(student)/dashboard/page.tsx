@@ -26,7 +26,7 @@ export default async function DashboardPage() {
       orderBy: { createdAt: "asc" },
     }),
     prisma.course.findMany({
-      where: { teachers: { some: { id: session.user.id } } },
+      where: { teachers: { some: { teacherId: session.user.id } } },
       include: {
         modules: {
           include: {
@@ -40,7 +40,7 @@ export default async function DashboardPage() {
       where: {
         published: true,
         enrollments: { none: { userId: session.user.id } },
-        teachers: { none: { id: session.user.id } },
+        teachers: { none: { teacherId: session.user.id } },
       },
       select: {
         id: true,

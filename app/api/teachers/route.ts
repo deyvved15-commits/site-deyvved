@@ -20,7 +20,7 @@ export async function GET() {
   const teachers = await prisma.user.findMany({
     where: { role: "TEACHER" },
     orderBy: { createdAt: "desc" },
-    include: { taughtCourses: { select: { title: true, id: true } } },
+    include: { taughtCourses: { include: { course: { select: { title: true, id: true } } } } },
   });
   return NextResponse.json(teachers);
 }

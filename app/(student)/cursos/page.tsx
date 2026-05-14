@@ -31,7 +31,7 @@ export default async function CursosPage({ searchParams }: { searchParams: Promi
       },
     }),
     prisma.course.findMany({
-      where: { teachers: { some: { id: session.user.id } } },
+      where: { teachers: { some: { teacherId: session.user.id } } },
       include: {
         modules: {
           orderBy: { order: "asc" },

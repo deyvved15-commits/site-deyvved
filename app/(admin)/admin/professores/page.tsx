@@ -5,7 +5,7 @@ export default async function ProfessoresPage() {
   const teachers = await prisma.user.findMany({
     where: { role: "TEACHER" },
     orderBy: { createdAt: "desc" },
-    include: { taughtCourses: { select: { title: true } } },
+    include: { taughtCourses: { include: { course: { select: { title: true } } } } },
   });
 
   return (
@@ -100,13 +100,13 @@ export default async function ProfessoresPage() {
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
                     {t.taughtCourses.length === 0
                       ? <span style={{ fontSize: 11, color: "var(--text-muted)" }}>Nenhum curso</span>
-                      : t.taughtCourses.map(c => (
-                          <span key={c.title} style={{
+                      : t.taughtCourses.map(ct => (
+                          <span key={ct.course.title} style={{
                             fontSize: 10, fontWeight: 600,
                             background: "rgba(201,169,122,0.08)", border: "1px solid var(--gold-20)",
                             color: "var(--gold)", padding: "2px 8px", borderRadius: 999,
                           }}>
-                            {c.title}
+                            {ct.course.title}
                           </span>
                         ))}
                   </div>
