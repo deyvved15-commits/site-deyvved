@@ -9,7 +9,7 @@ export default async function ProfessorCursosPage() {
   const userId = session?.user.id;
 
   const courses = await prisma.course.findMany({
-    where: { teachers: { some: { id: userId } } },
+    where: { teachers: { some: { teacherId: userId } } },
     include: {
       _count: {
         select: { enrollments: true }

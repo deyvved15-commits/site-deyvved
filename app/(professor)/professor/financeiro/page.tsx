@@ -7,19 +7,20 @@ export default async function ProfessorFinanceiro() {
   const session = await auth();
   const userId = session?.user.id;
 
-  const payments = await prisma.payment.findMany({
-    where: {
-      course: { teachers: { some: { id: userId } } },
-      status: "approved"
-    },
+  const earnings = await prisma.teacherEarning.findMany({
+    where: { teacherId: userId },
     include: {
-      course: true,
-      user: true
+      payment: {
+        include: {
+          course: true,
+          user: true
+        }
+      }
     },
     orderBy: { createdAt: "desc" }
   });
 
-  const totalCommission = payments.reduce((sum, p) => sum + (p.commissionAmount ?? 0), 0);
+  const totalCommission = earnings.reduce((sum, e) => sum + e.amount, 0);
 
   return (
     <div style={{ minHeight: "100%", background: "linear-gradient(180deg, var(--navy-darkest) 0%, var(--navy-mid) 100%)" }}>
@@ -88,13 +89,13 @@ export default async function ProfessorFinanceiro() {
                 </tr>
               </thead>
               <tbody>
-                {payments.map((p, i) => (
-                  <tr key={p.id} style={{ borderBottom: i < payments.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
-                    <td style={{ padding: "16px 24px", color: "var(--text-muted)" }}>{new Date(p.createdAt).toLocaleDateString("pt-BR")}</td>
-                    <td style={{ padding: "16px 24px", fontWeight: 500, color: "white" }}>{p.user.name}</td>
-                    <td style={{ padding: "16px 24px", color: "var(--text-secondary)" }}>{p.course.title}</td>
-                    <td style={{ padding: "16px 24px", textAlign: "right", color: "var(--text-muted)" }}>R$ {p.amount.toFixed(2)}</td>
-                    <td style={{ padding: "16px 24px", textAlign: "right", fontWeight: 700, color: "#6ee7b7" }}>+ R$ {p.commissionAmount?.toFixed(2)}</td>
+                {earnings.map((e, i) => (
+                  <tr key={e.id} style={{ borderBottom: i < earnings.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
+                    <td style={{ padding: "16px 24px", color: "var(--text-muted)" }}>{new Date(e.createdAt).toLocaleDateString("pt-BR")}</td>
+                    <td style={{ padding: "16px 24px", fontWeight: 500, color: "white" }}>{e.payment.user.name}</td>
+                    <td style={{ padding: "16px 24px", color: "var(--text-secondary)" }}>{e.payment.course.title}</td>
+                    <td style={{ padding: "16px 24px", textAlign: "right", color: "var(--text-muted)" }}>R$ {e.payment.amount.toFixed(2)}</td>
+                    <td style={{ padding: "16px 24px", textAlign: "right", fontWeight: 700, color: "#6ee7b7" }}>+ R$ {e.amount.toFixed(2)}</td>
                   </tr>
                 ))}
               </tbody>

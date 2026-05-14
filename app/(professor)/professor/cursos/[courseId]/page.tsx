@@ -12,7 +12,7 @@ export default async function ProfessorEditCursoPage({ params }: { params: Promi
   const course = await prisma.course.findUnique({
     where: { id: courseId },
     include: {
-      teachers: { select: { id: true, name: true } },
+      teachers: { include: { teacher: { select: { id: true, name: true } } } },
       modules: {
         orderBy: { order: "asc" },
         include: { lessons: { orderBy: { order: "asc" } } },
@@ -22,12 +22,12 @@ export default async function ProfessorEditCursoPage({ params }: { params: Promi
 
   if (!course) notFound();
 
-  const isTeacher = course.teachers.some(t => t.id === userId);
+  const isTeacher = course.teachers.some(t => t.teacherId === userId);
   if (!isTeacher && session?.user.role !== "ADMIN") {
     redirect("/professor");
   }
 
-  const teachers = course.teachers;
+  const allTeachers = course.teachers.map(ct => ct.teacher);
 
   return (
     <div style={{ minHeight: "100%", background: "linear-gradient(180deg, var(--navy-darkest) 0%, var(--navy-mid) 100%)" }}>
@@ -38,7 +38,7 @@ export default async function ProfessorEditCursoPage({ params }: { params: Promi
         Painel
       </Link>
       <div className="ka-section" style={{ padding: "16px 44px 44px" }}>
-        <CourseEditor course={course as any} teachers={teachers} isAdmin={false} />
+        <CourseEditor course={course as any} teachers={allTeachers} isAdmin={false} />
       </div>
     </div>
   );
