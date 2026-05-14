@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Plus, Search, Edit2, Trash2, Globe, Lock, Package, FileText, Download } from "lucide-react";
+import { getGoogleDriveImageUrl } from "@/lib/utils";
 
 interface Product {
   id: string;
@@ -140,7 +141,10 @@ export default function AdminProductsClient({ initialProducts }: { initialProduc
             <div className="ka-product-thumb">
               {product.thumbnail ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={product.thumbnail} alt={product.title} />
+                <img 
+                  src={product.thumbnail.includes("drive.google.com") ? getGoogleDriveImageUrl(product.thumbnail) : product.thumbnail} 
+                  alt={product.title} 
+                />
               ) : (
                 <Package size={40} style={{ color: "var(--gold-20)" }} />
               )}

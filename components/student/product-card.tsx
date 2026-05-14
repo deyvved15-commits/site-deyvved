@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { ShoppingBag, Download, FileText, Music, Video, Box } from "lucide-react";
+import { getGoogleDriveImageUrl } from "@/lib/utils";
 
 interface Product {
   id: string;
@@ -33,7 +34,11 @@ export default function ProductCard({ product, isPurchased }: ProductCardProps) 
       <div className="ka-thumb" style={{ height: 180, position: "relative" }}>
         {product.thumbnail ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={product.thumbnail} alt={product.title} className="ka-thumb-img" />
+          <img 
+            src={product.thumbnail.includes("drive.google.com") ? getGoogleDriveImageUrl(product.thumbnail) : product.thumbnail} 
+            alt={product.title} 
+            className="ka-thumb-img" 
+          />
         ) : (
           <div style={{ color: "var(--gold-35)" }}>
             {getTypeIcon(product.type)}
