@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, use } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { getGoogleDriveImageUrl } from "@/lib/utils";
@@ -15,43 +15,42 @@ interface Course {
   _count: { modules: number; enrollments: number };
 }
 
-export default function CheckoutPage({ params, searchParams }: { params: Promise<{ courseId: string }>; searchParams: Promise<{ renovar?: string }> }) {
+export default function CheckoutPage({ params: paramsPromise, searchParams: searchParamsPromise }: { params: Promise<{ courseId: string }>; searchParams: Promise<{ renovar?: string }> }) {
+  const params = use(paramsPromise);
+  const searchParams = use(searchParamsPromise);
   const router = useRouter();
+  
   const [course, setCourse] = useState<Course | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [courseId, setCourseId] = useState("");
-  const [isRenewal, setIsRenewal] = useState(false);
+  const [isRenewal, setIsRenewal] = useState(searchParams.renovar === "1");
   const [walletBalance, setWalletBalance] = useState(0);
   const [useWallet, setUseWallet] = useState(false);
   const [session, setSession] = useState<any>(null);
   const [userData, setUserData] = useState({ name: "", email: "", password: "" });
 
+  const courseId = params.courseId;
+
   useEffect(() => {
-    Promise.all([params, searchParams]).then(([p, sp]) => {
-      setCourseId(p.courseId);
-      setIsRenewal(sp.renovar === "1");
-      
-      // Buscar curso
-      fetch(`/api/courses/${p.courseId}/public`)
-        .then(r => r.json())
-        .then(setCourse)
-        .catch(() => setError("Curso não encontrado."));
+    // Buscar curso
+    fetch(`/api/courses/${courseId}/public`)
+      .then(r => r.json())
+      .then(setCourse)
+      .catch(() => setError("Curso não encontrado."));
 
-      // Buscar sessão
-      fetch("/api/auth/session")
-        .then(r => r.json())
-        .then(s => {
-          if (s && Object.keys(s).length > 0) setSession(s);
-        });
+    // Buscar sessão
+    fetch("/api/auth/session")
+      .then(r => r.json())
+      .then(s => {
+        if (s && Object.keys(s).length > 0) setSession(s);
+      });
 
-      // Buscar saldo da carteira (só funciona se logado)
-      fetch("/api/affiliate/wallet")
-        .then(r => r.json())
-        .then(data => setWalletBalance(data.balance ?? 0))
-        .catch(() => {});
-    });
-  }, [params, searchParams]);
+    // Buscar saldo da carteira (só funciona se logado)
+    fetch("/api/affiliate/wallet")
+      .then(r => r.json())
+      .then(data => setWalletBalance(data.balance ?? 0))
+      .catch(() => {});
+  }, [courseId]);
 
   const walletAmount = useWallet ? Math.min(walletBalance, course?.price ?? 0) : 0;
   const finalPrice = (course?.price ?? 0) - walletAmount;
