@@ -114,69 +114,70 @@ export default function AdminProductsClient({ initialProducts }: { initialProduc
   }
 
   return (
-    <div className="space-y-6">
+    <div className="ka-admin-container">
       {/* Barra de Ações */}
-      <div className="flex flex-col md:flex-row gap-4 justify-between">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
+      <div className="ka-admin-actions">
+        <div className="ka-search-container">
+          <Search className="ka-search-icon" size={18} />
           <input
             type="text"
             placeholder="Buscar produtos..."
-            className="w-full bg-slate-900/50 border border-slate-800 rounded-xl py-2.5 pl-10 pr-4 text-white focus:outline-none focus:border-[var(--gold)] transition-colors"
+            className="ka-search-input"
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
         </div>
-        <button
-          onClick={() => openModal()}
-          className="bg-[var(--gold)] hover:bg-[var(--gold-deep)] text-slate-950 px-6 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-[var(--gold)]/10"
-        >
-          <Plus size={20} />
+        <button onClick={() => openModal()} className="ka-btn-gold">
+          <Plus size={18} />
           Novo Produto
         </button>
       </div>
 
       {/* Grid de Produtos */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="ka-product-grid">
         {filtered.map(product => (
-          <div key={product.id} className="bg-slate-900/40 border border-slate-800 rounded-2xl overflow-hidden hover:border-slate-700 transition-all group">
-            <div className="h-40 bg-slate-800/50 relative flex items-center justify-center overflow-hidden">
+          <div key={product.id} className="ka-product-card">
+            <div className="ka-product-thumb">
               {product.thumbnail ? (
-                <img src={product.thumbnail} alt={product.title} className="w-full h-full object-cover" />
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={product.thumbnail} alt={product.title} />
               ) : (
-                <Package size={40} className="text-slate-700" />
+                <Package size={40} style={{ color: "var(--gold-20)" }} />
               )}
-              <div className="absolute top-3 right-3 flex gap-2">
+              <div className="ka-product-badge">
+                {product.type}
+              </div>
+              <div className="ka-product-status">
                 <button 
                   onClick={() => togglePublish(product)}
-                  className={`p-2 rounded-lg backdrop-blur-md transition-colors ${product.published ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-800/80 text-slate-400'}`}
+                  style={{
+                    padding: 6, borderRadius: 8, background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.1)",
+                    color: product.published ? "#10B981" : "var(--text-muted)", cursor: "pointer"
+                  }}
                   title={product.published ? "Publicado" : "Rascunho"}
                 >
-                  {product.published ? <Globe size={16} /> : <Lock size={16} />}
+                  {product.published ? <Globe size={14} /> : <Lock size={14} />}
                 </button>
               </div>
             </div>
             
-            <div className="p-5">
-              <div className="flex justify-between items-start mb-2">
-                <span className="text-[10px] font-bold text-[var(--gold)] uppercase tracking-widest px-2 py-1 bg-[var(--gold)]/10 rounded-md">
-                  {product.type}
-                </span>
-                <span className="text-sm font-bold text-white">R$ {product.price.toFixed(2)}</span>
-              </div>
-              <h3 className="text-lg font-bold text-white mb-1 line-clamp-1">{product.title}</h3>
-              <p className="text-sm text-slate-400 mb-4 line-clamp-2">{product.description || "Sem descrição."}</p>
+            <div className="ka-product-content">
+              <h3 className="ka-product-title">{product.title}</h3>
+              <div className="ka-product-price">R$ {product.price.toFixed(2).replace(".", ",")}</div>
+              <p style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 20, lineClamp: 2, display: "-webkit-box", WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+                {product.description || "Sem descrição."}
+              </p>
               
-              <div className="flex items-center justify-between pt-4 border-t border-slate-800">
-                <div className="flex items-center gap-2 text-xs text-slate-500">
+              <div className="ka-product-footer">
+                <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: "var(--text-muted)" }}>
                   <Download size={14} />
                   {product._count?.purchases || 0} vendas
                 </div>
-                <div className="flex gap-2">
-                  <button onClick={() => openModal(product)} className="p-2 text-slate-400 hover:text-[var(--gold)] transition-colors">
+                <div style={{ display: "flex", gap: 8 }}>
+                  <button onClick={() => openModal(product)} style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer" }}>
                     <Edit2 size={18} />
                   </button>
-                  <button onClick={() => handleDelete(product.id)} className="p-2 text-slate-400 hover:text-rose-500 transition-colors">
+                  <button onClick={() => handleDelete(product.id)} style={{ background: "none", border: "none", color: "rgba(230,57,70,0.6)", cursor: "pointer" }}>
                     <Trash2 size={18} />
                   </button>
                 </div>
@@ -188,102 +189,107 @@ export default function AdminProductsClient({ initialProducts }: { initialProduc
 
       {/* Modal CRUD */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl">
-            <div className="p-6 border-bottom border-slate-800 flex justify-between items-center bg-slate-800/30">
-              <h2 className="text-xl font-bold text-white" style={{ fontFamily: "'Cinzel',serif" }}>
-                {editingProduct ? "Editar Produto" : "Novo Produto"}
+        <div className="ka-modal-overlay">
+          <div className="ka-modal-content">
+            <div className="ka-modal-header">
+              <h2 className="ka-page-title" style={{ fontSize: 18 }}>
+                {editingProduct ? "Editar" : "Novo"} <span>Produto</span>
               </h2>
-              <button onClick={closeModal} className="text-slate-400 hover:text-white">✕</button>
+              <button onClick={closeModal} style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", fontSize: 20 }}>✕</button>
             </div>
             
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="col-span-2">
-                  <label className="text-xs font-bold text-[var(--gold)] uppercase tracking-widest block mb-2">Título</label>
-                  <input
-                    required
-                    type="text"
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-4 text-white focus:outline-none focus:border-[var(--gold)]"
-                    value={formData.title}
-                    onChange={e => setFormData({ ...formData, title: e.target.value })}
-                  />
-                </div>
-                
-                <div className="col-span-2">
-                  <label className="text-xs font-bold text-[var(--gold)] uppercase tracking-widest block mb-2">Descrição</label>
-                  <textarea
-                    rows={3}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-4 text-white focus:outline-none focus:border-[var(--gold)]"
-                    value={formData.description}
-                    onChange={e => setFormData({ ...formData, description: e.target.value })}
-                  />
-                </div>
+            <form onSubmit={handleSubmit} className="ka-modal-body">
+              <div className="ka-form-group">
+                <label className="ka-label">Título</label>
+                <input
+                  required
+                  type="text"
+                  className="ka-input"
+                  placeholder="Nome do produto"
+                  value={formData.title}
+                  onChange={e => setFormData({ ...formData, title: e.target.value })}
+                />
+              </div>
+              
+              <div className="ka-form-group">
+                <label className="ka-label">Descrição</label>
+                <textarea
+                  rows={3}
+                  className="ka-textarea"
+                  placeholder="Breve descrição do que o aluno está adquirindo"
+                  value={formData.description}
+                  onChange={e => setFormData({ ...formData, description: e.target.value })}
+                />
+              </div>
 
+              <div className="ka-form-row">
                 <div>
-                  <label className="text-xs font-bold text-[var(--gold)] uppercase tracking-widest block mb-2">Preço (R$)</label>
+                  <label className="ka-label">Preço (R$)</label>
                   <input
                     required
                     type="number"
                     step="0.01"
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-4 text-white focus:outline-none focus:border-[var(--gold)]"
+                    className="ka-input"
                     value={formData.price}
                     onChange={e => setFormData({ ...formData, price: parseFloat(e.target.value) })}
                   />
                 </div>
-
                 <div>
-                  <label className="text-xs font-bold text-[var(--gold)] uppercase tracking-widest block mb-2">Tipo</label>
+                  <label className="ka-label">Tipo de Arquivo</label>
                   <select
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-4 text-white focus:outline-none focus:border-[var(--gold)]"
+                    className="ka-input"
                     value={formData.type}
                     onChange={e => setFormData({ ...formData, type: e.target.value })}
                   >
-                    <option value="EBOOK">E-Book</option>
-                    <option value="FILE">Arquivo / PDF</option>
-                    <option value="AUDIO">Áudio</option>
-                    <option value="VIDEO">Vídeo</option>
+                    <option value="EBOOK">E-Book (PDF/EPUB)</option>
+                    <option value="FILE">Arquivo / Template</option>
+                    <option value="AUDIO">Áudio / Podcast</option>
+                    <option value="VIDEO">Vídeo / Masterclass</option>
                   </select>
-                </div>
-
-                <div className="col-span-2">
-                  <label className="text-xs font-bold text-[var(--gold)] uppercase tracking-widest block mb-2">URL da Thumbnail</label>
-                  <input
-                    type="text"
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-4 text-white focus:outline-none focus:border-[var(--gold)]"
-                    value={formData.thumbnail}
-                    onChange={e => setFormData({ ...formData, thumbnail: e.target.value })}
-                  />
-                </div>
-
-                <div className="col-span-2">
-                  <label className="text-xs font-bold text-[var(--gold)] uppercase tracking-widest block mb-2">URL do Arquivo (Download)</label>
-                  <input
-                    type="text"
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-4 text-white focus:outline-none focus:border-[var(--gold)]"
-                    value={formData.fileUrl}
-                    onChange={e => setFormData({ ...formData, fileUrl: e.target.value })}
-                  />
-                </div>
-
-                <div className="col-span-2 flex items-center gap-3">
-                  <input
-                    type="checkbox"
-                    id="published"
-                    className="w-5 h-5 rounded accent-[var(--gold)]"
-                    checked={formData.published}
-                    onChange={e => setFormData({ ...formData, published: e.target.checked })}
-                  />
-                  <label htmlFor="published" className="text-sm text-slate-300">Publicar imediatamente na loja</label>
                 </div>
               </div>
 
-              <div className="pt-6 border-t border-slate-800 flex justify-end gap-4">
-                <button type="button" onClick={closeModal} className="px-6 py-2.5 rounded-xl text-slate-400 hover:text-white transition-colors">
-                  Cancelar
+              <div className="ka-form-group">
+                <label className="ka-label">URL da Thumbnail (Imagem de capa)</label>
+                <input
+                  type="text"
+                  className="ka-input"
+                  placeholder="https://exemplo.com/capa.jpg"
+                  value={formData.thumbnail}
+                  onChange={e => setFormData({ ...formData, thumbnail: e.target.value })}
+                />
+              </div>
+
+              <div className="ka-form-group">
+                <label className="ka-label">URL do Arquivo (Link para download)</label>
+                <input
+                  type="text"
+                  className="ka-input"
+                  placeholder="Link do Google Drive, Dropbox, etc."
+                  value={formData.fileUrl}
+                  onChange={e => setFormData({ ...formData, fileUrl: e.target.value })}
+                />
+              </div>
+
+              <div className="ka-form-group" style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 24 }}>
+                <input
+                  type="checkbox"
+                  id="published"
+                  style={{ width: 18, height: 18, accentColor: "var(--gold)" }}
+                  checked={formData.published}
+                  onChange={e => setFormData({ ...formData, published: e.target.checked })}
+                />
+                <label htmlFor="published" style={{ fontSize: 13, color: "var(--text-secondary)", cursor: "pointer" }}>
+                  Publicar imediatamente na loja
+                </label>
+              </div>
+
+              <div style={{ marginTop: 32, display: "flex", justifyContent: "flex-end", gap: 16 }}>
+                <button type="button" onClick={closeModal} style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", fontSize: 13, fontWeight: 600 }}>
+                  CANCELAR
                 </button>
-                <button type="submit" className="bg-[var(--gold)] hover:bg-[var(--gold-deep)] text-slate-950 px-8 py-2.5 rounded-xl font-bold transition-all">
-                  Salvar Produto
+                <button type="submit" className="ka-btn-gold">
+                  SALVAR PRODUTO
                 </button>
               </div>
             </form>

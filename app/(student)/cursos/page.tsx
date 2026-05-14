@@ -115,7 +115,10 @@ export default async function CursosPage({ searchParams }: { searchParams: Promi
               <path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v18H6.5a2.5 2.5 0 0 0 0 5H20"/>
             </svg>
             <p style={{ fontSize: 14, fontWeight: 500, color: "var(--text-secondary)", marginBottom: 6 }}>Nenhum curso ainda</p>
-            <p style={{ fontSize: 12, color: "var(--text-muted)", lineHeight: 1.6 }}>Entre em contato com a administração para se matricular.</p>
+            <p style={{ fontSize: 12, color: "var(--text-muted)", lineHeight: 1.6, marginBottom: 20 }}>Visite nossa vitrine de produtos e cursos exclusivos.</p>
+            <Link href="/loja" className="ka-btn-gold" style={{ padding: "8px 20px" }}>
+              Visitar Loja
+            </Link>
           </div>
         ) : (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 32, marginBottom: 48 }}>
