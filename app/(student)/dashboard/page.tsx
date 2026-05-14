@@ -65,8 +65,8 @@ export default async function DashboardPage() {
   ]);
 
   const combinedCourses = [
-    ...enrollments.map(e => ({ course: e.course, expiresAt: e.expiresAt, isTeacher: false })),
-    ...taughtCourses.filter(tc => !enrollments.some(e => e.courseId === tc.id)).map(tc => ({ course: tc, expiresAt: null, isTeacher: true }))
+    ...enrollments.map(e => ({ course: e.course, expiresAt: e.expiresAt, isTeacher: false, enrolledAt: e.createdAt })),
+    ...taughtCourses.filter(tc => !enrollments.some(e => e.courseId === tc.id)).map(tc => ({ course: tc, expiresAt: null, isTeacher: true, enrolledAt: null }))
   ];
 
   const streak = calcStreak(progressData.map(p => p.completedAt));
@@ -127,8 +127,8 @@ export default async function DashboardPage() {
           </div>
         ) : (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(250px, 280px))", gap: 24 }}>
-            {combinedCourses.map(({ course, expiresAt }) => (
-              course ? <CourseCard key={course.id} course={course} isEnrolled={true} expiresAt={expiresAt} /> : null
+            {combinedCourses.map(({ course, expiresAt, enrolledAt }) => (
+              course ? <CourseCard key={course.id} course={course} isEnrolled={true} expiresAt={expiresAt} enrolledAt={enrolledAt} /> : null
             ))}
           </div>
         )}

@@ -538,6 +538,94 @@ body {
   background: rgba(201,169,122,0.04) !important;
 }
 
+/* ── Forms & Inputs ── */
+.ka-input {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(201,169,122,0.18);
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 13px;
+  color: #fff;
+  outline: none;
+  width: 100%;
+  font-family: 'Poppins', sans-serif;
+  transition: border-color var(--t-fast);
+}
+.ka-input:focus {
+  border-color: rgba(201,169,122,0.50);
+  background: rgba(255,255,255,0.06);
+}
+
+.ka-textarea {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(201,169,122,0.18);
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 13px;
+  color: #fff;
+  outline: none;
+  width: 100%;
+  font-family: 'Poppins', sans-serif;
+  resize: vertical;
+  line-height: 1.7;
+  transition: border-color var(--t-fast);
+}
+.ka-textarea:focus {
+  border-color: rgba(201,169,122,0.50);
+  background: rgba(255,255,255,0.06);
+}
+
+.ka-label {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(201,169,122,0.75);
+  display: block;
+  margin-bottom: 6px;
+}
+
+.ka-btn-gold {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 22px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #C9A97A, #A07840);
+  border: none;
+  color: #060D1F;
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(201,169,122,0.30);
+  transition: all var(--t-fast);
+}
+.ka-btn-gold:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(201,169,122,0.45);
+}
+.ka-btn-gold:active {
+  transform: translateY(0);
+}
+.ka-btn-gold:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.ka-card-premium {
+  background: linear-gradient(160deg, rgba(15,26,61,0.6) 0%, rgba(10,18,45,0.6) 100%);
+  border: 1px solid rgba(201,169,122,0.12);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+}
+
 /* ── Lesson row hover ── */
 .lesson-row:hover {
   background: rgba(201,169,122,0.04) !important;

@@ -227,7 +227,7 @@ export default function CourseEditor({ course: initial, teachers: allTeachers, i
           }}>
             {course.published ? <><Eye size={13} /> Publicado</> : <><EyeOff size={13} /> Rascunho</>}
           </button>
-          <button onClick={saveCourse} disabled={saving} style={{ ...S.btnSave, opacity: saving ? 0.6 : 1 }}>
+          <button onClick={saveCourse} disabled={saving} className="ka-btn-gold" style={{ padding: "10px 22px", flexShrink: 0 }}>
             {saving ? (
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" style={{ animation: "spin 1s linear infinite" }}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
             ) : (
@@ -251,20 +251,20 @@ export default function CourseEditor({ course: initial, teachers: allTeachers, i
 
         <div style={{ display: "grid", gap: 20 }}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-            <div style={S.field}>
-              <label style={S.label}>Título</label>
-              <input style={S.input} value={course.title} onChange={e => setCourse(c => ({ ...c, title: e.target.value }))} placeholder="Nome do curso" />
+            <div className="ka-field" style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              <label className="ka-label">Título</label>
+              <input className="ka-input" value={course.title} onChange={e => setCourse(c => ({ ...c, title: e.target.value }))} placeholder="Nome do curso" />
             </div>
-            <div style={S.field}>
-              <label style={S.label}>Categoria</label>
-              <input style={S.input} value={course.category ?? ""} onChange={e => setCourse(c => ({ ...c, category: e.target.value || null }))} placeholder="Ex: Teologia, Liderança..." />
+            <div className="ka-field" style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              <label className="ka-label">Categoria</label>
+              <input className="ka-input" value={course.category ?? ""} onChange={e => setCourse(c => ({ ...c, category: e.target.value || null }))} placeholder="Ex: Teologia, Liderança..." />
             </div>
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: thumbUrl ? "1fr 140px" : "1fr", gap: 20, alignItems: "start" }}>
-            <div style={S.field}>
-              <label style={S.label}>Descrição</label>
-              <textarea style={S.textarea} rows={4} value={course.description ?? ""} onChange={e => setCourse(c => ({ ...c, description: e.target.value }))} placeholder="Descreva o curso..." />
+            <div className="ka-field" style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              <label className="ka-label">Descrição</label>
+              <textarea className="ka-textarea" rows={4} value={course.description ?? ""} onChange={e => setCourse(c => ({ ...c, description: e.target.value }))} placeholder="Descreva o curso..." />
             </div>
             {thumbUrl && (
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -276,9 +276,9 @@ export default function CourseEditor({ course: initial, teachers: allTeachers, i
             )}
           </div>
 
-          <div style={S.field}>
-            <label style={S.label}>URL da Capa</label>
-            <input style={S.input} value={course.thumbnail ?? ""} onChange={e => setCourse(c => ({ ...c, thumbnail: e.target.value }))} placeholder="https://drive.google.com/..." />
+          <div className="ka-field" style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            <label className="ka-label">URL da Capa</label>
+            <input className="ka-input" value={course.thumbnail ?? ""} onChange={e => setCourse(c => ({ ...c, thumbnail: e.target.value }))} placeholder="https://drive.google.com/..." />
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
@@ -289,9 +289,9 @@ export default function CourseEditor({ course: initial, teachers: allTeachers, i
                 <input type="number" min="0" step="0.01" value={course.price ?? ""} onChange={e => setCourse(c => ({ ...c, price: e.target.value ? parseFloat(e.target.value) : null }))} placeholder="0,00" style={{ ...S.input, paddingLeft: 36 }} />
               </div>
             </div>
-            <div style={S.field}>
-              <label style={S.label}>Tipo de Acesso</label>
-              <select value={course.paymentType} onChange={e => setCourse(c => ({ ...c, paymentType: e.target.value as "ONE_TIME" | "MONTHLY" }))} style={{ ...S.input, cursor: "pointer", appearance: "none" as const }}>
+            <div className="ka-field" style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              <label className="ka-label">Tipo de Acesso</label>
+              <select className="ka-input" value={course.paymentType} onChange={e => setCourse(c => ({ ...c, paymentType: e.target.value as "ONE_TIME" | "MONTHLY" }))} style={{ cursor: "pointer", appearance: "none" }}>
                 <option value="ONE_TIME" style={{ background: "#0F1A3D" }}>Pagamento Único</option>
                 <option value="MONTHLY" style={{ background: "#0F1A3D" }}>Mensalidade (30 dias)</option>
               </select>
@@ -308,8 +308,8 @@ export default function CourseEditor({ course: initial, teachers: allTeachers, i
 
           {isAdmin && (
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-              <div style={S.field}>
-                <label style={S.label}>Professores Associados</label>
+              <div className="ka-field" style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                <label className="ka-label">Professores Associados</label>
                 <div style={{ 
                   display: "flex", flexDirection: "column", gap: 8, padding: "12px 16px",
                   background: "rgba(255,255,255,0.03)", border: "1px solid rgba(201,169,122,0.15)", borderRadius: 12,
@@ -339,9 +339,9 @@ export default function CourseEditor({ course: initial, teachers: allTeachers, i
                   })}
                 </div>
               </div>
-              <div style={S.field}>
-                <label style={S.label}>Comissão Global (%)</label>
-                <input type="number" min="0" max="100" value={course.commissionPercentage} onChange={e => setCourse(c => ({ ...c, commissionPercentage: parseFloat(e.target.value) || 0 }))} style={S.input} />
+              <div className="ka-field" style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                <label className="ka-label">Comissão Global (%)</label>
+                <input type="number" min="0" max="100" value={course.commissionPercentage} onChange={e => setCourse(c => ({ ...c, commissionPercentage: parseFloat(e.target.value) || 0 }))} className="ka-input" />
               </div>
             </div>
           )}
@@ -357,16 +357,16 @@ export default function CourseEditor({ course: initial, teachers: allTeachers, i
 
       {addingModule && (
         <div style={{ ...S.card, padding: 20, marginBottom: 16 }}>
-          <p style={S.label}>Novo Módulo</p>
+          <p className="ka-label">Novo Módulo</p>
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            <input value={newModuleTitle} onChange={e => setNewModuleTitle(e.target.value)} placeholder="Nome do módulo" style={S.input} />
-            <input value={newModuleThumbnail} onChange={e => setNewModuleThumbnail(e.target.value)} placeholder="URL da capa" style={S.input} />
+            <input value={newModuleTitle} onChange={e => setNewModuleTitle(e.target.value)} placeholder="Nome do módulo" className="ka-input" />
+            <input value={newModuleThumbnail} onChange={e => setNewModuleThumbnail(e.target.value)} placeholder="URL da capa" className="ka-input" />
             <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 0" }}>
               <input type="checkbox" id="newModBonus" checked={newModuleIsBonus} onChange={e => setNewModuleIsBonus(e.target.checked)} style={{ width: 16, height: 16, cursor: "pointer", accentColor: "var(--gold)" }} />
-              <label htmlFor="newModBonus" style={{ ...S.label, margin: 0, cursor: "pointer", textTransform: "none", fontSize: 12 }}>Este é um módulo bônus (não conta para progresso)</label>
+              <label htmlFor="newModBonus" className="ka-label" style={{ margin: 0, cursor: "pointer", textTransform: "none", fontSize: 12 }}>Este é um módulo bônus (não conta para progresso)</label>
             </div>
             <div style={{ display: "flex", gap: 8 }}>
-              <button style={S.btnPrimary} onClick={addModule}>Adicionar</button>
+              <button className="ka-btn-gold" onClick={addModule}>Adicionar</button>
               <button style={S.btnGhost} onClick={() => setAddingModule(false)}>Cancelar</button>
             </div>
           </div>
@@ -385,7 +385,8 @@ export default function CourseEditor({ course: initial, teachers: allTeachers, i
               {editingModule === mod.id ? (
                 <div style={{ flex: 1, display: "flex", gap: 8, alignItems: "center" }} onClick={e => e.stopPropagation()}>
                   <input 
-                    style={{ ...S.input, padding: "4px 12px", fontSize: 14 }} 
+                    className="ka-input"
+                    style={{ padding: "4px 12px", fontSize: 14 }} 
                     value={editModuleTitle} 
                     onChange={e => setEditModuleTitle(e.target.value)} 
                     onKeyDown={e => {
@@ -435,7 +436,7 @@ export default function CourseEditor({ course: initial, teachers: allTeachers, i
                       }} 
                       style={{ width: 16, height: 16, cursor: "pointer", accentColor: "var(--gold)" }} 
                     />
-                    <label htmlFor={`bonus-${mod.id}`} style={{ ...S.label, margin: 0, cursor: "pointer", textTransform: "none", fontSize: 11 }}>Módulo Bônus</label>
+                    <label htmlFor={`bonus-${mod.id}`} className="ka-label" style={{ margin: 0, cursor: "pointer", textTransform: "none", fontSize: 11 }}>Módulo Bônus</label>
                   </div>
                 </div>
 
@@ -495,34 +496,34 @@ export default function CourseEditor({ course: initial, teachers: allTeachers, i
                         <div style={{ background: "rgba(6,13,31,0.95)", border: "1px solid var(--gold)", borderRadius: 16, padding: 20, margin: "8px 0 16px", boxShadow: "0 8px 32px rgba(0,0,0,0.5)" }}>
                           <p style={{ ...S.label, color: "var(--gold)" }}>Editando Aula: {lesson.title}</p>
                           <div style={{ display: "grid", gap: 12 }}>
-                            <div style={S.field}>
-                              <label style={S.label}>Título</label>
-                              <input style={S.input} value={editLesson.title} onChange={e => setEditLesson(l => ({ ...l, title: e.target.value }))} />
-                            </div>
-                            <div style={S.field}>
-                              <label style={S.label}>URL YouTube</label>
-                              <input style={S.input} value={editLesson.youtubeUrl} onChange={e => setEditLesson(l => ({ ...l, youtubeUrl: e.target.value }))} />
-                            </div>
-                            <div style={S.field}>
-                              <label style={S.label}>Conteúdo (HTML)</label>
-                              <textarea style={S.textarea} value={editLesson.content || ""} onChange={e => setEditLesson(l => ({ ...l, content: e.target.value }))} rows={4} placeholder="HTML da apostila" />
-                            </div>
+                        <div className="ka-field" style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                          <label className="ka-label">Título</label>
+                          <input className="ka-input" value={editLesson.title} onChange={e => setEditLesson(l => ({ ...l, title: e.target.value }))} />
+                        </div>
+                        <div className="ka-field" style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                          <label className="ka-label">URL YouTube</label>
+                          <input className="ka-input" value={editLesson.youtubeUrl} onChange={e => setEditLesson(l => ({ ...l, youtubeUrl: e.target.value }))} />
+                        </div>
+                        <div className="ka-field" style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                          <label className="ka-label">Conteúdo (HTML)</label>
+                          <textarea className="ka-textarea" value={editLesson.content || ""} onChange={e => setEditLesson(l => ({ ...l, content: e.target.value }))} rows={4} placeholder="HTML da apostila" />
+                        </div>
                             
                             {/* Anexos */}
                             <div style={{ padding: "12px", background: "rgba(255,255,255,0.03)", borderRadius: 12, border: "1px solid rgba(201,169,122,0.15)" }}>
-                              <p style={{ ...S.label, fontSize: 9, marginBottom: 12 }}>Materiais de Apoio (Anexos)</p>
+                              <p className="ka-label" style={{ fontSize: 9, marginBottom: 12 }}>Materiais de Apoio (Anexos)</p>
                               {editLesson.attachments.map((at, i) => (
                                 <div key={i} style={{ display: "flex", gap: 8, marginBottom: 8 }}>
-                                  <input style={{ ...S.input, flex: 1 }} value={at.title} onChange={e => setEditLesson(l => ({ ...l, attachments: l.attachments.map((a, j) => i === j ? { ...a, title: e.target.value } : a) }))} placeholder="Título do arquivo" />
-                                  <input style={{ ...S.input, flex: 2 }} value={at.url} onChange={e => setEditLesson(l => ({ ...l, attachments: l.attachments.map((a, j) => i === j ? { ...a, url: e.target.value } : a) }))} placeholder="URL do arquivo" />
+                                  <input className="ka-input" style={{ flex: 1 }} value={at.title} onChange={e => setEditLesson(l => ({ ...l, attachments: l.attachments.map((a, j) => i === j ? { ...a, title: e.target.value } : a) }))} placeholder="Título do arquivo" />
+                                  <input className="ka-input" style={{ flex: 2 }} value={at.url} onChange={e => setEditLesson(l => ({ ...l, attachments: l.attachments.map((a, j) => i === j ? { ...a, url: e.target.value } : a) }))} placeholder="URL do arquivo" />
                                   <button onClick={() => setEditLesson(l => ({ ...l, attachments: l.attachments.filter((_, j) => i !== j) }))} style={S.btnRed}><Trash2 size={13} /></button>
                                 </div>
                               ))}
-                              <button onClick={() => setEditLesson(l => ({ ...l, attachments: [...l.attachments, { title: "", url: "" }] }))} style={{ ...S.btnGold, width: "100%", marginTop: 4 }}>+ Adicionar Anexo</button>
+                              <button onClick={() => setEditLesson(l => ({ ...l, attachments: [...l.attachments, { title: "", url: "" }] }))} className="ka-btn-gold" style={{ width: "100%", marginTop: 4 }}>+ Adicionar Anexo</button>
                             </div>
 
                             <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
-                              <button style={S.btnPrimary} onClick={() => saveEditLesson(mod.id, editingLesson)}>Salvar Alterações</button>
+                              <button className="ka-btn-gold" onClick={() => saveEditLesson(mod.id, editingLesson)}>Salvar Alterações</button>
                               <button style={S.btnGhost} onClick={() => setEditingLesson(null)}>Cancelar</button>
                             </div>
                           </div>
@@ -538,12 +539,12 @@ export default function CourseEditor({ course: initial, teachers: allTeachers, i
 
                 {addingLesson === mod.id && (
                   <div style={{ background: "rgba(6,13,31,0.5)", padding: 16, borderRadius: 12, marginTop: 12 }}>
-                    <p style={S.label}>Nova Aula</p>
+                    <p className="ka-label">Nova Aula</p>
                     <div style={{ display: "grid", gap: 12 }}>
-                      <input style={S.input} value={newLesson.title} onChange={e => setNewLesson(l => ({ ...l, title: e.target.value }))} placeholder="Título" />
-                      <input style={S.input} value={newLesson.youtubeUrl} onChange={e => setNewLesson(l => ({ ...l, youtubeUrl: e.target.value }))} placeholder="Link YouTube" />
+                      <input className="ka-input" value={newLesson.title} onChange={e => setNewLesson(l => ({ ...l, title: e.target.value }))} placeholder="Título" />
+                      <input className="ka-input" value={newLesson.youtubeUrl} onChange={e => setNewLesson(l => ({ ...l, youtubeUrl: e.target.value }))} placeholder="Link YouTube" />
                       <div style={{ display: "flex", gap: 8 }}>
-                        <button style={S.btnPrimary} onClick={() => addLesson(mod.id)}>Adicionar</button>
+                        <button className="ka-btn-gold" onClick={() => addLesson(mod.id)}>Adicionar</button>
                         <button style={S.btnGhost} onClick={() => setAddingLesson(null)}>Cancelar</button>
                       </div>
                     </div>

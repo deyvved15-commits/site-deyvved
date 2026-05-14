@@ -10,6 +10,7 @@ export default async function EditCursoPage({ params }: { params: Promise<{ cour
     prisma.course.findUnique({
       where: { id: courseId },
       include: {
+        teachers: { select: { id: true, name: true } },
         modules: {
           orderBy: { order: "asc" },
           include: { lessons: { orderBy: { order: "asc" } } },

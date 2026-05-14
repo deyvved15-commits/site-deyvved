@@ -6,9 +6,10 @@ interface CourseCardProps {
   course: any; // Using any for now to match current implementation, can be typed better later
   isEnrolled: boolean;
   expiresAt?: Date | null;
+  enrolledAt?: Date | null;
 }
 
-export default function CourseCard({ course, isEnrolled, expiresAt }: CourseCardProps) {
+export default function CourseCard({ course, isEnrolled, expiresAt, enrolledAt }: CourseCardProps) {
   const isExpired = !!expiresAt && expiresAt < new Date();
   const daysLeft = expiresAt && !isExpired
     ? Math.ceil((expiresAt.getTime() - Date.now()) / 86400000)
@@ -27,7 +28,13 @@ export default function CourseCard({ course, isEnrolled, expiresAt }: CourseCard
     const pct = total > 0 ? Math.round((done / total) * 100) : 0;
     const nextLesson = modules.flatMap((m: any) => m.lessons || []).find((l: any) => l.progress?.[0]?.completed === false) || allLessons[0];
     const label = pct > 0 && pct < 100 ? "Continuar" : pct === 100 ? "Rever" : "Começar";
-    const destination = modules.length > 1 
+    const daysSinceEnrollment = enrolledAt 
+      ? Math.floor((Date.now() - new Date(enrolledAt).getTime()) / 86400000) 
+      : 999;
+    
+    const isNextLessonBlocked = nextLesson && nextLesson.releaseAfterDays > daysSinceEnrollment;
+
+    const destination = (modules.length > 1 || isNextLessonBlocked)
       ? `/cursos/${course.slug}` 
       : nextLesson 
         ? `/cursos/${course.slug}/aula/${nextLesson.id}` 
