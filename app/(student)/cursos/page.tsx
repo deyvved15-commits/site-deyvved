@@ -11,7 +11,7 @@ export default async function CursosPage({ searchParams }: { searchParams: Promi
   if (!session) return null;
   const { categoria } = await searchParams;
 
-  const [enrollments, taughtCourses] = await Promise.all([
+  const [enrollments, taughtCourses, otherCourses] = await Promise.all([
     prisma.enrollment.findMany({
       where: { userId: session.user.id },
       include: {
@@ -44,6 +44,19 @@ export default async function CursosPage({ searchParams }: { searchParams: Promi
         },
       },
     }),
+    prisma.course.findMany({
+      where: {
+        published: true,
+        enrollments: { none: { userId: session.user.id } },
+        teachers: { none: { teacherId: session.user.id } },
+      },
+      select: {
+        id: true, title: true, thumbnail: true, price: true, slug: true, category: true,
+        _count: { select: { modules: true, enrollments: true } },
+        modules: { include: { _count: { select: { lessons: true } } } },
+      },
+      orderBy: { order: "asc" },
+    }),
   ]);
 
   const combinedCourses = [
@@ -51,10 +64,18 @@ export default async function CursosPage({ searchParams }: { searchParams: Promi
     ...taughtCourses.filter(tc => !enrollments.some(e => e.courseId === tc.id))
   ].filter(Boolean);
 
-  const allCategories = Array.from(new Set(combinedCourses.map(c => (c as any).category).filter(Boolean))) as string[];
-  const filteredCourses = categoria 
+  const allCategories = Array.from(new Set([
+    ...combinedCourses.map(c => (c as any).category),
+    ...otherCourses.map(c => c.category)
+  ].filter(Boolean))) as string[];
+
+  const filteredMyCourses = categoria 
     ? combinedCourses.filter(c => (c as any).category === categoria)
     : combinedCourses;
+
+  const filteredOtherCourses = categoria
+    ? otherCourses.filter(c => c.category === categoria)
+    : otherCourses;
 
   return (
     <div style={{ minHeight: "100%", background: "linear-gradient(180deg, var(--navy-darkest) 0%, var(--navy-mid) 100%)" }}>
@@ -62,17 +83,57 @@ export default async function CursosPage({ searchParams }: { searchParams: Promi
       {/* Header */}
       <div className="ka-page-header">
         <div className="ka-page-eyebrow">Minha Jornada</div>
-        <h1 className="ka-page-title">Meus <span>Cursos</span></h1>
-        <p className="ka-page-subtitle">
-          {combinedCourses.length === 0
-            ? "Nenhum curso matriculado ainda"
-            : `${filteredCourses.length} curso${filteredCourses.length > 1 ? "s" : ""} encontrado${filteredCourses.length > 1 ? "s" : ""}`}
-        </p>
+        <h1 className="ka-page-title">Cursos <span>Disponíveis</span></h1>
+        <p className="ka-page-subtitle">Explore novos conhecimentos e expanda seus horizontes.</p>
       </div>
 
       <div className="ka-section" style={{ padding: "0 44px 44px" }}>
         {allCategories.length > 0 && <CategoryFilter categories={allCategories} />}
-        {combinedCourses.length === 0 ? (
+
+        {/* ── Meus Cursos ── */}
+        {filteredMyCourses.length > 0 && (
+          <div style={{ marginBottom: 56 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
+              <h2 style={{ fontFamily: "'Cinzel',serif", fontSize: 13, fontWeight: 700, letterSpacing: 3, textTransform: "uppercase", color: "var(--gold)" }}>
+                Meus Cursos
+              </h2>
+              <div style={{ flex: 1, height: 1, background: "linear-gradient(90deg, rgba(201,169,122,0.2), transparent)" }} />
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 32 }}>
+              {filteredMyCourses.map((course: any) => (
+                <CourseCard 
+                  key={course.id} 
+                  course={course} 
+                  isEnrolled={true} 
+                  expiresAt={enrollments.find(e => e.courseId === course.id)?.expiresAt}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ── Cursos Disponíveis ── */}
+        {filteredOtherCourses.length > 0 && (
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
+              <h2 style={{ fontFamily: "'Cinzel',serif", fontSize: 13, fontWeight: 700, letterSpacing: 3, textTransform: "uppercase", color: "var(--gold)" }}>
+                {filteredMyCourses.length > 0 ? "Mais Cursos" : "Cursos Disponíveis"}
+              </h2>
+              <div style={{ flex: 1, height: 1, background: "linear-gradient(90deg, rgba(201,169,122,0.2), transparent)" }} />
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 32 }}>
+              {filteredOtherCourses.map((course: any) => (
+                <CourseCard 
+                  key={course.id} 
+                  course={course} 
+                  isEnrolled={false} 
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {filteredMyCourses.length === 0 && filteredOtherCourses.length === 0 && (
           <div style={{
             borderRadius: 20, padding: "56px 32px", textAlign: "center", maxWidth: 380,
             background: "linear-gradient(160deg, var(--navy-card) 0%, var(--navy-card-2) 100%)",
@@ -83,19 +144,7 @@ export default async function CursosPage({ searchParams }: { searchParams: Promi
               style={{ color: "rgba(201,169,122,0.25)", margin: "0 auto 16px", display: "block" }}>
               <path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v18H6.5a2.5 2.5 0 0 0 0 5H20"/>
             </svg>
-            <p style={{ fontSize: 14, fontWeight: 500, color: "var(--text-secondary)", marginBottom: 6 }}>Nenhum curso ainda</p>
-            <p style={{ fontSize: 12, color: "var(--text-muted)", lineHeight: 1.6 }}>Entre em contato com a administração para se matricular.</p>
-          </div>
-        ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 32 }}>
-            {filteredCourses.map((course: any) => (
-              <CourseCard 
-                key={course.id} 
-                course={course} 
-                isEnrolled={true} 
-                expiresAt={enrollments.find(e => e.courseId === course.id)?.expiresAt}
-              />
-            ))}
+            <p style={{ fontSize: 14, fontWeight: 500, color: "var(--text-secondary)", marginBottom: 6 }}>Nenhum curso encontrado</p>
           </div>
         )}
       </div>
