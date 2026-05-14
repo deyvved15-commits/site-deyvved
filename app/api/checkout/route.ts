@@ -162,6 +162,7 @@ export async function POST(req: NextRequest) {
         data: {
           userId: session!.user.id,
           courseId: courseId || null,
+          productId: productId || null,
           couponId: validCouponId,
           amount: itemPrice,
           walletUsed: walletAmount,
@@ -266,9 +267,18 @@ export async function POST(req: NextRequest) {
     data: {
       userId: session!.user.id,
       courseId: courseId || null,
+      productId: productId || null,
       couponId: validCouponId,
       amount: amountToPay,
+      walletUsed: walletAmount,
       status: "pending",
+      externalReference: preference.id,
+    },
+  });
+
+  // Se usou saldo parcial, debita agora para "reservar" o valor
+  if (walletAmount > 0) {
+    await prisma.$transaction([
       prisma.user.update({
         where: { id: session!.user.id },
         data: { walletBalance: { decrement: walletAmount } },
@@ -277,8 +287,8 @@ export async function POST(req: NextRequest) {
         data: {
           userId: session!.user.id,
           amount: -walletAmount,
-          type: "course_purchase",
-          description: `Desconto no curso: ${course.title}`,
+          type: "PURCHASE",
+          description: `Pagamento parcial: ${itemTitle}`,
         },
       }),
     ]);
