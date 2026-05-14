@@ -79,9 +79,17 @@ export async function DELETE(
     if (user.role !== "TEACHER") return NextResponse.json({ error: "Este usuário não é um professor" }, { status: 400 });
     if (user.id === session.user.id) return NextResponse.json({ error: "Você não pode excluir a si mesmo" }, { status: 400 });
 
-    await prisma.user.delete({ where: { id: teacherId } });
-    return NextResponse.json({ ok: true });
+    // Em vez de excluir o usuário, apenas removemos o cargo de professor
+    // e limpamos os vínculos de ensino.
+    await prisma.courseTeacher.deleteMany({ where: { teacherId } });
+    
+    await prisma.user.update({
+      where: { id: teacherId },
+      data: { role: "STUDENT" }
+    });
+
+    return NextResponse.json({ ok: true, message: "Professor rebaixado para aluno com sucesso." });
   } catch (error) {
-    return NextResponse.json({ error: "Erro ao excluir professor. Verifique se ele está vinculado a cursos." }, { status: 500 });
+    return NextResponse.json({ error: "Erro ao remover cargo de professor." }, { status: 500 });
   }
 }
