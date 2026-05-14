@@ -1,0 +1,34 @@
+[
+  {
+    "id": "cmoxcpork0001ky044iy2ay2i",
+    "userId": "cmoxc7y460000jp04atnbmuwy",
+    "lessonId": "cmoxc43q00003l7048hhprpzv",
+    "completed": true,
+    "completedAt": "2026-05-08T20:12:03.427Z",
+    "createdAt": "2026-05-08T20:12:03.867Z"
+  },
+  {
+    "id": "cmoxownlq0001l204ojr3azx0",
+    "userId": "cmoxc7y460000jp04atnbmuwy",
+    "lessonId": "cmoxc6ums0005l704f5jv15we",
+    "completed": true,
+    "completedAt": "2026-05-09T01:53:23.920Z",
+    "createdAt": "2026-05-09T01:53:24.350Z"
+  },
+  {
+    "id": "cmp0nlns00001l404nnhscafu",
+    "userId": "cmoxc7y460000jp04atnbmuwy",
+    "lessonId": "cmoxc7b0y0007l7044jhfpnfg",
+    "completed": true,
+    "completedAt": "2026-05-11T03:40:10.271Z",
+    "createdAt": "2026-05-11T03:40:10.272Z"
+  },
+  {
+    "id": "cmp0nlskd0001l804w7lfdq6w",
+    "userId": "cmoxc7y460000jp04atnbmuwy",
+    "lessonId": "cmoz5vuw30001jp04hnq8gocd",
+    "completed": true,
+    "completedAt": "2026-05-11T03:41:28.759Z",
+    "createdAt": "2026-05-11T03:40:16.478Z"
+  }
+]

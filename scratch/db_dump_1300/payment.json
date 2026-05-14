@@ -1,0 +1,62 @@
+[
+  {
+    "id": "cmp0mak480001jg04bglviosv",
+    "userId": "cmoxc7y460000jp04atnbmuwy",
+    "courseId": "cmoxap70o0000l204ldy0p8wv",
+    "amount": 50,
+    "status": "pending",
+    "mpPaymentId": null,
+    "mpPreferenceId": "2444535374-bed358e7-e19d-4090-a9c1-1d923b074cc6",
+    "createdAt": "2026-05-11T03:03:32.696Z",
+    "updatedAt": "2026-05-11T03:03:32.696Z",
+    "commissionAmount": null
+  },
+  {
+    "id": "cmp2lx2yh0001l4045zxgygbq",
+    "userId": "cmp2luil50000lb04rkbj0n19",
+    "courseId": "cmoxap70o0000l204ldy0p8wv",
+    "amount": 50,
+    "status": "pending",
+    "mpPaymentId": null,
+    "mpPreferenceId": "2444535374-fde02edb-72f1-40bc-b0a8-7abd3d47bd96",
+    "createdAt": "2026-05-12T12:28:36.282Z",
+    "updatedAt": "2026-05-12T12:28:36.282Z",
+    "commissionAmount": null
+  },
+  {
+    "id": "cmp2m5dy60001l5046uys8fx1",
+    "userId": "cmp2luil50000lb04rkbj0n19",
+    "courseId": "cmoxap70o0000l204ldy0p8wv",
+    "amount": 50,
+    "status": "pending",
+    "mpPaymentId": null,
+    "mpPreferenceId": "2444535374-d8ec4f4f-c551-409a-a4bc-561e6500b71c",
+    "createdAt": "2026-05-12T12:35:03.774Z",
+    "updatedAt": "2026-05-12T12:35:03.774Z",
+    "commissionAmount": null
+  },
+  {
+    "id": "cmp2me2570001l504cfgrza4b",
+    "userId": "cmp2luil50000lb04rkbj0n19",
+    "courseId": "cmoxap70o0000l204ldy0p8wv",
+    "amount": 50,
+    "status": "pending",
+    "mpPaymentId": null,
+    "mpPreferenceId": "2444535374-ac52e28e-ff78-43d1-afee-ff3cba2c3d3a",
+    "createdAt": "2026-05-12T12:41:48.379Z",
+    "updatedAt": "2026-05-12T12:41:48.379Z",
+    "commissionAmount": null
+  },
+  {
+    "id": "cmp2mqcsn0001jw04h1hicxbf",
+    "userId": "cmp2luil50000lb04rkbj0n19",
+    "courseId": "cmoxap70o0000l204ldy0p8wv",
+    "amount": 50,
+    "status": "pending",
+    "mpPaymentId": null,
+    "mpPreferenceId": "2444535374-4d12d982-70a8-4cba-83cf-a7ef562fe879",
+    "createdAt": "2026-05-12T12:51:22.055Z",
+    "updatedAt": "2026-05-12T12:51:22.055Z",
+    "commissionAmount": null
+  }
+]

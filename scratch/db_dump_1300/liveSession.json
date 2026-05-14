@@ -1,0 +1,42 @@
+[
+  {
+    "id": "cmoxr02jk0000ky04cfxo8z2j",
+    "title": "Aula",
+    "roomName": "Aula teste",
+    "active": false,
+    "createdAt": "2026-05-09T02:52:02.912Z",
+    "endedAt": "2026-05-09T02:53:52.018Z"
+  },
+  {
+    "id": "cmoxrdyfw0000kz044a664v2q",
+    "title": "ala teste",
+    "roomName": "aula teste",
+    "active": false,
+    "createdAt": "2026-05-09T03:02:50.780Z",
+    "endedAt": "2026-05-09T03:03:56.849Z"
+  },
+  {
+    "id": "cmoxrfp8b0001kz04ya4vu838",
+    "title": "Aula teste",
+    "roomName": "aula-teste",
+    "active": false,
+    "createdAt": "2026-05-09T03:04:12.094Z",
+    "endedAt": "2026-05-09T03:13:53.885Z"
+  },
+  {
+    "id": "cmoxrwra30000ky04rysxqpoy",
+    "title": "Aula teste",
+    "roomName": "https://meet.google.com/bez-tvbu-epf",
+    "active": false,
+    "createdAt": "2026-05-09T03:17:27.963Z",
+    "endedAt": "2026-05-09T03:17:46.790Z"
+  },
+  {
+    "id": "cmoxu6rw00000l504l2lkmajb",
+    "title": "Aula teste",
+    "roomName": "https://meet.google.com/ghs-mtpb-azs",
+    "active": false,
+    "createdAt": "2026-05-09T04:21:14.545Z",
+    "endedAt": "2026-05-09T04:21:40.051Z"
+  }
+]

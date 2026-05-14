@@ -8,21 +8,6 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-// ── ENUMS ─────────────────────────────────────────────────────
-
-enum Role {
-  ADMIN
-  STUDENT
-  TEACHER
-}
-
-enum PaymentType {
-  ONE_TIME
-  MONTHLY
-}
-
-// ── NEXTAUTH ──────────────────────────────────────────────────
-
 model Account {
   id                String  @id @default(cuid())
   userId            String
@@ -57,70 +42,61 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-// ── USERS ─────────────────────────────────────────────────────
-
 model User {
-  id        String   @id @default(cuid())
-  name      String
-  email     String   @unique
-  password  String?
-  role      Role     @default(STUDENT)
-  phone     String?
-  church    String?
-  active    Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
+  id             String            @id @default(cuid())
+  name           String
+  email          String            @unique
+  password       String?
+  role           Role              @default(STUDENT)
+  phone          String?
+  church         String?
+  active         Boolean           @default(true)
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
   accounts       Account[]
-  sessions       Session[]
+  certificates   Certificate[]
+  comments       Comment[]
+  taughtCourses  Course[]          @relation("CourseTeachers")
   enrollments    Enrollment[]
   progress       LessonProgress[]
+  ratings        LessonRating[]
   liveAttendance LiveAttendance[]
   payments       Payment[]
-  comments       Comment[]
-  taughtCourses  Course[]         @relation("CourseTeachers")
-  certificates   Certificate[]
-  ratings        LessonRating[]
+  sessions       Session[]
   tickets        Ticket[]
-  achievements   UserAchievement[]
   ticketMessages TicketMessage[]
+  achievements   UserAchievement[]
 }
 
-// ── LMS ───────────────────────────────────────────────────────
-
 model Course {
-  id          String   @id @default(cuid())
-  title       String
-  slug        String   @unique
-  description String?
-  thumbnail   String?
-  published   Boolean     @default(false)
-  price       Float?
-  paymentType PaymentType @default(ONE_TIME)
-  order       Int         @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  commissionPercentage Float   @default(0)
-  teachers             User[]  @relation("CourseTeachers")
+  id                   String        @id @default(cuid())
+  title                String
+  slug                 String        @unique
+  description          String?
+  thumbnail            String?
+  published            Boolean       @default(false)
+  price                Float?
+  paymentType          PaymentType   @default(ONE_TIME)
+  order                Int           @default(0)
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+  commissionPercentage Float         @default(0)
   category             String?
-  hasCertificate       Boolean @default(false)
-
-  modules      Module[]
-  enrollments  Enrollment[]
-  payments     Payment[]
-  certificates Certificate[]
-  tickets      Ticket[]
+  hasCertificate       Boolean       @default(false)
+  certificates         Certificate[]
+  teachers             User[]        @relation("CourseTeachers")
+  enrollments          Enrollment[]
+  modules              Module[]
+  payments             Payment[]
 }
 
 model Certificate {
-  id        String   @id @default(cuid())
-  userId    String
-  courseId  String
-  issuedAt  DateTime @default(now())
-
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  id       String   @id @default(cuid())
+  userId   String
+  courseId String
+  issuedAt DateTime @default(now())
+  course   Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, courseId])
 }
@@ -130,46 +106,42 @@ model Module {
   title       String
   description String?
   thumbnail   String?
-  isBonus     Boolean  @default(false)
   order       Int      @default(0)
   courseId    String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-
-  course  Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  lessons Lesson[]
+  lessons     Lesson[]
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
 }
 
 model Lesson {
-  id               String   @id @default(cuid())
+  id               String           @id @default(cuid())
   title            String
   description      String?
   content          String?
   youtubeUrl       String
   duration         String?
-  order            Int      @default(0)
-  releaseAfterDays Int      @default(0)
+  order            Int              @default(0)
+  releaseAfterDays Int              @default(0)
   moduleId         String
-  attachments      Json?    @default("[]")
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-
-  module   Module           @relation(fields: [moduleId], references: [id], onDelete: Cascade)
-  progress LessonProgress[]
-  comments Comment[]
-  ratings  LessonRating[]
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  attachments      Json?            @default("[]")
+  comments         Comment[]
+  module           Module           @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  progress         LessonProgress[]
+  ratings          LessonRating[]
 }
 
 model LessonRating {
   id        String   @id @default(cuid())
   lessonId  String
   userId    String
-  rating    Int      // 1-5 stars
+  rating    Int
   feedback  String?
   createdAt DateTime @default(now())
-
-  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, lessonId])
 }
@@ -180,9 +152,8 @@ model Enrollment {
   courseId  String
   expiresAt DateTime?
   createdAt DateTime  @default(now())
-
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  course    Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, courseId])
 }
@@ -194,27 +165,25 @@ model LessonProgress {
   completed   Boolean   @default(false)
   completedAt DateTime?
   createdAt   DateTime  @default(now())
-
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  lesson      Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, lessonId])
 }
 
 model Payment {
-  id              String   @id @default(cuid())
-  userId          String
-  courseId        String
-  amount          Float
-  status          String   @default("pending") // pending | approved | rejected | cancelled
-  mpPaymentId     String?
-  mpPreferenceId  String?
+  id               String   @id @default(cuid())
+  userId           String
+  courseId         String
+  amount           Float
+  status           String   @default("pending")
+  mpPaymentId      String?
+  mpPreferenceId   String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
   commissionAmount Float?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  course           Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Comment {
@@ -223,24 +192,20 @@ model Comment {
   userId    String
   body      String
   createdAt DateTime @default(now())
-
-  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Ticket {
-  id        String   @id @default(cuid())
+  id        String          @id @default(cuid())
   userId    String
-  courseId  String?
   subject   String
-  status    String   @default("open") // open | in_progress | resolved | closed
-  priority  String   @default("medium") // low | medium | high
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  user     User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course   Course?         @relation(fields: [courseId], references: [id], onDelete: SetNull)
-  messages TicketMessage[]
+  status    String          @default("open")
+  priority  String          @default("medium")
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages  TicketMessage[]
 }
 
 model TicketMessage {
@@ -250,30 +215,27 @@ model TicketMessage {
   body      String
   isAdmin   Boolean  @default(false)
   createdAt DateTime @default(now())
-
-  ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Achievement {
-  id          String   @id @default(cuid())
+  id          String            @id @default(cuid())
   title       String
   description String
-  icon        String   // emoji or lucide name
-  type        String   // progression | completion | streak | special
-  createdAt   DateTime @default(now())
-
-  users UserAchievement[]
+  icon        String
+  type        String
+  createdAt   DateTime          @default(now())
+  users       UserAchievement[]
 }
 
 model UserAchievement {
-  id            String   @id @default(cuid())
+  id            String      @id @default(cuid())
   userId        String
   achievementId String
-  awardedAt     DateTime @default(now())
-
-  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  achievement Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+  awardedAt     DateTime    @default(now())
+  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, achievementId])
 }
@@ -299,8 +261,18 @@ model LiveAttendance {
   userId   String
   date     String
   joinedAt DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, date])
+}
+
+enum Role {
+  ADMIN
+  STUDENT
+  TEACHER
+}
+
+enum PaymentType {
+  ONE_TIME
+  MONTHLY
 }

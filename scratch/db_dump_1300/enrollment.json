@@ -1,0 +1,37 @@
+[
+  {
+    "id": "cmoz657ty0002js04m8m9irra",
+    "userId": "cmoz657ty0000js04j7legrzf",
+    "courseId": "cmoxap70o0000l204ldy0p8wv",
+    "expiresAt": null,
+    "createdAt": "2026-05-10T02:43:43.462Z"
+  },
+  {
+    "id": "cmoz66noq0005js04ggybxegx",
+    "userId": "cmoz66noq0003js04wj3v8h7m",
+    "courseId": "cmoxap70o0000l204ldy0p8wv",
+    "expiresAt": null,
+    "createdAt": "2026-05-10T02:44:50.667Z"
+  },
+  {
+    "id": "cmp0nkkak0001jr047q27m1m3",
+    "userId": "cmoxc7y460000jp04atnbmuwy",
+    "courseId": "cmoxap70o0000l204ldy0p8wv",
+    "expiresAt": null,
+    "createdAt": "2026-05-11T03:39:19.100Z"
+  },
+  {
+    "id": "cmp189gd50001i904hm4okbtq",
+    "userId": "cmp188ovf0000jl048tuoa702",
+    "courseId": "cmoxap70o0000l204ldy0p8wv",
+    "expiresAt": null,
+    "createdAt": "2026-05-11T13:18:32.729Z"
+  },
+  {
+    "id": "cmp3j72ok0001jl07zhghi0xp",
+    "userId": "cmoxc7y460000jp04atnbmuwy",
+    "courseId": "cmp2uvvf40000i3040ucb61x4",
+    "expiresAt": null,
+    "createdAt": "2026-05-13T04:00:09.440Z"
+  }
+]

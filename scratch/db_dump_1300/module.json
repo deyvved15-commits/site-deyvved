@@ -1,0 +1,132 @@
+[
+  {
+    "id": "cmoxc24r90001l7040tswwl21",
+    "title": "Igreja Moderna",
+    "description": null,
+    "thumbnail": "https://drive.google.com/file/d/1ZywBjNHnwk-2LAIzaWg62g3vU7IZo1y8/view",
+    "order": 0,
+    "courseId": "cmoxap70o0000l204ldy0p8wv",
+    "createdAt": "2026-05-08T19:53:44.853Z",
+    "updatedAt": "2026-05-10T02:06:29.132Z"
+  },
+  {
+    "id": "cmp2vbyzs0004i304si9y8h4y",
+    "title": "CONHEÇA O CURSO",
+    "description": null,
+    "thumbnail": "https://drive.google.com/file/d/1Bz9g4GNjdJbjlV3Msddy3O5IhJJZwqx7/view",
+    "order": 1,
+    "courseId": "cmp2uvvf40000i3040ucb61x4",
+    "createdAt": "2026-05-12T16:52:07.529Z",
+    "updatedAt": "2026-05-12T16:52:07.529Z"
+  },
+  {
+    "id": "cmp2vcj9n0006i304lxq37usc",
+    "title": "HISTÓRIA DA CAPELANIA",
+    "description": null,
+    "thumbnail": "https://drive.google.com/file/d/1wsFPyhF3nEnhCjWAAw55390R23HV3dnq/view?usp=drive_link",
+    "order": 1,
+    "courseId": "cmp2uvvf40000i3040ucb61x4",
+    "createdAt": "2026-05-12T16:52:33.804Z",
+    "updatedAt": "2026-05-12T16:52:33.804Z"
+  },
+  {
+    "id": "cmp2vwskz0008i304nh21v042",
+    "title": "CAPELANIA HOSPITALAR",
+    "description": null,
+    "thumbnail": "https://drive.google.com/file/d/1EW0zQrtCQaeIcOHiW_KeFo_Pnq5ZWUf4/view",
+    "order": 2,
+    "courseId": "cmp2uvvf40000i3040ucb61x4",
+    "createdAt": "2026-05-12T17:08:18.996Z",
+    "updatedAt": "2026-05-12T17:08:18.996Z"
+  },
+  {
+    "id": "cmp3iyrmh0001l804oxap5tgk",
+    "title": "DIREITOS E DEVERES DO CAPELÃO",
+    "description": null,
+    "thumbnail": "https://drive.google.com/file/d/1CCZK54Xz9j4sFdjY72Iv51yKivmxn9LH/view",
+    "order": 3,
+    "courseId": "cmp2uvvf40000i3040ucb61x4",
+    "createdAt": "2026-05-13T03:53:42.233Z",
+    "updatedAt": "2026-05-13T03:53:42.233Z"
+  },
+  {
+    "id": "cmp3izi720003l80454ffjyz5",
+    "title": "CAPELANIA SOCIAL",
+    "description": null,
+    "thumbnail": "https://drive.google.com/file/d/1XV2Mh_zMBiRCpmBbZR0qf7bpJNRkfieu/view",
+    "order": 4,
+    "courseId": "cmp2uvvf40000i3040ucb61x4",
+    "createdAt": "2026-05-13T03:54:16.671Z",
+    "updatedAt": "2026-05-13T03:54:16.671Z"
+  },
+  {
+    "id": "cmp3j0udu0005l804tlb5bkib",
+    "title": "CAPELANIA ECLESIÁSTICA",
+    "description": null,
+    "thumbnail": "https://drive.google.com/file/d/1QcjS30SQX4sJnsp6m9vYOqpHI2_lcOnN/view",
+    "order": 5,
+    "courseId": "cmp2uvvf40000i3040ucb61x4",
+    "createdAt": "2026-05-13T03:55:19.123Z",
+    "updatedAt": "2026-05-13T03:55:19.123Z"
+  },
+  {
+    "id": "cmp3j1f060007l8047rsu3nmr",
+    "title": "CAPELANIA TERCEIRA IDADE",
+    "description": null,
+    "thumbnail": "https://drive.google.com/file/d/1QxK3zBMwZ9JhSB34SBELlFSnShHYoX9H/view",
+    "order": 6,
+    "courseId": "cmp2uvvf40000i3040ucb61x4",
+    "createdAt": "2026-05-13T03:55:45.846Z",
+    "updatedAt": "2026-05-13T03:55:45.846Z"
+  },
+  {
+    "id": "cmp3j2q2r000bl804vvdpwqhy",
+    "title": "CAPELANIA PRISIONAL OU CARCERÁRIA",
+    "description": null,
+    "thumbnail": "https://drive.google.com/file/d/1L0BVUVhM--UHigC1czxZJO_CdG5l4mOc/view?usp=drive_link",
+    "order": 8,
+    "courseId": "cmp2uvvf40000i3040ucb61x4",
+    "createdAt": "2026-05-13T03:56:46.851Z",
+    "updatedAt": "2026-05-13T03:56:46.851Z"
+  },
+  {
+    "id": "cmp3j3y1c000dl804ykckfcde",
+    "title": "CAPELANIA MILITAR",
+    "description": null,
+    "thumbnail": "https://drive.google.com/file/d/1FDD4N55rRc9WGux_WAoA3aOBoK3tj1jK/view?usp=drive_link",
+    "order": 9,
+    "courseId": "cmp2uvvf40000i3040ucb61x4",
+    "createdAt": "2026-05-13T03:57:43.824Z",
+    "updatedAt": "2026-05-13T03:57:43.824Z"
+  },
+  {
+    "id": "cmp3j5v3x0001i804lu0l43do",
+    "title": "TIPOS DE CAPELANIAS ",
+    "description": null,
+    "thumbnail": "https://drive.google.com/file/d/1qyeDQ45Sl4x6WwQarkI2_je4huNXn1yh/view?usp=drive_link",
+    "order": 11,
+    "courseId": "cmp2uvvf40000i3040ucb61x4",
+    "createdAt": "2026-05-13T03:59:13.341Z",
+    "updatedAt": "2026-05-13T03:59:13.341Z"
+  },
+  {
+    "id": "cmp3j569o000fl804hzqfaprp",
+    "title": "JESUS EXEMPLO DE CAPELÃO",
+    "description": null,
+    "thumbnail": "https://drive.google.com/file/d/19_orLYhN5DdPcIwj4bBgs3B1JGyF7CNO/view?usp=drive_link",
+    "order": 10,
+    "courseId": "cmp2uvvf40000i3040ucb61x4",
+    "createdAt": "2026-05-13T03:58:41.148Z",
+    "updatedAt": "2026-05-13T04:02:02.048Z"
+  },
+  {
+    "id": "cmp3j257j0009l804sinvdtle",
+    "title": "CAPELANIA TERCEIRA FÚNEBRE",
+    "description": null,
+    "thumbnail": "https://drive.google.com/file/d/1oUZZZWH9RAv6YEwC33YWe_bCcAED5Kt4/view",
+    "order": 7,
+    "courseId": "cmp2uvvf40000i3040ucb61x4",
+    "createdAt": "2026-05-13T03:56:19.807Z",
+    "updatedAt": "2026-05-13T12:06:05.401Z"
+  }
+]
