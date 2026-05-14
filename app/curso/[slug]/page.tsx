@@ -11,7 +11,7 @@ export default async function CursoPublicoPage({ params }: { params: Promise<{ s
   const course = await prisma.course.findUnique({
     where: { slug, published: true },
     include: {
-      teacher: { select: { name: true } },
+      teachers: { select: { name: true } },
       modules: {
         orderBy: { order: "asc" },
         include: { _count: { select: { lessons: true } } },
@@ -112,9 +112,9 @@ export default async function CursoPublicoPage({ params }: { params: Promise<{ s
             ))}
           </div>
 
-          {course.teacher && (
+          {course.teachers.length > 0 && (
             <p style={{ fontSize: 12, color: "rgba(255,255,255,0.40)", marginBottom: 32 }}>
-              Professor: <span style={{ color: "#C9A97A", fontWeight: 600 }}>{course.teacher.name}</span>
+              {course.teachers.length === 1 ? "Professor" : "Professores"}: <span style={{ color: "#C9A97A", fontWeight: 600 }}>{course.teachers.map(t => t.name).join(", ")}</span>
             </p>
           )}
 
