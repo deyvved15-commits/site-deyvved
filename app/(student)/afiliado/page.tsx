@@ -143,17 +143,17 @@ export default function AfiliadoPage() {
                 </span>
               </div>
               <p style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 12 }}>
-                Use este link para enviar o aluno para a listagem geral de cursos.
+                Use este link para enviar o aluno para a vitrine pública de todos os cursos.
               </p>
               <div style={{
                 display: "flex", alignItems: "center", gap: 12,
                 background: "rgba(0,0,0,0.25)", borderRadius: 12, padding: "12px 16px",
               }}>
                 <code style={{ flex: 1, fontSize: 12, color: "var(--text-primary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                  {baseUrl}/cursos?ref={data.affiliateCode}
+                  {baseUrl}/api/ref?code={data.affiliateCode}&redirect=/curso
                 </code>
                 <button
-                  onClick={() => copyToClipboard(`${baseUrl}/cursos?ref=${data.affiliateCode}`, "general")}
+                  onClick={() => copyToClipboard(`${baseUrl}/api/ref?code=${data.affiliateCode}&redirect=/curso`, "general")}
                   style={{
                     display: "flex", alignItems: "center", gap: 6, padding: "8px 16px", borderRadius: 10,
                     background: copiedLink === "general" ? "rgba(110,231,183,0.15)" : "rgba(201,169,122,0.15)",
@@ -178,7 +178,7 @@ export default function AfiliadoPage() {
 
             <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 32 }}>
               {data.courses.map(course => {
-                const link = `${baseUrl}/curso/${course.slug}?ref=${data.affiliateCode}`;
+                const link = `${baseUrl}/api/ref?code=${data.affiliateCode}&redirect=/curso/${course.slug}`;
                 const isCopied = copiedLink === course.id;
 
                 return (
