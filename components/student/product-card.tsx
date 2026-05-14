@@ -31,7 +31,7 @@ export default function ProductCard({ product, isPurchased }: ProductCardProps) 
 
   return (
     <div className="ka-card" style={{ height: "100%", display: "flex", flexDirection: "column" }}>
-      <div className="ka-thumb" style={{ height: 180, position: "relative" }}>
+      <div className="ka-thumb" style={{ height: 345, position: "relative" }}>
         {product.thumbnail ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img 
