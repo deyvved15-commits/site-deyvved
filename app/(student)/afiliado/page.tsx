@@ -4,12 +4,12 @@ import { useEffect, useState } from "react";
 import { Link2, Copy, CheckCircle, DollarSign, Users, TrendingUp, Wallet } from "lucide-react";
 import Link from "next/link";
 
-interface ReferralItem {
+interface CourseItem {
   id: string;
-  amount: number;
-  status: string;
-  createdAt: string;
-  course: { title: string };
+  title: string;
+  slug: string;
+  price: number;
+  affiliatePercentage: number;
 }
 
 interface AffiliateData {
@@ -18,13 +18,14 @@ interface AffiliateData {
   totalReferrals: number;
   totalEarned: number;
   recentReferrals: ReferralItem[];
+  courses: CourseItem[];
 }
 
 export default function AfiliadoPage() {
   const [data, setData] = useState<AffiliateData | null>(null);
   const [loading, setLoading] = useState(true);
   const [activating, setActivating] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [copiedLink, setCopiedLink] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/affiliate").then(r => r.json()).then(setData).finally(() => setLoading(false));
@@ -38,12 +39,10 @@ export default function AfiliadoPage() {
     setActivating(false);
   }
 
-  function copyLink() {
-    if (!data?.affiliateCode) return;
-    const baseUrl = window.location.origin;
-    navigator.clipboard.writeText(`${baseUrl}/curso?ref=${data.affiliateCode}`);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  function copyToClipboard(text: string, id: string) {
+    navigator.clipboard.writeText(text);
+    setCopiedLink(id);
+    setTimeout(() => setCopiedLink(null), 2000);
   }
 
   if (loading) return <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "linear-gradient(180deg, var(--navy-darkest) 0%, var(--navy-mid) 100%)" }}><p style={{ color: "var(--text-muted)", fontSize: 13 }}>Carregando...</p></div>;
@@ -121,7 +120,7 @@ export default function AfiliadoPage() {
               ))}
             </div>
 
-            {/* Link de indicação */}
+            {/* Link de indicação Geral */}
             <div style={{
               borderRadius: 20, padding: "24px 28px",
               background: "linear-gradient(135deg, rgba(201,169,122,0.10) 0%, rgba(201,169,122,0.03) 100%)",
@@ -132,36 +131,78 @@ export default function AfiliadoPage() {
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
                 <div style={{ width: 3, height: 16, background: "var(--gold)", borderRadius: 2 }} />
                 <span style={{ fontFamily: "'Cinzel',serif", fontSize: 10, fontWeight: 600, letterSpacing: 3, textTransform: "uppercase", color: "var(--gold)" }}>
-                  Seu Link de Indicação
+                  Link de Indicação Geral
                 </span>
               </div>
               <p style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 12 }}>
-                Adicione <code style={{ background: "rgba(201,169,122,0.10)", padding: "2px 6px", borderRadius: 4, color: "var(--gold)" }}>?ref={data.affiliateCode}</code> ao final de qualquer link de curso para rastrear suas indicações.
+                Use este link para enviar o aluno para a listagem geral de cursos.
               </p>
               <div style={{
                 display: "flex", alignItems: "center", gap: 12,
                 background: "rgba(0,0,0,0.25)", borderRadius: 12, padding: "12px 16px",
               }}>
                 <code style={{ flex: 1, fontSize: 12, color: "var(--text-primary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                  {baseUrl}/curso/SLUG?ref={data.affiliateCode}
+                  {baseUrl}/cursos?ref={data.affiliateCode}
                 </code>
                 <button
-                  onClick={copyLink}
+                  onClick={() => copyToClipboard(`${baseUrl}/cursos?ref=${data.affiliateCode}`, "general")}
                   style={{
                     display: "flex", alignItems: "center", gap: 6, padding: "8px 16px", borderRadius: 10,
-                    background: copied ? "rgba(110,231,183,0.15)" : "rgba(201,169,122,0.15)",
-                    border: `1px solid ${copied ? "rgba(110,231,183,0.30)" : "rgba(201,169,122,0.30)"}`,
-                    color: copied ? "#6ee7b7" : "var(--gold)",
+                    background: copiedLink === "general" ? "rgba(110,231,183,0.15)" : "rgba(201,169,122,0.15)",
+                    border: `1px solid ${copiedLink === "general" ? "rgba(110,231,183,0.30)" : "rgba(201,169,122,0.30)"}`,
+                    color: copiedLink === "general" ? "#6ee7b7" : "var(--gold)",
                     fontSize: 11, fontFamily: "'Cinzel',serif", fontWeight: 700, letterSpacing: 1,
                     cursor: "pointer", transition: "all 0.2s", flexShrink: 0,
                   }}
                 >
-                  {copied ? <><CheckCircle size={14} /> Copiado!</> : <><Copy size={14} /> Copiar</>}
+                  {copiedLink === "general" ? <><CheckCircle size={14} /> Copiado!</> : <><Copy size={14} /> Copiar</>}
                 </button>
               </div>
-              <p style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 8 }}>
-                Exemplo: {baseUrl}/curso/hebraico-biblico?ref={data.affiliateCode}
-              </p>
+            </div>
+
+            {/* Lista de Cursos Individuais */}
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
+              <div style={{ width: 3, height: 16, background: "var(--gold)", borderRadius: 2 }} />
+              <span style={{ fontFamily: "'Cinzel',serif", fontSize: 11, fontWeight: 600, letterSpacing: 3, textTransform: "uppercase", color: "var(--text-primary)" }}>
+                Links por Curso
+              </span>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 32 }}>
+              {data.courses.map(course => {
+                const link = `${baseUrl}/curso/${course.slug}?ref=${data.affiliateCode}`;
+                const isCopied = copiedLink === course.id;
+
+                return (
+                  <div key={course.id} style={{
+                    borderRadius: 16, padding: "16px 20px",
+                    background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)",
+                    display: "flex", alignItems: "center", justifyContent: "space-between", gap: 20,
+                  }}>
+                    <div style={{ flex: 1 }}>
+                      <p style={{ fontSize: 13, fontWeight: 600, color: "white", marginBottom: 2 }}>{course.title}</p>
+                      <p style={{ fontSize: 10, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 1 }}>
+                        Comissão: <span style={{ color: "#6ee7b7", fontWeight: 700 }}>{course.affiliatePercentage}%</span>
+                        {" · "}
+                        Valor: R$ {course.price.toFixed(2).replace(".", ",")}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => copyToClipboard(link, course.id)}
+                      style={{
+                        display: "flex", alignItems: "center", gap: 8, padding: "10px 18px", borderRadius: 10,
+                        background: isCopied ? "rgba(110,231,183,0.15)" : "rgba(255,255,255,0.05)",
+                        border: `1px solid ${isCopied ? "rgba(110,231,183,0.30)" : "rgba(255,255,255,0.15)"}`,
+                        color: isCopied ? "#6ee7b7" : "var(--text-secondary)",
+                        fontSize: 10, fontFamily: "'Cinzel',serif", fontWeight: 700, letterSpacing: 1,
+                        cursor: "pointer", transition: "all 0.2s",
+                      }}
+                    >
+                      {isCopied ? <><CheckCircle size={14} /> Link Copiado!</> : <><Link2 size={14} /> Copiar Link</>}
+                    </button>
+                  </div>
+                );
+              })}
             </div>
 
             {/* Link para carteira */}

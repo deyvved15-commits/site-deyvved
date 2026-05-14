@@ -38,12 +38,19 @@ export async function GET() {
     _sum: { amount: true },
   });
 
+  const courses = await prisma.course.findMany({
+    where: { published: true },
+    select: { id: true, title: true, slug: true, price: true, affiliatePercentage: true },
+    orderBy: { order: "asc" },
+  });
+
   return NextResponse.json({
     affiliateCode: user.affiliateCode,
     walletBalance: user.walletBalance,
     totalReferrals: user._count.referralsMade,
     totalEarned: totalEarned._sum.amount ?? 0,
     recentReferrals: user.referralsMade,
+    courses,
   });
 }
 
