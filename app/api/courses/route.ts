@@ -10,7 +10,7 @@ const createSchema = z.object({
   thumbnail: z.string().optional(),
   price: z.number().positive().optional(),
   paymentType: z.enum(["ONE_TIME", "MONTHLY"]).optional(),
-  teacherId: z.string().optional(),
+  teacherIds: z.array(z.string()).optional(),
   commissionPercentage: z.number().min(0).max(100).optional(),
 });
 
@@ -23,6 +23,7 @@ export async function GET() {
     include: {
       _count: { select: { modules: true, enrollments: true } },
       modules: { include: { _count: { select: { lessons: true } } } },
+      teachers: { select: { id: true, name: true } },
     },
   });
 
@@ -38,7 +39,7 @@ export async function POST(req: NextRequest) {
   const parsed = createSchema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
 
-  const { title, description, thumbnail, price, paymentType, teacherId, commissionPercentage } = parsed.data;
+  const { title, description, thumbnail, price, paymentType, teacherIds, commissionPercentage } = parsed.data;
   const slug = slugify(title);
 
   const course = await prisma.course.create({
@@ -49,7 +50,7 @@ export async function POST(req: NextRequest) {
       thumbnail: thumbnail || null, 
       price: price ?? null, 
       paymentType: paymentType ?? "ONE_TIME",
-      teacherId: teacherId || null,
+      teachers: teacherIds ? { connect: teacherIds.map(id => ({ id })) } : undefined,
       commissionPercentage: commissionPercentage ?? 0,
     },
   });

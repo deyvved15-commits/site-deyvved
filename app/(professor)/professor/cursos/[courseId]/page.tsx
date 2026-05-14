@@ -12,6 +12,7 @@ export default async function ProfessorEditCursoPage({ params }: { params: Promi
   const course = await prisma.course.findUnique({
     where: { id: courseId },
     include: {
+      teachers: { select: { id: true, name: true } },
       modules: {
         orderBy: { order: "asc" },
         include: { lessons: { orderBy: { order: "asc" } } },
@@ -21,13 +22,12 @@ export default async function ProfessorEditCursoPage({ params }: { params: Promi
 
   if (!course) notFound();
 
-  // Security check: only the assigned teacher (or admin) can edit
-  if (course.teacherId !== userId && session?.user.role !== "ADMIN") {
+  const isTeacher = course.teachers.some(t => t.id === userId);
+  if (!isTeacher && session?.user.role !== "ADMIN") {
     redirect("/professor");
   }
 
-  // Teachers don't need the list of all teachers
-  const teachers = [{ id: course.teacherId!, name: session?.user.name! }];
+  const teachers = course.teachers;
 
   return (
     <div style={{ minHeight: "100%", background: "linear-gradient(180deg, var(--navy-darkest) 0%, var(--navy-mid) 100%)" }}>

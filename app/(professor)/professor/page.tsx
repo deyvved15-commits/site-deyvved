@@ -11,7 +11,7 @@ export default async function ProfessorDashboard() {
 
   const [courses, payments, topLessons] = await Promise.all([
     prisma.course.findMany({
-      where: { teacherId: userId },
+      where: { teachers: { some: { id: userId } } },
       include: {
         _count: {
           select: { enrollments: true }
@@ -20,13 +20,13 @@ export default async function ProfessorDashboard() {
     }),
     prisma.payment.findMany({
       where: {
-        course: { teacherId: userId },
+        course: { teachers: { some: { id: userId } } },
         status: "approved"
       },
       select: { commissionAmount: true }
     }),
     prisma.lesson.findMany({
-      where: { module: { course: { teacherId: userId } } },
+      where: { module: { course: { teachers: { some: { id: userId } } } } },
       include: {
         _count: { select: { progress: { where: { completed: true } } } },
         module: { select: { course: { select: { title: true } } } }

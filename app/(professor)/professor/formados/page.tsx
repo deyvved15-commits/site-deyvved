@@ -10,7 +10,7 @@ export default async function TeacherFormadosPage() {
 
   const graduates = await prisma.certificate.findMany({
     where: {
-      course: { teacherId: session.user.id }
+      course: { teachers: { some: { id: session.user.id } } }
     },
     include: {
       user: { select: { id: true, name: true, email: true } },

@@ -9,12 +9,12 @@ import { Plus, Trash2, ChevronDown, ChevronRight, Eye, EyeOff, Pencil, X, Check,
 
 type Lesson = { id: string; title: string; youtubeUrl: string; duration: string | null; content: string | null; order: number; releaseAfterDays: number; attachments?: { title: string; url: string }[] };
 type Module = { id: string; title: string; description: string | null; thumbnail: string | null; isBonus: boolean; order: number; lessons: Lesson[] };
-type Course = { id: string; title: string; description: string | null; thumbnail: string | null; price: number | null; paymentType: "ONE_TIME" | "MONTHLY"; published: boolean; category: string | null; modules: Module[]; teacherId: string | null; commissionPercentage: number; hasCertificate: boolean };
+type Course = { id: string; title: string; description: string | null; thumbnail: string | null; price: number | null; paymentType: "ONE_TIME" | "MONTHLY"; published: boolean; category: string | null; modules: Module[]; teachers: { id: string; name: string }[]; commissionPercentage: number; hasCertificate: boolean };
 
 const textareaClass = "w-full bg-[rgba(255,255,255,0.04)] border border-[rgba(201,169,122,0.18)] rounded-xl px-4 py-3 text-sm text-white placeholder-[rgba(255,255,255,0.2)] outline-none resize-none focus:border-[rgba(201,169,122,0.5)] focus:bg-[rgba(255,255,255,0.06)] transition-all";
 const labelClass = "text-[10px] tracking-[3px] uppercase text-[rgba(201,169,122,0.7)] font-medium mb-2 block";
 
-export default function CourseEditor({ course: initial, teachers, isAdmin = true }: { course: Course, teachers: { id: string; name: string }[], isAdmin?: boolean }) {
+export default function CourseEditor({ course: initial, teachers: allTeachers, isAdmin = true }: { course: Course, teachers: { id: string; name: string }[], isAdmin?: boolean }) {
   const router = useRouter();
   const [course, setCourse] = useState(initial);
   const [saving, setSaving] = useState(false);
@@ -44,7 +44,7 @@ export default function CourseEditor({ course: initial, teachers, isAdmin = true
         paymentType: course.paymentType, 
         published: course.published,
         category: course.category,
-        teacherId: course.teacherId,
+        teacherIds: course.teachers.map(t => t.id),
         commissionPercentage: course.commissionPercentage,
         hasCertificate: course.hasCertificate
       }),
@@ -309,14 +309,38 @@ export default function CourseEditor({ course: initial, teachers, isAdmin = true
           {isAdmin && (
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
               <div style={S.field}>
-                <label style={S.label}>Professor Responsável</label>
-                <select value={course.teacherId || ""} onChange={e => setCourse(c => ({ ...c, teacherId: e.target.value || null }))} style={{ ...S.input, cursor: "pointer", appearance: "none" as const }}>
-                  <option value="" style={{ background: "#0F1A3D" }}>Nenhum professor selecionado</option>
-                  {teachers.map(t => (<option key={t.id} value={t.id} style={{ background: "#0F1A3D" }}>{t.name}</option>))}
-                </select>
+                <label style={S.label}>Professores Associados</label>
+                <div style={{ 
+                  display: "flex", flexDirection: "column", gap: 8, padding: "12px 16px",
+                  background: "rgba(255,255,255,0.03)", border: "1px solid rgba(201,169,122,0.15)", borderRadius: 12,
+                  maxHeight: 180, overflowY: "auto" 
+                }}>
+                  {allTeachers.map(t => {
+                    const isSelected = course.teachers.some(ct => ct.id === t.id);
+                    return (
+                      <label key={t.id} style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontSize: 13, color: isSelected ? "var(--gold)" : "rgba(255,255,255,0.6)" }}>
+                        <input 
+                          type="checkbox" 
+                          checked={isSelected}
+                          onChange={e => {
+                            const checked = e.target.checked;
+                            setCourse(c => ({
+                              ...c,
+                              teachers: checked 
+                                ? [...c.teachers, t]
+                                : c.teachers.filter(ct => ct.id !== t.id)
+                            }));
+                          }}
+                          style={{ width: 16, height: 16, accentColor: "var(--gold)" }}
+                        />
+                        {t.name}
+                      </label>
+                    );
+                  })}
+                </div>
               </div>
               <div style={S.field}>
-                <label style={S.label}>Comissão (%)</label>
+                <label style={S.label}>Comissão Global (%)</label>
                 <input type="number" min="0" max="100" value={course.commissionPercentage} onChange={e => setCourse(c => ({ ...c, commissionPercentage: parseFloat(e.target.value) || 0 }))} style={S.input} />
               </div>
             </div>

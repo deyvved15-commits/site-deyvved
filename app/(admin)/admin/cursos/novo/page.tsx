@@ -23,7 +23,7 @@ export default function NovoCursoPage() {
     thumbnail: "",
     price: "",
     paymentType: "ONE_TIME",
-    teacherId: "",
+    teacherIds: [] as string[],
     commissionPercentage: "0",
   });
   const [teachers, setTeachers] = useState<{ id: string; name: string }[]>([]);
@@ -35,11 +35,11 @@ export default function NovoCursoPage() {
       .then(data => {
         setTeachers(data);
         const tId = searchParams.get("teacherId");
-        if (tId) setForm(f => ({ ...f, teacherId: tId }));
+        if (tId) setForm(f => ({ ...f, teacherIds: [tId] }));
       });
   }, [searchParams]);
 
-  function set(k: string, v: string) { setForm(f => ({ ...f, [k]: v })); }
+  function set(k: string, v: any) { setForm(f => ({ ...f, [k]: v })); }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -54,7 +54,7 @@ export default function NovoCursoPage() {
         thumbnail: form.thumbnail || undefined,
         price: form.price ? parseFloat(form.price) : undefined,
         paymentType: form.paymentType,
-        teacherId: form.teacherId || undefined,
+        teacherIds: form.teacherIds,
         commissionPercentage: form.commissionPercentage ? parseFloat(form.commissionPercentage) : undefined,
       }),
     });
@@ -143,15 +143,36 @@ export default function NovoCursoPage() {
             {/* Professor + Comissão */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
               <div style={S.field}>
-                <label style={S.label}>Professor Responsável</label>
-                <select value={form.teacherId} onChange={e => set("teacherId", e.target.value)}
-                  style={{ ...S.input, cursor: "pointer", appearance: "none" as const }}>
-                  <option value="" style={{ background: "#0F1A3D" }}>Selecione um professor</option>
-                  {teachers.map(t => (<option key={t.id} value={t.id} style={{ background: "#0F1A3D" }}>{t.name}</option>))}
-                </select>
+                <label style={S.label}>Professores Associados</label>
+                <div style={{ 
+                  display: "flex", flexDirection: "column", gap: 8, padding: "12px 16px",
+                  background: "rgba(255,255,255,0.03)", border: "1px solid rgba(201,169,122,0.15)", borderRadius: 12,
+                  maxHeight: 160, overflowY: "auto" 
+                }}>
+                  {teachers.map(t => {
+                    const isSelected = form.teacherIds.includes(t.id);
+                    return (
+                      <label key={t.id} style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontSize: 13, color: isSelected ? "var(--gold)" : "rgba(255,255,255,0.6)" }}>
+                        <input 
+                          type="checkbox" 
+                          checked={isSelected}
+                          onChange={e => {
+                            const checked = e.target.checked;
+                            set("teacherIds", checked 
+                              ? [...form.teacherIds, t.id]
+                              : form.teacherIds.filter(id => id !== t.id)
+                            );
+                          }}
+                          style={{ width: 16, height: 16, accentColor: "var(--gold)" }}
+                        />
+                        {t.name}
+                      </label>
+                    );
+                  })}
+                </div>
               </div>
               <div style={S.field}>
-                <label style={S.label}>Comissão (%)</label>
+                <label style={S.label}>Comissão Global (%)</label>
                 <input type="number" min="0" max="100" style={S.input}
                   value={form.commissionPercentage} onChange={e => set("commissionPercentage", e.target.value)} placeholder="0" />
               </div>

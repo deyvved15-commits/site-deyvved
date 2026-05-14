@@ -14,7 +14,7 @@ export default async function TeacherSupportPage() {
   const tickets = await prisma.ticket.findMany({
     where: role === "ADMIN" 
       ? {} 
-      : { course: { teacherId: session.user.id } },
+      : { course: { teachers: { some: { id: session.user.id } } } },
     orderBy: { updatedAt: "desc" },
     include: { 
       user: { select: { name: true, email: true } },

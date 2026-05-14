@@ -78,7 +78,7 @@ model User {
   liveAttendance LiveAttendance[]
   payments       Payment[]
   comments       Comment[]
-  taughtCourses  Course[]         @relation("CourseTeacher")
+  taughtCourses  Course[]         @relation("CourseTeachers")
   certificates   Certificate[]
   ratings        LessonRating[]
   tickets        Ticket[]
@@ -101,9 +101,8 @@ model Course {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  teacherId            String?
   commissionPercentage Float   @default(0)
-  teacher              User?   @relation("CourseTeacher", fields: [teacherId], references: [id])
+  teachers             User[]  @relation("CourseTeachers")
   category             String?
   hasCertificate       Boolean @default(false)
 

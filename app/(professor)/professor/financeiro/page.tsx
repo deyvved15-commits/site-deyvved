@@ -9,7 +9,7 @@ export default async function ProfessorFinanceiro() {
 
   const payments = await prisma.payment.findMany({
     where: {
-      course: { teacherId: userId },
+      course: { teachers: { some: { id: userId } } },
       status: "approved"
     },
     include: {
