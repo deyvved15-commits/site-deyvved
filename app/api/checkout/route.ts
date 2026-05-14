@@ -7,7 +7,7 @@ import { cookies } from "next/headers";
 export async function POST(req: NextRequest) {
   let session = await auth();
   const body = await req.json();
-  const { courseId, walletAmount: rawWalletAmount, userData } = body;
+  const { courseId, walletAmount: rawWalletAmount, userData, couponId } = body;
 
   // Se não estiver logado, tenta criar conta ou logar
   if (!session) {
