@@ -192,7 +192,7 @@ export async function POST(req: NextRequest) {
 
         // Credita afiliado se houver curso
         if (affiliateId && course && course.affiliatePercentage > 0) {
-          const commission = (course.price * course.affiliatePercentage) / 100;
+          const commission = (course.price! * course.affiliatePercentage) / 100;
           await tx.referral.upsert({
             where: { buyerId_courseId: { buyerId: session!.user.id, courseId } },
             create: {
