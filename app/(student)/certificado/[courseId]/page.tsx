@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { notFound, redirect } from "next/navigation";
 import { Download, Award, ShieldCheck, Printer } from "lucide-react";
+import { getGoogleDriveImageUrl } from "@/lib/utils";
 
 export default async function CertificatePage({ 
   params, 
