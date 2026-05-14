@@ -62,14 +62,14 @@ export async function POST(req: NextRequest) {
       where: { affiliateCode: refCode },
       select: { id: true },
     });
-    if (affiliate && affiliate.id !== session.user.id) {
+    if (affiliate && affiliate.id !== session!.user.id) {
       affiliateId = affiliate.id;
     }
   }
 
   // Calcula uso da carteira
   const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
+    where: { id: session!.user.id },
     select: { walletBalance: true },
   });
   const availableBalance = user?.walletBalance ?? 0;
@@ -85,12 +85,12 @@ export async function POST(req: NextRequest) {
     // Debita carteira
     await prisma.$transaction([
       prisma.user.update({
-        where: { id: session.user.id },
+        where: { id: session!.user.id },
         data: { walletBalance: { decrement: walletAmount } },
       }),
       prisma.walletTransaction.create({
         data: {
-          userId: session.user.id,
+          userId: session!.user.id,
           amount: -walletAmount,
           type: "course_purchase",
           description: `Compra do curso: ${course.title}`,
@@ -98,7 +98,7 @@ export async function POST(req: NextRequest) {
       }),
       prisma.payment.create({
         data: {
-          userId: session.user.id,
+          userId: session!.user.id,
           courseId,
           amount: course.price,
           status: "approved",
@@ -106,9 +106,9 @@ export async function POST(req: NextRequest) {
         },
       }),
       prisma.enrollment.upsert({
-        where: { userId_courseId: { userId: session.user.id, courseId } },
+        where: { userId_courseId: { userId: session!.user.id, courseId } },
         create: {
-          userId: session.user.id,
+          userId: session!.user.id,
           courseId,
           expiresAt: course.paymentType === "MONTHLY"
             ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
@@ -127,10 +127,10 @@ export async function POST(req: NextRequest) {
       const commission = (course.price * course.affiliatePercentage) / 100;
       await prisma.$transaction([
         prisma.referral.upsert({
-          where: { buyerId_courseId: { buyerId: session.user.id, courseId } },
+          where: { buyerId_courseId: { buyerId: session!.user.id, courseId } },
           create: {
             referrerId: affiliateId,
-            buyerId: session.user.id,
+            buyerId: session!.user.id,
             courseId,
             amount: commission,
             status: "credited",
@@ -171,8 +171,8 @@ export async function POST(req: NextRequest) {
         currency_id: "BRL",
       }],
       payer: {
-        email: session.user.email ?? undefined,
-        name: session.user.name ?? undefined,
+        email: session!.user.email ?? undefined,
+        name: session!.user.name ?? undefined,
       },
       back_urls: {
         success: `${baseUrl}/checkout/sucesso?courseId=${courseId}`,
@@ -185,7 +185,7 @@ export async function POST(req: NextRequest) {
         installments: 12,
         default_installments: 1,
       },
-      external_reference: `${session.user.id}:${courseId}:${affiliateId ?? "none"}:${walletAmount}`,
+      external_reference: `${session!.user.id}:${courseId}:${affiliateId ?? "none"}:${walletAmount}`,
       statement_descriptor: "KADIMA ACADEMY",
     },
   });
@@ -193,7 +193,7 @@ export async function POST(req: NextRequest) {
   // Salva pagamento como pending
   await prisma.payment.create({
     data: {
-      userId: session.user.id,
+      userId: session!.user.id,
       courseId,
       amount: amountToPay,
       status: "pending",
@@ -205,12 +205,12 @@ export async function POST(req: NextRequest) {
   if (walletAmount > 0) {
     await prisma.$transaction([
       prisma.user.update({
-        where: { id: session.user.id },
+        where: { id: session!.user.id },
         data: { walletBalance: { decrement: walletAmount } },
       }),
       prisma.walletTransaction.create({
         data: {
-          userId: session.user.id,
+          userId: session!.user.id,
           amount: -walletAmount,
           type: "course_purchase",
           description: `Desconto no curso: ${course.title}`,
