@@ -6,7 +6,11 @@ let _resend: Resend | null = null;
 
 export function getResend(): Resend {
   if (!_resend) {
-    _resend = new Resend(process.env.RESEND_API_KEY ?? "");
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey) {
+      console.warn("⚠️ [Resend] RESEND_API_KEY não encontrada nas variáveis de ambiente.");
+    }
+    _resend = new Resend(apiKey ?? "");
   }
   return _resend;
 }
