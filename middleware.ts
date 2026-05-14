@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 
-export async function proxy(req: NextRequest) {
+export async function middleware(req: NextRequest) {
   try {
     const token = await getToken({
       req,
@@ -20,6 +20,7 @@ export async function proxy(req: NextRequest) {
       return NextResponse.redirect(url);
     };
 
+    // 1. Rotas que SEMPRE são públicas
     if (pathname === "/login" || pathname === "/cadastro") {
       if (token) {
         if (role === "ADMIN") return redirectTo("/admin");
@@ -29,6 +30,12 @@ export async function proxy(req: NextRequest) {
       return NextResponse.next();
     }
 
+    // 2. Rotas que PODEM ser públicas (Cursos e Checkout)
+    if (pathname.startsWith("/curso") || pathname.startsWith("/checkout") || pathname.startsWith("/api/ref")) {
+      return NextResponse.next();
+    }
+
+    // 3. Rota Raiz (redireciona conforme o papel ou login)
     if (pathname === "/") {
       if (!token) return redirectTo("/login");
       if (role === "ADMIN") return redirectTo("/admin");
@@ -36,8 +43,10 @@ export async function proxy(req: NextRequest) {
       return redirectTo("/dashboard");
     }
 
+    // 4. Todas as outras rotas exigem LOGIN
     if (!token) return redirectTo("/login");
 
+    // 5. Proteção por Role
     if (pathname.startsWith("/admin") && role !== "ADMIN") {
       return redirectTo("/dashboard");
     }
@@ -46,10 +55,9 @@ export async function proxy(req: NextRequest) {
       return redirectTo("/dashboard");
     }
 
-    if (pathname.startsWith("/curso/")) return NextResponse.next();
-
     return NextResponse.next();
-  } catch {
+  } catch (error) {
+    console.error("Middleware error:", error);
     const url = req.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
