@@ -27,7 +27,8 @@ export default async function CertificatePage({
       modules: {
         include: { lessons: { include: { progress: { where: { userId: targetUserId } } } } }
       },
-      teacher: true
+      teacher: false,
+      teachers: true
     }
   });
 
@@ -66,6 +67,8 @@ export default async function CertificatePage({
     month: "long",
     year: "numeric"
   });
+
+  const teacherNames = course.teachers.map(t => t.name).join(", ");
 
   return (
     <div style={{ minHeight: "100vh", background: "#050A1F", padding: "40px 20px", display: "flex", flexDirection: "column", alignItems: "center" }}>
@@ -143,7 +146,7 @@ export default async function CertificatePage({
           
           <div style={{ textAlign: "center" }}>
             <div style={{ width: 200, height: 1, background: "#ccc", marginBottom: 8 }} />
-            <p style={{ fontSize: 14, fontWeight: 700, margin: 0 }}>{course.teacher?.name || "Diretoria Acadêmica"}</p>
+            <p style={{ fontSize: 14, fontWeight: 700, margin: 0 }}>{teacherNames || "Diretoria Acadêmica"}</p>
             <p style={{ fontSize: 11, color: "#999", margin: 0 }}>Instrutor Responsável</p>
           </div>
 
