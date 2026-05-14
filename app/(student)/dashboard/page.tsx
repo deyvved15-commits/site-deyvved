@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import Link from "next/link";
 import HeroSection from "@/components/student/hero-section";
 import SectionHeader from "@/components/student/section-header";
 import CourseCard from "@/components/student/course-card";

@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import SectionHeader from "@/components/student/section-header";
 import ProductCard from "@/components/student/product-card";
+import CourseCard from "@/components/student/course-card";
 
 export default async function MarketplacePage() {
   const session = await auth();
