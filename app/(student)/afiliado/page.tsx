@@ -4,6 +4,14 @@ import { useEffect, useState } from "react";
 import { Link2, Copy, CheckCircle, DollarSign, Users, TrendingUp, Wallet } from "lucide-react";
 import Link from "next/link";
 
+interface ReferralItem {
+  id: string;
+  amount: number;
+  status: string;
+  createdAt: string;
+  course: { title: string };
+}
+
 interface CourseItem {
   id: string;
   title: string;
