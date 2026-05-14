@@ -9,7 +9,7 @@ import { Plus, Trash2, ChevronDown, ChevronRight, Eye, EyeOff, Pencil, X, Check,
 
 type Lesson = { id: string; title: string; youtubeUrl: string; duration: string | null; content: string | null; order: number; releaseAfterDays: number; attachments?: { title: string; url: string }[] };
 type Module = { id: string; title: string; description: string | null; thumbnail: string | null; isBonus: boolean; order: number; lessons: Lesson[] };
-type Course = { id: string; title: string; description: string | null; thumbnail: string | null; price: number | null; paymentType: "ONE_TIME" | "MONTHLY"; published: boolean; category: string | null; modules: Module[]; teachers: { teacherId: string; commissionPercentage: number; teacher: { id: string; name: string } }[]; hasCertificate: boolean; affiliatePercentage: number };
+type Course = { id: string; title: string; description: string | null; thumbnail: string | null; price: number | null; paymentType: "ONE_TIME" | "MONTHLY"; published: boolean; category: string | null; modules: Module[]; teachers: { teacherId: string; commissionPercentage: number; teacher: { id: string; name: string } }[]; hasCertificate: boolean; affiliatePercentage: number; certificateBg?: string | null; certificatePrimaryColor?: string | null; certificateSecondaryColor?: string | null; certificateCustomText?: string | null };
 
 const textareaClass = "w-full bg-[rgba(255,255,255,0.04)] border border-[rgba(201,169,122,0.18)] rounded-xl px-4 py-3 text-sm text-white placeholder-[rgba(255,255,255,0.2)] outline-none resize-none focus:border-[rgba(201,169,122,0.5)] focus:bg-[rgba(255,255,255,0.06)] transition-all";
 const labelClass = "text-[10px] tracking-[3px] uppercase text-[rgba(201,169,122,0.7)] font-medium mb-2 block";
@@ -50,6 +50,10 @@ export default function CourseEditor({ course: initial, teachers: allTeachers, i
         })),
         hasCertificate: course.hasCertificate,
         affiliatePercentage: course.affiliatePercentage,
+        certificateBg: course.certificateBg,
+        certificatePrimaryColor: course.certificatePrimaryColor,
+        certificateSecondaryColor: course.certificateSecondaryColor,
+        certificateCustomText: course.certificateCustomText,
       }),
     });
     if (res.ok) router.refresh();
@@ -308,6 +312,76 @@ export default function CourseEditor({ course: initial, teachers: allTeachers, i
               <p style={{ fontSize: 9, color: "var(--text-muted)", margin: 0 }}>Válido apenas para cursos de pagamento único com 100% de progresso.</p>
             </div>
           </div>
+
+          {course.hasCertificate && (
+            <div style={{ ...S.field, padding: "20px", background: "rgba(255,255,255,0.02)", borderRadius: 14, border: "1px solid rgba(201,169,122,0.1)", display: "flex", flexDirection: "column", gap: 16 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                <Pencil size={14} color="var(--gold)" />
+                <span style={{ fontFamily: "'Cinzel',serif", fontSize: 10, letterSpacing: 2, textTransform: "uppercase", color: "var(--gold)" }}>Personalizar Certificado</span>
+              </div>
+
+              <div style={S.field}>
+                <label style={S.label}>URL da Imagem de Fundo (Opcional)</label>
+                <input
+                  type="text"
+                  placeholder="https://..."
+                  value={course.certificateBg ?? ""}
+                  onChange={e => setCourse(c => ({ ...c, certificateBg: e.target.value }))}
+                  style={S.input}
+                />
+                <p style={{ fontSize: 9, color: "var(--text-muted)", marginTop: 4 }}>Recomendado: 1000x1414px (Proporção A4 Deitada)</p>
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                <div style={S.field}>
+                  <label style={S.label}>Cor Principal (Títulos)</label>
+                  <div style={{ display: "flex", gap: 10 }}>
+                    <input
+                      type="color"
+                      value={course.certificatePrimaryColor ?? "#C9A97A"}
+                      onChange={e => setCourse(c => ({ ...c, certificatePrimaryColor: e.target.value }))}
+                      style={{ width: 40, height: 40, padding: 0, border: "none", background: "none", cursor: "pointer" }}
+                    />
+                    <input
+                      type="text"
+                      value={course.certificatePrimaryColor ?? "#C9A97A"}
+                      onChange={e => setCourse(c => ({ ...c, certificatePrimaryColor: e.target.value }))}
+                      style={S.input}
+                    />
+                  </div>
+                </div>
+                <div style={S.field}>
+                  <label style={S.label}>Cor Secundária (Bordas/Ícones)</label>
+                  <div style={{ display: "flex", gap: 10 }}>
+                    <input
+                      type="color"
+                      value={course.certificateSecondaryColor ?? "#E8D5A8"}
+                      onChange={e => setCourse(c => ({ ...c, certificateSecondaryColor: e.target.value }))}
+                      style={{ width: 40, height: 40, padding: 0, border: "none", background: "none", cursor: "pointer" }}
+                    />
+                    <input
+                      type="text"
+                      value={course.certificateSecondaryColor ?? "#E8D5A8"}
+                      onChange={e => setCourse(c => ({ ...c, certificateSecondaryColor: e.target.value }))}
+                      style={S.input}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div style={S.field}>
+                <label style={S.label}>Texto Customizado (Opcional)</label>
+                <textarea
+                  placeholder="Ex: concluiu com aproveitamento total o treinamento de..."
+                  rows={2}
+                  value={course.certificateCustomText ?? ""}
+                  onChange={e => setCourse(c => ({ ...c, certificateCustomText: e.target.value }))}
+                  className={textareaClass}
+                />
+                <p style={{ fontSize: 9, color: "var(--text-muted)", marginTop: 4 }}>Substitui o texto padrão "concluiu com aproveitamento o curso de formação em"</p>
+              </div>
+            </div>
+          )}
 
           {/* Affiliate Percentage */}
           {isAdmin && (

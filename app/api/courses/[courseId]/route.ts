@@ -17,6 +17,10 @@ const updateSchema = z.object({
   })).optional(),
   hasCertificate: z.boolean().optional(),
   affiliatePercentage: z.number().min(0).max(100).optional(),
+  certificateBg: z.string().nullable().optional(),
+  certificatePrimaryColor: z.string().nullable().optional(),
+  certificateSecondaryColor: z.string().nullable().optional(),
+  certificateCustomText: z.string().nullable().optional(),
 });
 
 export async function GET(_: NextRequest, { params }: { params: Promise<{ courseId: string }> }) {
