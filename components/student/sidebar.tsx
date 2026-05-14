@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
@@ -89,6 +90,14 @@ const links = [
 export default function StudentSidebar({ user, streak = 0 }: { user: { name?: string | null; email?: string | null; role?: string }; streak?: number }) {
   const pathname = usePathname();
   const initials = user.name?.split(" ").map(n => n[0]).slice(0, 2).join("").toUpperCase() ?? "A";
+  const [walletBalance, setWalletBalance] = useState<number | null>(null);
+
+  useEffect(() => {
+    fetch("/api/affiliate/wallet")
+      .then(r => r.json())
+      .then(data => setWalletBalance(data.balance ?? 0))
+      .catch(() => setWalletBalance(0));
+  }, []);
   
   const allLinks = [...links];
   if (user.role === "ADMIN") {
@@ -186,6 +195,20 @@ export default function StudentSidebar({ user, streak = 0 }: { user: { name?: st
               </div>
             </div>
           </div>
+
+          <div style={{
+            padding: "10px 14px", borderRadius: 12, background: "rgba(201,169,122,0.08)",
+            border: "1px solid rgba(201,169,122,0.15)", marginBottom: 12,
+            display: "flex", alignItems: "center", gap: 8
+          }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--gold-light)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/>
+            </svg>
+            <span style={{ fontSize: 11, fontWeight: 600, color: "var(--gold-light)", fontFamily: "'Poppins',sans-serif" }}>
+              Carteira Kadima: <span style={{ color: "#fff" }}>R$ {walletBalance?.toFixed(2).replace(".", ",") ?? "0,00"}</span>
+            </span>
+          </div>
+
           <button className="ka-logout-btn" onClick={() => signOut({ callbackUrl: "/login" })}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>

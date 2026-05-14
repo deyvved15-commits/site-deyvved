@@ -199,6 +199,7 @@ model Payment {
   id               String   @id @default(cuid())
   userId           String
   courseId         String
+  couponId         String?
   amount           Float
   status           String   @default("pending")
   mpPaymentId      String?
@@ -208,6 +209,7 @@ model Payment {
   commissionAmount Float?
   course           Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
   user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  coupon           Coupon?          @relation(fields: [couponId], references: [id], onDelete: SetNull)
   teacherEarnings  TeacherEarning[]
 }
 
@@ -341,4 +343,24 @@ model WalletTransaction {
   createdAt   DateTime @default(now())
 
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Coupon {
+  id            String       @id @default(cuid())
+  code          String       @unique
+  discountType  DiscountType @default(PERCENTAGE)
+  discountValue Float
+  maxUses       Int?
+  usedCount     Int          @default(0)
+  expiresAt     DateTime?
+  active        Boolean      @default(true)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  payments      Payment[]
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED
 }

@@ -15,7 +15,7 @@ export default function HeroSection({ userName, streak = 0 }: HeroSectionProps) 
       <div className="ka-bokeh" style={{ bottom: -50, right: "15%", width: 220, height: 220, background: "rgba(80,110,200,0.18)" }} />
       <div className="ka-bokeh" style={{ top: "40%", left: "60%", width: 140, height: 140, background: "rgba(232,213,168,0.15)" }} />
 
-      <div style={{ position: "relative", zIndex: 2, textAlign: "center", padding: "0 20px" }}>
+      <div style={{ position: "relative", zIndex: 2, textAlign: "center", padding: "44px 20px 0" }}>
         <div className="ka-hero-logo">
           <Image
             src="/logo-nova.png"

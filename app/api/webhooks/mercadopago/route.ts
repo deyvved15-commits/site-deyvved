@@ -64,12 +64,13 @@ export async function POST(req: NextRequest) {
 
     if (!externalRef) return NextResponse.json({ ok: true });
 
-    // Formato: userId:courseId:affiliateId:walletAmount
+    // Formato: userId:courseId:affiliateId:walletAmount:couponId
     const parts = externalRef.split(":");
     const userId = parts[0];
     const courseId = parts[1];
     const affiliateId = parts[2] && parts[2] !== "none" ? parts[2] : null;
     const walletAmountUsed = parts[3] ? parseFloat(parts[3]) : 0;
+    const couponId = parts[4] && parts[4] !== "none" ? parts[4] : null;
 
     if (!userId || !courseId) return NextResponse.json({ ok: true });
 
@@ -158,6 +159,13 @@ export async function POST(req: NextRequest) {
     }
 
     if (status === "approved") {
+      // ── Cupom: incrementar uso ──
+      if (couponId) {
+        await prisma.coupon.update({
+          where: { id: couponId },
+          data: { usedCount: { increment: 1 } }
+        }).catch(err => console.error("[webhook/coupon]", err));
+      }
       const user = await prisma.user.findUnique({ where: { id: userId }, select: { name: true, email: true } });
 
       const expiresAt = course?.paymentType === "MONTHLY"

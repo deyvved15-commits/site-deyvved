@@ -67,21 +67,55 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  // Validar Cupom se houver
+  let couponDiscount = 0;
+  let validCouponId: string | null = null;
+  if (couponId) {
+    const coupon = await prisma.coupon.findUnique({
+      where: { id: couponId, active: true }
+    });
+    
+    if (coupon) {
+      const isExpired = coupon.expiresAt && new Date() > coupon.expiresAt;
+      const isUsageLimitReached = coupon.maxUses && coupon.usedCount >= coupon.maxUses;
+      
+      if (!isExpired && !isUsageLimitReached) {
+        validCouponId = coupon.id;
+        couponDiscount = coupon.discountType === "PERCENTAGE"
+          ? (course.price * coupon.discountValue) / 100
+          : coupon.discountValue;
+      }
+    }
+  }
+
   // Calcula uso da carteira
   const user = await prisma.user.findUnique({
     where: { id: session!.user.id },
     select: { walletBalance: true },
   });
   const availableBalance = user?.walletBalance ?? 0;
+  
+  // O desconto do cupom é aplicado primeiro sobre o preço original
+  const priceAfterCoupon = Math.max(0, course.price - couponDiscount);
+
   const walletAmount = Math.min(
     Math.max(0, Number(rawWalletAmount) || 0),
     availableBalance,
-    course.price
+    priceAfterCoupon
   );
-  const amountToPay = Math.max(0, course.price - walletAmount);
+  
+  const amountToPay = Math.max(0, priceAfterCoupon - walletAmount);
 
-  // Se o saldo cobre 100% do curso
+  // Se o saldo + cupom cobre 100% do curso
   if (amountToPay <= 0) {
+    // Se usou cupom, incrementa uso
+    if (validCouponId) {
+      await prisma.coupon.update({
+        where: { id: validCouponId },
+        data: { usedCount: { increment: 1 } }
+      });
+    }
+
     // Debita carteira
     await prisma.$transaction([
       prisma.user.update({
@@ -100,6 +134,7 @@ export async function POST(req: NextRequest) {
         data: {
           userId: session!.user.id,
           courseId,
+          couponId: validCouponId,
           amount: course.price,
           status: "approved",
           commissionAmount: null,
@@ -185,7 +220,7 @@ export async function POST(req: NextRequest) {
         installments: 12,
         default_installments: 1,
       },
-      external_reference: `${session!.user.id}:${courseId}:${affiliateId ?? "none"}:${walletAmount}`,
+      external_reference: `${session!.user.id}:${courseId}:${affiliateId ?? "none"}:${walletAmount}:${validCouponId ?? "none"}`,
       statement_descriptor: "KADIMA ACADEMY",
     },
   });
@@ -195,6 +230,7 @@ export async function POST(req: NextRequest) {
     data: {
       userId: session!.user.id,
       courseId,
+      couponId: validCouponId,
       amount: amountToPay,
       status: "pending",
       mpPreferenceId: preference.id ?? null,

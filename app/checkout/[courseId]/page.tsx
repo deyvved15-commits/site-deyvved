@@ -28,6 +28,10 @@ export default function CheckoutPage({ params: paramsPromise, searchParams: sear
   const [useWallet, setUseWallet] = useState(false);
   const [session, setSession] = useState<any>(null);
   const [userData, setUserData] = useState({ name: "", email: "", password: "" });
+  const [couponCode, setCouponCode] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<any>(null);
+  const [couponError, setCouponError] = useState("");
+  const [validatingCoupon, setValidatingCoupon] = useState(false);
 
   const courseId = params.courseId;
 
@@ -53,7 +57,39 @@ export default function CheckoutPage({ params: paramsPromise, searchParams: sear
   }, [courseId]);
 
   const walletAmount = useWallet ? Math.min(walletBalance, course?.price ?? 0) : 0;
-  const finalPrice = (course?.price ?? 0) - walletAmount;
+  
+  // Cálculo de desconto do cupom
+  const couponDiscount = appliedCoupon 
+    ? (appliedCoupon.discountType === "PERCENTAGE" 
+        ? (course?.price ?? 0) * (appliedCoupon.discountValue / 100)
+        : appliedCoupon.discountValue)
+    : 0;
+
+  const finalPrice = Math.max(0, (course?.price ?? 0) - walletAmount - couponDiscount);
+
+  async function handleApplyCoupon() {
+    if (!couponCode.trim()) return;
+    setValidatingCoupon(true);
+    setCouponError("");
+    
+    try {
+      const res = await fetch("/api/coupons/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: couponCode }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setAppliedCoupon(data);
+      } else {
+        setCouponError(data.error || "Cupom inválido");
+      }
+    } catch (err) {
+      setCouponError("Erro ao validar cupom");
+    } finally {
+      setValidatingCoupon(false);
+    }
+  }
 
   async function handleCheckout() {
     setLoading(true);
@@ -74,6 +110,7 @@ export default function CheckoutPage({ params: paramsPromise, searchParams: sear
       body: JSON.stringify({ 
         courseId, 
         walletAmount: useWallet ? walletAmount : 0,
+        couponId: appliedCoupon?.id,
         userData: !session ? userData : null 
       }),
     });
@@ -188,6 +225,59 @@ export default function CheckoutPage({ params: paramsPromise, searchParams: sear
                   R$ {course.price.toFixed(2).replace(".", ",")}
                 </span>
               </div>
+
+              {/* Cupom de Desconto */}
+              <div style={{ marginBottom: 16 }}>
+                {!appliedCoupon ? (
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <input
+                      type="text" placeholder="Tem um cupom?"
+                      value={couponCode} onChange={e => setCouponCode(e.target.value.toUpperCase())}
+                      style={{ flex: 1, background: "rgba(0,0,0,0.2)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, padding: "10px 14px", color: "white", fontSize: 13 }}
+                    />
+                    <button
+                      onClick={handleApplyCoupon}
+                      disabled={validatingCoupon || !couponCode}
+                      style={{
+                        padding: "10px 20px", borderRadius: 10, border: "1px solid var(--gold-35)",
+                        background: "rgba(201,169,122,0.1)", color: "var(--gold)",
+                        fontSize: 10, fontWeight: 700, fontFamily: "'Cinzel',serif", cursor: "pointer",
+                        textTransform: "uppercase", letterSpacing: 1
+                      }}
+                    >
+                      {validatingCoupon ? "..." : "Aplicar"}
+                    </button>
+                  </div>
+                ) : (
+                  <div style={{
+                    padding: "10px 14px", borderRadius: 10, background: "rgba(110,231,183,0.1)",
+                    border: "1px solid rgba(110,231,183,0.3)", display: "flex", alignItems: "center", justifyContent: "space-between"
+                  }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6ee7b7" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/>
+                      </svg>
+                      <span style={{ fontSize: 12, fontWeight: 700, color: "#6ee7b7", letterSpacing: 1 }}>{appliedCoupon.code} ATIVADO</span>
+                    </div>
+                    <button onClick={() => { setAppliedCoupon(null); setCouponCode(""); }} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.3)", cursor: "pointer", fontSize: 10 }}>Remover</button>
+                  </div>
+                )}
+                {couponError && <p style={{ color: "#FF8088", fontSize: 11, marginTop: 4, marginLeft: 4 }}>{couponError}</p>}
+              </div>
+
+              {/* Discount Info (if any) */}
+              {appliedCoupon && (
+                <div style={{
+                  padding: "12px 20px", borderRadius: 14, marginBottom: 12,
+                  background: "rgba(110,231,183,0.06)", border: "1px dashed rgba(110,231,183,0.3)",
+                  display: "flex", alignItems: "center", justifyContent: "space-between",
+                }}>
+                  <span style={{ fontSize: 11, color: "#6ee7b7", fontWeight: 600 }}>DESCONTO DO CUPOM</span>
+                  <span style={{ fontWeight: 700, fontSize: 14, color: "#6ee7b7" }}>
+                    -R$ {couponDiscount.toFixed(2).replace(".", ",")}
+                  </span>
+                </div>
+              )}
 
               {/* Wallet Option */}
               {walletBalance > 0 && (
