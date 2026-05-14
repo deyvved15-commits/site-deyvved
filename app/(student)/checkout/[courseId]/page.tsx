@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getGoogleDriveImageUrl } from "@/lib/utils";
+import { Wallet } from "lucide-react";
 
 interface Course {
   id: string;
@@ -20,6 +21,8 @@ export default function CheckoutPage({ params, searchParams }: { params: Promise
   const [error, setError] = useState("");
   const [courseId, setCourseId] = useState("");
   const [isRenewal, setIsRenewal] = useState(false);
+  const [walletBalance, setWalletBalance] = useState(0);
+  const [useWallet, setUseWallet] = useState(false);
 
   useEffect(() => {
     Promise.all([params, searchParams]).then(([p, sp]) => {
@@ -30,7 +33,16 @@ export default function CheckoutPage({ params, searchParams }: { params: Promise
         .then(setCourse)
         .catch(() => setError("Curso não encontrado."));
     });
+
+    // Buscar saldo da carteira
+    fetch("/api/affiliate/wallet")
+      .then(r => r.json())
+      .then(data => setWalletBalance(data.balance ?? 0))
+      .catch(() => {});
   }, [params, searchParams]);
+
+  const walletAmount = useWallet ? Math.min(walletBalance, course?.price ?? 0) : 0;
+  const finalPrice = (course?.price ?? 0) - walletAmount;
 
   async function handleCheckout() {
     setLoading(true);
@@ -38,10 +50,17 @@ export default function CheckoutPage({ params, searchParams }: { params: Promise
     const res = await fetch("/api/checkout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ courseId }),
+      body: JSON.stringify({ courseId, walletAmount: useWallet ? walletAmount : 0 }),
     });
     const data = await res.json();
     if (!res.ok) { setError(data.error ?? "Erro ao iniciar pagamento."); setLoading(false); return; }
+
+    // Se pagou 100% com saldo
+    if (data.paid && data.redirectUrl) {
+      window.location.href = data.redirectUrl;
+      return;
+    }
+
     window.location.href = data.checkoutUrl;
   }
 
@@ -119,17 +138,75 @@ export default function CheckoutPage({ params, searchParams }: { params: Promise
 
               {/* Price */}
               <div style={{
-                padding: "16px 20px", borderRadius: 14, marginBottom: 20,
+                padding: "16px 20px", borderRadius: 14, marginBottom: 16,
                 background: "rgba(201,169,122,0.06)", border: "1px solid rgba(201,169,122,0.18)",
                 display: "flex", alignItems: "center", justifyContent: "space-between",
               }}>
                 <span style={{ fontFamily: "'Cinzel',serif", fontSize: 11, letterSpacing: 2, color: "var(--text-muted)", textTransform: "uppercase" }}>
                   {isRenewal ? "Mensalidade (30 dias)" : "Valor do curso"}
                 </span>
-                <span style={{ fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 26, color: "var(--gold-light)" }}>
+                <span style={{ fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 26, color: useWallet && walletAmount > 0 ? "var(--text-muted)" : "var(--gold-light)", textDecoration: useWallet && walletAmount > 0 ? "line-through" : "none" }}>
                   R$ {course.price.toFixed(2).replace(".", ",")}
                 </span>
               </div>
+
+              {/* Wallet Option */}
+              {walletBalance > 0 && (
+                <div style={{
+                  padding: "16px 20px", borderRadius: 14, marginBottom: 16,
+                  background: useWallet ? "rgba(110,231,183,0.06)" : "rgba(255,255,255,0.02)",
+                  border: `1px solid ${useWallet ? "rgba(110,231,183,0.25)" : "rgba(255,255,255,0.08)"}`,
+                  cursor: "pointer", transition: "all 0.2s",
+                }} onClick={() => setUseWallet(!useWallet)}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <div style={{
+                      width: 20, height: 20, borderRadius: 6,
+                      border: `2px solid ${useWallet ? "#6ee7b7" : "rgba(255,255,255,0.15)"}`,
+                      background: useWallet ? "#6ee7b7" : "transparent",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      transition: "all 0.2s", flexShrink: 0,
+                    }}>
+                      {useWallet && (
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#060D1F" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                      )}
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                        <Wallet size={14} color={useWallet ? "#6ee7b7" : "var(--text-muted)"} />
+                        <span style={{ fontSize: 12, fontWeight: 600, color: useWallet ? "#6ee7b7" : "var(--text-secondary)" }}>
+                          Usar Carteira Kadima
+                        </span>
+                      </div>
+                      <p style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>
+                        Saldo disponível: R$ {walletBalance.toFixed(2).replace(".", ",")}
+                      </p>
+                    </div>
+                    {useWallet && (
+                      <span style={{ fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 14, color: "#6ee7b7" }}>
+                        -R$ {walletAmount.toFixed(2).replace(".", ",")}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Final Price */}
+              {useWallet && walletAmount > 0 && (
+                <div style={{
+                  padding: "16px 20px", borderRadius: 14, marginBottom: 16,
+                  background: "rgba(110,231,183,0.06)", border: "1px solid rgba(110,231,183,0.20)",
+                  display: "flex", alignItems: "center", justifyContent: "space-between",
+                }}>
+                  <span style={{ fontFamily: "'Cinzel',serif", fontSize: 11, letterSpacing: 2, color: "#6ee7b7", textTransform: "uppercase" }}>
+                    {finalPrice <= 0 ? "Valor coberto pelo saldo" : "Valor a pagar"}
+                  </span>
+                  <span style={{ fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 26, color: "#6ee7b7" }}>
+                    R$ {Math.max(0, finalPrice).toFixed(2).replace(".", ",")}
+                  </span>
+                </div>
+              )}
 
               {error && (
                 <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 14px", borderRadius: 10, background: "rgba(230,57,70,0.08)", border: "1px solid rgba(230,57,70,0.25)", marginBottom: 16 }}>
@@ -146,11 +223,11 @@ export default function CheckoutPage({ params, searchParams }: { params: Promise
                 disabled={loading}
                 style={{
                   width: "100%", padding: "14px 24px", borderRadius: 14, cursor: loading ? "default" : "pointer",
-                  background: loading ? "rgba(201,169,122,0.20)" : "linear-gradient(135deg, #009EE3, #007BC2)",
-                  color: loading ? "rgba(255,255,255,0.40)" : "#fff",
+                  background: loading ? "rgba(201,169,122,0.20)" : finalPrice <= 0 ? "linear-gradient(135deg, #6ee7b7, #34d399)" : "linear-gradient(135deg, #009EE3, #007BC2)",
+                  color: loading ? "rgba(255,255,255,0.40)" : finalPrice <= 0 ? "#060D1F" : "#fff",
                   fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 12,
                   letterSpacing: 2, textTransform: "uppercase", border: "none",
-                  boxShadow: loading ? "none" : "0 6px 24px rgba(0,158,227,0.35)",
+                  boxShadow: loading ? "none" : finalPrice <= 0 ? "0 6px 24px rgba(110,231,183,0.35)" : "0 6px 24px rgba(0,158,227,0.35)",
                   display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
                   transition: "all 0.2s",
                 }}
@@ -161,6 +238,11 @@ export default function CheckoutPage({ params, searchParams }: { params: Promise
                       <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
                     </svg>
                     Redirecionando...
+                  </>
+                ) : finalPrice <= 0 ? (
+                  <>
+                    <Wallet size={16} />
+                    Comprar com Saldo
                   </>
                 ) : (
                   <>
@@ -173,8 +255,10 @@ export default function CheckoutPage({ params, searchParams }: { params: Promise
               </button>
 
               <p style={{ fontSize: 10, color: "var(--text-muted)", textAlign: "center", marginTop: 12, fontFamily: "'Poppins',sans-serif", lineHeight: 1.6 }}>
-                Você será redirecionado para o Mercado Pago.<br />
-                {isRenewal ? "Acesso renovado por 30 dias após confirmação." : "Pagamento 100% seguro. Acesso liberado imediatamente após confirmação."}
+                {finalPrice <= 0
+                  ? "Seu saldo da Carteira Kadima cobre o valor total deste curso."
+                  : <>Você será redirecionado para o Mercado Pago.<br />{isRenewal ? "Acesso renovado por 30 dias após confirmação." : "Pagamento 100% seguro. Acesso liberado imediatamente após confirmação."}</>
+                }
               </p>
             </div>
           </div>

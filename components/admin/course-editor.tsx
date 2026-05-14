@@ -9,7 +9,7 @@ import { Plus, Trash2, ChevronDown, ChevronRight, Eye, EyeOff, Pencil, X, Check,
 
 type Lesson = { id: string; title: string; youtubeUrl: string; duration: string | null; content: string | null; order: number; releaseAfterDays: number; attachments?: { title: string; url: string }[] };
 type Module = { id: string; title: string; description: string | null; thumbnail: string | null; isBonus: boolean; order: number; lessons: Lesson[] };
-type Course = { id: string; title: string; description: string | null; thumbnail: string | null; price: number | null; paymentType: "ONE_TIME" | "MONTHLY"; published: boolean; category: string | null; modules: Module[]; teachers: { teacherId: string; commissionPercentage: number; teacher: { id: string; name: string } }[]; hasCertificate: boolean };
+type Course = { id: string; title: string; description: string | null; thumbnail: string | null; price: number | null; paymentType: "ONE_TIME" | "MONTHLY"; published: boolean; category: string | null; modules: Module[]; teachers: { teacherId: string; commissionPercentage: number; teacher: { id: string; name: string } }[]; hasCertificate: boolean; affiliatePercentage: number };
 
 const textareaClass = "w-full bg-[rgba(255,255,255,0.04)] border border-[rgba(201,169,122,0.18)] rounded-xl px-4 py-3 text-sm text-white placeholder-[rgba(255,255,255,0.2)] outline-none resize-none focus:border-[rgba(201,169,122,0.5)] focus:bg-[rgba(255,255,255,0.06)] transition-all";
 const labelClass = "text-[10px] tracking-[3px] uppercase text-[rgba(201,169,122,0.7)] font-medium mb-2 block";
@@ -48,7 +48,8 @@ export default function CourseEditor({ course: initial, teachers: allTeachers, i
           teacherId: t.teacherId,
           commissionPercentage: t.commissionPercentage
         })),
-        hasCertificate: course.hasCertificate
+        hasCertificate: course.hasCertificate,
+        affiliatePercentage: course.affiliatePercentage,
       }),
     });
     if (res.ok) router.refresh();
@@ -307,6 +308,25 @@ export default function CourseEditor({ course: initial, teachers: allTeachers, i
               <p style={{ fontSize: 9, color: "var(--text-muted)", margin: 0 }}>Válido apenas para cursos de pagamento único com 100% de progresso.</p>
             </div>
           </div>
+
+          {/* Affiliate Percentage */}
+          {isAdmin && (
+            <div style={S.field}>
+              <label style={S.label}>Comissão de Afiliado (%)</label>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <input
+                  type="number"
+                  min={0}
+                  max={100}
+                  step={0.5}
+                  value={course.affiliatePercentage ?? 0}
+                  onChange={e => setCourse(c => ({ ...c, affiliatePercentage: parseFloat(e.target.value) || 0 }))}
+                  style={{ ...S.input, width: 100, textAlign: "center" as const }}
+                />
+                <span style={{ fontSize: 11, color: "var(--text-muted)" }}>% do valor do curso para quem indicar</span>
+              </div>
+            </div>
+          )}
 
           {isAdmin && (
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>

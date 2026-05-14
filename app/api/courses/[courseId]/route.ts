@@ -16,6 +16,7 @@ const updateSchema = z.object({
     commissionPercentage: z.number().min(0).max(100)
   })).optional(),
   hasCertificate: z.boolean().optional(),
+  affiliatePercentage: z.number().min(0).max(100).optional(),
 });
 
 export async function GET(_: NextRequest, { params }: { params: Promise<{ courseId: string }> }) {

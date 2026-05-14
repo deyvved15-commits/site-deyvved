@@ -64,7 +64,13 @@ export async function POST(req: NextRequest) {
 
     if (!externalRef) return NextResponse.json({ ok: true });
 
-    const [userId, courseId] = externalRef.split(":");
+    // Formato: userId:courseId:affiliateId:walletAmount
+    const parts = externalRef.split(":");
+    const userId = parts[0];
+    const courseId = parts[1];
+    const affiliateId = parts[2] && parts[2] !== "none" ? parts[2] : null;
+    const walletAmountUsed = parts[3] ? parseFloat(parts[3]) : 0;
+
     if (!userId || !courseId) return NextResponse.json({ ok: true });
 
     const course = await prisma.course.findUnique({ 
@@ -75,11 +81,12 @@ export async function POST(req: NextRequest) {
     });
 
     const amount = mpData.transaction_amount ?? course?.price ?? 0;
+    const fullAmount = amount + walletAmountUsed; // Valor real do curso
     
     // Calculate total commission sum
     const totalCommissionPercentage = course?.teachers.reduce((acc, t) => acc + t.commissionPercentage, 0) || 0;
     const totalCommissionAmount = (status === "approved" && totalCommissionPercentage > 0)
-      ? (amount * totalCommissionPercentage) / 100
+      ? (fullAmount * totalCommissionPercentage) / 100
       : null;
 
     await prisma.payment.updateMany({
@@ -109,9 +116,44 @@ export async function POST(req: NextRequest) {
           data: course.teachers.filter(t => t.commissionPercentage > 0).map(t => ({
             teacherId: t.teacherId,
             paymentId: p.id,
-            amount: (amount * t.commissionPercentage) / 100
+            amount: (fullAmount * t.commissionPercentage) / 100
           }))
         });
+      }
+
+      // ── Afiliado: creditar comissão ──
+      if (affiliateId && course.affiliatePercentage > 0) {
+        const commission = (fullAmount * course.affiliatePercentage) / 100;
+        
+        await prisma.$transaction([
+          prisma.referral.upsert({
+            where: { buyerId_courseId: { buyerId: userId, courseId } },
+            create: {
+              referrerId: affiliateId,
+              buyerId: userId,
+              courseId,
+              paymentId: updatedPayments[0]?.id,
+              amount: commission,
+              status: "credited",
+            },
+            update: {
+              amount: { increment: commission },
+              status: "credited",
+            },
+          }),
+          prisma.user.update({
+            where: { id: affiliateId },
+            data: { walletBalance: { increment: commission } },
+          }),
+          prisma.walletTransaction.create({
+            data: {
+              userId: affiliateId,
+              amount: commission,
+              type: "affiliate_commission",
+              description: `Comissão: ${course.title}`,
+            },
+          }),
+        ]);
       }
     }
 

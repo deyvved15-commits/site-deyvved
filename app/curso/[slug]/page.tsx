@@ -2,11 +2,28 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { cookies } from "next/headers";
 import { getGoogleDriveImageUrl } from "@/lib/utils";
 
-export default async function CursoPublicoPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function CursoPublicoPage({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<{ ref?: string }> }) {
   const { slug } = await params;
+  const { ref } = await searchParams;
   const session = await auth().catch(() => null);
+
+  // Se veio com ?ref=CODIGO, salva o cookie de afiliado
+  if (ref) {
+    const affiliate = await prisma.user.findUnique({ where: { affiliateCode: ref }, select: { id: true } });
+    if (affiliate) {
+      const cookieStore = await cookies();
+      cookieStore.set("kadima_ref", ref, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 30 * 24 * 60 * 60,
+        path: "/",
+      });
+    }
+  }
 
   const course = await prisma.course.findUnique({
     where: { slug, published: true },
