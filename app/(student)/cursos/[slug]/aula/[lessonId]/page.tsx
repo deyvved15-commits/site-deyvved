@@ -23,7 +23,7 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
         include: {
           lessons: {
             orderBy: { order: "asc" },
-            include: { 
+            include: {
               progress: { where: { userId: session.user.id } },
               ratings: { where: { userId: session.user.id } }
             },
@@ -42,7 +42,7 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
   });
 
   if (!enrollment && !isTeacher && !isAdmin) redirect("/dashboard");
-  
+
   if (enrollment && enrollment.expiresAt && enrollment.expiresAt < new Date()) {
     redirect(`/checkout/${course.id}?renovar=1`);
   }
@@ -95,7 +95,7 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
             transition: "color 0.2s",
           }}>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M19 12H5M12 5l-7 7 7 7"/>
+              <path d="M19 12H5M12 5l-7 7 7 7" />
             </svg>
             {course.title}
           </Link>
@@ -130,7 +130,7 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
             ) : (
               <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 12 }}>
                 <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ color: "rgba(201,169,122,0.20)" }}>
-                  <rect x="2" y="6" width="14" height="12" rx="2"/><path d="M22 8l-6 4 6 4V8z"/>
+                  <rect x="2" y="6" width="14" height="12" rx="2" /><path d="M22 8l-6 4 6 4V8z" />
                 </svg>
                 <p style={{ fontSize: 13, color: "var(--text-muted)" }}>Vídeo não disponível</p>
               </div>
@@ -157,12 +157,12 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
               transition: "all 0.2s",
             }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M19 12H5M12 5l-7 7 7 7"/>
+                <path d="M19 12H5M12 5l-7 7 7 7" />
               </svg>
               Anterior
             </Link>
           ) : <div />}
-          
+
           <div style={{ fontFamily: "'Cinzel',serif", fontSize: 12, color: "var(--gold-light)", fontWeight: 700, letterSpacing: 2 }}>
             {currentIndex + 1} <span style={{ opacity: 0.4, margin: "0 4px" }}>/</span> {total}
           </div>
@@ -176,7 +176,7 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
             }}>
               Próxima
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M5 12h14M12 5l7 7-7 7"/>
+                <path d="M5 12h14M12 5l7 7-7 7" />
               </svg>
             </Link>
           ) : (
@@ -192,9 +192,9 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
 
         {/* ── Lesson info ── */}
         <div style={{ padding: "32px 28px 40px" }}>
-          <div style={{ 
-            display: "flex", alignItems: "center", justifyContent: "space-between", gap: 24, 
-            marginBottom: 24, paddingBottom: 24, borderBottom: "1px solid rgba(201,169,122,0.12)" 
+          <div style={{
+            display: "flex", alignItems: "center", justifyContent: "space-between", gap: 24,
+            marginBottom: 24, paddingBottom: 24, borderBottom: "1px solid rgba(201,169,122,0.12)"
           }}>
             <div style={{ flex: 1 }}>
               <h1 style={{ fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 24, letterSpacing: 2, color: "var(--text-primary)", lineHeight: 1.2, textTransform: "uppercase" }}>
@@ -202,10 +202,10 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
               </h1>
               {lesson.duration && (
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 8 }}>
-                   <div style={{ width: 4, height: 4, borderRadius: "50%", background: "var(--gold)", boxShadow: "0 0 6px var(--gold)" }} />
-                   <p style={{ fontSize: 10, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 1.5, fontFamily: "'Cinzel',serif" }}>
-                     Duração: {lesson.duration}
-                   </p>
+                  <div style={{ width: 4, height: 4, borderRadius: "50%", background: "var(--gold)", boxShadow: "0 0 6px var(--gold)" }} />
+                  <p style={{ fontSize: 10, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 1.5, fontFamily: "'Cinzel',serif" }}>
+                    Duração: {lesson.duration}
+                  </p>
                 </div>
               )}
             </div>
@@ -220,7 +220,7 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
                 <HtmlContent html={lesson.description} className="prose-lesson" style={{ fontSize: 14, color: "var(--text-secondary)", lineHeight: 1.8 }} />
               </div>
             )}
-            
+
             <div style={{ maxWidth: 450 }}>
               <LessonRating lessonId={lesson.id} initialRating={initialRating} />
             </div>
@@ -262,7 +262,7 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
             }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" />
                 </svg>
                 <span style={{ fontFamily: "'Cinzel',serif", fontSize: 10, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--gold)" }}>
                   Arquivos e Downloads
@@ -276,7 +276,7 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
                     color: "white", textDecoration: "none", fontSize: 12, transition: "all 0.2s"
                   }} onMouseEnter={e => { e.currentTarget.style.background = "rgba(201,169,122,0.15)"; e.currentTarget.style.borderColor = "var(--gold)"; }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" />
                     </svg>
                     <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{at.title || "Arquivo"}</span>
                   </a>
@@ -285,7 +285,7 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
             </div>
           </div>
         )}
-        
+
         {/* Comments */}
         <LessonComments
           lessonId={lesson.id}
@@ -308,8 +308,8 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
         <div style={{ paddingBottom: 16 }}>
           {course.modules.map((mod) => (
             <div key={mod.id}>
-              <div style={{ 
-                display: "flex", alignItems: "center", gap: 10, padding: "16px 16px 8px" 
+              <div style={{
+                display: "flex", alignItems: "center", gap: 10, padding: "16px 16px 8px"
               }}>
                 <LessonThumbnail src={mod.thumbnail} />
                 <p className="ka-lesson-module-title" style={{ padding: 0, margin: 0 }}>{mod.title}</p>
@@ -324,7 +324,7 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
                   return (
                     <div key={l.id} className="ka-lesson-item" style={{ opacity: 0.5, cursor: "default" }} title={`Disponível em ${daysLeft} dia${daysLeft !== 1 ? "s" : ""}`}>
                       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" />
                       </svg>
                       <span style={{ fontSize: 12, lineHeight: 1.4, color: "var(--text-muted)", fontFamily: "'Poppins',sans-serif" }}>
                         {l.title}
@@ -340,11 +340,11 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
                     style={{ textDecoration: "none" }}>
                     {lDone ? (
                       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6ee7b7" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" />
                       </svg>
                     ) : (
                       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={active ? "var(--gold)" : "rgba(201,169,122,0.25)"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-                        <circle cx="12" cy="12" r="10"/>
+                        <circle cx="12" cy="12" r="10" />
                       </svg>
                     )}
                     <span style={{
@@ -369,7 +369,7 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
             background: "rgba(201,169,122,0.08)", border: "1px solid rgba(201,169,122,0.2)",
             textDecoration: "none", color: "var(--gold-light)", transition: "all 0.2s"
           }} className="hover-gold-cta">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
             <div style={{ minWidth: 0 }}>
               <p style={{ fontSize: 11, fontWeight: 700, margin: 0, fontFamily: "'Cinzel',serif", textTransform: "uppercase", letterSpacing: 1 }}>Dúvidas?</p>
               <p style={{ fontSize: 9, color: "rgba(255,255,255,0.4)", margin: 0 }}>Fale com o professor</p>
