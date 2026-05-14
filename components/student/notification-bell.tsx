@@ -98,11 +98,12 @@ export default function NotificationBell() {
 
       {isOpen && (
         <div style={{
-          position: "absolute", top: "100%", right: 0, marginTop: 12,
-          width: 320, maxHeight: 450, overflowY: "auto",
+          position: "absolute", top: "100%", left: -10, marginTop: 12,
+          width: "min(350px, 80vw)", maxHeight: 480, overflowY: "auto",
           background: "var(--navy-card)", border: "1px solid rgba(201,169,122,0.25)",
-          borderRadius: 16, boxShadow: "0 12px 48px rgba(0,0,0,0.6)",
-          zIndex: 100, display: "flex", flexDirection: "column"
+          borderRadius: 20, boxShadow: "0 16px 64px rgba(0,0,0,0.8)",
+          zIndex: 999, display: "flex", flexDirection: "column",
+          backdropFilter: "blur(12px)",
         }}>
           <div style={{
             padding: "16px 20px", borderBottom: "1px solid rgba(255,255,255,0.06)",
