@@ -73,7 +73,7 @@ export default async function ProfessorFinanceiro() {
           border: "1px solid rgba(201,169,122,0.12)",
           boxShadow: "0 8px 32px rgba(0,0,0,0.35)",
         }}>
-          {payments.length === 0 ? (
+          {earnings.length === 0 ? (
             <div style={{ padding: "48px 24px", textAlign: "center" }}>
               <p style={{ fontSize: 13, color: "var(--text-muted)" }}>Nenhuma venda registrada ainda.</p>
             </div>
