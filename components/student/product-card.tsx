@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ShoppingBag, Download, FileText, Music, Video, Box } from "lucide-react";
+import { Download, FileText, Music, Video, Box } from "lucide-react";
 import { getGoogleDriveImageUrl } from "@/lib/utils";
 
 interface Product {
@@ -19,87 +19,107 @@ interface ProductCardProps {
   isPurchased: boolean;
 }
 
+function TypeIcon({ type }: { type: string }) {
+  switch (type) {
+    case "EBOOK": return <FileText size={20} />;
+    case "AUDIO": return <Music size={20} />;
+    case "VIDEO": return <Video size={20} />;
+    default: return <Box size={20} />;
+  }
+}
+
 export default function ProductCard({ product, isPurchased }: ProductCardProps) {
-  const getTypeIcon = (type: string) => {
-    switch (type) {
-      case "EBOOK": return <FileText size={20} />;
-      case "AUDIO": return <Music size={20} />;
-      case "VIDEO": return <Video size={20} />;
-      default: return <Box size={20} />;
-    }
-  };
+  const thumbUrl = product.thumbnail?.includes("drive.google.com")
+    ? getGoogleDriveImageUrl(product.thumbnail)
+    : product.thumbnail;
 
   return (
-    <div className="ka-card" style={{ height: "100%", display: "flex", flexDirection: "column" }}>
-      <div className="ka-thumb" style={{ height: 345, position: "relative" }}>
-        {product.thumbnail ? (
+    <article className="ka-card">
+      {/* Thumbnail */}
+      <div className="ka-thumb">
+        {thumbUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img 
-            src={product.thumbnail.includes("drive.google.com") ? getGoogleDriveImageUrl(product.thumbnail) : product.thumbnail} 
-            alt={product.title} 
-            className="ka-thumb-img" 
-          />
+          <img src={thumbUrl} alt={product.title} className="ka-thumb-img" />
         ) : (
           <div style={{ color: "var(--gold-35)" }}>
-            {getTypeIcon(product.type)}
+            <TypeIcon type={product.type} />
           </div>
         )}
-        
+
+        {/* Type badge */}
         <div style={{
-          position: "absolute", top: 12, left: 12,
-          padding: "4px 10px", borderRadius: "var(--radius-sm)",
-          background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)",
-          border: "1px solid rgba(201,169,122,0.3)",
+          position: "absolute", top: 10, left: 10,
+          padding: "3px 10px", borderRadius: "var(--radius-sm)",
+          background: "rgba(0,0,0,0.60)", backdropFilter: "blur(4px)",
+          border: "1px solid rgba(201,169,122,0.30)",
           fontSize: 10, fontWeight: 700, color: "var(--gold-light)",
-          display: "flex", alignItems: "center", gap: 6, textTransform: "uppercase"
+          display: "flex", alignItems: "center", gap: 5, textTransform: "uppercase",
+          letterSpacing: 1,
         }}>
-          {getTypeIcon(product.type)}
-          {product.type}
+          <TypeIcon type={product.type} />
+          {product.type === "EBOOK" ? "E-Book" : product.type === "AUDIO" ? "Áudio" : product.type === "VIDEO" ? "Vídeo" : "Arquivo"}
         </div>
+
+        {/* Purchased badge */}
+        {isPurchased && (
+          <div className="ka-progress-badge" style={{ background: "var(--green)", boxShadow: "0 0 10px rgba(16,185,129,0.5)" }}>
+            ✓
+          </div>
+        )}
       </div>
 
-      <div style={{ padding: 20, flex: 1, display: "flex", flexDirection: "column" }}>
-        <h3 style={{ fontFamily: "var(--font-cinzel)", fontSize: 16, fontWeight: 700, color: "white", marginBottom: 8, lineHeight: 1.3 }}>
+      {/* Content */}
+      <div style={{ padding: "20px 22px 22px", display: "flex", flexDirection: "column", flex: 1 }}>
+        <h3 style={{
+          fontFamily: "var(--font-cinzel)", fontWeight: 600, fontSize: 16,
+          letterSpacing: 1.5, color: "var(--text-primary)", marginBottom: 6, lineHeight: 1.3,
+        }}>
           {product.title}
         </h3>
-        
-        <p style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 20, flex: 1, lineClamp: 2, display: "-webkit-box", WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+
+        <p style={{
+          fontSize: 12, color: "var(--text-muted)", marginBottom: 16, lineHeight: 1.6,
+          display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden",
+          flex: 1,
+        }}>
           {product.description || "Sem descrição disponível."}
         </p>
 
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "auto" }}>
-          {!isPurchased ? (
-            <>
-              <div style={{ display: "flex", flexDirection: "column" }}>
-                <span style={{ fontSize: 10, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 1 }}>Valor</span>
-                <span style={{ fontSize: 18, fontWeight: 700, color: "var(--gold-bright)" }}>
-                  R$ {product.price.toFixed(2).replace(".", ",")}
-                </span>
-              </div>
-              <Link href={`/checkout/product/${product.id}`} className="ka-btn-gold" style={{ padding: "8px 16px", borderRadius: 10 }}>
-                Comprar
-              </Link>
-            </>
-          ) : (
-            <div style={{ width: "100%" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--green)", fontSize: 11, fontWeight: 600, marginBottom: 10 }}>
-                <div style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--green)" }} />
-                JÁ ADQUIRIDO
-              </div>
-              <a 
-                href={product.fileUrl || "#"} 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="ka-continue-btn"
-                style={{ background: "linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.05))", borderColor: "rgba(16, 185, 129, 0.3)", color: "var(--green-lighter)" }}
-              >
-                <Download size={14} />
-                Download
-              </a>
+        {isPurchased ? (
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--green)", fontSize: 11, fontWeight: 600, marginBottom: 10 }}>
+              <span style={{ width: 4, height: 4, borderRadius: "50%", background: "var(--green)", boxShadow: "0 0 4px var(--green)", flexShrink: 0 }} />
+              JÁ ADQUIRIDO
             </div>
-          )}
-        </div>
+            <a
+              href={product.fileUrl || "#"}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ka-continue-btn"
+              style={{
+                background: "linear-gradient(135deg, var(--green-bg), rgba(16,185,129,0.05))",
+                borderColor: "var(--green-border)",
+                color: "var(--green-light)",
+              }}
+            >
+              <Download size={14} />
+              Download
+            </a>
+          </div>
+        ) : (
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+            <div>
+              <span style={{ fontSize: 10, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 1, display: "block" }}>Valor</span>
+              <span style={{ fontSize: 18, fontWeight: 700, color: "var(--gold-bright)", fontFamily: "var(--font-cinzel)" }}>
+                R$ {product.price.toFixed(2).replace(".", ",")}
+              </span>
+            </div>
+            <Link href={`/checkout/product/${product.id}`} className="ka-btn-gold" style={{ padding: "8px 18px" }}>
+              Comprar
+            </Link>
+          </div>
+        )}
       </div>
-    </div>
+    </article>
   );
 }
