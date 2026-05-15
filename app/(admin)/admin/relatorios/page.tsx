@@ -15,8 +15,9 @@ type TabId = (typeof TABS)[number]["id"];
 interface Course  { id: string; title: string }
 interface Student { id: string; name: string; email: string }
 
-function fmt(v: number) {
-  return "R$ " + v.toFixed(2).replace(".", ",");
+function fmt(v: number | null | undefined) {
+  if (v == null || isNaN(Number(v))) return "—";
+  return "R$ " + Number(v).toFixed(2).replace(".", ",");
 }
 function fmtDate(d: string | Date | null | undefined) {
   if (!d) return "—";
@@ -61,6 +62,8 @@ export default function RelatoriosPage() {
 
   const load = useCallback(async () => {
     setLoading(true);
+    setData([]);
+    setExtra({ total: 0, walletSum: 0 });
     try {
       const params = new URLSearchParams({ type: tab });
       if (courseId) params.set("courseId", courseId);
@@ -68,12 +71,13 @@ export default function RelatoriosPage() {
       if (from)     params.set("from",     from);
       if (to)       params.set("to",       to);
       const res  = await fetch(`/api/admin/reports?${params}`);
+      if (!res.ok) { console.error("[reports]", res.status, await res.text()); return; }
       const json = await res.json();
-      if (json.error) { setData([]); return; }
-      setData(json.data ?? []);
-      setExtra({ total: json.total ?? 0, walletSum: json.walletSum ?? 0 });
-    } catch {
-      setData([]);
+      if (json.error) { console.error("[reports]", json.error); return; }
+      setData(Array.isArray(json.data) ? json.data : []);
+      setExtra({ total: Number(json.total) || 0, walletSum: Number(json.walletSum) || 0 });
+    } catch (e) {
+      console.error("[reports] fetch error", e);
     } finally {
       setLoading(false);
     }
@@ -339,7 +343,7 @@ function FinanceiroTable({ data, loading }: { data: any[]; loading: boolean }) {
   return (
     <>
       <div style={headRowStyle} className="rpt-head">
-        {["Aluno","Item","Valor Total","Saldo Usado","Método","Cupom","Data"].map(h => <TH key={h} label={h} />)}
+        {["Aluno","Item","Valor Total","Saldo Usado","Método","Data"].map(h => <TH key={h} label={h} />)}
       </div>
       <div style={bodyStyle}>
         {data.map((p: any, i: number) => (
@@ -362,9 +366,6 @@ function FinanceiroTable({ data, loading }: { data: any[]; loading: boolean }) {
             </span>
             <span style={{ ...muted, flex: 1, textTransform: "uppercase", fontSize: 10 }} className="rpt-cell-muted">
               {p.method ?? "—"}
-            </span>
-            <span style={{ ...muted, flex: 1 }} className="rpt-cell-muted">
-              {p.coupon?.code ?? "—"}
             </span>
             <span style={{ ...muted, flex: 1 }} className="rpt-cell-muted">
               {fmtDate(p.createdAt)}

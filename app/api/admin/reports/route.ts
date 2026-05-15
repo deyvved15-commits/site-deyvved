@@ -58,10 +58,9 @@ export async function GET(req: NextRequest) {
           user:    { select: { id: true, name: true, email: true } },
           course:  { select: { id: true, title: true } },
           product: { select: { id: true, title: true } },
-          coupon:  { select: { code: true } },
         },
       });
-      const total     = payments.reduce((s, p) => s + p.amount, 0);
+      const total     = payments.reduce((s, p) => s + (p.amount    ?? 0), 0);
       const walletSum = payments.reduce((s, p) => s + (p.walletUsed ?? 0), 0);
       return NextResponse.json({ data: payments, total, walletSum });
     }
