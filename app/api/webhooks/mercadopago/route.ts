@@ -8,8 +8,8 @@ import { emailConfirmacaoPagamento } from "@/lib/email-templates";
 function verifySignature(req: NextRequest, rawBody: string): boolean {
   const secret = process.env.MP_WEBHOOK_SECRET;
   if (!secret) {
-    console.warn("[MP Webhook] MP_WEBHOOK_SECRET is not set. Skipping signature verification.");
-    return false;
+    console.warn("[MP Webhook] MP_WEBHOOK_SECRET is not set. Allowing webhook without signature check.");
+    return true;
   }
 
   const xSignature = req.headers.get("x-signature") ?? "";
