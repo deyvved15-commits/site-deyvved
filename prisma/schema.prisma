@@ -82,8 +82,10 @@ model User {
   earnings        TeacherEarning[]
   referralsMade   Referral[]
   walletHistory   WalletTransaction[]
-  notifications   Notification[]
+  notifications    Notification[]
   productPurchases ProductPurchase[]
+  bookmarks        LessonBookmark[]
+  pushSubscriptions PushSubscription[]
 }
 
 model Course {
@@ -99,6 +101,8 @@ model Course {
   createdAt            DateTime      @default(now())
   updatedAt            DateTime      @updatedAt
   category             String?
+  difficulty           String?       // BEGINNER | INTERMEDIATE | ADVANCED
+  estimatedHours       Int?
   hasCertificate       Boolean       @default(false)
   certificateBg        String?       // URL da imagem de fundo
   certificatePrimaryColor String?    // Cor principal (ex: #C9A97A)
@@ -160,6 +164,7 @@ model Lesson {
   duration         String?
   order            Int              @default(0)
   releaseAfterDays Int              @default(0)
+  isFree           Boolean          @default(false)
   moduleId         String
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
@@ -168,6 +173,7 @@ model Lesson {
   module           Module           @relation(fields: [moduleId], references: [id], onDelete: Cascade)
   progress         LessonProgress[]
   ratings          LessonRating[]
+  bookmarks        LessonBookmark[]
 }
 
 model LessonRating {
@@ -428,4 +434,26 @@ enum ProductType {
 enum DiscountType {
   PERCENTAGE
   FIXED
+}
+
+model LessonBookmark {
+  id        String   @id @default(cuid())
+  userId    String
+  lessonId  String
+  note      String?
+  createdAt DateTime @default(now())
+  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lessonId])
+}
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

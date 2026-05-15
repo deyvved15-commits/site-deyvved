@@ -35,18 +35,44 @@ export default function LessonComments({
   isAdmin: boolean;
 }) {
   const [comments, setComments] = useState<Comment[]>([]);
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [body, setBody] = useState("");
   const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
+  async function loadComments(cursor?: string) {
+    const url = `/api/lessons/${lessonId}/comments${cursor ? `?cursor=${cursor}` : ""}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    return data as { comments: Comment[]; nextCursor: string | null };
+  }
+
   useEffect(() => {
     setLoading(true);
-    fetch(`/api/lessons/${lessonId}/comments`)
-      .then(r => r.json())
-      .then(data => { setComments(data); setLoading(false); })
-      .catch(() => setLoading(false));
+    setComments([]);
+    setNextCursor(null);
+    loadComments()
+      .then(({ comments, nextCursor }) => {
+        setComments(comments);
+        setNextCursor(nextCursor);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lessonId]);
+
+  async function handleLoadMore() {
+    if (!nextCursor) return;
+    setLoadingMore(true);
+    try {
+      const { comments: older, nextCursor: next } = await loadComments(nextCursor);
+      setComments(prev => [...older, ...prev]);
+      setNextCursor(next);
+    } catch {}
+    setLoadingMore(false);
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -96,12 +122,39 @@ export default function LessonComments({
               background: "rgba(201,169,122,0.12)", color: "var(--gold)",
               padding: "1px 8px", borderRadius: 999,
             }}>
-              {comments.length}
+              {comments.length}{nextCursor ? "+" : ""}
             </span>
           )}
         </div>
 
         <div style={{ padding: "16px 20px", display: "flex", flexDirection: "column", gap: 12 }}>
+
+          {/* Load older */}
+          {nextCursor && (
+            <button
+              onClick={handleLoadMore}
+              disabled={loadingMore}
+              style={{
+                background: "rgba(201,169,122,0.06)", border: "1px solid rgba(201,169,122,0.15)",
+                borderRadius: 10, padding: "8px 14px", cursor: "pointer",
+                fontSize: 11, color: "rgba(201,169,122,0.70)",
+                fontFamily: "'Cinzel',serif", letterSpacing: 1.5, textTransform: "uppercase",
+                display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+                transition: "all 0.15s", opacity: loadingMore ? 0.6 : 1,
+              }}
+            >
+              {loadingMore ? (
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" style={{ animation: "spin 1s linear infinite" }}>
+                  <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+                </svg>
+              ) : (
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="18 15 12 9 6 15"/>
+                </svg>
+              )}
+              {loadingMore ? "Carregando..." : "Ver comentários anteriores"}
+            </button>
+          )}
 
           {/* Comment list */}
           {loading ? (
@@ -121,7 +174,6 @@ export default function LessonComments({
                     background: isOwn ? "rgba(201,169,122,0.06)" : "rgba(255,255,255,0.02)",
                     border: `1px solid ${isOwn ? "rgba(201,169,122,0.12)" : "rgba(255,255,255,0.04)"}`,
                   }}>
-                    {/* Avatar */}
                     <div style={{
                       width: 30, height: 30, borderRadius: "50%", flexShrink: 0,
                       background: isOwn
@@ -218,6 +270,7 @@ export default function LessonComments({
           </p>
         </div>
       </div>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { sendPushToUser } from "@/lib/push";
 
 const schema = z.object({
   title: z.string().min(2),
@@ -56,6 +57,14 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ cou
           link: `/cursos/${course.slug}`
         }))
       });
+      // Fire push notifications without blocking the response
+      enrollments.forEach(e =>
+        sendPushToUser(e.userId, {
+          title: "Nova aula disponível!",
+          message: `"${lesson.title}" — ${course.title}`,
+          url: `/cursos/${course.slug}`,
+        })
+      );
     }
   }
 

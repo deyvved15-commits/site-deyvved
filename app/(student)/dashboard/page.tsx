@@ -10,17 +10,37 @@ export default async function DashboardPage() {
   const session = await auth();
   if (!session) return null;
 
+  const lessonSelect = {
+    select: {
+      id: true,
+      order: true,
+      releaseAfterDays: true,
+      progress: { where: { userId: session.user.id }, select: { completed: true } },
+    },
+  } as const;
+
+  const moduleSelect = {
+    select: {
+      id: true,
+      isBonus: true,
+      order: true,
+      lessons: lessonSelect,
+    },
+    orderBy: { order: "asc" as const },
+  } as const;
+
   const [enrollments, taughtCourses, otherCourses, achievements, progressData] = await Promise.all([
     prisma.enrollment.findMany({
       where: { userId: session.user.id },
-      include: {
+      select: {
+        courseId: true,
+        expiresAt: true,
+        createdAt: true,
         course: {
-          include: {
-            modules: {
-              include: {
-                lessons: { include: { progress: { where: { userId: session.user.id } } } },
-              },
-            },
+          select: {
+            id: true, title: true, slug: true, thumbnail: true,
+            price: true, paymentType: true,
+            modules: moduleSelect,
           },
         },
       },
@@ -28,12 +48,10 @@ export default async function DashboardPage() {
     }),
     prisma.course.findMany({
       where: { teachers: { some: { teacherId: session.user.id } } },
-      include: {
-        modules: {
-          include: {
-            lessons: { include: { progress: { where: { userId: session.user.id } } } },
-          },
-        },
+      select: {
+        id: true, title: true, slug: true, thumbnail: true,
+        price: true, paymentType: true,
+        modules: moduleSelect,
       },
       orderBy: { order: "asc" },
     }),
@@ -65,9 +83,10 @@ export default async function DashboardPage() {
     }),
   ]);
 
+  const enrolledCourseIds = new Set(enrollments.map(e => e.courseId));
   const combinedCourses = [
     ...enrollments.map(e => ({ course: e.course, expiresAt: e.expiresAt, isTeacher: false, enrolledAt: e.createdAt })),
-    ...taughtCourses.filter(tc => !enrollments.some(e => e.courseId === tc.id)).map(tc => ({ course: tc, expiresAt: null, isTeacher: true, enrolledAt: null }))
+    ...taughtCourses.filter(tc => !enrolledCourseIds.has(tc.id)).map(tc => ({ course: tc, expiresAt: null, isTeacher: true, enrolledAt: null })),
   ];
 
   const streak = calcStreak(progressData.map(p => p.completedAt));

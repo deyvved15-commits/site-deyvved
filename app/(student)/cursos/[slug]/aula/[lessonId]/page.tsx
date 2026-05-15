@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { getYoutubeId } from "@/lib/utils";
 import Link from "next/link";
 import ProgressButton from "@/components/student/progress-button";
+import BookmarkButton from "@/components/student/bookmark-button";
 import LessonComments from "@/components/student/lesson-comments";
 import LessonRating from "@/components/student/lesson-rating";
 import HtmlContent from "@/components/student/html-content";
@@ -209,7 +210,8 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
                 </div>
               )}
             </div>
-            <div style={{ marginRight: 44 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <BookmarkButton lessonId={lesson.id} />
               <ProgressButton lessonId={lesson.id} completed={isCompleted} />
             </div>
           </div>

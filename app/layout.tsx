@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Poppins, Cinzel } from "next/font/google";
 import Providers from "@/components/providers";
+import SwRegister from "@/components/student/sw-register";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -45,7 +46,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="pt-BR" className={`h-full ${poppins.variable} ${cinzel.variable}`}>
       <body className="h-full" style={{ fontFamily: "var(--font-poppins,'Poppins',sans-serif)" }}>
-        <Providers>{children}</Providers>
+        <Providers>
+          <SwRegister />
+          {children}
+        </Providers>
       </body>
     </html>
   );

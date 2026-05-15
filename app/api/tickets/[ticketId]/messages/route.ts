@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { sendPushToUser } from "@/lib/push";
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ ticketId: string }> }) {
   const session = await auth();
@@ -46,6 +47,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tic
           type: "SUPPORT_REPLY",
           link: `/suporte/${ticketId}`
         }
+      });
+      sendPushToUser(ticket.userId, {
+        title: "Novo retorno no suporte",
+        message: `Resposta no ticket: "${ticket.subject}"`,
+        url: `/suporte/${ticketId}`,
       });
     }
   } else {

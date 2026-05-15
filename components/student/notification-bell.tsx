@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Bell, BookOpen, MessageSquare, Info, Check } from "lucide-react";
+import { Bell, BookOpen, MessageSquare, Info } from "lucide-react";
 import Link from "next/link";
+import PushPermission from "./push-permission";
 
 interface Notification {
   id: string;
@@ -110,14 +111,17 @@ export default function NotificationBell() {
             display: "flex", alignItems: "center", justifyContent: "space-between"
           }}>
             <h3 style={{ fontFamily: "'Cinzel',serif", fontSize: 11, fontWeight: 700, letterSpacing: 2, color: "white" }}>NOTIFICAÇÕES</h3>
-            {unreadCount > 0 && (
-              <button
-                onClick={markAllAsRead}
-                style={{ background: "none", border: "none", color: "var(--gold)", fontSize: 9, fontWeight: 600, cursor: "pointer", textTransform: "uppercase" }}
-              >
-                Lidas
-              </button>
-            )}
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <PushPermission />
+              {unreadCount > 0 && (
+                <button
+                  onClick={markAllAsRead}
+                  style={{ background: "none", border: "none", color: "var(--gold)", fontSize: 9, fontWeight: 600, cursor: "pointer", textTransform: "uppercase" }}
+                >
+                  Lidas
+                </button>
+              )}
+            </div>
           </div>
 
           <div style={{ flex: 1, overflowY: "auto" }}>
