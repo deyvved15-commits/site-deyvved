@@ -28,8 +28,8 @@ export default function HeroSection({ userName, streak = 0 }: HeroSectionProps) 
         <h1 style={{
           fontFamily: "var(--font-cinzel)",
           fontWeight: 700,
-          fontSize: 36,
-          letterSpacing: 8,
+          fontSize: "clamp(20px, 7vw, 36px)",
+          letterSpacing: "clamp(3px, 1.5vw, 8px)",
           color: "var(--text-primary)",
           marginBottom: 14,
           textShadow: "0 2px 20px rgba(201,169,122,0.40)"

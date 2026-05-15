@@ -3,22 +3,36 @@ import Link from "next/link";
 import { Suspense } from "react";
 import SearchInput from "@/components/ui/search-input";
 
-export default async function AlunosPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
-  const { q } = await searchParams;
-  const students = await prisma.user.findMany({
-    where: {
-      role: "STUDENT",
-      ...(q ? {
-        OR: [
-          { name: { contains: q, mode: "insensitive" } },
-          { email: { contains: q, mode: "insensitive" } },
-          { church: { contains: q, mode: "insensitive" } },
-        ],
-      } : {}),
-    },
-    orderBy: { createdAt: "desc" },
-    include: { enrollments: { include: { course: { select: { title: true } } } } },
-  });
+const PAGE_SIZE = 25;
+
+export default async function AlunosPage({ searchParams }: { searchParams: Promise<{ q?: string; page?: string }> }) {
+  const { q, page: pageParam } = await searchParams;
+  const page = Math.max(1, parseInt(pageParam ?? "1") || 1);
+  const skip = (page - 1) * PAGE_SIZE;
+
+  const where = {
+    role: "STUDENT" as const,
+    ...(q ? {
+      OR: [
+        { name: { contains: q, mode: "insensitive" as const } },
+        { email: { contains: q, mode: "insensitive" as const } },
+        { church: { contains: q, mode: "insensitive" as const } },
+      ],
+    } : {}),
+  };
+
+  const [students, totalCount] = await Promise.all([
+    prisma.user.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      skip,
+      take: PAGE_SIZE,
+      include: { enrollments: { include: { course: { select: { title: true } } } } },
+    }),
+    prisma.user.count({ where }),
+  ]);
+
+  const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
   return (
     <div style={{ minHeight: "100%", background: "linear-gradient(180deg, var(--navy-darkest) 0%, var(--navy-mid) 100%)" }}>
@@ -28,7 +42,7 @@ export default async function AlunosPage({ searchParams }: { searchParams: Promi
         <div>
           <div className="ka-page-eyebrow">Gestão</div>
           <h1 className="ka-page-title">Meus <span>Alunos</span></h1>
-          <p className="ka-page-subtitle">{students.length} aluno{students.length !== 1 ? "s" : ""} cadastrado{students.length !== 1 ? "s" : ""}</p>
+          <p className="ka-page-subtitle">{totalCount} aluno{totalCount !== 1 ? "s" : ""} cadastrado{totalCount !== 1 ? "s" : ""}</p>
         </div>
         <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
           <Suspense><SearchInput placeholder="Buscar por nome, e-mail ou igreja..." /></Suspense>
@@ -166,6 +180,31 @@ export default async function AlunosPage({ searchParams }: { searchParams: Promi
                   </div>
                 );
               })}
+            </div>
+          </div>
+        )}
+
+        {/* Paginação */}
+        {totalPages > 1 && (
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 24, flexWrap: "wrap", gap: 12 }}>
+            <span style={{ fontSize: 12, color: "var(--text-muted)" }}>
+              Página {page} de {totalPages} — {totalCount} alunos
+            </span>
+            <div style={{ display: "flex", gap: 8 }}>
+              {page > 1 && (
+                <Link href={`?${new URLSearchParams({ ...(q ? { q } : {}), page: String(page - 1) })}`} style={{
+                  padding: "8px 16px", borderRadius: 10, textDecoration: "none",
+                  border: "1px solid rgba(201,169,122,0.25)", color: "var(--gold)",
+                  fontSize: 12, fontWeight: 600,
+                }}>← Anterior</Link>
+              )}
+              {page < totalPages && (
+                <Link href={`?${new URLSearchParams({ ...(q ? { q } : {}), page: String(page + 1) })}`} style={{
+                  padding: "8px 16px", borderRadius: 10, textDecoration: "none",
+                  background: "linear-gradient(135deg, var(--gold), var(--gold-deep))",
+                  color: "var(--navy-darkest)", fontSize: 12, fontWeight: 700,
+                }}>Próxima →</Link>
+              )}
             </div>
           </div>
         )}

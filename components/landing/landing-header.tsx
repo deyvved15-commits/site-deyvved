@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import Image from "next/image";
 
 export default function LandingHeader() {
   const [scrolled, setScrolled] = useState(false);
@@ -19,18 +18,18 @@ export default function LandingHeader() {
       position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
       background: scrolled ? "rgba(6,13,31,0.92)" : "transparent",
       backdropFilter: scrolled ? "blur(20px)" : "none",
+      WebkitBackdropFilter: scrolled ? "blur(20px)" : "none",
       borderBottom: scrolled ? "1px solid rgba(201,169,122,0.12)" : "1px solid transparent",
       transition: "all 0.35s ease",
-      padding: "0 40px",
     }}>
-      <div style={{ maxWidth: 1200, margin: "0 auto", height: 72, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 24 }}>
+      <div className="landing-header-inner" style={{ maxWidth: 1200, margin: "0 auto", height: 68, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
 
         {/* Logo */}
-        <Link href="/" style={{ display: "flex", alignItems: "center", gap: 12, textDecoration: "none" }}>
+        <Link href="/lp" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none", flexShrink: 0 }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo-nova.png" alt="Kadima Academy" style={{ width: 38, height: 38, objectFit: "contain", filter: "drop-shadow(0 0 8px rgba(201,169,122,0.5))" }} />
+          <img src="/logo-nova.png" alt="Kadima Academy" style={{ width: 36, height: 36, objectFit: "contain", filter: "drop-shadow(0 0 8px rgba(201,169,122,0.5))" }} />
           <div>
-            <div style={{ fontFamily: "var(--font-cinzel)", fontWeight: 700, fontSize: 16, letterSpacing: 4, color: "#fff", lineHeight: 1 }}>
+            <div style={{ fontFamily: "var(--font-cinzel)", fontWeight: 700, fontSize: 15, letterSpacing: 4, color: "#fff", lineHeight: 1 }}>
               KADIMA
             </div>
             <div style={{ fontFamily: "var(--font-cinzel)", fontSize: 9, letterSpacing: 5, color: "var(--gold)", textTransform: "uppercase" }}>
@@ -40,26 +39,27 @@ export default function LandingHeader() {
         </Link>
 
         {/* Nav — desktop */}
-        <nav style={{ display: "flex", alignItems: "center", gap: 8 }} className="landing-nav-desktop">
-          <a href="#cursos" style={{ color: "rgba(255,255,255,0.65)", textDecoration: "none", fontSize: 13, fontWeight: 500, padding: "8px 16px", borderRadius: 8, transition: "color 0.2s" }}
+        <nav style={{ display: "flex", alignItems: "center", gap: 4 }} className="landing-nav-desktop">
+          <a href="#cursos" style={{ color: "rgba(255,255,255,0.65)", textDecoration: "none", fontSize: 13, fontWeight: 500, padding: "10px 14px", borderRadius: 8, transition: "color 0.2s", minHeight: 44, display: "flex", alignItems: "center" }}
             onMouseEnter={e => (e.currentTarget.style.color = "#fff")}
             onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.65)")}
           >Cursos</a>
-          <a href="#sobre" style={{ color: "rgba(255,255,255,0.65)", textDecoration: "none", fontSize: 13, fontWeight: 500, padding: "8px 16px", borderRadius: 8, transition: "color 0.2s" }}
+          <a href="#sobre" style={{ color: "rgba(255,255,255,0.65)", textDecoration: "none", fontSize: 13, fontWeight: 500, padding: "10px 14px", borderRadius: 8, transition: "color 0.2s", minHeight: 44, display: "flex", alignItems: "center" }}
             onMouseEnter={e => (e.currentTarget.style.color = "#fff")}
             onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.65)")}
           >Sobre</a>
         </nav>
 
         {/* CTA */}
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <Link href="/login" style={{
-            padding: "10px 22px", borderRadius: 10, textDecoration: "none",
+            padding: "10px 18px", borderRadius: 10, textDecoration: "none",
             background: "linear-gradient(135deg, var(--gold), var(--gold-deep))",
             color: "var(--navy-darkest)", fontFamily: "var(--font-cinzel)",
             fontWeight: 700, fontSize: 11, letterSpacing: 1.5, textTransform: "uppercase",
             boxShadow: "0 4px 16px rgba(201,169,122,0.35)",
-            transition: "all 0.2s", whiteSpace: "nowrap",
+            transition: "all 0.2s", whiteSpace: "nowrap", minHeight: 44,
+            display: "flex", alignItems: "center",
           }}>
             Área de Membros
           </Link>
@@ -68,10 +68,18 @@ export default function LandingHeader() {
           <button
             className="landing-hamburger"
             onClick={() => setMenuOpen(o => !o)}
-            style={{ background: "none", border: "none", color: "#fff", cursor: "pointer", padding: 8, display: "none" }}
-            aria-label="Menu"
+            aria-label={menuOpen ? "Fechar menu" : "Abrir menu"}
+            aria-expanded={menuOpen}
+            style={{
+              background: "none", border: "1px solid rgba(255,255,255,0.12)",
+              color: "#fff", cursor: "pointer",
+              padding: 0, display: "none",
+              width: 44, height: 44, borderRadius: 8,
+              alignItems: "center", justifyContent: "center",
+              flexShrink: 0,
+            }}
           >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               {menuOpen
                 ? <><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></>
                 : <><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></>
@@ -85,25 +93,26 @@ export default function LandingHeader() {
       {menuOpen && (
         <div style={{
           background: "rgba(6,13,31,0.97)", backdropFilter: "blur(20px)",
+          WebkitBackdropFilter: "blur(20px)",
           borderTop: "1px solid rgba(201,169,122,0.12)",
-          padding: "20px 40px 24px",
+          padding: "16px 20px 20px",
         }}>
-          <nav style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-            <a href="#cursos" onClick={() => setMenuOpen(false)} style={{ color: "rgba(255,255,255,0.8)", textDecoration: "none", fontSize: 15, padding: "12px 0", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>Cursos</a>
-            <a href="#sobre"  onClick={() => setMenuOpen(false)} style={{ color: "rgba(255,255,255,0.8)", textDecoration: "none", fontSize: 15, padding: "12px 0", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>Sobre</a>
-            <Link href="/login" onClick={() => setMenuOpen(false)} style={{ color: "var(--gold)", textDecoration: "none", fontSize: 15, padding: "12px 0", fontWeight: 600 }}>Área de Membros →</Link>
+          <nav style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            <a href="#cursos" onClick={() => setMenuOpen(false)} style={{ color: "rgba(255,255,255,0.8)", textDecoration: "none", fontSize: 15, padding: "14px 4px", borderBottom: "1px solid rgba(255,255,255,0.05)", minHeight: 44, display: "flex", alignItems: "center" }}>Cursos</a>
+            <a href="#sobre"  onClick={() => setMenuOpen(false)} style={{ color: "rgba(255,255,255,0.8)", textDecoration: "none", fontSize: 15, padding: "14px 4px", borderBottom: "1px solid rgba(255,255,255,0.05)", minHeight: 44, display: "flex", alignItems: "center" }}>Sobre</a>
+            <Link href="/login" onClick={() => setMenuOpen(false)} style={{ color: "var(--gold)", textDecoration: "none", fontSize: 15, padding: "14px 4px", fontWeight: 600, minHeight: 44, display: "flex", alignItems: "center" }}>Área de Membros →</Link>
           </nav>
         </div>
       )}
 
       <style>{`
-        @media (max-width: 640px) {
+        .landing-header-inner { padding: 0 20px; }
+        @media (min-width: 769px) {
+          .landing-header-inner { padding: 0 40px; }
+        }
+        @media (max-width: 768px) {
           .landing-nav-desktop { display: none !important; }
           .landing-hamburger { display: flex !important; }
-        }
-        header { padding: 0 20px !important; }
-        @media (min-width: 641px) {
-          header { padding: 0 40px !important; }
         }
       `}</style>
     </header>

@@ -63,6 +63,15 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; }
 
+/* Smooth scroll */
+html { scroll-behavior: smooth; }
+
+/* Remove tap highlight on mobile — use focus styles instead */
+a, button { -webkit-tap-highlight-color: transparent; }
+
+/* Prevent horizontal overflow */
+body { overflow-x: hidden; }
+
 select {
   appearance: none;
   -webkit-appearance: none;
@@ -348,6 +357,14 @@ body {
   border: 1px solid var(--gold-20);
 }
 
+/* ── Card body — responsive padding ── */
+.ka-card-body {
+  padding: 20px 22px 22px;
+}
+@media (max-width: 480px) {
+  .ka-card-body { padding: 14px 14px 16px; }
+}
+
 /* ── Course Cards ── */
 .ka-card {
   background: linear-gradient(160deg, var(--navy-card) 0%, var(--navy-card-2) 100%);
@@ -490,15 +507,15 @@ body {
 }
 .ka-page-eyebrow {
   font-family: 'Cinzel', serif;
-  font-size: 10px; font-weight: 500;
+  font-size: clamp(9px, 2vw, 10px); font-weight: 500;
   letter-spacing: 5px; text-transform: uppercase;
   color: var(--gold);
   margin-bottom: 8px;
 }
 .ka-page-title {
   font-family: 'Cinzel', serif;
-  font-size: 26px; font-weight: 700;
-  letter-spacing: 3px; text-transform: uppercase;
+  font-size: clamp(18px, 4vw, 26px); font-weight: 700;
+  letter-spacing: clamp(1px, 0.5vw, 3px); text-transform: uppercase;
   color: var(--text-primary);
   line-height: 1.2;
 }
@@ -633,9 +650,9 @@ select.ka-input option {
 
 .ka-label {
   font-family: 'Cinzel', serif;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
-  letter-spacing: 3px;
+  letter-spacing: 2px;
   text-transform: uppercase;
   color: rgba(201,169,122,0.75);
   display: block;
@@ -731,14 +748,16 @@ select.ka-input option {
   display: none;
   position: fixed;
   bottom: 0; left: 0; right: 0;
-  height: 64px;
+  height: 70px;
   background: linear-gradient(180deg, rgba(6,10,28,0.97) 0%, #060D1F 100%);
   border-top: 1px solid rgba(201,169,122,0.15);
   backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   z-index: 100;
   align-items: center;
   justify-content: flex-start;
   padding: 0 4px;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
   box-shadow: 0 -4px 24px rgba(0,0,0,0.50);
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
@@ -750,15 +769,17 @@ select.ka-input option {
 .ka-mobile-nav-btn {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: 4px; flex-shrink: 0; min-width: 72px; height: 100%;
+  min-height: 44px;
   text-decoration: none; cursor: pointer;
   color: rgba(255,255,255,0.30);
   font-family: 'Poppins', sans-serif;
-  font-size: 9px; font-weight: 600;
+  font-size: 11px; font-weight: 600;
   letter-spacing: 0.5px;
   border: none; background: none;
   transition: color 0.2s;
-  padding: 0;
+  padding: 0 4px;
   position: relative;
+  -webkit-tap-highlight-color: transparent;
 }
 .ka-mobile-nav-btn.active {
   color: var(--gold-light);
@@ -780,8 +801,8 @@ select.ka-input option {
   .ka-sidebar { display: none !important; }
   .ka-mobile-nav { display: flex; }
 
-  /* Main content bottom padding for nav bar */
-  .ka-main { padding-bottom: 64px; }
+  /* Main content bottom padding for nav bar + safe area (iPhone notch) */
+  .ka-main { padding-bottom: calc(70px + env(safe-area-inset-bottom, 0px)); }
 
   /* Page headers */
   .ka-page-header {
@@ -791,8 +812,7 @@ select.ka-input option {
     left: 16px !important;
     right: 16px !important;
   }
-  .ka-page-eyebrow { font-size: 9px !important; letter-spacing: 3px !important; }
-  .ka-page-title { font-size: 18px !important; letter-spacing: 1.5px !important; }
+  /* clamp() handles font scaling — no override needed */
 
   /* Live header */
   .ka-live-header {
@@ -805,13 +825,19 @@ select.ka-input option {
   .ka-back-link { padding: 10px 16px 0 !important; }
 
   /* Hero */
-  .ka-hero { height: 200px !important; }
+  .ka-hero { height: auto !important; min-height: 180px !important; padding-bottom: 28px !important; }
   .ka-hero-logo { width: 72px !important; height: 72px !important; }
+  .ka-hero-logo::before { inset: -6px !important; }
+  .ka-hero-logo::after { inset: -14px !important; }
 
-  /* Card grid — single column on small phones, 2 cols on larger */
+  /* Card grid — 1 col < 480px, 2 cols from 480px */
   .ka-grid {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important;
-    gap: 14px !important;
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  @media (min-width: 480px) {
+    .ka-grid { grid-template-columns: repeat(2, 1fr) !important; }
   }
 
   /* Card thumbnail maintains 4:5 ratio on mobile */
@@ -846,10 +872,6 @@ select.ka-input option {
   /* Adjust page headers for mobile */
   .ka-page-header { padding: 20px 16px 16px !important; }
   .ka-page-header::before { left: 16px !important; right: 16px !important; }
-  .ka-page-title { font-size: 20px !important; }
-
-  /* Hero title scaling */
-  .ka-hero h1 { font-size: 22px !important; letter-spacing: 4px !important; }
   .ka-hero p { font-size: 12px !important; }
 }
 
@@ -916,7 +938,7 @@ select.ka-input option {
 
 .ka-product-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
   gap: 24px;
 }
 

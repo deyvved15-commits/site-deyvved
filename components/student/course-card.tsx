@@ -69,10 +69,10 @@ export default function CourseCard({ course, isEnrolled, expiresAt, enrolledAt }
             </Link>
           )}
         </div>
-        <div style={{ padding: "20px 22px 22px" }}>
+        <div className="ka-card-body">
           <h3 style={{
-            fontFamily: "var(--font-cinzel)", fontWeight: 600, fontSize: 16,
-            letterSpacing: 1.5, color: "var(--text-primary)", marginBottom: 6, lineHeight: 1.3
+            fontFamily: "var(--font-cinzel)", fontWeight: 600, fontSize: "clamp(13px, 3.5vw, 16px)",
+            letterSpacing: 1, color: "var(--text-primary)", marginBottom: 6, lineHeight: 1.3
           }}>
             {course.title}
           </h3>
@@ -126,7 +126,7 @@ export default function CourseCard({ course, isEnrolled, expiresAt, enrolledAt }
       transition: "all 0.3s cubic-bezier(0.4,0,0.2,1)",
       opacity: 0.85,
     }}>
-      <div style={{ position: "relative", height: 345, background: "linear-gradient(140deg, var(--navy-deep), #101830)", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ position: "relative", aspectRatio: "4/5", background: "linear-gradient(140deg, var(--navy-deep), #101830)", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
         {thumbnailUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={thumbnailUrl} alt={course.title}
@@ -147,8 +147,8 @@ export default function CourseCard({ course, isEnrolled, expiresAt, enrolledAt }
         </div>
       </div>
 
-      <div style={{ padding: "18px 20px 20px" }}>
-        <h3 style={{ fontFamily: "var(--font-cinzel)", fontWeight: 600, fontSize: 15, letterSpacing: 1.2, color: "var(--text-secondary)", marginBottom: 6, lineHeight: 1.3 }}>
+      <div className="ka-card-body">
+        <h3 style={{ fontFamily: "var(--font-cinzel)", fontWeight: 600, fontSize: "clamp(13px, 3.5vw, 15px)", letterSpacing: 1, color: "var(--text-secondary)", marginBottom: 6, lineHeight: 1.3 }}>
           {course.title}
         </h3>
         <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 14, display: "flex", alignItems: "center", gap: 10 }}>

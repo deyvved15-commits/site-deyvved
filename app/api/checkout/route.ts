@@ -21,15 +21,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Este e-mail já possui conta. Faça login para continuar." }, { status: 400 });
     }
 
-    // Cria o usuário (como é um MVP, salvando senha simples, mas ideal usar hash)
-    // O authjs vai lidar com o login depois.
+    const bcrypt = await import("bcryptjs");
+    const hashedPassword = await bcrypt.hash(userData.password, 12);
+
     user = await prisma.user.create({
       data: {
         name: userData.name,
         email: userData.email,
-        password: userData.password, // Nota: O ideal é encriptar, mas mantendo compatibilidade com seu sistema de login atual
-        role: "STUDENT"
-      }
+        password: hashedPassword,
+        role: "STUDENT",
+      },
     });
     
     // Simula uma sessão para o resto da lógica
