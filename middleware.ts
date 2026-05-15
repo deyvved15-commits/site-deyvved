@@ -30,21 +30,14 @@ export async function middleware(req: NextRequest) {
       return NextResponse.next();
     }
 
-    // 2. Rotas que PODEM ser públicas (Cursos, Checkout e APIs públicas)
+    // 2. Rotas que PODEM ser públicas (Cursos, Checkout, LP e APIs públicas)
     if (
+      pathname === "/lp" ||
       pathname.startsWith("/curso") ||
       pathname.startsWith("/checkout") ||
       pathname.startsWith("/api/")
     ) {
       return NextResponse.next();
-    }
-
-    // 3. Rota Raiz
-    if (pathname === "/") {
-      if (!token) return NextResponse.next(); // Landing page pública
-      if (role === "ADMIN") return redirectTo("/admin");
-      if (role === "TEACHER") return redirectTo("/professor");
-      return redirectTo("/dashboard");
     }
 
     // 4. Todas as outras rotas exigem LOGIN
