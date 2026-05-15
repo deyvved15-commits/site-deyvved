@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Download, FileText, Music, Video, Box } from "lucide-react";
+import { Download, FileText, Music, Video, Box, Printer } from "lucide-react";
 import { getGoogleDriveImageUrl } from "@/lib/utils";
 
 interface Product {
@@ -21,10 +21,21 @@ interface ProductCardProps {
 
 function TypeIcon({ type }: { type: string }) {
   switch (type) {
-    case "EBOOK": return <FileText size={20} />;
-    case "AUDIO": return <Music size={20} />;
-    case "VIDEO": return <Video size={20} />;
-    default: return <Box size={20} />;
+    case "EBOOK":   return <FileText size={20} />;
+    case "AUDIO":   return <Music size={20} />;
+    case "VIDEO":   return <Video size={20} />;
+    case "PRINTED": return <Printer size={20} />;
+    default:        return <Box size={20} />;
+  }
+}
+
+function typeLabel(type: string) {
+  switch (type) {
+    case "EBOOK":   return "E-Book";
+    case "AUDIO":   return "Áudio";
+    case "VIDEO":   return "Vídeo";
+    case "PRINTED": return "Material Impresso";
+    default:        return "Arquivo";
   }
 }
 
@@ -57,7 +68,7 @@ export default function ProductCard({ product, isPurchased }: ProductCardProps) 
           letterSpacing: 1,
         }}>
           <TypeIcon type={product.type} />
-          {product.type === "EBOOK" ? "E-Book" : product.type === "AUDIO" ? "Áudio" : product.type === "VIDEO" ? "Vídeo" : "Arquivo"}
+          {typeLabel(product.type)}
         </div>
 
         {/* Purchased badge */}

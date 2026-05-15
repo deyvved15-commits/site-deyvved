@@ -249,6 +249,7 @@ export default function AdminProductsClient({ initialProducts }: { initialProduc
                     <option value="FILE">Arquivo / Template</option>
                     <option value="AUDIO">Áudio / Podcast</option>
                     <option value="VIDEO">Vídeo / Masterclass</option>
+                    <option value="PRINTED">Material Impresso</option>
                   </select>
                 </div>
               </div>

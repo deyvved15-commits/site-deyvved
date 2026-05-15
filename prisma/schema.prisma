@@ -412,6 +412,7 @@ enum ProductType {
   FILE
   AUDIO
   VIDEO
+  PRINTED
 }
 
 enum DiscountType {
