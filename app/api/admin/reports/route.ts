@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
         orderBy: { createdAt: "desc" },
         include: {
           user: { select: { id: true, name: true, email: true, phone: true, church: true } },
-          course: { select: { id: true, title: true } },
+          course: { select: { id: true, title: true, paymentType: true } },
         },
       });
       return NextResponse.json({ data: enrollments });

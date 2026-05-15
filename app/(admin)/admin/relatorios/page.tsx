@@ -313,9 +313,20 @@ function AlunosTable({ data, loading }: { data: any[]; loading: boolean }) {
             <span style={{ ...muted, flex: 1 }}   className="rpt-cell-muted">{e.user?.church ?? "—"}</span>
             <span style={{ ...muted, flex: 1 }}   className="rpt-cell-muted">{e.course?.title ?? "—"}</span>
             <span style={{ ...muted, flex: 1 }}   className="rpt-cell-muted">{fmtDate(e.createdAt)}</span>
-            <span style={{ flex: 1, ...muted, color: e.expiresAt && new Date(e.expiresAt) < new Date() ? "var(--red)" : "var(--text-muted)" }} className="rpt-cell-muted">
-              {e.expiresAt ? fmtDate(e.expiresAt) : "Vitalício"}
-            </span>
+            {(() => {
+              // Se expiresAt está null mas o curso é mensal, calcula createdAt + 30 dias
+              const expiry = e.expiresAt
+                ? new Date(e.expiresAt)
+                : e.course?.paymentType === "MONTHLY"
+                  ? new Date(new Date(e.createdAt).getTime() + 30 * 24 * 60 * 60 * 1000)
+                  : null;
+              const expired = expiry && expiry < new Date();
+              return (
+                <span style={{ flex: 1, ...muted, color: expired ? "var(--red)" : "var(--text-muted)" }} className="rpt-cell-muted">
+                  {expiry ? fmtDate(expiry) : "Vitalício"}
+                </span>
+              );
+            })()}
           </div>
         ))}
       </div>
