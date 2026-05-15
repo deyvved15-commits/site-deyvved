@@ -41,6 +41,10 @@ function verifySignature(req: NextRequest, rawBody: string): boolean {
   return expected === v1;
 }
 
+export async function GET() {
+  return NextResponse.json({ ok: true });
+}
+
 export async function POST(req: NextRequest) {
   try {
     const rawBody = await req.text();
