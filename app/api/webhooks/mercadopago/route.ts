@@ -7,13 +7,21 @@ import { emailConfirmacaoPagamento } from "@/lib/email-templates";
 
 function verifySignature(req: NextRequest, rawBody: string): boolean {
   const secret = process.env.MP_WEBHOOK_SECRET;
-  if (!secret) return false;
+  if (!secret) {
+    console.warn("[MP Webhook] MP_WEBHOOK_SECRET is not set. Skipping signature verification.");
+    return false;
+  }
 
   const xSignature = req.headers.get("x-signature") ?? "";
   const xRequestId = req.headers.get("x-request-id") ?? "";
 
-  // Extrai ts e v1 do header x-signature
-  const parts = Object.fromEntries(xSignature.split(",").map((p) => p.split("=")));
+  // Safe parsing of x-signature header (ts=...,v1=...)
+  const parts: Record<string, string> = {};
+  xSignature.split(",").forEach(item => {
+    const [key, val] = item.split("=");
+    if (key && val) parts[key.trim()] = val.trim();
+  });
+
   const ts = parts["ts"];
   const v1 = parts["v1"];
   if (!ts || !v1) return false;
