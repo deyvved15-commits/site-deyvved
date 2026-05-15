@@ -39,9 +39,9 @@ export async function middleware(req: NextRequest) {
       return NextResponse.next();
     }
 
-    // 3. Rota Raiz (redireciona conforme o papel ou login)
+    // 3. Rota Raiz
     if (pathname === "/") {
-      if (!token) return redirectTo("/login");
+      if (!token) return NextResponse.next(); // Landing page pública
       if (role === "ADMIN") return redirectTo("/admin");
       if (role === "TEACHER") return redirectTo("/professor");
       return redirectTo("/dashboard");
