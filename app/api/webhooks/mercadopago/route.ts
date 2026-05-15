@@ -6,27 +6,31 @@ import { getResend, FROM_EMAIL } from "@/lib/resend";
 import { emailConfirmacaoPagamento } from "@/lib/email-templates";
 
 function verifySignature(req: NextRequest, rawBody: string): boolean {
-  const secret = process.env.MP_WEBHOOK_SECRET;
-  if (!secret) {
-    console.warn("[MP Webhook] MP_WEBHOOK_SECRET is not set. Allowing webhook without signature check.");
+  // IPN (sistema legado) não envia x-signature — aceitar sem verificação HMAC
+  const xSignature = req.headers.get("x-signature");
+  if (!xSignature) {
+    console.info("[MP Webhook] No x-signature — treating as IPN notification, skipping HMAC.");
     return true;
   }
 
-  const xSignature = req.headers.get("x-signature") ?? "";
+  const secret = process.env.MP_WEBHOOK_SECRET;
+  if (!secret) {
+    console.warn("[MP Webhook] MP_WEBHOOK_SECRET not set — skipping signature check.");
+    return true;
+  }
+
   const xRequestId = req.headers.get("x-request-id") ?? "";
 
-  // Safe parsing of x-signature header (ts=...,v1=...)
-  const parts: Record<string, string> = {};
+  const sigParts: Record<string, string> = {};
   xSignature.split(",").forEach(item => {
-    const [key, val] = item.split("=");
-    if (key && val) parts[key.trim()] = val.trim();
+    const eqIdx = item.indexOf("=");
+    if (eqIdx > 0) sigParts[item.slice(0, eqIdx).trim()] = item.slice(eqIdx + 1).trim();
   });
 
-  const ts = parts["ts"];
-  const v1 = parts["v1"];
+  const ts = sigParts["ts"];
+  const v1 = sigParts["v1"];
   if (!ts || !v1) return false;
 
-  // Monta o manifest conforme documentação MP
   let dataId = "";
   try {
     const parsed = JSON.parse(rawBody);

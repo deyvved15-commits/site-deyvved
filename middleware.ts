@@ -30,8 +30,12 @@ export async function middleware(req: NextRequest) {
       return NextResponse.next();
     }
 
-    // 2. Rotas que PODEM ser públicas (Cursos e Checkout)
-    if (pathname.startsWith("/curso") || pathname.startsWith("/checkout") || pathname.startsWith("/api/ref")) {
+    // 2. Rotas que PODEM ser públicas (Cursos, Checkout e APIs públicas)
+    if (
+      pathname.startsWith("/curso") ||
+      pathname.startsWith("/checkout") ||
+      pathname.startsWith("/api/")
+    ) {
       return NextResponse.next();
     }
 
