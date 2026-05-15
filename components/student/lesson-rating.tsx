@@ -34,7 +34,7 @@ export default function LessonRating({ lessonId, initialRating }: { lessonId: st
       marginTop: 8, 
       padding: "24px", 
       background: "rgba(201,169,122,0.03)", 
-      borderRadius: 20, 
+      borderRadius: "var(--radius-xl)",
       border: "1px solid rgba(201,169,122,0.12)",
       display: "flex",
       flexDirection: "column",
@@ -44,7 +44,7 @@ export default function LessonRating({ lessonId, initialRating }: { lessonId: st
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
         </svg>
-        <p style={{ fontFamily: "'Cinzel',serif", fontSize: 10, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--gold)", margin: 0 }}>
+        <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 10, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--gold)", margin: 0 }}>
           O que achou desta aula?
         </p>
       </div>
@@ -74,10 +74,10 @@ export default function LessonRating({ lessonId, initialRating }: { lessonId: st
         ))}
         {sent && (
           <div style={{ 
-            marginLeft: 12, padding: "4px 12px", borderRadius: 8, 
+            marginLeft: 12, padding: "4px 12px", borderRadius: "var(--radius-sm)",
             background: "rgba(110,231,183,0.1)", border: "1px solid rgba(110,231,183,0.2)"
           }}>
-            <span style={{ fontSize: 10, color: "#6ee7b7", fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.5, fontFamily: "'Cinzel',serif" }}>
+            <span style={{ fontSize: 10, color: "var(--green-light)", fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.5, fontFamily: "var(--font-cinzel)" }}>
               Avaliado com sucesso
             </span>
           </div>

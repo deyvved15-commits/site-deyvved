@@ -26,7 +26,7 @@ export default function HeroSection({ userName, streak = 0 }: HeroSectionProps) 
           />
         </div>
         <h1 style={{
-          fontFamily: "'Cinzel',serif",
+          fontFamily: "var(--font-cinzel)",
           fontWeight: 700,
           fontSize: 36,
           letterSpacing: 8,
@@ -40,7 +40,7 @@ export default function HeroSection({ userName, streak = 0 }: HeroSectionProps) 
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 14, marginBottom: 10 }}>
           <span style={{ width: 60, height: 1, background: "linear-gradient(90deg, transparent, var(--gold) 50%, transparent)" }} />
           <span style={{
-            fontFamily: "'Cinzel',serif",
+            fontFamily: "var(--font-cinzel)",
             fontWeight: 500,
             fontSize: 11,
             letterSpacing: 5,
@@ -52,7 +52,7 @@ export default function HeroSection({ userName, streak = 0 }: HeroSectionProps) 
           <span style={{ width: 60, height: 1, background: "linear-gradient(90deg, var(--gold), transparent 50%, transparent)" }} />
         </div>
 
-        <p style={{ fontFamily: "'Poppins',sans-serif", fontSize: 15, fontWeight: 300, color: "var(--text-secondary)", letterSpacing: 1 }}>
+        <p style={{ fontFamily: "var(--font-poppins)", fontSize: 15, fontWeight: 300, color: "var(--text-secondary)", letterSpacing: 1 }}>
           Bem-vindo, <strong style={{ fontWeight: 600, color: "var(--gold-light)" }}>{firstName}</strong>
         </p>
 
@@ -65,7 +65,7 @@ export default function HeroSection({ userName, streak = 0 }: HeroSectionProps) 
             backdropFilter: "blur(8px)",
           }}>
             <span style={{ fontSize: 18 }}>🔥</span>
-            <span style={{ fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 15, color: "var(--gold-bright)" }}>
+            <span style={{ fontFamily: "var(--font-cinzel)", fontWeight: 700, fontSize: 15, color: "var(--gold-bright)" }}>
               {streak} {streak === 1 ? "dia" : "dias"}
             </span>
             <span style={{ fontSize: 11, color: "var(--text-muted)", letterSpacing: 1 }}>de sequência</span>

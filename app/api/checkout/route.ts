@@ -242,6 +242,8 @@ export async function POST(req: NextRequest) {
       items: [{
         id: itemId,
         title: itemTitle,
+        description: itemType === "COURSE" ? "Curso online — Kadima Academy" : "Material digital — Kadima Academy",
+        category_id: "education",
         quantity: 1,
         unit_price: amountToPay,
         currency_id: "BRL",

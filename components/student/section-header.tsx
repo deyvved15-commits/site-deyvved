@@ -11,7 +11,7 @@ export default function SectionHeader({ icon, title, highlight, subtitle }: Sect
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 26 }}>
       <div style={{
-        width: 38, height: 38, borderRadius: 12,
+        width: 38, height: 38, borderRadius: "var(--radius-md)",
         background: "linear-gradient(135deg, rgba(201,169,122,0.20), rgba(201,169,122,0.05))",
         border: "1px solid var(--gold-35)",
         display: "flex", alignItems: "center", justifyContent: "center",
@@ -21,7 +21,7 @@ export default function SectionHeader({ icon, title, highlight, subtitle }: Sect
       </div>
       <div>
         <h2 style={{ 
-          fontFamily: "'Cinzel',serif", 
+          fontFamily: "var(--font-cinzel)",
           fontWeight: 600, 
           fontSize: subtitle ? 18 : 22, 
           letterSpacing: 3, 
@@ -31,7 +31,7 @@ export default function SectionHeader({ icon, title, highlight, subtitle }: Sect
           {title} {highlight && <span style={{ color: "var(--gold-light)" }}>{highlight}</span>}
         </h2>
         {subtitle && (
-          <p style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 3, fontFamily: "'Poppins',sans-serif" }}>
+          <p style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 3, fontFamily: "var(--font-poppins)" }}>
             {subtitle}
           </p>
         )}

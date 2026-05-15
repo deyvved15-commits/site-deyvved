@@ -30,9 +30,9 @@ export default function CategoryFilter({ categories }: { categories: string[] })
         onClick={() => setCategory("todos")}
         style={{
           padding: "8px 18px",
-          borderRadius: 20,
+          borderRadius: "var(--radius-xl)",
           fontSize: 11,
-          fontFamily: "'Cinzel',serif",
+          fontFamily: "var(--font-cinzel)",
           fontWeight: 600,
           letterSpacing: 2,
           textTransform: "uppercase",
@@ -52,9 +52,9 @@ export default function CategoryFilter({ categories }: { categories: string[] })
           onClick={() => setCategory(cat)}
           style={{
             padding: "8px 18px",
-            borderRadius: 20,
+            borderRadius: "var(--radius-xl)",
             fontSize: 11,
-            fontFamily: "'Cinzel',serif",
+            fontFamily: "var(--font-cinzel)",
             fontWeight: 600,
             letterSpacing: 2,
             textTransform: "uppercase",

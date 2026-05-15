@@ -156,17 +156,17 @@ export default function StudentSidebar({ user, streak = 0 }: { user: { name?: st
         </div>
 
         <div style={{ textAlign: "center", paddingBottom: 20 }}>
-          <div style={{ fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 22, letterSpacing: 4, color: "var(--text-primary)", marginBottom: 2 }}>
+          <div style={{ fontFamily: "var(--font-cinzel)", fontWeight: 700, fontSize: 22, letterSpacing: 4, color: "var(--text-primary)", marginBottom: 2 }}>
             KADIMA
           </div>
-          <div style={{ fontFamily: "'Cinzel',serif", fontWeight: 500, fontSize: 11, letterSpacing: 6, color: "var(--gold-light)", textTransform: "uppercase" }}>
+          <div style={{ fontFamily: "var(--font-cinzel)", fontWeight: 500, fontSize: 11, letterSpacing: 6, color: "var(--gold-light)", textTransform: "uppercase" }}>
             Academy
           </div>
 
           {streak > 0 && (
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 5, marginTop: 10, padding: "4px 12px", borderRadius: 20, background: "rgba(201,169,122,0.08)", border: "1px solid rgba(201,169,122,0.18)" }}>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 5, marginTop: 10, padding: "4px 12px", borderRadius: "var(--radius-xl)", background: "rgba(201,169,122,0.08)", border: "1px solid rgba(201,169,122,0.18)" }}>
               <span style={{ fontSize: 13 }}>🔥</span>
-              <span style={{ fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 12, color: "var(--gold-bright)" }}>
+              <span style={{ fontFamily: "var(--font-cinzel)", fontWeight: 700, fontSize: 12, color: "var(--gold-bright)" }}>
                 {streak} {streak === 1 ? "dia" : "dias"}
               </span>
             </div>
@@ -200,12 +200,12 @@ export default function StudentSidebar({ user, streak = 0 }: { user: { name?: st
 
         {/* Footer */}
         <div style={{ padding: 16, borderTop: "1px solid rgba(201,169,122,0.10)", background: "linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.30) 100%)" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 11, padding: 8, borderRadius: 12, background: "rgba(255,255,255,0.02)", marginBottom: 10 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 11, padding: 8, borderRadius: "var(--radius-md)", background: "rgba(255,255,255,0.02)", marginBottom: 10 }}>
             <div style={{
               width: 40, height: 40, borderRadius: "50%", flexShrink: 0,
               background: "radial-gradient(circle at 30% 30%, var(--gold-bright) 0%, var(--gold) 50%, var(--gold-deep) 100%)",
               display: "flex", alignItems: "center", justifyContent: "center",
-              color: "var(--navy-darkest)", fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 14,
+              color: "var(--navy-darkest)", fontFamily: "var(--font-cinzel)", fontWeight: 700, fontSize: 14,
               boxShadow: "0 0 14px rgba(201,169,122,0.45)", border: "1px solid var(--gold-light)",
             }}>
               {initials}
@@ -221,14 +221,14 @@ export default function StudentSidebar({ user, streak = 0 }: { user: { name?: st
           </div>
 
           <div style={{
-            padding: "10px 14px", borderRadius: 12, background: "rgba(201,169,122,0.08)",
+            padding: "10px 14px", borderRadius: "var(--radius-md)", background: "rgba(201,169,122,0.08)",
             border: "1px solid rgba(201,169,122,0.15)", marginBottom: 12,
             display: "flex", alignItems: "center", gap: 8
           }}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--gold-light)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/>
             </svg>
-            <span style={{ fontSize: 11, fontWeight: 600, color: "var(--gold-light)", fontFamily: "'Poppins',sans-serif" }}>
+            <span style={{ fontSize: 11, fontWeight: 600, color: "var(--gold-light)", fontFamily: "var(--font-poppins)" }}>
               Carteira Kadima: <span style={{ color: "#fff" }}>R$ {walletBalance?.toFixed(2).replace(".", ",") ?? "0,00"}</span>
             </span>
           </div>
@@ -256,7 +256,7 @@ export default function StudentSidebar({ user, streak = 0 }: { user: { name?: st
                   <span style={{
                     position: "absolute", top: -3, right: -3,
                     width: 8, height: 8, borderRadius: "50%",
-                    background: "#E63946", border: "1.5px solid #060D1F",
+                    background: "var(--red)", border: "1.5px solid var(--navy-darkest)",
                     boxShadow: "0 0 6px rgba(230,57,70,0.80)",
                   }} />
                 )}

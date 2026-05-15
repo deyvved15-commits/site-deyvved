@@ -37,11 +37,11 @@ export default function ProgressButton({ lessonId, completed: initial }: { lesso
           : "bg-[rgba(201,169,122,0.03)] border-[rgba(201,169,122,0.15)] text-[#C9A97A] hover:bg-[rgba(201,169,122,0.08)]"
       )}
       style={{ 
-        fontFamily: "'Cinzel',serif", 
+        fontFamily: "var(--font-cinzel)",
         fontSize: 10, 
         letterSpacing: 2, 
         textTransform: "uppercase",
-        borderRadius: "12px",
+        borderRadius: "var(--radius-md)",
         paddingLeft: 40,
         paddingRight: 40,
       }}

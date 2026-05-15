@@ -47,7 +47,7 @@ export default function ProductCard({ product, isPurchased }: ProductCardProps) 
         
         <div style={{
           position: "absolute", top: 12, left: 12,
-          padding: "4px 10px", borderRadius: 8,
+          padding: "4px 10px", borderRadius: "var(--radius-sm)",
           background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)",
           border: "1px solid rgba(201,169,122,0.3)",
           fontSize: 10, fontWeight: 700, color: "var(--gold-light)",
@@ -59,7 +59,7 @@ export default function ProductCard({ product, isPurchased }: ProductCardProps) 
       </div>
 
       <div style={{ padding: 20, flex: 1, display: "flex", flexDirection: "column" }}>
-        <h3 style={{ fontFamily: "'Cinzel',serif", fontSize: 16, fontWeight: 700, color: "white", marginBottom: 8, lineHeight: 1.3 }}>
+        <h3 style={{ fontFamily: "var(--font-cinzel)", fontSize: 16, fontWeight: 700, color: "white", marginBottom: 8, lineHeight: 1.3 }}>
           {product.title}
         </h3>
         
@@ -82,8 +82,8 @@ export default function ProductCard({ product, isPurchased }: ProductCardProps) 
             </>
           ) : (
             <div style={{ width: "100%" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#10B981", fontSize: 11, fontWeight: 600, marginBottom: 10 }}>
-                <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#10B981" }} />
+              <div style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--green)", fontSize: 11, fontWeight: 600, marginBottom: 10 }}>
+                <div style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--green)" }} />
                 JÁ ADQUIRIDO
               </div>
               <a 
@@ -91,7 +91,7 @@ export default function ProductCard({ product, isPurchased }: ProductCardProps) 
                 target="_blank" 
                 rel="noopener noreferrer" 
                 className="ka-continue-btn"
-                style={{ background: "linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.05))", borderColor: "rgba(16, 185, 129, 0.3)", color: "#A7F3D0" }}
+                style={{ background: "linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.05))", borderColor: "rgba(16, 185, 129, 0.3)", color: "var(--green-lighter)" }}
               >
                 <Download size={14} />
                 Download

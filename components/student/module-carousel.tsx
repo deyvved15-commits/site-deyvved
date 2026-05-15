@@ -102,7 +102,7 @@ export default function ModuleCarousel({ modules, slug }: ModuleCarouselProps) {
                   <div style={{
                     position: "absolute", top: 10, left: 10,
                     background: "linear-gradient(135deg, var(--gold-bright), var(--gold))",
-                    borderRadius: 8, padding: "3px 10px", fontSize: 9, fontWeight: 800,
+                    borderRadius: "var(--radius-sm)", padding: "3px 10px", fontSize: 9, fontWeight: 800,
                     color: "var(--navy-darkest)", letterSpacing: 1, textTransform: "uppercase",
                     zIndex: 5, boxShadow: "0 0 10px rgba(201,169,122,0.3)"
                   }}>
@@ -122,7 +122,7 @@ export default function ModuleCarousel({ modules, slug }: ModuleCarouselProps) {
 
               {/* Body */}
               <div style={{ padding: "18px 20px 20px" }}>
-                <h3 style={{ fontFamily: "'Cinzel',serif", fontWeight: 600, fontSize: 15, letterSpacing: 1.2, color: "var(--text-primary)", marginBottom: 5, lineHeight: 1.3 }}>
+                <h3 style={{ fontFamily: "var(--font-cinzel)", fontWeight: 600, fontSize: 15, letterSpacing: 1.2, color: "var(--text-primary)", marginBottom: 5, lineHeight: 1.3 }}>
                   {mod.title}
                 </h3>
                 <div style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>

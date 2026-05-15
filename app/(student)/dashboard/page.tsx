@@ -81,13 +81,13 @@ export default async function DashboardPage() {
       {achievements.length > 0 && (
         <section className="ka-section" style={{ padding: "0 44px 20px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
-            <span style={{ fontSize: 10, fontFamily: "'Cinzel',serif", letterSpacing: 4, textTransform: "uppercase", color: "var(--gold)" }}>Suas Conquistas</span>
+            <span style={{ fontSize: 10, fontFamily: "var(--font-cinzel)", letterSpacing: 4, textTransform: "uppercase", color: "var(--gold)" }}>Suas Conquistas</span>
           </div>
           <div style={{ display: "flex", gap: 16, overflowX: "auto", paddingBottom: 10 }}>
             {achievements.map(ua => (
               <div key={ua.id} style={{ 
                 flexShrink: 0, padding: "12px 16px", background: "rgba(201,169,122,0.05)", 
-                border: "1px solid rgba(201,169,122,0.15)", borderRadius: 16, display: "flex", 
+                border: "1px solid rgba(201,169,122,0.15)", borderRadius: "var(--radius-lg)", display: "flex",
                 alignItems: "center", gap: 10 
               }}>
                 <span style={{ fontSize: 20 }}>{ua.achievement.icon}</span>
@@ -116,7 +116,7 @@ export default async function DashboardPage() {
 
         {combinedCourses.length === 0 ? (
           <div style={{ 
-            borderRadius: 20, padding: "56px 32px", textAlign: "center", maxWidth: 380, 
+            borderRadius: "var(--radius-xl)", padding: "56px 32px", textAlign: "center", maxWidth: 380,
             background: "linear-gradient(160deg, var(--navy-card) 0%, var(--navy-card-2) 100%)", 
             border: "1px solid rgba(201,169,122,0.12)" 
           }}>

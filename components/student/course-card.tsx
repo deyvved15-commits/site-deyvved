@@ -54,8 +54,8 @@ export default function CourseCard({ course, isEnrolled, expiresAt, enrolledAt }
           {isExpired && (
             <div style={{ 
               position: "absolute", top: 10, right: 10, 
-              background: "rgba(230,57,70,0.85)", backdropFilter: "blur(4px)", 
-              borderRadius: 8, padding: "3px 10px", fontSize: 10, fontWeight: 700, 
+              background: "rgba(230,57,70,0.85)", backdropFilter: "blur(4px)",
+              borderRadius: "var(--radius-sm)", padding: "3px 10px", fontSize: 10, fontWeight: 700,
               color: "#fff", letterSpacing: 1, textTransform: "uppercase" 
             }}>
               Expirado
@@ -70,17 +70,17 @@ export default function CourseCard({ course, isEnrolled, expiresAt, enrolledAt }
           )}
         </div>
         <div style={{ padding: "20px 22px 22px" }}>
-          <h3 style={{ 
-            fontFamily: "'Cinzel',serif", fontWeight: 600, fontSize: 16, 
-            letterSpacing: 1.5, color: "var(--text-primary)", marginBottom: 6, lineHeight: 1.3 
+          <h3 style={{
+            fontFamily: "var(--font-cinzel)", fontWeight: 600, fontSize: 16,
+            letterSpacing: 1.5, color: "var(--text-primary)", marginBottom: 6, lineHeight: 1.3
           }}>
             {course.title}
           </h3>
           <div style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 14, display: "flex", alignItems: "center", gap: 6 }}>
             <span style={{ 
               width: 4, height: 4, borderRadius: "50%", 
-              background: isExpired ? "#e63946" : "var(--gold)", 
-              boxShadow: `0 0 4px ${isExpired ? "#e63946" : "var(--gold)"}`, flexShrink: 0 
+              background: isExpired ? "var(--red)" : "var(--gold)",
+              boxShadow: `0 0 4px ${isExpired ? "var(--red)" : "var(--gold)"}`, flexShrink: 0
             }} />
             {isExpired
               ? "Acesso expirado — renove para continuar"
@@ -96,9 +96,9 @@ export default function CourseCard({ course, isEnrolled, expiresAt, enrolledAt }
           {isExpired ? (
             <Link href={`/checkout/${course.id}`} style={{
               display: "flex", alignItems: "center", justifyContent: "center", gap: 8, textDecoration: "none",
-              padding: "11px 16px", borderRadius: 12, width: "100%",
-              background: "linear-gradient(135deg, #e63946, #c1121f)",
-              color: "#fff", fontFamily: "'Cinzel',serif",
+              padding: "11px 16px", borderRadius: "var(--radius-md)", width: "100%",
+              background: "linear-gradient(135deg, var(--red), #c1121f)",
+              color: "#fff", fontFamily: "var(--font-cinzel)",
               fontWeight: 700, fontSize: 11, letterSpacing: 1.5, textTransform: "uppercase",
               boxShadow: "0 4px 16px rgba(230,57,70,0.30)",
             }}>
@@ -121,12 +121,12 @@ export default function CourseCard({ course, isEnrolled, expiresAt, enrolledAt }
     <article className="ka-other-card" style={{
       background: "linear-gradient(160deg, rgba(17,24,58,0.7) 0%, rgba(22,32,79,0.7) 100%)",
       border: "1px solid rgba(255,255,255,0.06)",
-      borderRadius: 20, overflow: "hidden",
+      borderRadius: "var(--radius-xl)", overflow: "hidden",
       boxShadow: "0 8px 32px rgba(0,0,0,0.30)",
       transition: "all 0.3s cubic-bezier(0.4,0,0.2,1)",
       opacity: 0.85,
     }}>
-      <div style={{ position: "relative", height: 345, background: "linear-gradient(140deg, #080E22, #101830)", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ position: "relative", height: 345, background: "linear-gradient(140deg, var(--navy-deep), #101830)", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
         {thumbnailUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={thumbnailUrl} alt={course.title}
@@ -148,7 +148,7 @@ export default function CourseCard({ course, isEnrolled, expiresAt, enrolledAt }
       </div>
 
       <div style={{ padding: "18px 20px 20px" }}>
-        <h3 style={{ fontFamily: "'Cinzel',serif", fontWeight: 600, fontSize: 15, letterSpacing: 1.2, color: "var(--text-secondary)", marginBottom: 6, lineHeight: 1.3 }}>
+        <h3 style={{ fontFamily: "var(--font-cinzel)", fontWeight: 600, fontSize: 15, letterSpacing: 1.2, color: "var(--text-secondary)", marginBottom: 6, lineHeight: 1.3 }}>
           {course.title}
         </h3>
         <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 14, display: "flex", alignItems: "center", gap: 10 }}>
@@ -158,11 +158,11 @@ export default function CourseCard({ course, isEnrolled, expiresAt, enrolledAt }
         </div>
         {course.price ? (
           <Link href={`/checkout/${course.id}`} style={{
-            width: "100%", padding: "10px 14px", borderRadius: 12, textDecoration: "none",
+            width: "100%", padding: "10px 14px", borderRadius: "var(--radius-md)", textDecoration: "none",
             background: "linear-gradient(135deg, var(--gold), var(--gold-deep))",
             display: "flex", alignItems: "center", justifyContent: "space-between", gap: 7,
             color: "var(--navy-darkest)", fontSize: 11, fontWeight: 700,
-            fontFamily: "'Cinzel',serif", letterSpacing: 1.5, textTransform: "uppercase",
+            fontFamily: "var(--font-cinzel)", letterSpacing: 1.5, textTransform: "uppercase",
             boxShadow: "0 4px 16px rgba(201,169,122,0.30)",
           }}>
             <span>Comprar Agora</span>
@@ -172,12 +172,12 @@ export default function CourseCard({ course, isEnrolled, expiresAt, enrolledAt }
           </Link>
         ) : (
           <div style={{
-            width: "100%", padding: "10px 14px", borderRadius: 12,
+            width: "100%", padding: "10px 14px", borderRadius: "var(--radius-md)",
             border: "1px solid rgba(255,255,255,0.08)",
             background: "rgba(255,255,255,0.03)",
             display: "flex", alignItems: "center", justifyContent: "center", gap: 7,
             color: "var(--text-muted)", fontSize: 11, fontWeight: 600,
-            fontFamily: "'Cinzel',serif", letterSpacing: 1.5, textTransform: "uppercase",
+            fontFamily: "var(--font-cinzel)", letterSpacing: 1.5, textTransform: "uppercase",
           }}>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>

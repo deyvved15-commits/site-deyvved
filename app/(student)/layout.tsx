@@ -16,7 +16,7 @@ export default async function StudentLayout({ children }: { children: React.Reac
   const streak = calcStreak(progress.map(p => p.completedAt));
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{ background: "#060D1F" }}>
+    <div className="flex h-screen overflow-hidden" style={{ background: "var(--navy-darkest)" }}>
       <StudentSidebar user={session.user} streak={streak} />
       <main className="flex-1 overflow-y-auto ka-main">
         {children}
