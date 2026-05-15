@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { mpPreference } from "@/lib/mercadopago";
 import { cookies } from "next/headers";
+import { sendWelcomeEmail } from "@/lib/emails";
 
 export async function POST(req: NextRequest) {
   let session = await auth();
@@ -32,7 +33,9 @@ export async function POST(req: NextRequest) {
         role: "STUDENT",
       },
     });
-    
+
+    sendWelcomeEmail(user.name, user.email);
+
     // Simula uma sessão para o resto da lógica
     session = { user: { id: user.id, email: user.email, name: user.name, role: user.role } } as any;
   }

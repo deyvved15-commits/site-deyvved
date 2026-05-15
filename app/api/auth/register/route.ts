@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { sendWelcomeEmail } from "@/lib/emails";
 
 export async function POST(req: NextRequest) {
   const { name, email, password, phone, church } = await req.json();
@@ -20,7 +21,7 @@ export async function POST(req: NextRequest) {
 
   const hashed = await bcrypt.hash(password, 12);
 
-  await prisma.user.create({
+  const newUser = await prisma.user.create({
     data: {
       name: name.trim(),
       email: email.trim().toLowerCase(),
@@ -30,6 +31,9 @@ export async function POST(req: NextRequest) {
       role: "STUDENT",
     },
   });
+
+  // Fire-and-forget — não bloqueia a resposta
+  sendWelcomeEmail(newUser.name, newUser.email);
 
   return NextResponse.json({ ok: true }, { status: 201 });
 }

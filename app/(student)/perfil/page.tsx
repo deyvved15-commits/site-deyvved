@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
+import Image from "next/image";
 
 const S = {
   field: { display: "flex", flexDirection: "column" as const, gap: 8 },
@@ -13,7 +14,14 @@ const S = {
     background: "rgba(255,255,255,0.04)", border: "1px solid rgba(201,169,122,0.18)",
     borderRadius: 12, padding: "13px 16px", fontSize: 13, color: "#fff",
     outline: "none", width: "100%", fontFamily: "'Poppins',sans-serif",
-    boxSizing: "border-box" as const,
+    boxSizing: "border-box" as const, transition: "border-color 0.2s",
+  },
+  textarea: {
+    background: "rgba(255,255,255,0.04)", border: "1px solid rgba(201,169,122,0.18)",
+    borderRadius: 12, padding: "13px 16px", fontSize: 13, color: "#fff",
+    outline: "none", width: "100%", fontFamily: "'Poppins',sans-serif",
+    boxSizing: "border-box" as const, resize: "vertical" as const, minHeight: 90,
+    lineHeight: 1.6, transition: "border-color 0.2s",
   },
   btnPrimary: {
     display: "inline-flex", alignItems: "center", gap: 7,
@@ -51,43 +59,54 @@ function Alert({ type, msg }: { type: "error" | "success"; msg: string }) {
   );
 }
 
-interface UserData { id: string; name: string | null; email: string | null }
+interface UserData { id: string; name: string | null; email: string | null; bio: string | null; avatar: string | null }
 
 export default function PerfilPage() {
   const { update: updateSession } = useSession();
   const [user, setUser] = useState<UserData | null>(null);
   const [name, setName] = useState("");
+  const [bio, setBio] = useState("");
+  const [avatar, setAvatar] = useState("");
+  const [avatarInput, setAvatarInput] = useState("");
+  const [showAvatarInput, setShowAvatarInput] = useState(false);
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const [nameLoading, setNameLoading] = useState(false);
-  const [nameMsg, setNameMsg] = useState<{ type: "error" | "success"; msg: string } | null>(null);
+  const [infoLoading, setInfoLoading] = useState(false);
+  const [infoMsg, setInfoMsg] = useState<{ type: "error" | "success"; msg: string } | null>(null);
   const [pwLoading, setPwLoading] = useState(false);
   const [pwMsg, setPwMsg] = useState<{ type: "error" | "success"; msg: string } | null>(null);
 
   useEffect(() => {
     fetch("/api/profile")
       .then(r => r.json())
-      .then((data: UserData) => { setUser(data); setName(data.name ?? ""); });
+      .then((data: UserData) => {
+        setUser(data);
+        setName(data.name ?? "");
+        setBio(data.bio ?? "");
+        setAvatar(data.avatar ?? "");
+      });
   }, []);
 
-  async function handleNameSave(e: React.FormEvent) {
+  async function handleInfoSave(e: React.FormEvent) {
     e.preventDefault();
-    setNameLoading(true);
-    setNameMsg(null);
+    setInfoLoading(true);
+    setInfoMsg(null);
     const res = await fetch("/api/profile", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name }),
+      body: JSON.stringify({ name, bio: bio || null, avatar: avatar || null }),
     });
     const data = await res.json();
-    setNameLoading(false);
-    if (!res.ok) { setNameMsg({ type: "error", msg: data.error ?? "Erro ao salvar." }); return; }
-    setUser(u => u ? { ...u, name: data.name } : u);
+    setInfoLoading(false);
+    if (!res.ok) { setInfoMsg({ type: "error", msg: data.error ?? "Erro ao salvar." }); return; }
+    setUser(u => u ? { ...u, name: data.name, bio: data.bio, avatar: data.avatar } : u);
+    setAvatar(data.avatar ?? "");
     await updateSession({ name: data.name });
-    setNameMsg({ type: "success", msg: "Nome atualizado com sucesso!" });
+    setInfoMsg({ type: "success", msg: "Perfil atualizado com sucesso!" });
+    setShowAvatarInput(false);
   }
 
   async function handlePasswordSave(e: React.FormEvent) {
@@ -109,9 +128,11 @@ export default function PerfilPage() {
 
   const displayName = name || user?.name || "";
   const initials = displayName.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase() || "A";
+  const currentAvatar = avatar || user?.avatar || "";
 
   return (
     <div style={{ minHeight: "100%", background: "linear-gradient(180deg, var(--navy-darkest) 0%, var(--navy-mid) 100%)" }}>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } } .pf-input:focus, .pf-textarea:focus { border-color: rgba(201,169,122,0.55) !important; background: rgba(255,255,255,0.07) !important; }`}</style>
 
       {/* Header */}
       <div style={{ padding: "28px 32px 0" }}>
@@ -131,28 +152,105 @@ export default function PerfilPage() {
           background: "linear-gradient(160deg, rgba(15,26,61,0.7) 0%, rgba(10,18,45,0.7) 100%)",
           border: "1px solid rgba(201,169,122,0.14)",
           boxShadow: "0 24px 60px rgba(0,0,0,0.40)",
-          display: "flex", alignItems: "center", gap: 20,
+          display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap",
         }}>
-          <div style={{
-            width: 68, height: 68, borderRadius: "50%", flexShrink: 0,
-            background: "radial-gradient(circle at 30% 30%, #E8D5A8 0%, #C9A97A 50%, #7A5530 100%)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 24,
-            color: "var(--navy-darkest)",
-            boxShadow: "0 0 30px rgba(201,169,122,0.40), 0 0 60px rgba(201,169,122,0.15)",
-            border: "2px solid var(--gold-light)",
-          }}>
-            {initials}
+          {/* Avatar */}
+          <div style={{ position: "relative", flexShrink: 0 }}>
+            <div style={{
+              width: 80, height: 80, borderRadius: "50%",
+              background: "radial-gradient(circle at 30% 30%, #E8D5A8 0%, #C9A97A 50%, #7A5530 100%)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 28,
+              color: "var(--navy-darkest)",
+              boxShadow: "0 0 30px rgba(201,169,122,0.40), 0 0 60px rgba(201,169,122,0.15)",
+              border: "2px solid var(--gold-light)",
+              overflow: "hidden",
+            }}>
+              {currentAvatar ? (
+                <Image
+                  src={currentAvatar}
+                  alt={displayName}
+                  width={80}
+                  height={80}
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  onError={() => setAvatar("")}
+                />
+              ) : initials}
+            </div>
+            <button
+              onClick={() => setShowAvatarInput(v => !v)}
+              title="Alterar foto"
+              style={{
+                position: "absolute", bottom: 0, right: 0,
+                width: 26, height: 26, borderRadius: "50%",
+                background: "linear-gradient(135deg, #C9A97A, #8B6914)",
+                border: "2px solid #060D1F",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                cursor: "pointer", color: "#060D1F",
+              }}
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+            </button>
           </div>
-          <div>
-            <div style={{ fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 18, letterSpacing: 2, color: "var(--text-primary)", marginBottom: 4 }}>
+
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 18, letterSpacing: 2, color: "var(--text-primary)", marginBottom: 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               {displayName || "Carregando..."}
             </div>
-            <div style={{ fontSize: 13, color: "var(--text-muted)" }}>{user?.email ?? ""}</div>
+            <div style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: bio ? 8 : 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              {user?.email ?? ""}
+            </div>
+            {bio && (
+              <div style={{ fontSize: 12, color: "rgba(255,255,255,0.40)", lineHeight: 1.5, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+                {bio}
+              </div>
+            )}
           </div>
+
+          {/* Avatar URL input */}
+          {showAvatarInput && (
+            <div style={{ width: "100%", marginTop: 4 }}>
+              <label style={{ ...S.label, display: "block", marginBottom: 8 }}>URL da Foto de Perfil</label>
+              <div style={{ display: "flex", gap: 8 }}>
+                <input
+                  className="pf-input"
+                  style={{ ...S.input, flex: 1 }}
+                  value={avatarInput}
+                  onChange={e => setAvatarInput(e.target.value)}
+                  placeholder="https://exemplo.com/minha-foto.jpg"
+                  type="url"
+                />
+                <button
+                  type="button"
+                  onClick={() => { setAvatar(avatarInput); setShowAvatarInput(false); }}
+                  style={{ ...S.btnPrimary, padding: "12px 16px", flexShrink: 0 }}
+                >
+                  OK
+                </button>
+                {currentAvatar && (
+                  <button
+                    type="button"
+                    onClick={() => { setAvatar(""); setAvatarInput(""); setShowAvatarInput(false); }}
+                    style={{
+                      padding: "12px 16px", borderRadius: 12, border: "1px solid rgba(230,57,70,0.30)",
+                      background: "rgba(230,57,70,0.08)", color: "#FF8088", fontSize: 11,
+                      fontFamily: "'Cinzel',serif", cursor: "pointer", flexShrink: 0,
+                    }}
+                  >
+                    Remover
+                  </button>
+                )}
+              </div>
+              <p style={{ fontSize: 11, color: "rgba(255,255,255,0.30)", marginTop: 6, fontFamily: "'Poppins',sans-serif" }}>
+                Cole a URL de uma imagem. Salve o perfil para confirmar.
+              </p>
+            </div>
+          )}
         </div>
 
-        {/* Name section */}
+        {/* Info section (nome + bio) */}
         <div style={{
           borderRadius: 20, padding: "28px 32px", marginBottom: 20,
           background: "linear-gradient(160deg, rgba(15,26,61,0.7) 0%, rgba(10,18,45,0.7) 100%)",
@@ -164,18 +262,32 @@ export default function PerfilPage() {
             <span style={S.sectionLabel}>Informações Pessoais</span>
           </div>
 
-          <form onSubmit={handleNameSave} style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+          <form onSubmit={handleInfoSave} style={{ display: "flex", flexDirection: "column", gap: 18 }}>
             <div style={S.field}>
               <label style={S.label}>Seu Nome</label>
-              <input style={S.input} value={name} onChange={e => setName(e.target.value)} placeholder="Seu nome completo" required />
+              <input className="pf-input" style={S.input} value={name} onChange={e => setName(e.target.value)} placeholder="Seu nome completo" required />
             </div>
-            {nameMsg && <Alert type={nameMsg.type} msg={nameMsg.msg} />}
+            <div style={S.field}>
+              <label style={S.label}>Bio <span style={{ opacity: 0.5, fontWeight: 400 }}>(opcional)</span></label>
+              <textarea
+                className="pf-textarea"
+                style={S.textarea}
+                value={bio}
+                onChange={e => setBio(e.target.value)}
+                placeholder="Fale um pouco sobre você..."
+                maxLength={500}
+              />
+              <span style={{ fontSize: 11, color: "rgba(255,255,255,0.25)", fontFamily: "'Poppins',sans-serif", textAlign: "right" }}>
+                {bio.length}/500
+              </span>
+            </div>
+            {infoMsg && <Alert type={infoMsg.type} msg={infoMsg.msg} />}
             <div>
-              <button type="submit" disabled={nameLoading} style={{ ...S.btnPrimary, opacity: nameLoading ? 0.7 : 1 }}>
-                {nameLoading
+              <button type="submit" disabled={infoLoading} style={{ ...S.btnPrimary, opacity: infoLoading ? 0.7 : 1 }}>
+                {infoLoading
                   ? <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" style={{ animation: "spin 1s linear infinite" }}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
                   : <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>}
-                {nameLoading ? "Salvando..." : "Salvar Nome"}
+                {infoLoading ? "Salvando..." : "Salvar Perfil"}
               </button>
             </div>
           </form>
@@ -196,15 +308,15 @@ export default function PerfilPage() {
           <form onSubmit={handlePasswordSave} style={{ display: "flex", flexDirection: "column", gap: 18 }}>
             <div style={S.field}>
               <label style={S.label}>Senha Atual</label>
-              <input type="password" style={S.input} value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} placeholder="••••••••" required />
+              <input type="password" className="pf-input" style={S.input} value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} placeholder="••••••••" required />
             </div>
             <div style={S.field}>
               <label style={S.label}>Nova Senha</label>
-              <input type="password" style={S.input} value={newPassword} onChange={e => setNewPassword(e.target.value)} placeholder="Mínimo 6 caracteres" required minLength={6} />
+              <input type="password" className="pf-input" style={S.input} value={newPassword} onChange={e => setNewPassword(e.target.value)} placeholder="Mínimo 6 caracteres" required minLength={6} />
             </div>
             <div style={S.field}>
               <label style={S.label}>Confirmar Nova Senha</label>
-              <input type="password" style={S.input} value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="Repita a nova senha" required />
+              <input type="password" className="pf-input" style={S.input} value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="Repita a nova senha" required />
             </div>
             {pwMsg && <Alert type={pwMsg.type} msg={pwMsg.msg} />}
             <div>
@@ -218,8 +330,6 @@ export default function PerfilPage() {
           </form>
         </div>
       </div>
-
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }

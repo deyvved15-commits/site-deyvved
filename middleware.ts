@@ -30,9 +30,11 @@ export async function middleware(req: NextRequest) {
       return NextResponse.next();
     }
 
-    // 2. Rotas que PODEM ser públicas (Cursos, Checkout, LP e APIs públicas)
+    // 2. Rotas que PODEM ser públicas (Cursos, Checkout, LP, recuperação de senha e APIs públicas)
     if (
       pathname === "/lp" ||
+      pathname === "/esqueci-senha" ||
+      pathname === "/redefinir-senha" ||
       pathname.startsWith("/curso") ||
       pathname.startsWith("/checkout") ||
       pathname.startsWith("/api/")

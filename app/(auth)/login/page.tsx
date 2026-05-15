@@ -276,13 +276,20 @@ export default function LoginPage() {
                   </>
                 )}
               </button>
-              {/* Link cadastro */}
-              <p style={{ textAlign: "center", fontSize: 12, color: "rgba(255,255,255,0.30)", fontFamily: "'Poppins',sans-serif", marginTop: 4 }}>
-                Não tem conta?{" "}
-                <Link href="/cadastro" style={{ color: "rgba(201,169,122,0.70)", textDecoration: "none", fontWeight: 500 }}>
-                  Cadastrar
-                </Link>
-              </p>
+              {/* Links */}
+              <div style={{ display: "flex", flexDirection: "column", gap: 6, marginTop: 4 }}>
+                <p style={{ textAlign: "center", fontSize: 12, color: "rgba(255,255,255,0.30)", fontFamily: "'Poppins',sans-serif", margin: 0 }}>
+                  <Link href="/esqueci-senha" style={{ color: "rgba(201,169,122,0.60)", textDecoration: "none" }}>
+                    Esqueci minha senha
+                  </Link>
+                </p>
+                <p style={{ textAlign: "center", fontSize: 12, color: "rgba(255,255,255,0.30)", fontFamily: "'Poppins',sans-serif", margin: 0 }}>
+                  Não tem conta?{" "}
+                  <Link href="/cadastro" style={{ color: "rgba(201,169,122,0.70)", textDecoration: "none", fontWeight: 500 }}>
+                    Cadastrar
+                  </Link>
+                </p>
+              </div>
             </form>
           </div>
 
