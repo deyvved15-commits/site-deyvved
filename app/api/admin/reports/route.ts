@@ -8,145 +8,189 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Acesso negado" }, { status: 403 });
   }
 
-  const { searchParams } = new URL(req.url);
-  const type = searchParams.get("type") ?? "alunos";
-  const courseId = searchParams.get("courseId") ?? undefined;
-  const from = searchParams.get("from") ? new Date(searchParams.get("from")!) : undefined;
-  const to = searchParams.get("to") ? new Date(searchParams.get("to") + "T23:59:59") : undefined;
+  try {
+    const { searchParams } = new URL(req.url);
+    const type = searchParams.get("type") ?? "alunos";
+    const courseId = searchParams.get("courseId") || undefined;
+    const userId   = searchParams.get("userId")   || undefined;
+    const fromStr  = searchParams.get("from");
+    const toStr    = searchParams.get("to");
+    const from     = fromStr ? new Date(fromStr) : undefined;
+    const to       = toStr   ? new Date(toStr + "T23:59:59") : undefined;
 
-  const dateFilter = (field: "createdAt" | "issuedAt" | "completedAt") =>
-    from || to
-      ? { [field]: { ...(from ? { gte: from } : {}), ...(to ? { lte: to } : {}) } }
-      : {};
+    function dateRange(field: string) {
+      if (!from && !to) return {};
+      const range: Record<string, Date> = {};
+      if (from) range.gte = from;
+      if (to)   range.lte = to;
+      return { [field]: range };
+    }
 
-  if (type === "alunos") {
-    const enrollments = await prisma.enrollment.findMany({
-      where: {
-        ...(courseId ? { courseId } : {}),
-        ...dateFilter("createdAt"),
-      },
-      orderBy: { createdAt: "desc" },
-      include: {
-        user: { select: { id: true, name: true, email: true, phone: true, church: true } },
-        course: { select: { id: true, title: true } },
-      },
-    });
-    return NextResponse.json({ data: enrollments });
-  }
+    // ── ALUNOS ────────────────────────────────────────────────────────────────
+    if (type === "alunos") {
+      const where: Record<string, unknown> = {};
+      if (courseId) where.courseId = courseId;
+      if (userId)   where.userId   = userId;
+      Object.assign(where, dateRange("createdAt"));
 
-  if (type === "financeiro") {
-    const payments = await prisma.payment.findMany({
-      where: {
-        status: "approved",
-        ...(courseId ? { courseId } : {}),
-        ...dateFilter("createdAt"),
-      },
-      orderBy: { createdAt: "desc" },
-      include: {
-        user: { select: { id: true, name: true, email: true } },
-        course: { select: { id: true, title: true } },
-        product: { select: { id: true, title: true } },
-      },
-    });
-    const total = payments.reduce((s, p) => s + p.amount, 0);
-    return NextResponse.json({ data: payments, total });
-  }
+      const enrollments = await prisma.enrollment.findMany({
+        where,
+        orderBy: { createdAt: "desc" },
+        include: {
+          user: { select: { id: true, name: true, email: true, phone: true, church: true } },
+          course: { select: { id: true, title: true } },
+        },
+      });
+      return NextResponse.json({ data: enrollments });
+    }
 
-  if (type === "formados") {
-    const certificates = await prisma.certificate.findMany({
-      where: {
-        ...(courseId ? { courseId } : {}),
-        ...dateFilter("issuedAt"),
-      },
-      orderBy: { issuedAt: "desc" },
-      include: {
-        user: { select: { id: true, name: true, email: true } },
-        course: { select: { id: true, title: true } },
-      },
-    });
-    return NextResponse.json({ data: certificates });
-  }
+    // ── FINANCEIRO ────────────────────────────────────────────────────────────
+    if (type === "financeiro") {
+      const where: Record<string, unknown> = { status: "approved" };
+      if (courseId) where.courseId = courseId;
+      Object.assign(where, dateRange("createdAt"));
 
-  if (type === "progresso") {
-    const courses = await prisma.course.findMany({
-      where: {
-        published: true,
-        ...(courseId ? { id: courseId } : {}),
-      },
-      select: {
-        id: true,
-        title: true,
-        enrollments: { select: { userId: true } },
-        modules: {
-          where: { isBonus: false },
-          select: {
-            lessons: {
-              select: {
-                id: true,
-                progress: {
-                  where: { completed: true },
-                  select: { userId: true },
+      const payments = await prisma.payment.findMany({
+        where,
+        orderBy: { createdAt: "desc" },
+        take: 1000,
+        include: {
+          user:    { select: { id: true, name: true, email: true } },
+          course:  { select: { id: true, title: true } },
+          product: { select: { id: true, title: true } },
+          coupon:  { select: { code: true } },
+        },
+      });
+      const total     = payments.reduce((s, p) => s + p.amount, 0);
+      const walletSum = payments.reduce((s, p) => s + (p.walletUsed ?? 0), 0);
+      return NextResponse.json({ data: payments, total, walletSum });
+    }
+
+    // ── FORMADOS ──────────────────────────────────────────────────────────────
+    if (type === "formados") {
+      const where: Record<string, unknown> = {};
+      if (courseId) where.courseId = courseId;
+      if (userId)   where.userId   = userId;
+      Object.assign(where, dateRange("issuedAt"));
+
+      const certificates = await prisma.certificate.findMany({
+        where,
+        orderBy: { issuedAt: "desc" },
+        include: {
+          user:   { select: { id: true, name: true, email: true } },
+          course: { select: { id: true, title: true } },
+        },
+      });
+      return NextResponse.json({ data: certificates });
+    }
+
+    // ── PROGRESSO ─────────────────────────────────────────────────────────────
+    if (type === "progresso") {
+      const where: Record<string, unknown> = { published: true };
+      if (courseId) where.id = courseId;
+
+      const courses = await prisma.course.findMany({
+        where,
+        select: {
+          id: true, title: true,
+          enrollments: { select: { userId: true } },
+          modules: {
+            where: { isBonus: false },
+            select: {
+              lessons: {
+                select: {
+                  id: true,
+                  progress: { where: { completed: true }, select: { userId: true } },
                 },
               },
             },
           },
         },
-      },
-      orderBy: { title: "asc" },
-    });
+        orderBy: { title: "asc" },
+      });
 
-    const data = courses.map(c => {
-      const totalStudents = c.enrollments.length;
-      const allLessons = c.modules.flatMap(m => m.lessons);
-      const totalLessons = allLessons.length;
-      const completedLessonsByUser = allLessons.reduce<Record<string, number>>((acc, l) => {
-        for (const p of l.progress) {
-          acc[p.userId] = (acc[p.userId] ?? 0) + 1;
-        }
-        return acc;
-      }, {});
-      const graduated = Object.values(completedLessonsByUser).filter(n => n >= totalLessons && totalLessons > 0).length;
-      const avgPct = totalStudents > 0 && totalLessons > 0
-        ? Math.round(
-            Object.values(completedLessonsByUser).reduce((s, n) => s + Math.min(n / totalLessons, 1), 0)
-            / totalStudents * 100
-          )
-        : 0;
-      return { id: c.id, title: c.title, totalStudents, totalLessons, graduated, avgPct };
-    });
+      const data = courses.map(c => {
+        const totalStudents = c.enrollments.length;
+        const allLessons = c.modules.flatMap(m => m.lessons);
+        const totalLessons = allLessons.length;
+        const byUser = allLessons.reduce<Record<string, number>>((acc, l) => {
+          for (const p of l.progress) acc[p.userId] = (acc[p.userId] ?? 0) + 1;
+          return acc;
+        }, {});
+        const graduated = Object.values(byUser).filter(n => totalLessons > 0 && n >= totalLessons).length;
+        const avgPct = totalStudents > 0 && totalLessons > 0
+          ? Math.round(Object.values(byUser).reduce((s, n) => s + Math.min(n / totalLessons, 1), 0) / totalStudents * 100)
+          : 0;
+        return { id: c.id, title: c.title, totalStudents, totalLessons, graduated, avgPct };
+      });
 
-    return NextResponse.json({ data });
-  }
+      return NextResponse.json({ data });
+    }
 
-  if (type === "log") {
-    const progress = await prisma.lessonProgress.findMany({
-      where: {
-        completed: true,
-        ...(dateFilter("completedAt").completedAt ? dateFilter("completedAt") : dateFilter("createdAt")),
-        ...(courseId
-          ? { lesson: { module: { courseId } } }
-          : {}),
-      },
-      orderBy: { completedAt: "desc" },
-      take: 500,
-      include: {
-        user: { select: { id: true, name: true, email: true } },
-        lesson: {
-          select: {
-            id: true,
-            title: true,
-            module: {
-              select: {
-                title: true,
-                course: { select: { id: true, title: true } },
+    // ── LOG DOS ALUNOS ────────────────────────────────────────────────────────
+    if (type === "log") {
+      const where: Record<string, unknown> = { completed: true };
+      if (userId) where.userId = userId;
+      if (courseId) where.lesson = { module: { courseId } };
+
+      // Filtra por data de conclusão ou criação
+      if (from || to) {
+        const range: Record<string, Date> = {};
+        if (from) range.gte = from;
+        if (to)   range.lte = to;
+        where.createdAt = range;
+      }
+
+      const progress = await prisma.lessonProgress.findMany({
+        where,
+        orderBy: { createdAt: "desc" },
+        take: 500,
+        include: {
+          user: { select: { id: true, name: true, email: true, createdAt: true, lastLoginAt: true } },
+          lesson: {
+            select: {
+              id: true, title: true,
+              module: {
+                select: {
+                  title: true,
+                  course: { select: { id: true, title: true } },
+                },
               },
             },
           },
         },
-      },
-    });
-    return NextResponse.json({ data: progress });
-  }
+      });
 
-  return NextResponse.json({ error: "Tipo inválido" }, { status: 400 });
+      // Busca data de matrícula para cada par userId+courseId presente no resultado
+      const pairs = [...new Set(
+        progress.map(p => `${p.userId}|${p.lesson.module.course.id}`)
+      )].map(key => {
+        const [uid, cid] = key.split("|");
+        return { userId: uid, courseId: cid };
+      });
+
+      const enrollments = pairs.length > 0
+        ? await prisma.enrollment.findMany({
+            where: { OR: pairs },
+            select: { userId: true, courseId: true, createdAt: true },
+          })
+        : [];
+
+      const enrollMap = new Map(
+        enrollments.map(e => [`${e.userId}|${e.courseId}`, e.createdAt])
+      );
+
+      const data = progress.map(p => ({
+        ...p,
+        enrolledAt: enrollMap.get(`${p.userId}|${p.lesson.module.course.id}`) ?? null,
+      }));
+
+      return NextResponse.json({ data });
+    }
+
+    return NextResponse.json({ error: "Tipo inválido" }, { status: 400 });
+  } catch (err) {
+    console.error("[reports]", err);
+    return NextResponse.json({ error: "Erro interno ao gerar relatório" }, { status: 500 });
+  }
 }

@@ -53,6 +53,7 @@ model User {
   active          Boolean           @default(true)
   affiliateCode   String?           @unique
   walletBalance   Float             @default(0)
+  lastLoginAt     DateTime?
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
   accounts        Account[]
