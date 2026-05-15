@@ -33,7 +33,7 @@ export default async function StudentProfilePage({ params }: { params: Promise<{
         },
       },
     }),
-    prisma.course.findMany({ where: { published: true }, select: { id: true, title: true } }),
+    prisma.course.findMany({ select: { id: true, title: true }, orderBy: { title: "asc" } }),
   ]);
 
   if (!student) notFound();
@@ -81,9 +81,7 @@ export default async function StudentProfilePage({ params }: { params: Promise<{
             <p style={{ fontSize: 13, color: "var(--text-muted)" }}>{student.email}</p>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0, marginLeft: "auto", justifyContent: "flex-end", flexWrap: "wrap" }} className="w-full md:w-auto">
-            {notEnrolled.length > 0 && (
-              <EnrollButton studentId={studentId} courses={notEnrolled} />
-            )}
+            <EnrollButton studentId={studentId} courses={notEnrolled} />
             <ResetPasswordButton studentId={studentId} />
             <PromoteStudentButton studentId={studentId} studentName={student.name} currentRole={student.role} />
             <DeleteStudentButton studentId={studentId} studentName={student.name} />

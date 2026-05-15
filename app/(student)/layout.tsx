@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 import StudentSidebar from "@/components/student/sidebar";
 import { calcStreak } from "@/lib/streak";
 
+export const dynamic = 'force-dynamic';
+
 export default async function StudentLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
   if (!session) redirect("/login");

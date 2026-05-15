@@ -2,6 +2,8 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import ProfessorSidebar from "@/components/professor/sidebar";
 
+export const dynamic = 'force-dynamic';
+
 export default async function ProfessorLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
   
