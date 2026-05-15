@@ -1,7 +1,8 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { ChevronLeft, Send, MessageSquare } from "lucide-react";
+import { ChevronLeft, MessageSquare } from "lucide-react";
+import { Suspense } from "react";
 import CreateTicketForm from "./form";
 
 export default async function NewTicketPage() {
@@ -47,7 +48,9 @@ export default async function NewTicketPage() {
           border: "1px solid rgba(201,169,122,0.12)", borderRadius: 24, padding: "40px",
           boxShadow: "0 20px 50px rgba(0,0,0,0.3)"
         }}>
-          <CreateTicketForm courses={courses} />
+          <Suspense fallback={<div style={{ color: "var(--text-muted)", fontSize: 13 }}>Carregando formulário...</div>}>
+            <CreateTicketForm courses={courses} />
+          </Suspense>
         </div>
       </div>
 
