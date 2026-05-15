@@ -70,18 +70,42 @@ export async function POST(req: NextRequest) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const preferenceId = (mpData as any).preference_id ? String((mpData as any).preference_id) : null;
 
-    if (!externalRef) return NextResponse.json({ ok: true });
+    if (!externalRef && !preferenceId) return NextResponse.json({ ok: true });
 
-    // Formato: userId:courseId:affiliateId:walletAmount:couponId:productId
-    const parts = externalRef.split(":");
-    const userId = parts[0];
-    const courseId = parts[1] !== "none" ? parts[1] : null;
-    const affiliateId = parts[2] && parts[2] !== "none" ? parts[2] : null;
-    const walletAmountUsed = parts[3] ? parseFloat(parts[3]) : 0;
-    const couponId = parts[4] && parts[4] !== "none" ? parts[4] : null;
-    const productId = parts[5] && parts[5] !== "none" ? parts[5] : null;
+    // ── Tentar buscar o pagamento no banco pelo preferenceId ou externalRef ──
+    const existingPayment = await prisma.payment.findFirst({
+      where: {
+        OR: [
+          { externalReference: preferenceId ?? "none" },
+          { externalReference: externalRef ?? "none" },
+          { mpPaymentId: paymentId }
+        ]
+      },
+      include: { user: true }
+    });
 
-    if (!userId || (!courseId && !productId)) return NextResponse.json({ ok: true });
+    let userId = existingPayment?.userId;
+    let courseId = existingPayment?.courseId;
+    let productId = existingPayment?.productId;
+    let couponId = existingPayment?.couponId;
+    let walletAmountUsed = existingPayment?.walletUsed ?? 0;
+    let affiliateId: string | null = null;
+
+    // Fallback: Se não achou no banco, tenta extrair do externalRef (legado/segurança)
+    if (!userId && externalRef && externalRef.includes(":")) {
+      const parts = externalRef.split(":");
+      userId = parts[0];
+      courseId = parts[1] !== "none" ? parts[1] : null;
+      affiliateId = parts[2] && parts[2] !== "none" ? parts[2] : null;
+      walletAmountUsed = parts[3] ? parseFloat(parts[3]) : 0;
+      couponId = parts[4] && parts[4] !== "none" ? parts[4] : null;
+      productId = parts[5] && parts[5] !== "none" ? parts[5] : null;
+    }
+
+    if (!userId || (!courseId && !productId)) {
+      console.warn("[webhook/mp] Could not identify user or item", { externalRef, preferenceId, paymentId });
+      return NextResponse.json({ ok: true });
+    }
 
     let itemTitle = "";
     let itemPrice = 0;
