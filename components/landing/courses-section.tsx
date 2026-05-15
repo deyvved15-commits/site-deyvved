@@ -97,7 +97,7 @@ function CourseCard({ course, onSelect }: { course: Course; onSelect: () => void
       }}
     >
       {/* Thumbnail */}
-      <div style={{ position: "relative", aspectRatio: "4/3", background: "linear-gradient(140deg, var(--navy-darkest), #101830)", overflow: "hidden" }}>
+      <div style={{ position: "relative", aspectRatio: "4/5", background: "linear-gradient(140deg, var(--navy-darkest), #101830)", overflow: "hidden" }}>
         {imgUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={imgUrl} alt={course.title} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center", transition: "transform 0.4s ease", transform: hovered ? "scale(1.04)" : "scale(1)" }} />
@@ -203,7 +203,7 @@ function CourseModal({ course, onClose }: { course: Course; onClose: () => void 
 
         {/* Thumbnail */}
         {imgUrl && (
-          <div style={{ height: 240, overflow: "hidden", position: "relative" }}>
+          <div style={{ aspectRatio: "4/5", maxHeight: 320, overflow: "hidden", position: "relative" }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={imgUrl} alt={course.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
             <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, #060D1F 0%, transparent 60%)" }} />
