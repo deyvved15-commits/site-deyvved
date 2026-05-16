@@ -10,7 +10,7 @@ const schema = z.object({
   content: z.string().optional(),
   duration: z.string().optional(),
   releaseAfterDays: z.number().int().min(0).optional(),
-  attachments: z.array(z.object({ title: z.string(), url: z.string() })).optional().nullable(),
+  attachments: z.array(z.object({ title: z.string(), url: z.string() })).optional(),
   order: z.number().int().optional(),
 });
 
@@ -26,7 +26,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ cour
   if (!course) return NextResponse.json({ error: "Course not found" }, { status: 404 });
 
   const isAdmin = session.user.role === "ADMIN";
-  const isTeacher = course.teachers.some(t => t.id === session.user.id);
+  const isTeacher = course.teachers.some(t => t.teacherId === session.user.id);
 
   if (!isAdmin && !isTeacher) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -36,7 +36,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ cour
   const parsed = schema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
 
-  const lesson = await prisma.lesson.update({ where: { id: lessonId }, data: parsed.data });
+  const lesson = await prisma.lesson.update({ where: { id: lessonId }, data: parsed.data as any });
   return NextResponse.json(lesson);
 }
 
@@ -52,7 +52,7 @@ export async function DELETE(_: NextRequest, { params }: { params: Promise<{ cou
   if (!course) return NextResponse.json({ error: "Course not found" }, { status: 404 });
 
   const isAdmin = session.user.role === "ADMIN";
-  const isTeacher = course.teachers.some(t => t.id === session.user.id);
+  const isTeacher = course.teachers.some(t => t.teacherId === session.user.id);
 
   if (!isAdmin && !isTeacher) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });

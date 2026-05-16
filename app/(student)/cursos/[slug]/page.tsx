@@ -28,7 +28,7 @@ export default async function CursoPage({ params }: { params: Promise<{ slug: st
   });
   if (!course) notFound();
 
-  const isTeacherOfCourse = course.teachers.some(t => t.id === session.user.id);
+  const isTeacherOfCourse = course.teachers.some(t => t.teacherId === session.user.id);
   const enrollment = await prisma.enrollment.findUnique({
     where: { userId_courseId: { userId: session.user.id, courseId: course.id } },
   });

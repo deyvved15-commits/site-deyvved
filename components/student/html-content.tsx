@@ -72,7 +72,7 @@ export default function HtmlContent({
           srcDoc={finalHtml}
           title="Custom Content"
           style={{ width: "100%", border: "none", height: iframeHeight, display: "block" }}
-          sandbox="allow-scripts allow-popups allow-forms allow-modals allow-same-origin"
+          sandbox="allow-scripts allow-popups allow-forms allow-modals"
         />
       </div>
     );

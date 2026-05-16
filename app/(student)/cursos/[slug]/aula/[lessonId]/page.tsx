@@ -36,7 +36,7 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
   if (!course) notFound();
 
   // Verifica matrícula e expiração
-  const isTeacher = course.teachers.some(t => t.id === session.user.id);
+  const isTeacher = course.teachers.some(t => t.teacherId === session.user.id);
   const isAdmin = session.user.role === "ADMIN";
   const enrollment = await prisma.enrollment.findUnique({
     where: { userId_courseId: { userId: session.user.id, courseId: course.id } },

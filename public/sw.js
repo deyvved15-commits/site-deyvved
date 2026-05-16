@@ -30,7 +30,10 @@ self.addEventListener('fetch', (event) => {
         }
         return response;
       })
-      .catch(() => caches.match(event.request))
+      .catch(async () => {
+      const cached = await caches.match(event.request);
+      return cached ?? new Response('', { status: 408, statusText: 'Offline' });
+    })
   );
 });
 
