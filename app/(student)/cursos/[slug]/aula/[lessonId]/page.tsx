@@ -272,11 +272,11 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 10 }}>
                 {(lesson.attachments as { title: string; url: string }[]).map((at, i) => (
-                  <a key={i} href={at.url} target="_blank" rel="noopener noreferrer" style={{
+                  <a key={i} href={at.url} target="_blank" rel="noopener noreferrer" className="ka-attachment-link" style={{
                     display: "flex", alignItems: "center", gap: 10, padding: "10px 14px",
                     background: "rgba(255,255,255,0.05)", borderRadius: 10, border: "1px solid rgba(255,255,255,0.08)",
                     color: "white", textDecoration: "none", fontSize: 12, transition: "all 0.2s"
-                  }} onMouseEnter={e => { e.currentTarget.style.background = "rgba(201,169,122,0.15)"; e.currentTarget.style.borderColor = "var(--gold)"; }}>
+                  }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" />
                     </svg>
@@ -385,6 +385,10 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
           background: rgba(201,169,122,0.15) !important;
           border-color: var(--gold) !important;
           transform: translateY(-1px);
+        }
+        .ka-attachment-link:hover {
+          background: rgba(201,169,122,0.15) !important;
+          border-color: var(--gold) !important;
         }
       `}</style>
     </div>
