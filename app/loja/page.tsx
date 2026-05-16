@@ -65,7 +65,7 @@ export default async function LojaPublicaPage() {
       </nav>
 
       {/* HEADER */}
-      <div style={{ padding: "56px 44px 32px", maxWidth: 1200, margin: "0 auto" }}>
+      <div style={{ padding: "56px 44px 32px" }}>
         <p style={{ fontFamily: "'Cinzel',serif", fontSize: 10, fontWeight: 600, letterSpacing: 4, textTransform: "uppercase", color: "#C9A97A", marginBottom: 10 }}>
           Kadima Academy
         </p>
@@ -78,7 +78,7 @@ export default async function LojaPublicaPage() {
       </div>
 
       {/* CONTENT */}
-      <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+      <div>
         <MarketplaceClient
           initialProducts={products}
           initialCourses={courses}
