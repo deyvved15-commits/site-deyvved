@@ -25,6 +25,7 @@ export default function ProductCheckoutPage({ params: paramsPromise }: { params:
   const [walletBalance, setWalletBalance] = useState(0);
   const [useWallet, setUseWallet] = useState(false);
   const [session, setSession] = useState<any>(null);
+  const [userData, setUserData] = useState({ name: "", email: "", password: "" });
   const [couponCode, setCouponCode] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState<any>(null);
   const [couponError, setCouponError] = useState("");
@@ -90,22 +91,26 @@ export default function ProductCheckoutPage({ params: paramsPromise }: { params:
   const finalPrice = Math.max(0, (product?.price ?? 0) - walletAmount - couponDiscount);
 
   async function handleCheckout() {
-    if (!session) {
-      router.push(`/login?callbackUrl=/checkout/product/${productId}`);
-      return;
-    }
-
     setLoading(true);
     setError("");
+
+    if (!session) {
+      if (!userData.name || !userData.email || !userData.password) {
+        setError("Por favor, preencha todos os campos para criar sua conta.");
+        setLoading(false);
+        return;
+      }
+    }
 
     try {
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          productId, 
+        body: JSON.stringify({
+          productId,
           walletAmount: useWallet ? walletAmount : 0,
-          couponId: appliedCoupon?.id
+          couponId: appliedCoupon?.id,
+          userData: !session ? userData : null,
         }),
       });
       const data = await res.json();
@@ -180,6 +185,38 @@ export default function ProductCheckoutPage({ params: paramsPromise }: { params:
               <h1 style={{ fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 20, letterSpacing: 2, color: "var(--text-primary)", marginBottom: 8, lineHeight: 1.3 }}>
                 {product.title}
               </h1>
+
+              {/* Cadastro para visitantes */}
+              {!session && (
+                <div style={{ marginBottom: 20, padding: "20px", background: "rgba(201,169,122,0.05)", borderRadius: 16, border: "1px solid rgba(201,169,122,0.15)" }}>
+                  <p style={{ fontFamily: "'Cinzel',serif", fontSize: 10, letterSpacing: 2, color: "var(--gold)", marginBottom: 16, textTransform: "uppercase", fontWeight: 700 }}>
+                    Crie sua conta para acessar
+                  </p>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                    <input
+                      type="text" placeholder="Nome Completo"
+                      value={userData.name} onChange={e => setUserData({ ...userData, name: e.target.value })}
+                      style={{ width: "100%", background: "rgba(0,0,0,0.2)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, padding: "10px 14px", color: "white", fontSize: 13 }}
+                    />
+                    <input
+                      type="email" placeholder="E-mail"
+                      value={userData.email} onChange={e => setUserData({ ...userData, email: e.target.value })}
+                      style={{ width: "100%", background: "rgba(0,0,0,0.2)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, padding: "10px 14px", color: "white", fontSize: 13 }}
+                    />
+                    <input
+                      type="password" placeholder="Crie uma Senha"
+                      value={userData.password} onChange={e => setUserData({ ...userData, password: e.target.value })}
+                      style={{ width: "100%", background: "rgba(0,0,0,0.2)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, padding: "10px 14px", color: "white", fontSize: 13 }}
+                    />
+                    <p style={{ fontSize: 9, color: "var(--text-muted)", margin: 0 }}>
+                      Já tem conta?{" "}
+                      <a href={`/login?callbackUrl=/checkout/product/${productId}`} style={{ color: "var(--gold)", textDecoration: "none" }}>
+                        Faça login aqui
+                      </a>
+                    </p>
+                  </div>
+                </div>
+              )}
 
               <div style={{
                 padding: "16px 20px", borderRadius: 14, marginBottom: 16,
