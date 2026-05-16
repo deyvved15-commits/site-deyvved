@@ -98,28 +98,6 @@ export default async function MeusProdutosPage({ searchParams }: { searchParams:
 
       <div className="ka-section" style={{ padding: "38px 44px 44px" }}>
 
-        {/* ── Meus Produtos Digitais ── */}
-        {myProducts.length > 0 && (
-          <>
-            <SectionHeader
-              title="Produtos"
-              highlight="Digitais"
-              icon={<Package size={20} />}
-            />
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 280px))", gap: 24, marginBottom: 56 }}>
-              {myProducts.map(product => (
-                <ProductCard key={product.id} product={product} isPurchased={true} />
-              ))}
-            </div>
-
-            <div style={{ height: 1, margin: "0 0 48px", background: "linear-gradient(90deg, transparent 0%, rgba(201,169,122,0.18) 30%, rgba(201,169,122,0.18) 70%, transparent 100%)", position: "relative" }}>
-              <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", background: "var(--navy-mid)", padding: "0 16px" }}>
-                <span style={{ width: 4, height: 4, borderRadius: "50%", background: "var(--gold)", boxShadow: "0 0 6px var(--gold)", display: "block" }} />
-              </div>
-            </div>
-          </>
-        )}
-
         {/* ── Filtro de categoria ── */}
         {allCategories.length > 0 && <CategoryFilter categories={allCategories} />}
 
@@ -158,6 +136,27 @@ export default async function MeusProdutosPage({ searchParams }: { searchParams:
               />
             ))}
           </div>
+        )}
+
+        {/* ── Meus Produtos Digitais ── */}
+        {myProducts.length > 0 && (
+          <>
+            <div style={{ height: 1, margin: "0 0 48px", background: "linear-gradient(90deg, transparent 0%, rgba(201,169,122,0.18) 30%, rgba(201,169,122,0.18) 70%, transparent 100%)", position: "relative" }}>
+              <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", background: "var(--navy-mid)", padding: "0 16px" }}>
+                <span style={{ width: 4, height: 4, borderRadius: "50%", background: "var(--gold)", boxShadow: "0 0 6px var(--gold)", display: "block" }} />
+              </div>
+            </div>
+            <SectionHeader
+              title="Produtos"
+              highlight="Digitais"
+              icon={<Package size={20} />}
+            />
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 280px))", gap: 24, marginBottom: 56 }}>
+              {myProducts.map(product => (
+                <ProductCard key={product.id} product={product} isPurchased={true} />
+              ))}
+            </div>
+          </>
         )}
 
         {/* ── Divider ── */}
