@@ -192,7 +192,7 @@ export default function ProductCard({ product, isPurchased }: ProductCardProps) 
               </h2>
 
               {product.description && (
-                <p style={{ fontSize: 14, color: "rgba(255,255,255,0.60)", lineHeight: 1.8, marginBottom: 24 }}>
+                <p style={{ fontSize: 14, color: "rgba(255,255,255,0.60)", lineHeight: 1.8, marginBottom: 24, whiteSpace: "pre-wrap" }}>
                   {product.description}
                 </p>
               )}
