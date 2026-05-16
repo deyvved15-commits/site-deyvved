@@ -10,7 +10,7 @@ const schema = z.object({
   content: z.string().optional(),
   duration: z.string().optional(),
   releaseAfterDays: z.number().int().min(0).optional(),
-  attachments: z.any().optional(),
+  attachments: z.array(z.object({ title: z.string(), url: z.string() })).optional().nullable(),
   order: z.number().int().optional(),
 });
 

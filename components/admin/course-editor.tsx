@@ -100,28 +100,46 @@ export default function CourseEditor({ course: initial, teachers: allTeachers, i
     setCourse(c => ({ ...c, modules: c.modules.map(m => m.id === moduleId ? { ...m, lessons: m.lessons.filter(l => l.id !== lessonId) } : m) }));
   }
 
+  function parseAttachments(raw: any): { title: string; url: string }[] {
+    if (!raw) return [];
+    if (Array.isArray(raw)) return raw;
+    if (typeof raw === "string") {
+      try { const p = JSON.parse(raw); return Array.isArray(p) ? p : []; } catch { return []; }
+    }
+    return [];
+  }
+
   function startEditLesson(lesson: Lesson) {
     setEditingLesson(lesson.id);
-    setEditLesson({ 
-      title: lesson.title, 
-      youtubeUrl: lesson.youtubeUrl, 
-      duration: lesson.duration ?? "", 
-      content: lesson.content ?? "", 
+    setEditLesson({
+      title: lesson.title,
+      youtubeUrl: lesson.youtubeUrl,
+      duration: lesson.duration ?? "",
+      content: lesson.content ?? "",
       releaseAfterDays: lesson.releaseAfterDays ?? 0,
-      attachments: lesson.attachments ?? []
+      attachments: parseAttachments(lesson.attachments),
     });
   }
 
   async function saveEditLesson(moduleId: string, lessonId: string) {
     setEditSaving(true);
-    const res = await fetch(`/api/courses/${course.id}/modules/${moduleId}/lessons/${lessonId}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(editLesson),
-    });
-    const updated = await res.json();
-    setCourse(c => ({ ...c, modules: c.modules.map(m => m.id === moduleId ? { ...m, lessons: m.lessons.map(l => l.id === lessonId ? { ...l, ...updated } : l) } : m) }));
-    setEditingLesson(null);
+    try {
+      const res = await fetch(`/api/courses/${course.id}/modules/${moduleId}/lessons/${lessonId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editLesson),
+      });
+      const updated = await res.json();
+      if (!res.ok) {
+        alert(`Erro ao salvar: ${updated.error ? JSON.stringify(updated.error) : res.status}`);
+        setEditSaving(false);
+        return;
+      }
+      setCourse(c => ({ ...c, modules: c.modules.map(m => m.id === moduleId ? { ...m, lessons: m.lessons.map(l => l.id === lessonId ? { ...l, ...updated } : l) } : m) }));
+      setEditingLesson(null);
+    } catch {
+      alert("Erro de conexão ao salvar aula.");
+    }
     setEditSaving(false);
   }
 

@@ -26,7 +26,9 @@ export default function CourseCard({ course, isEnrolled, expiresAt, enrolledAt }
     const done = allLessons.filter((l: any) => l.progress?.[0]?.completed).length;
     const total = allLessons.length;
     const pct = total > 0 ? Math.round((done / total) * 100) : 0;
-    const nextLesson = modules.flatMap((m: any) => m.lessons || []).find((l: any) => l.progress?.[0]?.completed === false) || allLessons[0];
+    const allLessonsSorted = modules
+      .flatMap((m: any) => (m.lessons || []).slice().sort((a: any, b: any) => a.order - b.order));
+    const nextLesson = allLessonsSorted.find((l: any) => !l.progress?.[0]?.completed) || allLessonsSorted[0];
     const label = pct > 0 && pct < 100 ? "Continuar" : pct === 100 ? "Rever" : "Começar";
     const daysSinceEnrollment = enrolledAt 
       ? Math.floor((Date.now() - new Date(enrolledAt).getTime()) / 86400000) 
