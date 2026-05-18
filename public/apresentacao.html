@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kadima Academy — Avante no Conhecimento</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Inter:wght@300;400;500;600&family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════
+   RESET & VARIABLES
+══════════════════════════════════════════ */
+:root {
+  --gold:    #C9A97A;
+  --gold-l:  #E8D5A8;
+  --gold-d:  #9A7A50;
+  --navy:    #0F1A3D;
+  --blue:    #1B2E6B;
+  --blue-m:  #2A4490;
+  --white:   #FFFFFF;
+  --cream:   #F8F5EF;
+  --gray:    #6B6B7B;
+  --ease:    cubic-bezier(.25,.46,.45,.94);
+}
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body { font-family: 'Inter', sans-serif; background: var(--white); color: var(--navy); overflow-x: hidden; }
+img { display: block; max-width: 100%; }
+a { text-decoration: none; color: inherit; }
+
+/* ══════════════════════════════════════════
+   SCROLL ANIMATIONS
+══════════════════════════════════════════ */
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity .8s var(--ease), transform .8s var(--ease);
+}
+.reveal.left  { transform: translateX(-40px); }
+.reveal.right { transform: translateX(40px); }
+.reveal.scale { transform: scale(.92); }
+.reveal.visible {
+  opacity: 1;
+  transform: translate(0) scale(1);
+}
+.delay-1 { transition-delay: .1s; }
+.delay-2 { transition-delay: .2s; }
+.delay-3 { transition-delay: .3s; }
+.delay-4 { transition-delay: .4s; }
+.delay-5 { transition-delay: .5s; }
+
+/* ══════════════════════════════════════════
+   NAV
+══════════════════════════════════════════ */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  padding: 20px 48px;
+  display: flex; align-items: center; justify-content: space-between;
+  transition: background .4s, padding .4s, box-shadow .4s;
+}
+.nav.scrolled {
+  background: rgba(15,26,61,.97);
+  padding: 14px 48px;
+  box-shadow: 0 4px 40px rgba(0,0,0,.25);
+  backdrop-filter: blur(12px);
+}
+.nav-logo { display: flex; align-items: center; gap: 12px; }
+.nav-logo img { height: 38px; filter: drop-shadow(0 0 8px rgba(201,169,122,.4)); }
+.nav-wordmark { font-family: 'Cinzel', serif; font-size: 15px; letter-spacing: 3px; color: var(--white); }
+.nav-links { display: flex; align-items: center; gap: 32px; }
+.nav-links a { font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,.65); transition: color .3s; }
+.nav-links a:hover { color: var(--gold); }
+.nav-cta {
+  background: var(--gold); color: var(--navy) !important;
+  padding: 10px 22px; border-radius: 4px;
+  font-weight: 600; letter-spacing: 1px !important;
+  transition: background .3s, transform .2s !important;
+}
+.nav-cta:hover { background: var(--gold-l); transform: translateY(-1px); }
+
+/* ══════════════════════════════════════════
+   HERO
+══════════════════════════════════════════ */
+.hero {
+  min-height: 100vh;
+  background: var(--navy);
+  position: relative;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center;
+  overflow: hidden;
+  padding: 120px 24px 80px;
+}
+/* Animated gradient orbs */
+.orb {
+  position: absolute; border-radius: 50%;
+  filter: blur(80px); pointer-events: none;
+  animation: drift 12s ease-in-out infinite;
+}
+.orb-1 { width: 500px; height: 500px; background: rgba(42,68,144,.35); top: -100px; left: -100px; animation-duration: 14s; }
+.orb-2 { width: 400px; height: 400px; background: rgba(201,169,122,.12); top: 30%; right: -80px; animation-duration: 10s; animation-delay: -4s; }
+.orb-3 { width: 350px; height: 350px; background: rgba(27,46,107,.4); bottom: -80px; left: 20%; animation-duration: 16s; animation-delay: -8s; }
+@keyframes drift {
+  0%, 100% { transform: translate(0,0) scale(1); }
+  33%       { transform: translate(30px,-20px) scale(1.05); }
+  66%       { transform: translate(-20px,30px) scale(.96); }
+}
+
+/* Floating particles */
+.particles { position: absolute; inset: 0; pointer-events: none; }
+.particle {
+  position: absolute;
+  width: 2px; height: 2px;
+  background: var(--gold);
+  border-radius: 50%;
+  opacity: 0;
+  animation: float-up linear infinite;
+}
+@keyframes float-up {
+  0%   { transform: translateY(100vh) scale(0); opacity: 0; }
+  10%  { opacity: .6; }
+  90%  { opacity: .3; }
+  100% { transform: translateY(-10vh) scale(1.5); opacity: 0; }
+}
+
+.hero-eyebrow {
+  font-size: 11px; letter-spacing: 6px; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 28px;
+  opacity: 0; animation: fadeDown .8s var(--ease) .3s forwards;
+}
+.hero-logo {
+  width: 160px; margin: 0 auto 36px;
+  filter: drop-shadow(0 0 40px rgba(201,169,122,.5));
+  opacity: 0; animation: fadeDown .8s var(--ease) .5s forwards;
+}
+.hero-title {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(32px, 6vw, 72px);
+  font-weight: 700; letter-spacing: 4px;
+  color: var(--white); line-height: 1.1;
+  margin-bottom: 16px;
+  opacity: 0; animation: fadeDown .8s var(--ease) .7s forwards;
+}
+.hero-rule {
+  width: 80px; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  margin: 0 auto 24px;
+  opacity: 0; animation: fadeIn .6s var(--ease) .9s forwards;
+}
+.hero-tagline {
+  font-family: 'Playfair Display', serif; font-style: italic;
+  font-size: clamp(20px, 3vw, 32px);
+  color: var(--gold); margin-bottom: 20px;
+  opacity: 0; animation: fadeDown .8s var(--ease) 1.0s forwards;
+}
+.hero-sub {
+  font-size: clamp(14px, 1.6vw, 17px);
+  color: rgba(255,255,255,.55); line-height: 1.8; max-width: 580px;
+  margin: 0 auto 52px;
+  opacity: 0; animation: fadeDown .8s var(--ease) 1.1s forwards;
+}
+.hero-btns {
+  display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
+  opacity: 0; animation: fadeDown .8s var(--ease) 1.3s forwards;
+}
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 16px 36px; border-radius: 4px;
+  font-size: 13px; font-weight: 600; letter-spacing: 1.5px;
+  text-transform: uppercase; cursor: pointer;
+  transition: transform .25s var(--ease), box-shadow .25s;
+  border: none;
+}
+.btn:hover { transform: translateY(-3px); }
+.btn-gold {
+  background: var(--gold); color: var(--navy);
+  box-shadow: 0 8px 32px rgba(201,169,122,.3);
+}
+.btn-gold:hover { background: var(--gold-l); box-shadow: 0 14px 40px rgba(201,169,122,.45); }
+.btn-outline {
+  background: transparent; color: var(--white);
+  border: 1px solid rgba(255,255,255,.3);
+}
+.btn-outline:hover { border-color: var(--gold); color: var(--gold); box-shadow: 0 8px 24px rgba(201,169,122,.15); }
+
+.hero-scroll {
+  position: absolute; bottom: 36px; left: 50%; transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  color: rgba(255,255,255,.25); font-size: 9px; letter-spacing: 3px; text-transform: uppercase;
+  opacity: 0; animation: fadeIn 1s var(--ease) 1.8s forwards;
+}
+.scroll-line {
+  width: 1px; height: 50px;
+  background: linear-gradient(to bottom, rgba(201,169,122,.6), transparent);
+  animation: scrollPulse 2s ease-in-out infinite;
+}
+@keyframes scrollPulse {
+  0%, 100% { opacity: .3; transform: scaleY(1); }
+  50%       { opacity: 1; transform: scaleY(1.1); }
+}
+
+@keyframes fadeDown {
+  from { opacity:0; transform: translateY(-16px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+/* ══════════════════════════════════════════
+   STATS BAR
+══════════════════════════════════════════ */
+.stats {
+  background: var(--blue); padding: 48px;
+  display: grid; grid-template-columns: repeat(4,1fr);
+  gap: 1px; overflow: hidden;
+}
+.stat-item {
+  padding: 32px 24px; text-align: center;
+  background: rgba(255,255,255,.03);
+  border-right: 1px solid rgba(255,255,255,.06);
+}
+.stat-item:last-child { border-right: none; }
+.stat-n {
+  font-family: 'Cinzel', serif; font-size: 48px;
+  font-weight: 700; color: var(--gold); line-height: 1;
+  margin-bottom: 8px;
+}
+.stat-n .unit { font-size: 24px; color: var(--gold-l); }
+.stat-l { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,.4); }
+
+/* ══════════════════════════════════════════
+   SECTION BASE
+══════════════════════════════════════════ */
+.section { padding: 120px 48px; max-width: 1100px; margin: 0 auto; }
+.section-full { padding: 0; max-width: none; margin: 0; }
+
+.chip { display: inline-block; font-size: 10px; letter-spacing: 4px; text-transform: uppercase; color: var(--gold); margin-bottom: 16px; }
+.h2 { font-family: 'Cinzel', serif; font-size: clamp(26px,3.5vw,44px); line-height: 1.2; margin-bottom: 16px; }
+.h2 em { color: var(--gold-d); font-style: normal; }
+.lead { font-size: 17px; color: var(--gray); line-height: 1.85; max-width: 660px; }
+.divider { width: 50px; height: 2px; background: linear-gradient(90deg,var(--gold),var(--gold-l)); margin: 28px 0 52px; }
+
+/* ══════════════════════════════════════════
+   PROBLEM SECTION
+══════════════════════════════════════════ */
+.problem-wrap { background: var(--cream); }
+.problem-inner {
+  max-width: 1100px; margin: 0 auto;
+  padding: 120px 48px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
+}
+.problem-visual {
+  position: relative; border-radius: 16px; overflow: hidden;
+  background: var(--navy);
+  aspect-ratio: 4/5; max-height: 520px;
+  display: flex; align-items: center; justify-content: center;
+}
+.problem-visual-inner {
+  padding: 48px; text-align: center;
+}
+.problem-q {
+  font-family: 'Playfair Display', serif; font-size: 32px;
+  color: var(--white); line-height: 1.4; margin-bottom: 24px;
+  font-style: italic;
+}
+.problem-q em { color: var(--gold); font-style: normal; }
+.pv-rule { width: 50px; height: 1px; background: var(--gold); margin: 0 auto; }
+.problem-glare {
+  position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(ellipse at 30% 30%, rgba(201,169,122,.12) 0%, transparent 60%);
+}
+.problem-content {}
+.problem-list { list-style: none; display: flex; flex-direction: column; gap: 24px; }
+.pl-item { display: flex; gap: 20px; align-items: flex-start; }
+.pl-icon {
+  width: 44px; height: 44px; min-width: 44px; border-radius: 10px;
+  background: rgba(201,169,122,.1); border: 1px solid rgba(201,169,122,.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; margin-top: 2px;
+}
+.pl-t { font-size: 16px; font-weight: 600; color: var(--navy); margin-bottom: 4px; }
+.pl-p { font-size: 14px; color: var(--gray); line-height: 1.7; }
+
+/* ══════════════════════════════════════════
+   DIFFERENTIALS
+══════════════════════════════════════════ */
+.diff-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 28px; margin-top: 52px; }
+.diff-card {
+  border: 1px solid rgba(201,169,122,.15); border-radius: 16px;
+  padding: 40px 32px; cursor: default;
+  position: relative; overflow: hidden;
+  transition: transform .35s var(--ease), box-shadow .35s, border-color .35s;
+}
+.diff-card::before {
+  content: ''; position: absolute; inset: 0; border-radius: 16px;
+  background: linear-gradient(135deg, rgba(201,169,122,.06) 0%, transparent 60%);
+  opacity: 0; transition: opacity .35s;
+}
+.diff-card:hover { transform: translateY(-8px); box-shadow: 0 24px 60px rgba(0,0,0,.1); border-color: rgba(201,169,122,.4); }
+.diff-card:hover::before { opacity: 1; }
+.diff-num { font-family: 'Cinzel', serif; font-size: 64px; font-weight: 700; color: rgba(201,169,122,.12); line-height: 1; margin-bottom: 20px; }
+.diff-icon { font-size: 36px; margin-bottom: 20px; }
+.diff-t { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: var(--navy); margin-bottom: 12px; }
+.diff-p { font-size: 14px; color: var(--gray); line-height: 1.75; }
+.diff-bar { width: 0; height: 2px; background: var(--gold); margin-top: 24px; transition: width .5s var(--ease); }
+.diff-card:hover .diff-bar { width: 48px; }
+
+/* ══════════════════════════════════════════
+   COURSES ACCORDION
+══════════════════════════════════════════ */
+.courses-wrap { background: var(--navy); }
+.courses-inner { max-width: 1100px; margin: 0 auto; padding: 120px 48px; }
+.courses-inner .h2 { color: var(--white); }
+.courses-inner .lead { color: rgba(255,255,255,.5); }
+.courses-inner .chip { color: rgba(201,169,122,.7); }
+
+.accordion { display: flex; flex-direction: column; gap: 2px; margin-top: 52px; }
+.acc-item {
+  border-radius: 0; overflow: hidden;
+  transition: border-radius .3s;
+}
+.acc-item:first-child { border-radius: 12px 12px 0 0; }
+.acc-item:last-child  { border-radius: 0 0 12px 12px; }
+.acc-item.open { border-radius: 12px; margin: 6px 0; }
+
+.acc-head {
+  display: flex; align-items: center; gap: 20px;
+  padding: 24px 28px; cursor: pointer;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.07);
+  transition: background .3s;
+  user-select: none;
+}
+.acc-item.open .acc-head {
+  background: rgba(201,169,122,.1);
+  border-color: rgba(201,169,122,.25);
+  border-bottom-color: transparent;
+}
+.acc-head:hover { background: rgba(255,255,255,.07); }
+.acc-item.open .acc-head:hover { background: rgba(201,169,122,.12); }
+
+.acc-step {
+  width: 36px; height: 36px; min-width: 36px; border-radius: 50%;
+  background: rgba(201,169,122,.12); border: 1px solid rgba(201,169,122,.25);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Cinzel', serif; font-size: 13px; color: var(--gold);
+  transition: background .3s;
+}
+.acc-item.open .acc-step { background: var(--gold); color: var(--navy); border-color: var(--gold); }
+
+.acc-title { flex: 1; font-family: 'Playfair Display', serif; font-size: 20px; color: var(--white); font-weight: 700; }
+.acc-sub { font-size: 12px; color: rgba(255,255,255,.35); letter-spacing: 1px; }
+.acc-arr {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.12);
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(255,255,255,.4); font-size: 14px;
+  transition: transform .4s var(--ease), border-color .3s, color .3s;
+}
+.acc-item.open .acc-arr { transform: rotate(180deg); border-color: var(--gold); color: var(--gold); }
+
+.acc-body {
+  max-height: 0; overflow: hidden;
+  transition: max-height .5s var(--ease);
+  background: rgba(201,169,122,.05);
+  border: 1px solid rgba(201,169,122,.2);
+  border-top: none; border-radius: 0 0 12px 12px;
+}
+.acc-item.open .acc-body { max-height: 500px; }
+.acc-content { padding: 28px 28px 32px; display: flex; gap: 48px; flex-wrap: wrap; }
+.acc-desc { flex: 2; min-width: 200px; font-size: 15px; color: rgba(255,255,255,.65); line-height: 1.8; }
+.acc-meta { flex: 1; min-width: 160px; display: flex; flex-direction: column; gap: 14px; }
+.acc-tag {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 11px; color: var(--gold); letter-spacing: 1px;
+}
+.acc-tag::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--gold); }
+.acc-next {
+  display: inline-flex; align-items: center; gap: 8px;
+  margin-top: 8px; font-size: 12px; color: rgba(255,255,255,.35);
+  letter-spacing: 1px;
+}
+.acc-next span { color: var(--gold); }
+
+/* ══════════════════════════════════════════
+   HOW IT WORKS
+══════════════════════════════════════════ */
+.how-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; margin-top: 52px; background: rgba(201,169,122,.12); border-radius: 16px; overflow: hidden; }
+.how-item { padding: 48px 36px; background: var(--white); position: relative; transition: background .35s; }
+.how-item:hover { background: var(--cream); }
+.how-n {
+  font-family: 'Cinzel', serif; font-size: 80px; font-weight: 700;
+  color: rgba(201,169,122,.15); line-height: 1; margin-bottom: 24px;
+  transition: color .35s;
+}
+.how-item:hover .how-n { color: rgba(201,169,122,.3); }
+.how-t { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--navy); font-weight: 700; margin-bottom: 12px; }
+.how-p { font-size: 14px; color: var(--gray); line-height: 1.75; }
+
+/* ══════════════════════════════════════════
+   LIVE BADGE / COMMUNITY
+══════════════════════════════════════════ */
+.community-wrap { background: var(--cream); }
+.community-inner { max-width: 1100px; margin: 0 auto; padding: 120px 48px; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+.comm-cards { display: flex; flex-direction: column; gap: 16px; }
+.comm-card { background: var(--white); border: 1px solid rgba(201,169,122,.18); border-radius: 14px; padding: 28px; display: flex; gap: 20px; align-items: flex-start; transition: transform .3s, box-shadow .3s; }
+.comm-card:hover { transform: translateY(-4px); box-shadow: 0 14px 40px rgba(0,0,0,.08); }
+.comm-icon { width: 52px; height: 52px; min-width: 52px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+.c-blue { background: rgba(27,46,107,.08); }
+.c-gold { background: rgba(201,169,122,.12); }
+.c-green { background: rgba(34,197,94,.08); }
+.comm-t { font-size: 16px; font-weight: 600; color: var(--navy); margin-bottom: 4px; }
+.comm-p { font-size: 13px; color: var(--gray); line-height: 1.65; }
+.live-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.2); border-radius: 20px; padding: 4px 12px; font-size: 11px; color: #dc2626; letter-spacing: 1px; font-weight: 600; margin-bottom: 6px; }
+.live-dot { width: 6px; height: 6px; background: #dc2626; border-radius: 50%; animation: livePulse 1.5s ease-in-out infinite; }
+@keyframes livePulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:.4; transform:scale(1.3); } }
+
+/* ══════════════════════════════════════════
+   PROFESSORS
+══════════════════════════════════════════ */
+.prof-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 32px; margin-top: 52px; }
+.prof-card {
+  background: var(--white); border: 1px solid rgba(201,169,122,.15); border-radius: 16px;
+  padding: 40px; position: relative; overflow: hidden;
+  transition: transform .35s, box-shadow .35s;
+}
+.prof-card:hover { transform: translateY(-6px); box-shadow: 0 20px 60px rgba(0,0,0,.1); }
+.prof-card::after {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--gold), var(--gold-l));
+}
+.prof-avatar { width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, var(--blue), var(--navy)); display: flex; align-items: center; justify-content: center; font-family: 'Cinzel', serif; font-size: 26px; color: var(--gold); margin-bottom: 20px; }
+.prof-name { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
+.prof-role { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--gold-d); margin-bottom: 16px; }
+.prof-p { font-size: 14px; color: var(--gray); line-height: 1.75; }
+
+/* ══════════════════════════════════════════
+   CTA FINAL
+══════════════════════════════════════════ */
+.cta-section {
+  background: var(--navy); padding: 140px 48px; text-align: center;
+  position: relative; overflow: hidden;
+}
+.cta-section::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 50%, rgba(201,169,122,.1) 0%, transparent 65%);
+}
+.cta-orb1 { position: absolute; width: 600px; height: 600px; border: 1px solid rgba(201,169,122,.06); border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%,-50%); }
+.cta-orb2 { position: absolute; width: 800px; height: 800px; border: 1px solid rgba(201,169,122,.04); border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%,-50%); }
+.cta-inner { position: relative; z-index: 1; max-width: 700px; margin: 0 auto; }
+.cta-title { font-family: 'Cinzel', serif; font-size: clamp(28px,4.5vw,52px); color: var(--white); line-height: 1.2; margin-bottom: 20px; }
+.cta-sub { font-family: 'Playfair Display', serif; font-style: italic; font-size: clamp(18px,2.5vw,26px); color: var(--gold); margin-bottom: 16px; }
+.cta-p { font-size: 15px; color: rgba(255,255,255,.5); line-height: 1.8; max-width: 500px; margin: 0 auto 52px; }
+.cta-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+.btn-lg { padding: 20px 48px; font-size: 14px; }
+
+/* ══════════════════════════════════════════
+   FOOTER
+══════════════════════════════════════════ */
+footer { background: #08101F; padding: 64px 48px; }
+.footer-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 64px; }
+.footer-brand {}
+.footer-logo-row { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+.footer-logo-row img { height: 40px; opacity: .85; }
+.footer-wm { font-family: 'Cinzel', serif; font-size: 16px; letter-spacing: 3px; color: var(--gold); }
+.footer-p { font-size: 13px; color: rgba(255,255,255,.35); line-height: 1.75; max-width: 280px; }
+.footer-col-t { font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-bottom: 20px; }
+.footer-links { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+.footer-links li a { font-size: 13px; color: rgba(255,255,255,.4); transition: color .3s; }
+.footer-links li a:hover { color: var(--gold); }
+.footer-bottom { max-width: 1100px; margin: 48px auto 0; padding-top: 28px; border-top: 1px solid rgba(255,255,255,.06); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+.footer-copy { font-size: 12px; color: rgba(255,255,255,.2); letter-spacing: 1px; }
+.footer-tag { font-family: 'Playfair Display', serif; font-style: italic; font-size: 13px; color: rgba(201,169,122,.5); }
+
+/* ══════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════ */
+@media(max-width:900px) {
+  .stats { grid-template-columns: repeat(2,1fr); }
+  .problem-inner { grid-template-columns: 1fr; }
+  .problem-visual { aspect-ratio: 3/2; }
+  .diff-grid { grid-template-columns: 1fr; }
+  .how-grid { grid-template-columns: 1fr; }
+  .community-inner { grid-template-columns: 1fr; }
+  .prof-grid { grid-template-columns: 1fr; }
+  .footer-inner { grid-template-columns: 1fr; gap: 40px; }
+  .footer-bottom { flex-direction: column; text-align: center; }
+}
+@media(max-width:600px) {
+  .nav { padding: 16px 20px; }
+  .nav.scrolled { padding: 12px 20px; }
+  .nav-links { display: none; }
+  .section { padding: 80px 24px; }
+  .courses-inner, .footer-inner { padding-left: 24px; padding-right: 24px; }
+  .stats { grid-template-columns: repeat(2,1fr); gap: 0; }
+  .cta-section { padding: 100px 24px; }
+  footer { padding: 48px 24px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav class="nav" id="nav">
+  <div class="nav-logo">
+    <img src="file:///G:/Meu%20Drive/Escola/Kadima%20Academy/logo-nova.png" alt="Kadima">
+    <span class="nav-wordmark">KADIMA ACADEMY</span>
+  </div>
+  <div class="nav-links">
+    <a href="#diferenciais">Diferenciais</a>
+    <a href="#cursos">Cursos</a>
+    <a href="#como-funciona">Como Funciona</a>
+    <a href="#professores">Professores</a>
+    <a href="https://wa.me/5521983051035" target="_blank" rel="noopener noreferrer" class="nav-cta">Matricular-se</a>
+  </div>
+</nav>
+
+<!-- ══ HERO ══ -->
+<section class="hero" id="hero">
+  <div class="particles" id="particles"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <p class="hero-eyebrow">Escola Teológica Online</p>
+  <img src="file:///G:/Meu%20Drive/Escola/Kadima%20Academy/logo-nova.png" alt="Kadima Academy" class="hero-logo">
+  <h1 class="hero-title">KADIMA ACADEMY</h1>
+  <div class="hero-rule"></div>
+  <p class="hero-tagline">Avante no Conhecimento</p>
+  <p class="hero-sub">Aprenda a Bíblia com profundidade real — através de metodologia visual única, tipologia hebraica e ensino cristocêntrico acessível a qualquer evangélico.</p>
+  <div class="hero-btns">
+    <a href="https://wa.me/5521983051035" target="_blank" rel="noopener noreferrer" class="btn btn-gold btn-lg">Quero me matricular</a>
+    <a href="#cursos" class="btn btn-outline">Ver os cursos</a>
+  </div>
+
+  <div class="hero-scroll">
+    <span>Descubra mais</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- ══ STATS ══ -->
+<div class="stats">
+  <div class="stat-item reveal delay-1">
+    <div class="stat-n" data-target="7"><span class="count">7</span><span class="unit">+</span></div>
+    <div class="stat-l">Anos de ensino</div>
+  </div>
+  <div class="stat-item reveal delay-2">
+    <div class="stat-n"><span class="count" data-target="5">5</span></div>
+    <div class="stat-l">Cursos na jornada</div>
+  </div>
+  <div class="stat-item reveal delay-3">
+    <div class="stat-n"><span class="count" data-target="2">2</span></div>
+    <div class="stat-l">Professores especializados</div>
+  </div>
+  <div class="stat-item reveal delay-4">
+    <div class="stat-n"><span class="count" data-target="52">52</span></div>
+    <div class="stat-l">Aulas ao vivo por ano</div>
+  </div>
+</div>
+
+<!-- ══ PROBLEMA ══ -->
+<div class="problem-wrap">
+  <div class="problem-inner">
+    <div class="problem-visual reveal left">
+      <div class="problem-glare"></div>
+      <div class="problem-visual-inner">
+        <p class="problem-q">Você frequenta a<br>igreja há anos.<br>Mas ainda sente que<br>não entende a Bíblia<br><em>de verdade.</em></p>
+        <div class="pv-rule"></div>
+      </div>
+    </div>
+    <div class="problem-content">
+      <p class="chip reveal">O Problema</p>
+      <h2 class="h2 reveal delay-1">A fé sem <em>fundamento</em> é frágil</h2>
+      <div class="divider reveal delay-2"></div>
+      <ul class="problem-list">
+        <li class="pl-item reveal delay-2">
+          <div class="pl-icon">📖</div>
+          <div>
+            <div class="pl-t">Sermões sem conexão</div>
+            <div class="pl-p">Você ouve, anota, mas os pontos nunca se conectam de forma clara na sua mente.</div>
+          </div>
+        </li>
+        <li class="pl-item reveal delay-3">
+          <div class="pl-icon">🔍</div>
+          <div>
+            <div class="pl-t">Doutrina sem profundidade</div>
+            <div class="pl-p">O ensino superficial deixa você vulnerável a interpretações erradas e falsas doutrinas.</div>
+          </div>
+        </li>
+        <li class="pl-item reveal delay-4">
+          <div class="pl-icon">🗺️</div>
+          <div>
+            <div class="pl-t">Sem metodologia clara</div>
+            <div class="pl-p">Não existe escola acessível que ensine a Bíblia de forma visual, sequencial e profunda.</div>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ══ DIFERENCIAIS ══ -->
+<section class="section" id="diferenciais">
+  <p class="chip reveal">Por que a Kadima?</p>
+  <h2 class="h2 reveal delay-1">Uma escola diferente do que<br>você já conhece</h2>
+  <div class="divider reveal delay-2"></div>
+  <p class="lead reveal delay-2">Nossa metodologia combina rigor teológico com visualização — para que você não apenas aprenda a Bíblia, mas a veja como nunca antes.</p>
+
+  <div class="diff-grid">
+    <div class="diff-card reveal delay-1">
+      <div class="diff-icon">🎨</div>
+      <div class="diff-t">Metodologia Visual</div>
+      <div class="diff-p">Mapas, diagramas e desenhos ao vivo que revelam o que está escrito. Você vê a Palavra de Deus — não apenas a ouve. Uma experiência única no mercado teológico brasileiro.</div>
+      <div class="diff-bar"></div>
+    </div>
+    <div class="diff-card reveal delay-2">
+      <div class="diff-icon">✡️</div>
+      <div class="diff-t">Tipologia Hebraica</div>
+      <div class="diff-p">Compreender as raízes hebraicas da Bíblia transforma seu entendimento. Letras, símbolos e contextos que iluminam passagens que antes pareciam obscuras.</div>
+      <div class="diff-bar"></div>
+    </div>
+    <div class="diff-card reveal delay-3">
+      <div class="diff-icon">✝️</div>
+      <div class="diff-t">Cristocêntrico 100%</div>
+      <div class="diff-p">Todo conteúdo parte de Cristo e retorna a Cristo. Ancoragem doutrinária profunda e consistente — porque a Bíblia inteira aponta para Ele.</div>
+      <div class="diff-bar"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ CURSOS ══ -->
+<div class="courses-wrap" id="cursos">
+  <div class="courses-inner">
+    <p class="chip reveal">Jornada Formativa</p>
+    <h2 class="h2 reveal delay-1">Uma esteira de <em style="color:var(--gold);">crescimento</em></h2>
+    <div class="divider reveal delay-2" style="background:linear-gradient(90deg,var(--gold),var(--gold-l));"></div>
+    <p class="lead reveal delay-2">Cada curso prepara você para o próximo nível. Do iniciante ao líder ministerial — uma jornada contínua e estruturada.</p>
+
+    <div class="accordion reveal delay-2">
+
+      <div class="acc-item open">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <div class="acc-step">1</div>
+          <div>
+            <div class="acc-title">Capelania</div>
+            <div class="acc-sub">Porta de entrada · Ticket acessível</div>
+          </div>
+          <div class="acc-arr">▾</div>
+        </div>
+        <div class="acc-body">
+          <div class="acc-content">
+            <div class="acc-desc">O ponto de entrada perfeito para quem quer começar a entender a Palavra de Deus com profundidade. Curso acessível, com certificado digital incluído. Ao concluir, você recebe acesso gratuito às primeiras 2 aulas do próximo nível como prévia da sua jornada.</div>
+            <div class="acc-meta">
+              <div class="acc-tag">Certificado Digital</div>
+              <div class="acc-tag">Credencial Impressa (opcional)</div>
+              <div class="acc-tag">Plano de Implantação Local</div>
+              <div class="acc-next">Próximo: <span>Batalha Espiritual →</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <div class="acc-step">2</div>
+          <div>
+            <div class="acc-title">Batalha Espiritual (1, 2 e 3)</div>
+            <div class="acc-sub">Aprofundamento ministerial</div>
+          </div>
+          <div class="acc-arr">▾</div>
+        </div>
+        <div class="acc-body">
+          <div class="acc-content">
+            <div class="acc-desc">Formação aprofundada sobre o mundo espiritual, libertação e identidade em Cristo. Este nível consolida o aluno dentro do ecossistema formativo e prepara para os próximos passos da jornada.</div>
+            <div class="acc-meta">
+              <div class="acc-tag">3 módulos progressivos</div>
+              <div class="acc-tag">Fundamentos doutrinários</div>
+              <div class="acc-tag">Certificado de Conclusão</div>
+              <div class="acc-next">Próximo: <span>Anatomia Espiritual →</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <div class="acc-step">3</div>
+          <div>
+            <div class="acc-title">Anatomia da Vida Espiritual</div>
+            <div class="acc-sub">Cuidado e fortalecimento interior</div>
+          </div>
+          <div class="acc-arr">▾</div>
+        </div>
+        <div class="acc-body">
+          <div class="acc-content">
+            <div class="acc-desc">Formação voltada ao entendimento da tricotomia humana (espírito, alma e corpo) e ao fortalecimento espiritual interior. Introduz a necessidade de cobertura espiritual e pastoreio como fundamentos do crescimento.</div>
+            <div class="acc-meta">
+              <div class="acc-tag">Tricotomia bíblica</div>
+              <div class="acc-tag">Vida interior</div>
+              <div class="acc-tag">Pastoreio e cobertura</div>
+              <div class="acc-next">Próximo: <span>Profeta e Sacerdote →</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <div class="acc-step">4</div>
+          <div>
+            <div class="acc-title">Profeta e Sacerdote</div>
+            <div class="acc-sub">Identidade ministerial</div>
+          </div>
+          <div class="acc-arr">▾</div>
+        </div>
+        <div class="acc-body">
+          <div class="acc-content">
+            <div class="acc-desc">Formação de alinhamento espiritual, honra, cobertura e identidade ministerial. Prepara o aluno para entender seu papel no Reino de Deus e o coloca no caminho para a formação mais avançada da jornada.</div>
+            <div class="acc-meta">
+              <div class="acc-tag">Identidade ministerial</div>
+              <div class="acc-tag">Honra e cobertura</div>
+              <div class="acc-tag">Alinhamento espiritual</div>
+              <div class="acc-next">Próximo: <span>Tesouraria do Reino →</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <div class="acc-step">5</div>
+          <div>
+            <div class="acc-title">Tesouraria do Reino</div>
+            <div class="acc-sub">Maturidade avançada · Maior nível</div>
+          </div>
+          <div class="acc-arr">▾</div>
+        </div>
+        <div class="acc-body">
+          <div class="acc-content">
+            <div class="acc-desc">O nível mais avançado da jornada Kadima. Formação aprofundada sobre os princípios de honra, gestão e finanças do Reino de Deus. Conteúdo exclusivo para alunos que chegaram à maturidade ministerial.</div>
+            <div class="acc-meta">
+              <div class="acc-tag">Finanças do Reino</div>
+              <div class="acc-tag">Gestão ministerial</div>
+              <div class="acc-tag">Maturidade avançada</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══ COMO FUNCIONA ══ -->
+<section class="section" id="como-funciona">
+  <p class="chip reveal">Simples assim</p>
+  <h2 class="h2 reveal delay-1">Como você <em>avança</em></h2>
+  <div class="divider reveal delay-2"></div>
+
+  <div class="how-grid">
+    <div class="how-item reveal delay-1">
+      <div class="how-n">01</div>
+      <div class="how-t">Escolha seu curso</div>
+      <div class="how-p">Comece pela Capelania — o ponto de entrada ideal para qualquer evangélico, independente do conhecimento teológico que já tem.</div>
+    </div>
+    <div class="how-item reveal delay-2">
+      <div class="how-n">02</div>
+      <div class="how-t">Aprenda visualmente</div>
+      <div class="how-p">Aulas gravadas com metodologia visual exclusiva + aulas ao vivo toda sexta. Aprenda no seu ritmo ou em tempo real.</div>
+    </div>
+    <div class="how-item reveal delay-3">
+      <div class="how-n">03</div>
+      <div class="how-t">Avance na jornada</div>
+      <div class="how-p">Cada curso abre o próximo. Uma esteira contínua do iniciante ao líder ministerial — com comunidade ativa em cada etapa.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ COMUNIDADE ══ -->
+<div class="community-wrap">
+  <div class="community-inner">
+    <div>
+      <p class="chip reveal">Mais que um curso</p>
+      <h2 class="h2 reveal delay-1">Uma <em>comunidade</em> que avança junto</h2>
+      <div class="divider reveal delay-2"></div>
+      <p class="lead reveal delay-2">Na Kadima, você não estuda sozinho. Faz parte de uma comunidade de evangélicos comprometidos com o conhecimento real da Palavra.</p>
+    </div>
+    <div class="comm-cards">
+      <div class="comm-card reveal delay-1">
+        <div class="comm-icon c-gold"><span style="font-size:22px;">📡</span></div>
+        <div>
+          <div class="live-badge"><div class="live-dot"></div>AO VIVO</div>
+          <div class="comm-t">Aulas ao vivo toda sexta</div>
+          <div class="comm-p">Toda sexta-feira há uma aula ao vivo — para aprender, tirar dúvidas e se conectar com a comunidade em tempo real.</div>
+        </div>
+      </div>
+      <div class="comm-card reveal delay-2">
+        <div class="comm-icon c-blue"><span style="font-size:22px;">🏛️</span></div>
+        <div>
+          <div class="comm-t">Plataforma própria</div>
+          <div class="comm-p">Conteúdo gravado disponível 24h, área de membros organizada, certificados digitais e acesso vitalício às aulas do seu curso.</div>
+        </div>
+      </div>
+      <div class="comm-card reveal delay-3">
+        <div class="comm-icon c-green"><span style="font-size:22px;">🌱</span></div>
+        <div>
+          <div class="comm-t">Expansão local</div>
+          <div class="comm-p">Alunos da Capelania recebem um Plano de Implantação para apresentar na sua igreja — levando o ensino para sua comunidade.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PROFESSORES ══ -->
+<section class="section" id="professores">
+  <p class="chip reveal">Quem ensina</p>
+  <h2 class="h2 reveal delay-1">Professores com <em>autoridade</em> real</h2>
+  <div class="divider reveal delay-2"></div>
+  <p class="lead reveal delay-2">7 anos de ensino teológico presencial. Metodologia visual desenvolvida e refinada na prática — com centenas de alunos formados.</p>
+
+  <div class="prof-grid">
+    <div class="prof-card reveal delay-1">
+      <div class="prof-avatar">D</div>
+      <div class="prof-name">Deyvved Mesquita</div>
+      <div class="prof-role">Fundador & Professor Principal</div>
+      <div class="prof-p">Bacharel em Teologia pela Hossana Academy. Especialista em tipologia hebraica e metodologia visual de ensino bíblico. Fundador da Escola Teológica Abrigo de Deus — hoje Kadima Academy.</div>
+    </div>
+    <div class="prof-card reveal delay-2">
+      <div class="prof-avatar">A</div>
+      <div class="prof-name">Pr Adilson</div>
+      <div class="prof-role">Co-fundador & Professor</div>
+      <div class="prof-p">Pastor e professor com anos de experiência ministerial. Ensino cristocêntrico e bibliocêntrico com profundidade doutrinária e didática pastoral. Referência em formação ministerial.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ CTA FINAL ══ -->
+<div class="cta-section" id="matricula">
+  <div class="cta-orb1"></div>
+  <div class="cta-orb2"></div>
+  <div class="cta-inner">
+    <p class="chip reveal" style="color:rgba(201,169,122,.7);">Comece hoje</p>
+    <h2 class="cta-title reveal delay-1">Está na hora de<br>avançar no conhecimento</h2>
+    <p class="cta-sub reveal delay-2">Avante no Conhecimento</p>
+    <p class="cta-p reveal delay-3">Matricule-se no curso de Capelania e dê o primeiro passo de uma jornada que vai transformar sua relação com a Palavra de Deus.</p>
+    <div class="cta-btns reveal delay-4">
+      <a href="https://wa.me/5521983051035" target="_blank" rel="noopener noreferrer" class="btn btn-gold btn-lg">Quero me matricular agora</a>
+      <a href="#cursos" class="btn btn-outline btn-lg">Ver todos os cursos</a>
+    </div>
+  </div>
+</div>
+
+<!-- ══ FOOTER ══ -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="footer-logo-row">
+        <img src="file:///G:/Meu%20Drive/Escola/Kadima%20Academy/logo-nova.png" alt="Kadima">
+        <span class="footer-wm">KADIMA ACADEMY</span>
+      </div>
+      <p class="footer-p">Escola teológica online. Metodologia visual exclusiva. Avante no conhecimento — com profundidade, clareza e comunidade.</p>
+    </div>
+    <div>
+      <div class="footer-col-t">Cursos</div>
+      <ul class="footer-links">
+        <li><a href="#">Capelania</a></li>
+        <li><a href="#">Batalha Espiritual</a></li>
+        <li><a href="#">Anatomia da Vida Espiritual</a></li>
+        <li><a href="#">Profeta e Sacerdote</a></li>
+        <li><a href="#">Tesouraria do Reino</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-t">Sobre</div>
+      <ul class="footer-links">
+        <li><a href="#">Nossa História</a></li>
+        <li><a href="#">Professores</a></li>
+        <li><a href="#">Metodologia</a></li>
+        <li><a href="#">Comunidade</a></li>
+        <li><a href="#">Contato</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p class="footer-copy">© 2025 Kadima Academy · Todos os direitos reservados</p>
+    <p class="footer-tag">Avante no Conhecimento</p>
+  </div>
+</footer>
+
+<!-- ══════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════ -->
+<script>
+/* ── NAV SCROLL ── */
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 50);
+});
+
+/* ── REVEAL ON SCROLL ── */
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.12 });
+reveals.forEach(el => observer.observe(el));
+
+/* ── PARTICLES ── */
+const container = document.getElementById('particles');
+const count = 60;
+for (let i = 0; i < count; i++) {
+  const p = document.createElement('div');
+  p.className = 'particle';
+  p.style.cssText = `
+    left: ${Math.random()*100}%;
+    width: ${Math.random()*3+1}px;
+    height: ${Math.random()*3+1}px;
+    animation-duration: ${Math.random()*15+8}s;
+    animation-delay: ${Math.random()*10}s;
+    opacity: ${Math.random()*.5+.1};
+  `;
+  container.appendChild(p);
+}
+
+/* ── COUNTERS ── */
+function animateCounter(el) {
+  const target = parseInt(el.dataset.target || el.textContent);
+  const duration = 1800;
+  const start = performance.now();
+  const update = (time) => {
+    const elapsed = time - start;
+    const progress = Math.min(elapsed / duration, 1);
+    const ease = 1 - Math.pow(1 - progress, 3);
+    el.textContent = Math.round(ease * target);
+    if (progress < 1) requestAnimationFrame(update);
+  };
+  requestAnimationFrame(update);
+}
+const counterObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.querySelectorAll('.count').forEach(animateCounter);
+      counterObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.5 });
+document.querySelectorAll('.stats').forEach(el => counterObs.observe(el));
+
+/* ── ACCORDION ── */
+function toggleAcc(head) {
+  const item = head.parentElement;
+  const isOpen = item.classList.contains('open');
+  // close all
+  document.querySelectorAll('.acc-item.open').forEach(i => i.classList.remove('open'));
+  // open clicked (if was closed)
+  if (!isOpen) item.classList.add('open');
+}
+</script>
+
+</body>
+</html>

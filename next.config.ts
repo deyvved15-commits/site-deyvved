@@ -2,6 +2,14 @@ import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
 
 const nextConfig: NextConfig = {
+  async rewrites() {
+    return [
+      {
+        source: "/apresentacao",
+        destination: "/apresentacao.html",
+      },
+    ];
+  },
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "img.youtube.com" },
