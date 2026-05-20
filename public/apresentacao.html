@@ -3,623 +3,890 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Kadima Academy — Escola Teológica Online. Metodologia visual exclusiva, tipologia hebraica e ensino cristocêntrico. Avante no Conhecimento.">
 <title>Kadima Academy — Avante no Conhecimento</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Inter:wght@300;400;500;600&family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-/* ══════════════════════════════════════════
-   RESET & VARIABLES
-══════════════════════════════════════════ */
+/* ═══════════════════════════════════════════
+   TOKENS
+═══════════════════════════════════════════ */
 :root {
   --gold:    #C9A97A;
   --gold-l:  #E8D5A8;
   --gold-d:  #9A7A50;
-  --navy:    #0F1A3D;
-  --blue:    #1B2E6B;
-  --blue-m:  #2A4490;
-  --white:   #FFFFFF;
+  --gold-20: rgba(201,169,122,.20);
+  --navy:    #060D1F;
+  --navy-2:  #0A1228;
+  --navy-3:  #0F1A3D;
+  --navy-4:  #1B2E6B;
   --cream:   #F8F5EF;
-  --gray:    #6B6B7B;
+  --cream-2: #EDE9E1;
+  --txt:     #1A1A2E;
+  --muted:   #6B7080;
+  --white:   #FFFFFF;
   --ease:    cubic-bezier(.25,.46,.45,.94);
+  --ease-back: cubic-bezier(.34,1.56,.64,1);
 }
-*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-html { scroll-behavior: smooth; font-size: 16px; }
-body { font-family: 'Inter', sans-serif; background: var(--white); color: var(--navy); overflow-x: hidden; }
-img { display: block; max-width: 100%; }
-a { text-decoration: none; color: inherit; }
+*,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; font-size:16px; }
+body { font-family:'Poppins',sans-serif; background:var(--white); color:var(--txt); overflow-x:hidden; }
+img { display:block; max-width:100%; }
+a { text-decoration:none; color:inherit; }
 
-/* ══════════════════════════════════════════
-   SCROLL ANIMATIONS
-══════════════════════════════════════════ */
+/* ═══════════════════════════════════════════
+   REVEAL ANIMATIONS
+═══════════════════════════════════════════ */
 .reveal {
-  opacity: 0;
-  transform: translateY(40px);
-  transition: opacity .8s var(--ease), transform .8s var(--ease);
+  opacity:0; transform:translateY(36px);
+  transition:opacity .75s var(--ease), transform .75s var(--ease);
 }
-.reveal.left  { transform: translateX(-40px); }
-.reveal.right { transform: translateX(40px); }
-.reveal.scale { transform: scale(.92); }
-.reveal.visible {
-  opacity: 1;
-  transform: translate(0) scale(1);
-}
-.delay-1 { transition-delay: .1s; }
-.delay-2 { transition-delay: .2s; }
-.delay-3 { transition-delay: .3s; }
-.delay-4 { transition-delay: .4s; }
-.delay-5 { transition-delay: .5s; }
+.reveal.left  { transform:translateX(-36px); }
+.reveal.right { transform:translateX(36px); }
+.reveal.scale { transform:scale(.94); }
+.reveal.visible { opacity:1; transform:translate(0) scale(1); }
+.d1 { transition-delay:.1s; } .d2 { transition-delay:.2s; }
+.d3 { transition-delay:.3s; } .d4 { transition-delay:.4s; }
+.d5 { transition-delay:.5s; } .d6 { transition-delay:.6s; }
 
-/* ══════════════════════════════════════════
+/* ═══════════════════════════════════════════
    NAV
-══════════════════════════════════════════ */
+═══════════════════════════════════════════ */
 .nav {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
-  padding: 20px 48px;
-  display: flex; align-items: center; justify-content: space-between;
-  transition: background .4s, padding .4s, box-shadow .4s;
+  position:fixed; top:0; left:0; right:0; z-index:1000;
+  padding:20px 56px;
+  display:flex; align-items:center; justify-content:space-between;
+  transition:all .4s var(--ease);
 }
 .nav.scrolled {
-  background: rgba(15,26,61,.97);
-  padding: 14px 48px;
-  box-shadow: 0 4px 40px rgba(0,0,0,.25);
-  backdrop-filter: blur(12px);
+  background:rgba(6,13,31,.97);
+  padding:13px 56px;
+  box-shadow:0 4px 40px rgba(0,0,0,.3);
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(201,169,122,.12);
 }
-.nav-logo { display: flex; align-items: center; gap: 12px; }
-.nav-logo img { height: 38px; filter: drop-shadow(0 0 8px rgba(201,169,122,.4)); }
-.nav-wordmark { font-family: 'Cinzel', serif; font-size: 15px; letter-spacing: 3px; color: var(--white); }
-.nav-links { display: flex; align-items: center; gap: 32px; }
-.nav-links a { font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,.65); transition: color .3s; }
-.nav-links a:hover { color: var(--gold); }
+.nav-logo { display:flex; align-items:center; gap:12px; }
+.nav-logo img { height:36px; filter:drop-shadow(0 0 10px rgba(201,169,122,.45)); }
+.nav-wordmark { font-family:'Cinzel',serif; font-size:14px; letter-spacing:3.5px; color:var(--white); }
+.nav-links { display:flex; align-items:center; gap:36px; }
+.nav-links a { font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,.55); transition:color .3s; }
+.nav-links a:hover { color:var(--gold); }
 .nav-cta {
-  background: var(--gold); color: var(--navy) !important;
-  padding: 10px 22px; border-radius: 4px;
-  font-weight: 600; letter-spacing: 1px !important;
-  transition: background .3s, transform .2s !important;
+  background:linear-gradient(135deg,var(--gold),var(--gold-d));
+  color:var(--navy) !important; padding:10px 24px; border-radius:6px;
+  font-weight:600; letter-spacing:.5px !important;
+  box-shadow:0 4px 20px rgba(201,169,122,.3);
+  transition:all .3s !important;
 }
-.nav-cta:hover { background: var(--gold-l); transform: translateY(-1px); }
+.nav-cta:hover { transform:translateY(-2px); box-shadow:0 8px 28px rgba(201,169,122,.45); }
+.hamburger {
+  display:none; flex-direction:column; gap:5px; cursor:pointer;
+  padding:6px; background:none; border:none;
+}
+.hamburger span {
+  width:24px; height:2px; background:rgba(255,255,255,.7); border-radius:2px;
+  transition:all .3s var(--ease);
+}
+.hamburger.open span:nth-child(1) { transform:rotate(45deg) translateY(9px); }
+.hamburger.open span:nth-child(2) { opacity:0; transform:scaleX(0); }
+.hamburger.open span:nth-child(3) { transform:rotate(-45deg) translateY(-9px); }
 
-/* ══════════════════════════════════════════
+/* Mobile drawer */
+.mobile-menu {
+  position:fixed; top:0; left:0; right:0; bottom:0; z-index:999;
+  background:rgba(6,13,31,.98); backdrop-filter:blur(16px);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:36px; opacity:0; pointer-events:none;
+  transition:opacity .35s var(--ease);
+}
+.mobile-menu.open { opacity:1; pointer-events:all; }
+.mobile-menu a {
+  font-family:'Cinzel',serif; font-size:22px; letter-spacing:3px;
+  color:rgba(255,255,255,.6); transition:color .3s;
+}
+.mobile-menu a:hover { color:var(--gold); }
+.mobile-menu .mob-cta {
+  background:linear-gradient(135deg,var(--gold),var(--gold-d));
+  color:var(--navy) !important; padding:14px 40px; border-radius:8px;
+  font-size:14px; font-weight:700; box-shadow:0 8px 32px rgba(201,169,122,.35);
+}
+
+/* ═══════════════════════════════════════════
    HERO
-══════════════════════════════════════════ */
+═══════════════════════════════════════════ */
 .hero {
-  min-height: 100vh;
-  background: var(--navy);
-  position: relative;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  text-align: center;
-  overflow: hidden;
-  padding: 120px 24px 80px;
+  min-height:100vh;
+  background:linear-gradient(175deg, var(--navy) 0%, var(--navy-2) 50%, var(--navy-3) 100%);
+  position:relative; overflow:hidden;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  text-align:center; padding:140px 24px 100px;
 }
-/* Animated gradient orbs */
-.orb {
-  position: absolute; border-radius: 50%;
-  filter: blur(80px); pointer-events: none;
-  animation: drift 12s ease-in-out infinite;
+.hero-bg-orb {
+  position:absolute; border-radius:50%; pointer-events:none;
+  filter:blur(90px);
 }
-.orb-1 { width: 500px; height: 500px; background: rgba(42,68,144,.35); top: -100px; left: -100px; animation-duration: 14s; }
-.orb-2 { width: 400px; height: 400px; background: rgba(201,169,122,.12); top: 30%; right: -80px; animation-duration: 10s; animation-delay: -4s; }
-.orb-3 { width: 350px; height: 350px; background: rgba(27,46,107,.4); bottom: -80px; left: 20%; animation-duration: 16s; animation-delay: -8s; }
-@keyframes drift {
-  0%, 100% { transform: translate(0,0) scale(1); }
-  33%       { transform: translate(30px,-20px) scale(1.05); }
-  66%       { transform: translate(-20px,30px) scale(.96); }
+.hero-bg-orb.o1 { width:600px; height:600px; background:rgba(42,68,144,.30); top:-200px; left:-100px; animation:driftOrb 14s ease-in-out infinite; }
+.hero-bg-orb.o2 { width:450px; height:450px; background:rgba(201,169,122,.09); top:20%; right:-100px; animation:driftOrb 10s ease-in-out infinite; animation-delay:-4s; }
+.hero-bg-orb.o3 { width:380px; height:380px; background:rgba(27,46,107,.45); bottom:-80px; left:15%; animation:driftOrb 16s ease-in-out infinite; animation-delay:-8s; }
+.hero-grid-lines {
+  position:absolute; inset:0; pointer-events:none;
+  background-image:
+    linear-gradient(rgba(201,169,122,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201,169,122,.04) 1px, transparent 1px);
+  background-size:60px 60px;
+  mask-image:radial-gradient(ellipse 80% 60% at 50% 50%, black 0%, transparent 100%);
 }
-
-/* Floating particles */
-.particles { position: absolute; inset: 0; pointer-events: none; }
+@keyframes driftOrb {
+  0%,100% { transform:translate(0,0) scale(1); }
+  33%      { transform:translate(30px,-25px) scale(1.06); }
+  66%      { transform:translate(-20px,30px) scale(.95); }
+}
+.particles { position:absolute; inset:0; pointer-events:none; }
 .particle {
-  position: absolute;
-  width: 2px; height: 2px;
-  background: var(--gold);
-  border-radius: 50%;
-  opacity: 0;
-  animation: float-up linear infinite;
+  position:absolute; border-radius:50%;
+  background:var(--gold); opacity:0;
+  animation:particleUp linear infinite;
 }
-@keyframes float-up {
-  0%   { transform: translateY(100vh) scale(0); opacity: 0; }
-  10%  { opacity: .6; }
-  90%  { opacity: .3; }
-  100% { transform: translateY(-10vh) scale(1.5); opacity: 0; }
+@keyframes particleUp {
+  0%   { transform:translateY(100vh) scale(0); opacity:0; }
+  10%  { opacity:.5; }
+  90%  { opacity:.2; }
+  100% { transform:translateY(-5vh) scale(1.5); opacity:0; }
 }
-
 .hero-eyebrow {
-  font-size: 11px; letter-spacing: 6px; text-transform: uppercase;
-  color: var(--gold); margin-bottom: 28px;
-  opacity: 0; animation: fadeDown .8s var(--ease) .3s forwards;
+  font-size:10px; letter-spacing:6px; text-transform:uppercase;
+  color:rgba(201,169,122,.7); margin-bottom:28px;
+  opacity:0; animation:fadeDown .8s var(--ease) .3s forwards;
 }
 .hero-logo {
-  width: 160px; margin: 0 auto 36px;
-  filter: drop-shadow(0 0 40px rgba(201,169,122,.5));
-  opacity: 0; animation: fadeDown .8s var(--ease) .5s forwards;
+  width:140px; margin:0 auto 32px;
+  filter:drop-shadow(0 0 48px rgba(201,169,122,.55));
+  opacity:0; animation:fadeDown .9s var(--ease) .5s forwards;
 }
 .hero-title {
-  font-family: 'Cinzel', serif;
-  font-size: clamp(32px, 6vw, 72px);
-  font-weight: 700; letter-spacing: 4px;
-  color: var(--white); line-height: 1.1;
-  margin-bottom: 16px;
-  opacity: 0; animation: fadeDown .8s var(--ease) .7s forwards;
+  font-family:'Cinzel',serif;
+  font-size:clamp(30px,5.5vw,68px);
+  font-weight:700; letter-spacing:5px;
+  color:var(--white); line-height:1.1; margin-bottom:16px;
+  opacity:0; animation:fadeDown .8s var(--ease) .7s forwards;
 }
 .hero-rule {
-  width: 80px; height: 1px;
-  background: linear-gradient(90deg, transparent, var(--gold), transparent);
-  margin: 0 auto 24px;
-  opacity: 0; animation: fadeIn .6s var(--ease) .9s forwards;
+  width:90px; height:1px; margin:0 auto 22px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  opacity:0; animation:fadeIn .6s .9s forwards;
 }
 .hero-tagline {
-  font-family: 'Playfair Display', serif; font-style: italic;
-  font-size: clamp(20px, 3vw, 32px);
-  color: var(--gold); margin-bottom: 20px;
-  opacity: 0; animation: fadeDown .8s var(--ease) 1.0s forwards;
+  font-family:'Playfair Display',serif; font-style:italic;
+  font-size:clamp(18px,2.8vw,30px); color:var(--gold);
+  margin-bottom:20px;
+  opacity:0; animation:fadeDown .8s var(--ease) 1s forwards;
 }
 .hero-sub {
-  font-size: clamp(14px, 1.6vw, 17px);
-  color: rgba(255,255,255,.55); line-height: 1.8; max-width: 580px;
-  margin: 0 auto 52px;
-  opacity: 0; animation: fadeDown .8s var(--ease) 1.1s forwards;
+  font-size:clamp(14px,1.5vw,17px); color:rgba(255,255,255,.5);
+  line-height:1.85; max-width:580px; margin:0 auto 56px;
+  font-weight:300;
+  opacity:0; animation:fadeDown .8s var(--ease) 1.1s forwards;
 }
 .hero-btns {
-  display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
-  opacity: 0; animation: fadeDown .8s var(--ease) 1.3s forwards;
+  display:flex; gap:14px; justify-content:center; flex-wrap:wrap;
+  opacity:0; animation:fadeDown .8s var(--ease) 1.3s forwards;
 }
 .btn {
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 16px 36px; border-radius: 4px;
-  font-size: 13px; font-weight: 600; letter-spacing: 1.5px;
-  text-transform: uppercase; cursor: pointer;
-  transition: transform .25s var(--ease), box-shadow .25s;
-  border: none;
+  display:inline-flex; align-items:center; gap:9px;
+  padding:15px 34px; border-radius:6px; border:none;
+  font-family:'Poppins',sans-serif; font-size:12px;
+  font-weight:600; letter-spacing:1.5px; text-transform:uppercase;
+  cursor:pointer; transition:transform .25s var(--ease), box-shadow .25s;
 }
-.btn:hover { transform: translateY(-3px); }
+.btn:hover { transform:translateY(-3px); }
 .btn-gold {
-  background: var(--gold); color: var(--navy);
-  box-shadow: 0 8px 32px rgba(201,169,122,.3);
+  background:linear-gradient(135deg,var(--gold),var(--gold-d));
+  color:var(--navy); box-shadow:0 8px 32px rgba(201,169,122,.3);
 }
-.btn-gold:hover { background: var(--gold-l); box-shadow: 0 14px 40px rgba(201,169,122,.45); }
-.btn-outline {
-  background: transparent; color: var(--white);
-  border: 1px solid rgba(255,255,255,.3);
+.btn-gold:hover { box-shadow:0 14px 44px rgba(201,169,122,.5); }
+.btn-ghost {
+  background:transparent; color:var(--white);
+  border:1px solid rgba(255,255,255,.25);
 }
-.btn-outline:hover { border-color: var(--gold); color: var(--gold); box-shadow: 0 8px 24px rgba(201,169,122,.15); }
+.btn-ghost:hover { border-color:var(--gold); color:var(--gold); }
+.btn-lg { padding:18px 46px; font-size:13px; }
+.hero-trust {
+  position:absolute; bottom:0; left:0; right:0;
+  display:flex; align-items:center; justify-content:center; gap:40px;
+  padding:18px 24px;
+  background:rgba(255,255,255,.04);
+  border-top:1px solid rgba(255,255,255,.06);
+  flex-wrap:wrap;
+  opacity:0; animation:fadeIn 1s 1.8s forwards;
+}
+.hero-trust-item {
+  display:flex; align-items:center; gap:8px;
+  font-size:11px; color:rgba(255,255,255,.35); letter-spacing:.5px;
+}
+.hero-trust-item span { color:rgba(201,169,122,.6); font-weight:600; }
+.hero-trust-dot { width:4px; height:4px; border-radius:50%; background:rgba(255,255,255,.15); }
 
-.hero-scroll {
-  position: absolute; bottom: 36px; left: 50%; transform: translateX(-50%);
-  display: flex; flex-direction: column; align-items: center; gap: 8px;
-  color: rgba(255,255,255,.25); font-size: 9px; letter-spacing: 3px; text-transform: uppercase;
-  opacity: 0; animation: fadeIn 1s var(--ease) 1.8s forwards;
-}
-.scroll-line {
-  width: 1px; height: 50px;
-  background: linear-gradient(to bottom, rgba(201,169,122,.6), transparent);
-  animation: scrollPulse 2s ease-in-out infinite;
-}
-@keyframes scrollPulse {
-  0%, 100% { opacity: .3; transform: scaleY(1); }
-  50%       { opacity: 1; transform: scaleY(1.1); }
-}
+@keyframes fadeDown { from{opacity:0;transform:translateY(-18px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeIn   { from{opacity:0} to{opacity:1} }
 
-@keyframes fadeDown {
-  from { opacity:0; transform: translateY(-16px); }
-  to   { opacity:1; transform: translateY(0); }
+/* ═══════════════════════════════════════════
+   STATS
+═══════════════════════════════════════════ */
+.stats-bar {
+  background:var(--navy-3);
+  border-top:1px solid rgba(201,169,122,.12);
+  border-bottom:1px solid rgba(201,169,122,.12);
+  display:grid; grid-template-columns:repeat(4,1fr);
 }
-@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
-
-/* ══════════════════════════════════════════
-   STATS BAR
-══════════════════════════════════════════ */
-.stats {
-  background: var(--blue); padding: 48px;
-  display: grid; grid-template-columns: repeat(4,1fr);
-  gap: 1px; overflow: hidden;
+.stat {
+  padding:36px 24px; text-align:center;
+  border-right:1px solid rgba(255,255,255,.06);
+  position:relative; overflow:hidden;
+  transition:background .3s;
 }
-.stat-item {
-  padding: 32px 24px; text-align: center;
-  background: rgba(255,255,255,.03);
-  border-right: 1px solid rgba(255,255,255,.06);
+.stat:last-child { border-right:none; }
+.stat::before {
+  content:''; position:absolute; bottom:0; left:50%; transform:translateX(-50%);
+  width:0; height:2px; background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  transition:width .4s var(--ease);
 }
-.stat-item:last-child { border-right: none; }
+.stat:hover { background:rgba(255,255,255,.03); }
+.stat:hover::before { width:80%; }
 .stat-n {
-  font-family: 'Cinzel', serif; font-size: 48px;
-  font-weight: 700; color: var(--gold); line-height: 1;
-  margin-bottom: 8px;
+  font-family:'Cinzel',serif; font-size:46px; font-weight:700;
+  color:var(--gold); line-height:1; margin-bottom:6px;
 }
-.stat-n .unit { font-size: 24px; color: var(--gold-l); }
-.stat-l { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,.4); }
+.stat-n .sup { font-size:22px; color:var(--gold-l); vertical-align:super; }
+.stat-l { font-size:11px; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,.35); }
 
-/* ══════════════════════════════════════════
-   SECTION BASE
-══════════════════════════════════════════ */
-.section { padding: 120px 48px; max-width: 1100px; margin: 0 auto; }
-.section-full { padding: 0; max-width: none; margin: 0; }
+/* ═══════════════════════════════════════════
+   SECTION HELPERS
+═══════════════════════════════════════════ */
+.section { padding:110px 56px; max-width:1160px; margin:0 auto; }
+.section-fw { padding:0; max-width:none; margin:0; }
+.chip { display:inline-flex; align-items:center; gap:8px; font-size:10px; letter-spacing:4px; text-transform:uppercase; color:var(--gold); margin-bottom:14px; }
+.chip::before { content:''; width:18px; height:1px; background:var(--gold); }
+.h2 { font-family:'Cinzel',serif; font-size:clamp(24px,3.2vw,42px); line-height:1.2; margin-bottom:14px; }
+.h2 em { color:var(--gold-d); font-style:normal; }
+.h2-light { color:var(--white); }
+.h2-light em { color:var(--gold); }
+.lead { font-size:16px; color:var(--muted); line-height:1.9; max-width:640px; font-weight:300; }
+.lead-light { color:rgba(255,255,255,.45); }
+.divider { width:48px; height:2px; background:linear-gradient(90deg,var(--gold),var(--gold-l)); margin:24px 0 48px; border-radius:2px; }
+.divider-light { background:linear-gradient(90deg,rgba(201,169,122,.4),rgba(201,169,122,.1)); }
 
-.chip { display: inline-block; font-size: 10px; letter-spacing: 4px; text-transform: uppercase; color: var(--gold); margin-bottom: 16px; }
-.h2 { font-family: 'Cinzel', serif; font-size: clamp(26px,3.5vw,44px); line-height: 1.2; margin-bottom: 16px; }
-.h2 em { color: var(--gold-d); font-style: normal; }
-.lead { font-size: 17px; color: var(--gray); line-height: 1.85; max-width: 660px; }
-.divider { width: 50px; height: 2px; background: linear-gradient(90deg,var(--gold),var(--gold-l)); margin: 28px 0 52px; }
-
-/* ══════════════════════════════════════════
-   PROBLEM SECTION
-══════════════════════════════════════════ */
-.problem-wrap { background: var(--cream); }
+/* ═══════════════════════════════════════════
+   PROBLEMA
+═══════════════════════════════════════════ */
+.problem-wrap { background:var(--cream); }
 .problem-inner {
-  max-width: 1100px; margin: 0 auto;
-  padding: 120px 48px;
-  display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
+  max-width:1160px; margin:0 auto; padding:110px 56px;
+  display:grid; grid-template-columns:1fr 1fr; gap:80px; align-items:center;
 }
 .problem-visual {
-  position: relative; border-radius: 16px; overflow: hidden;
-  background: var(--navy);
-  aspect-ratio: 4/5; max-height: 520px;
-  display: flex; align-items: center; justify-content: center;
+  position:relative; border-radius:20px; overflow:hidden;
+  aspect-ratio:4/5; max-height:540px;
+  background:linear-gradient(160deg, var(--navy-3), var(--navy));
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 32px 80px rgba(0,0,0,.25);
 }
-.problem-visual-inner {
-  padding: 48px; text-align: center;
+.problem-visual-glow {
+  position:absolute; inset:0;
+  background:radial-gradient(ellipse at 30% 30%, rgba(201,169,122,.14) 0%, transparent 60%);
 }
-.problem-q {
-  font-family: 'Playfair Display', serif; font-size: 32px;
-  color: var(--white); line-height: 1.4; margin-bottom: 24px;
-  font-style: italic;
+.problem-visual-quote {
+  position:relative; z-index:1; padding:52px 44px; text-align:center;
 }
-.problem-q em { color: var(--gold); font-style: normal; }
-.pv-rule { width: 50px; height: 1px; background: var(--gold); margin: 0 auto; }
-.problem-glare {
-  position: absolute; inset: 0; pointer-events: none;
-  background: radial-gradient(ellipse at 30% 30%, rgba(201,169,122,.12) 0%, transparent 60%);
+.pq {
+  font-family:'Playfair Display',serif; font-style:italic;
+  font-size:clamp(18px,2.5vw,26px); color:var(--white);
+  line-height:1.55; margin-bottom:28px;
 }
-.problem-content {}
-.problem-list { list-style: none; display: flex; flex-direction: column; gap: 24px; }
-.pl-item { display: flex; gap: 20px; align-items: flex-start; }
-.pl-icon {
-  width: 44px; height: 44px; min-width: 44px; border-radius: 10px;
-  background: rgba(201,169,122,.1); border: 1px solid rgba(201,169,122,.2);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 20px; margin-top: 2px;
+.pq em { color:var(--gold); font-style:normal; font-weight:700; }
+.pq-line { width:48px; height:1px; background:var(--gold); margin:0 auto; opacity:.5; }
+.prob-list { list-style:none; display:flex; flex-direction:column; gap:22px; }
+.pl { display:flex; gap:18px; align-items:flex-start; }
+.pl-ico {
+  width:46px; height:46px; min-width:46px; border-radius:12px;
+  border:1px solid rgba(201,169,122,.20);
+  background:rgba(201,169,122,.08);
+  display:flex; align-items:center; justify-content:center;
+  font-size:20px; margin-top:2px;
+  transition:background .3s, transform .3s;
 }
-.pl-t { font-size: 16px; font-weight: 600; color: var(--navy); margin-bottom: 4px; }
-.pl-p { font-size: 14px; color: var(--gray); line-height: 1.7; }
+.pl:hover .pl-ico { background:rgba(201,169,122,.15); transform:scale(1.06); }
+.pl-t { font-size:15px; font-weight:600; color:var(--txt); margin-bottom:4px; }
+.pl-p { font-size:13px; color:var(--muted); line-height:1.7; }
 
-/* ══════════════════════════════════════════
-   DIFFERENTIALS
-══════════════════════════════════════════ */
-.diff-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 28px; margin-top: 52px; }
+/* ═══════════════════════════════════════════
+   DIFERENCIAIS
+═══════════════════════════════════════════ */
+.diff-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; margin-top:52px; }
 .diff-card {
-  border: 1px solid rgba(201,169,122,.15); border-radius: 16px;
-  padding: 40px 32px; cursor: default;
-  position: relative; overflow: hidden;
-  transition: transform .35s var(--ease), box-shadow .35s, border-color .35s;
+  border-radius:20px; padding:44px 36px;
+  border:1px solid rgba(201,169,122,.13);
+  position:relative; overflow:hidden;
+  transition:transform .35s var(--ease), box-shadow .35s, border-color .35s;
+  cursor:default;
 }
-.diff-card::before {
-  content: ''; position: absolute; inset: 0; border-radius: 16px;
-  background: linear-gradient(135deg, rgba(201,169,122,.06) 0%, transparent 60%);
-  opacity: 0; transition: opacity .35s;
+.diff-card::after {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(135deg,rgba(201,169,122,.06) 0%,transparent 65%);
+  opacity:0; transition:opacity .35s;
 }
-.diff-card:hover { transform: translateY(-8px); box-shadow: 0 24px 60px rgba(0,0,0,.1); border-color: rgba(201,169,122,.4); }
-.diff-card:hover::before { opacity: 1; }
-.diff-num { font-family: 'Cinzel', serif; font-size: 64px; font-weight: 700; color: rgba(201,169,122,.12); line-height: 1; margin-bottom: 20px; }
-.diff-icon { font-size: 36px; margin-bottom: 20px; }
-.diff-t { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: var(--navy); margin-bottom: 12px; }
-.diff-p { font-size: 14px; color: var(--gray); line-height: 1.75; }
-.diff-bar { width: 0; height: 2px; background: var(--gold); margin-top: 24px; transition: width .5s var(--ease); }
-.diff-card:hover .diff-bar { width: 48px; }
+.diff-card:hover { transform:translateY(-10px); box-shadow:0 28px 70px rgba(0,0,0,.1); border-color:rgba(201,169,122,.35); }
+.diff-card:hover::after { opacity:1; }
+.diff-num {
+  font-family:'Cinzel',serif; font-size:72px; font-weight:700;
+  color:rgba(201,169,122,.1); line-height:1; margin-bottom:16px;
+  transition:color .35s;
+}
+.diff-card:hover .diff-num { color:rgba(201,169,122,.18); }
+.diff-icon-wrap {
+  width:56px; height:56px; border-radius:14px;
+  background:rgba(201,169,122,.08); border:1px solid rgba(201,169,122,.15);
+  display:flex; align-items:center; justify-content:center;
+  font-size:26px; margin-bottom:22px;
+}
+.diff-t { font-family:'Playfair Display',serif; font-size:21px; font-weight:700; color:var(--txt); margin-bottom:12px; }
+.diff-p { font-size:14px; color:var(--muted); line-height:1.8; }
+.diff-bar { width:0; height:2px; background:linear-gradient(90deg,var(--gold),var(--gold-l)); margin-top:22px; border-radius:2px; transition:width .5s var(--ease); }
+.diff-card:hover .diff-bar { width:52px; }
 
-/* ══════════════════════════════════════════
-   COURSES ACCORDION
-══════════════════════════════════════════ */
-.courses-wrap { background: var(--navy); }
-.courses-inner { max-width: 1100px; margin: 0 auto; padding: 120px 48px; }
-.courses-inner .h2 { color: var(--white); }
-.courses-inner .lead { color: rgba(255,255,255,.5); }
-.courses-inner .chip { color: rgba(201,169,122,.7); }
+/* ═══════════════════════════════════════════
+   JORNADA
+═══════════════════════════════════════════ */
+.journey-wrap { background:var(--navy); }
+.journey-inner { max-width:1160px; margin:0 auto; padding:110px 56px; }
 
-.accordion { display: flex; flex-direction: column; gap: 2px; margin-top: 52px; }
-.acc-item {
-  border-radius: 0; overflow: hidden;
-  transition: border-radius .3s;
+/* Timeline visual */
+.journey-path {
+  display:flex; gap:0; margin-top:64px; position:relative;
+  overflow-x:auto; padding-bottom:16px;
 }
-.acc-item:first-child { border-radius: 12px 12px 0 0; }
-.acc-item:last-child  { border-radius: 0 0 12px 12px; }
-.acc-item.open { border-radius: 12px; margin: 6px 0; }
+.journey-path::before {
+  content:''; position:absolute; top:36px; left:60px; right:60px; height:2px;
+  background:linear-gradient(90deg, var(--gold-d), var(--gold), var(--gold-l), var(--gold), var(--gold-d));
+  z-index:0; opacity:.4;
+}
+.journey-step {
+  flex:1; min-width:160px; display:flex; flex-direction:column; align-items:center;
+  gap:16px; position:relative; z-index:1; padding:0 12px;
+  cursor:pointer;
+  transition:transform .3s var(--ease);
+}
+.journey-step:hover { transform:translateY(-6px); }
+.journey-num {
+  width:72px; height:72px; border-radius:50%;
+  background:linear-gradient(135deg, rgba(201,169,122,.12), rgba(201,169,122,.04));
+  border:2px solid rgba(201,169,122,.25);
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Cinzel',serif; font-size:22px; font-weight:700; color:var(--gold);
+  transition:all .3s var(--ease);
+  position:relative;
+}
+.journey-step.active .journey-num,
+.journey-step:hover .journey-num {
+  background:linear-gradient(135deg, rgba(201,169,122,.3), rgba(201,169,122,.12));
+  border-color:var(--gold);
+  box-shadow:0 0 0 6px rgba(201,169,122,.08), 0 0 40px rgba(201,169,122,.25);
+}
+.journey-badge {
+  position:absolute; top:-6px; right:-6px;
+  background:var(--gold); color:var(--navy);
+  font-size:8px; font-weight:700; letter-spacing:1px;
+  padding:2px 7px; border-radius:20px; font-family:'Poppins',sans-serif;
+  white-space:nowrap; display:none;
+}
+.journey-step:first-child .journey-badge { display:block; }
+.journey-title {
+  font-family:'Cinzel',serif; font-size:13px; font-weight:700;
+  color:rgba(255,255,255,.55); text-align:center; letter-spacing:.5px;
+  transition:color .3s; line-height:1.3;
+}
+.journey-step.active .journey-title,
+.journey-step:hover .journey-title { color:var(--white); }
+.journey-sub {
+  font-size:10px; letter-spacing:1px; text-transform:uppercase;
+  color:rgba(201,169,122,.4); text-align:center; transition:color .3s;
+}
+.journey-step:hover .journey-sub { color:var(--gold); }
 
-.acc-head {
-  display: flex; align-items: center; gap: 20px;
-  padding: 24px 28px; cursor: pointer;
-  background: rgba(255,255,255,.04);
-  border: 1px solid rgba(255,255,255,.07);
-  transition: background .3s;
-  user-select: none;
+/* Course detail panel */
+.journey-detail {
+  margin-top:44px; border-radius:20px; overflow:hidden;
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(201,169,122,.15);
+  transition:all .3s;
 }
-.acc-item.open .acc-head {
-  background: rgba(201,169,122,.1);
-  border-color: rgba(201,169,122,.25);
-  border-bottom-color: transparent;
+.jd-head {
+  padding:24px 32px; background:rgba(201,169,122,.06);
+  border-bottom:1px solid rgba(201,169,122,.10);
+  display:flex; align-items:center; justify-content:space-between; gap:16px;
 }
-.acc-head:hover { background: rgba(255,255,255,.07); }
-.acc-item.open .acc-head:hover { background: rgba(201,169,122,.12); }
+.jd-step-badge {
+  font-family:'Cinzel',serif; font-size:28px; font-weight:700; color:var(--gold);
+  width:56px; height:56px; border-radius:50%;
+  background:rgba(201,169,122,.10); border:1px solid rgba(201,169,122,.25);
+  display:flex; align-items:center; justify-content:center;
+}
+.jd-title { font-family:'Cinzel',serif; font-size:22px; color:var(--white); font-weight:700; }
+.jd-sub { font-size:12px; color:rgba(201,169,122,.6); letter-spacing:1.5px; margin-top:4px; }
+.jd-body { padding:32px; display:grid; grid-template-columns:1fr auto; gap:40px; align-items:start; }
+.jd-desc { font-size:14px; color:rgba(255,255,255,.6); line-height:1.85; }
+.jd-tags { display:flex; flex-direction:column; gap:10px; min-width:180px; }
+.jd-tag {
+  display:flex; align-items:center; gap:8px;
+  font-size:11px; color:var(--gold); letter-spacing:.5px;
+}
+.jd-tag::before { content:''; width:6px; height:6px; border-radius:50%; background:var(--gold); flex-shrink:0; }
+.jd-nav {
+  display:flex; align-items:center; gap:10px; margin-top:28px;
+  font-size:12px; color:rgba(255,255,255,.3); letter-spacing:1px;
+}
+.jd-nav a { color:var(--gold); transition:color .2s; }
+.jd-nav a:hover { color:var(--gold-l); }
 
-.acc-step {
-  width: 36px; height: 36px; min-width: 36px; border-radius: 50%;
-  background: rgba(201,169,122,.12); border: 1px solid rgba(201,169,122,.25);
-  display: flex; align-items: center; justify-content: center;
-  font-family: 'Cinzel', serif; font-size: 13px; color: var(--gold);
-  transition: background .3s;
-}
-.acc-item.open .acc-step { background: var(--gold); color: var(--navy); border-color: var(--gold); }
-
-.acc-title { flex: 1; font-family: 'Playfair Display', serif; font-size: 20px; color: var(--white); font-weight: 700; }
-.acc-sub { font-size: 12px; color: rgba(255,255,255,.35); letter-spacing: 1px; }
-.acc-arr {
-  width: 32px; height: 32px; border-radius: 50%;
-  border: 1px solid rgba(255,255,255,.12);
-  display: flex; align-items: center; justify-content: center;
-  color: rgba(255,255,255,.4); font-size: 14px;
-  transition: transform .4s var(--ease), border-color .3s, color .3s;
-}
-.acc-item.open .acc-arr { transform: rotate(180deg); border-color: var(--gold); color: var(--gold); }
-
-.acc-body {
-  max-height: 0; overflow: hidden;
-  transition: max-height .5s var(--ease);
-  background: rgba(201,169,122,.05);
-  border: 1px solid rgba(201,169,122,.2);
-  border-top: none; border-radius: 0 0 12px 12px;
-}
-.acc-item.open .acc-body { max-height: 500px; }
-.acc-content { padding: 28px 28px 32px; display: flex; gap: 48px; flex-wrap: wrap; }
-.acc-desc { flex: 2; min-width: 200px; font-size: 15px; color: rgba(255,255,255,.65); line-height: 1.8; }
-.acc-meta { flex: 1; min-width: 160px; display: flex; flex-direction: column; gap: 14px; }
-.acc-tag {
-  display: inline-flex; align-items: center; gap: 8px;
-  font-size: 11px; color: var(--gold); letter-spacing: 1px;
-}
-.acc-tag::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--gold); }
-.acc-next {
-  display: inline-flex; align-items: center; gap: 8px;
-  margin-top: 8px; font-size: 12px; color: rgba(255,255,255,.35);
-  letter-spacing: 1px;
-}
-.acc-next span { color: var(--gold); }
-
-/* ══════════════════════════════════════════
-   HOW IT WORKS
-══════════════════════════════════════════ */
-.how-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; margin-top: 52px; background: rgba(201,169,122,.12); border-radius: 16px; overflow: hidden; }
-.how-item { padding: 48px 36px; background: var(--white); position: relative; transition: background .35s; }
-.how-item:hover { background: var(--cream); }
+/* ═══════════════════════════════════════════
+   COMO FUNCIONA
+═══════════════════════════════════════════ */
+.how-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; margin-top:52px; background:var(--cream-2); border-radius:20px; overflow:hidden; border:1px solid rgba(201,169,122,.12); }
+.how-item { padding:52px 40px; background:var(--cream); position:relative; overflow:hidden; transition:background .3s; }
+.how-item:hover { background:var(--white); }
 .how-n {
-  font-family: 'Cinzel', serif; font-size: 80px; font-weight: 700;
-  color: rgba(201,169,122,.15); line-height: 1; margin-bottom: 24px;
-  transition: color .35s;
+  font-family:'Cinzel',serif; font-size:88px; font-weight:700;
+  color:rgba(201,169,122,.12); line-height:1; margin-bottom:20px;
+  transition:color .3s;
 }
-.how-item:hover .how-n { color: rgba(201,169,122,.3); }
-.how-t { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--navy); font-weight: 700; margin-bottom: 12px; }
-.how-p { font-size: 14px; color: var(--gray); line-height: 1.75; }
+.how-item:hover .how-n { color:rgba(201,169,122,.22); }
+.how-t { font-family:'Playfair Display',serif; font-size:22px; font-weight:700; color:var(--txt); margin-bottom:12px; }
+.how-p { font-size:14px; color:var(--muted); line-height:1.8; }
+.how-arrow {
+  position:absolute; top:50%; right:-1px; transform:translateY(-50%);
+  width:32px; height:32px; background:var(--cream-2);
+  clip-path:polygon(0 50%, 100% 0, 100% 100%);
+  z-index:1;
+}
+.how-item:last-child .how-arrow { display:none; }
 
-/* ══════════════════════════════════════════
-   LIVE BADGE / COMMUNITY
-══════════════════════════════════════════ */
-.community-wrap { background: var(--cream); }
-.community-inner { max-width: 1100px; margin: 0 auto; padding: 120px 48px; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
-.comm-cards { display: flex; flex-direction: column; gap: 16px; }
-.comm-card { background: var(--white); border: 1px solid rgba(201,169,122,.18); border-radius: 14px; padding: 28px; display: flex; gap: 20px; align-items: flex-start; transition: transform .3s, box-shadow .3s; }
-.comm-card:hover { transform: translateY(-4px); box-shadow: 0 14px 40px rgba(0,0,0,.08); }
-.comm-icon { width: 52px; height: 52px; min-width: 52px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
-.c-blue { background: rgba(27,46,107,.08); }
-.c-gold { background: rgba(201,169,122,.12); }
-.c-green { background: rgba(34,197,94,.08); }
-.comm-t { font-size: 16px; font-weight: 600; color: var(--navy); margin-bottom: 4px; }
-.comm-p { font-size: 13px; color: var(--gray); line-height: 1.65; }
-.live-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.2); border-radius: 20px; padding: 4px 12px; font-size: 11px; color: #dc2626; letter-spacing: 1px; font-weight: 600; margin-bottom: 6px; }
-.live-dot { width: 6px; height: 6px; background: #dc2626; border-radius: 50%; animation: livePulse 1.5s ease-in-out infinite; }
-@keyframes livePulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:.4; transform:scale(1.3); } }
+/* ═══════════════════════════════════════════
+   COMUNIDADE
+═══════════════════════════════════════════ */
+.comm-wrap { background:linear-gradient(160deg, var(--navy-2) 0%, var(--navy) 100%); }
+.comm-inner { max-width:1160px; margin:0 auto; padding:110px 56px; display:grid; grid-template-columns:1fr 1fr; gap:80px; align-items:center; }
+.comm-cards { display:flex; flex-direction:column; gap:16px; }
+.comm-card {
+  background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08);
+  border-radius:16px; padding:28px 24px;
+  display:flex; gap:18px; align-items:flex-start;
+  transition:border-color .3s, background .3s, transform .3s;
+}
+.comm-card:hover { border-color:rgba(201,169,122,.25); background:rgba(201,169,122,.04); transform:translateX(6px); }
+.comm-ico {
+  width:48px; height:48px; min-width:48px; border-radius:12px;
+  display:flex; align-items:center; justify-content:center; font-size:22px;
+}
+.ico-gold { background:rgba(201,169,122,.12); }
+.ico-blue { background:rgba(27,46,107,.25); }
+.ico-green { background:rgba(34,197,94,.08); }
+.comm-t { font-size:15px; font-weight:600; color:var(--white); margin-bottom:4px; }
+.comm-p { font-size:13px; color:rgba(255,255,255,.45); line-height:1.65; }
+.live-badge {
+  display:inline-flex; align-items:center; gap:6px;
+  background:rgba(239,68,68,.1); border:1px solid rgba(239,68,68,.2);
+  border-radius:20px; padding:3px 10px;
+  font-size:10px; color:#dc2626; letter-spacing:1px; font-weight:600;
+  margin-bottom:5px;
+}
+.live-dot { width:5px; height:5px; background:#dc2626; border-radius:50%; animation:livePulse 1.5s ease-in-out infinite; }
+@keyframes livePulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(1.3)} }
 
-/* ══════════════════════════════════════════
-   PROFESSORS
-══════════════════════════════════════════ */
-.prof-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 32px; margin-top: 52px; }
+/* ═══════════════════════════════════════════
+   PROFESSORES
+═══════════════════════════════════════════ */
+.prof-wrap { background:var(--cream); }
+.prof-inner { max-width:1160px; margin:0 auto; padding:110px 56px; }
+.prof-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:28px; margin-top:52px; }
 .prof-card {
-  background: var(--white); border: 1px solid rgba(201,169,122,.15); border-radius: 16px;
-  padding: 40px; position: relative; overflow: hidden;
-  transition: transform .35s, box-shadow .35s;
+  background:var(--white); border-radius:20px;
+  border:1px solid rgba(201,169,122,.12);
+  padding:44px; position:relative; overflow:hidden;
+  transition:transform .35s var(--ease), box-shadow .35s;
+  display:flex; gap:28px; align-items:flex-start;
 }
-.prof-card:hover { transform: translateY(-6px); box-shadow: 0 20px 60px rgba(0,0,0,.1); }
-.prof-card::after {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-  background: linear-gradient(90deg, var(--gold), var(--gold-l));
+.prof-card:hover { transform:translateY(-8px); box-shadow:0 24px 64px rgba(0,0,0,.12); }
+.prof-card::before {
+  content:''; position:absolute; left:0; top:0; bottom:0; width:3px;
+  background:linear-gradient(180deg, var(--gold), var(--gold-l));
+  border-radius:0;
 }
-.prof-avatar { width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, var(--blue), var(--navy)); display: flex; align-items: center; justify-content: center; font-family: 'Cinzel', serif; font-size: 26px; color: var(--gold); margin-bottom: 20px; }
-.prof-name { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
-.prof-role { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--gold-d); margin-bottom: 16px; }
-.prof-p { font-size: 14px; color: var(--gray); line-height: 1.75; }
+.prof-avatar {
+  width:80px; height:80px; min-width:80px; border-radius:50%;
+  background:linear-gradient(135deg, var(--navy-3), var(--navy-4));
+  border:2px solid rgba(201,169,122,.25);
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Cinzel',serif; font-size:28px; color:var(--gold);
+  box-shadow:0 0 0 4px rgba(201,169,122,.08);
+}
+.prof-content {}
+.prof-name { font-family:'Playfair Display',serif; font-size:22px; font-weight:700; color:var(--txt); margin-bottom:4px; }
+.prof-role { font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--gold-d); margin-bottom:14px; font-weight:600; }
+.prof-p { font-size:13px; color:var(--muted); line-height:1.8; }
+.prof-badges { display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; }
+.prof-badge {
+  font-size:10px; font-weight:600; letter-spacing:.5px;
+  padding:4px 12px; border-radius:20px;
+  background:rgba(201,169,122,.08); border:1px solid rgba(201,169,122,.18);
+  color:var(--gold-d);
+}
 
-/* ══════════════════════════════════════════
+/* ═══════════════════════════════════════════
+   DEPOIMENTOS
+═══════════════════════════════════════════ */
+.testimonials-wrap { background:var(--navy); }
+.testimonials-inner { max-width:1160px; margin:0 auto; padding:110px 56px; }
+.testi-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; margin-top:52px; }
+.testi-card {
+  background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.07);
+  border-radius:20px; padding:36px 32px; position:relative;
+  transition:border-color .3s, transform .3s;
+}
+.testi-card:hover { border-color:rgba(201,169,122,.25); transform:translateY(-6px); }
+.testi-card::before {
+  content:'"'; font-family:'Playfair Display',serif; font-size:80px;
+  color:rgba(201,169,122,.15); line-height:1; position:absolute; top:16px; left:24px;
+}
+.testi-stars { display:flex; gap:4px; margin-bottom:20px; }
+.testi-stars span { color:var(--gold); font-size:14px; }
+.testi-text {
+  font-size:14px; color:rgba(255,255,255,.6); line-height:1.85;
+  position:relative; z-index:1; margin-bottom:24px;
+  font-style:italic;
+}
+.testi-author { display:flex; align-items:center; gap:12px; }
+.testi-avatar {
+  width:40px; height:40px; border-radius:50%;
+  background:linear-gradient(135deg, var(--navy-3), var(--navy-4));
+  border:1px solid rgba(201,169,122,.25);
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Cinzel',serif; font-size:14px; color:var(--gold); flex-shrink:0;
+}
+.testi-name { font-size:13px; font-weight:600; color:var(--white); }
+.testi-city { font-size:11px; color:rgba(255,255,255,.3); }
+
+/* ═══════════════════════════════════════════
+   FAQ
+═══════════════════════════════════════════ */
+.faq-wrap { background:var(--cream); }
+.faq-inner { max-width:1160px; margin:0 auto; padding:110px 56px; }
+.faq-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:52px; }
+.faq-item {
+  border-radius:16px; overflow:hidden;
+  border:1px solid rgba(201,169,122,.12);
+  background:var(--white);
+}
+.faq-q {
+  display:flex; align-items:center; justify-content:space-between; gap:16px;
+  padding:22px 24px; cursor:pointer;
+  user-select:none; transition:background .25s;
+}
+.faq-q:hover { background:rgba(201,169,122,.04); }
+.faq-item.open .faq-q { background:rgba(201,169,122,.06); }
+.faq-q-text { font-size:14px; font-weight:600; color:var(--txt); line-height:1.4; }
+.faq-arr {
+  width:28px; height:28px; min-width:28px; border-radius:50%;
+  border:1px solid rgba(201,169,122,.2);
+  display:flex; align-items:center; justify-content:center;
+  color:var(--gold); font-size:12px;
+  transition:transform .35s var(--ease), background .25s;
+}
+.faq-item.open .faq-arr { transform:rotate(180deg); background:rgba(201,169,122,.1); }
+.faq-a {
+  max-height:0; overflow:hidden;
+  transition:max-height .45s var(--ease);
+  border-top:0px solid transparent;
+}
+.faq-item.open .faq-a { max-height:300px; border-top:1px solid rgba(201,169,122,.08); }
+.faq-a-inner { padding:18px 24px 22px; font-size:13px; color:var(--muted); line-height:1.8; }
+
+/* ═══════════════════════════════════════════
    CTA FINAL
-══════════════════════════════════════════ */
+═══════════════════════════════════════════ */
 .cta-section {
-  background: var(--navy); padding: 140px 48px; text-align: center;
-  position: relative; overflow: hidden;
+  background:var(--navy); padding:160px 56px; text-align:center;
+  position:relative; overflow:hidden;
 }
 .cta-section::before {
-  content: ''; position: absolute; inset: 0;
-  background: radial-gradient(ellipse at 50% 50%, rgba(201,169,122,.1) 0%, transparent 65%);
+  content:''; position:absolute; inset:0;
+  background:radial-gradient(ellipse at 50% 50%, rgba(201,169,122,.12) 0%, transparent 65%);
+  pointer-events:none;
 }
-.cta-orb1 { position: absolute; width: 600px; height: 600px; border: 1px solid rgba(201,169,122,.06); border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%,-50%); }
-.cta-orb2 { position: absolute; width: 800px; height: 800px; border: 1px solid rgba(201,169,122,.04); border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%,-50%); }
-.cta-inner { position: relative; z-index: 1; max-width: 700px; margin: 0 auto; }
-.cta-title { font-family: 'Cinzel', serif; font-size: clamp(28px,4.5vw,52px); color: var(--white); line-height: 1.2; margin-bottom: 20px; }
-.cta-sub { font-family: 'Playfair Display', serif; font-style: italic; font-size: clamp(18px,2.5vw,26px); color: var(--gold); margin-bottom: 16px; }
-.cta-p { font-size: 15px; color: rgba(255,255,255,.5); line-height: 1.8; max-width: 500px; margin: 0 auto 52px; }
-.cta-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
-.btn-lg { padding: 20px 48px; font-size: 14px; }
+.cta-rings { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); pointer-events:none; }
+.cta-ring {
+  position:absolute; border-radius:50%;
+  border:1px solid rgba(201,169,122,.05);
+  transform:translate(-50%,-50%);
+  animation:expandRing linear infinite;
+}
+.cta-ring:nth-child(1) { width:400px; height:400px; animation-duration:8s; }
+.cta-ring:nth-child(2) { width:700px; height:700px; animation-duration:10s; animation-delay:2s; }
+.cta-ring:nth-child(3) { width:1000px; height:1000px; animation-duration:12s; animation-delay:4s; }
+@keyframes expandRing {
+  0%   { opacity:.3; transform:translate(-50%,-50%) scale(.8); }
+  100% { opacity:0; transform:translate(-50%,-50%) scale(1.1); }
+}
+.cta-inner { position:relative; z-index:1; max-width:720px; margin:0 auto; }
+.cta-title {
+  font-family:'Cinzel',serif; font-size:clamp(26px,4.2vw,50px);
+  color:var(--white); line-height:1.2; margin-bottom:18px; font-weight:700;
+}
+.cta-sub {
+  font-family:'Playfair Display',serif; font-style:italic;
+  font-size:clamp(16px,2.4vw,24px); color:var(--gold); margin-bottom:14px;
+}
+.cta-p { font-size:15px; color:rgba(255,255,255,.45); line-height:1.85; max-width:500px; margin:0 auto 52px; font-weight:300; }
+.cta-btns { display:flex; gap:14px; justify-content:center; flex-wrap:wrap; }
 
-/* ══════════════════════════════════════════
+/* ═══════════════════════════════════════════
    FOOTER
-══════════════════════════════════════════ */
-footer { background: #08101F; padding: 64px 48px; }
-.footer-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 64px; }
+═══════════════════════════════════════════ */
+footer { background:#040B18; padding:80px 56px 40px; border-top:1px solid rgba(201,169,122,.08); }
+.footer-inner { max-width:1160px; margin:0 auto; display:grid; grid-template-columns:2.5fr 1fr 1fr 1fr; gap:56px; }
 .footer-brand {}
-.footer-logo-row { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
-.footer-logo-row img { height: 40px; opacity: .85; }
-.footer-wm { font-family: 'Cinzel', serif; font-size: 16px; letter-spacing: 3px; color: var(--gold); }
-.footer-p { font-size: 13px; color: rgba(255,255,255,.35); line-height: 1.75; max-width: 280px; }
-.footer-col-t { font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-bottom: 20px; }
-.footer-links { list-style: none; display: flex; flex-direction: column; gap: 12px; }
-.footer-links li a { font-size: 13px; color: rgba(255,255,255,.4); transition: color .3s; }
-.footer-links li a:hover { color: var(--gold); }
-.footer-bottom { max-width: 1100px; margin: 48px auto 0; padding-top: 28px; border-top: 1px solid rgba(255,255,255,.06); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
-.footer-copy { font-size: 12px; color: rgba(255,255,255,.2); letter-spacing: 1px; }
-.footer-tag { font-family: 'Playfair Display', serif; font-style: italic; font-size: 13px; color: rgba(201,169,122,.5); }
-
-/* ══════════════════════════════════════════
-   RESPONSIVE
-══════════════════════════════════════════ */
-@media(max-width:900px) {
-  .stats { grid-template-columns: repeat(2,1fr); }
-  .problem-inner { grid-template-columns: 1fr; }
-  .problem-visual { aspect-ratio: 3/2; }
-  .diff-grid { grid-template-columns: 1fr; }
-  .how-grid { grid-template-columns: 1fr; }
-  .community-inner { grid-template-columns: 1fr; }
-  .prof-grid { grid-template-columns: 1fr; }
-  .footer-inner { grid-template-columns: 1fr; gap: 40px; }
-  .footer-bottom { flex-direction: column; text-align: center; }
+.footer-logo-wrap { display:flex; align-items:center; gap:12px; margin-bottom:18px; }
+.footer-logo-wrap img { height:38px; opacity:.8; }
+.footer-wm { font-family:'Cinzel',serif; font-size:15px; letter-spacing:3px; color:var(--gold); }
+.footer-desc { font-size:13px; color:rgba(255,255,255,.3); line-height:1.75; max-width:280px; margin-bottom:24px; }
+.footer-social { display:flex; gap:12px; }
+.footer-soc-btn {
+  width:36px; height:36px; border-radius:8px; border:1px solid rgba(255,255,255,.1);
+  display:flex; align-items:center; justify-content:center; color:rgba(255,255,255,.35);
+  font-size:16px; transition:border-color .3s, color .3s, background .3s;
 }
-@media(max-width:600px) {
-  .nav { padding: 16px 20px; }
-  .nav.scrolled { padding: 12px 20px; }
-  .nav-links { display: none; }
-  .section { padding: 80px 24px; }
-  .courses-inner, .footer-inner { padding-left: 24px; padding-right: 24px; }
-  .stats { grid-template-columns: repeat(2,1fr); gap: 0; }
-  .cta-section { padding: 100px 24px; }
-  footer { padding: 48px 24px; }
+.footer-soc-btn:hover { border-color:var(--gold); color:var(--gold); background:rgba(201,169,122,.06); }
+.footer-col-t { font-family:'Cinzel',serif; font-size:10px; letter-spacing:3px; text-transform:uppercase; color:rgba(201,169,122,.6); margin-bottom:20px; }
+.footer-links { list-style:none; display:flex; flex-direction:column; gap:11px; }
+.footer-links li a { font-size:13px; color:rgba(255,255,255,.35); transition:color .3s; }
+.footer-links li a:hover { color:var(--gold); }
+.footer-bottom {
+  max-width:1160px; margin:48px auto 0; padding-top:28px;
+  border-top:1px solid rgba(255,255,255,.05);
+  display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;
+}
+.footer-copy { font-size:11px; color:rgba(255,255,255,.18); letter-spacing:1px; }
+.footer-tag { font-family:'Playfair Display',serif; font-style:italic; font-size:13px; color:rgba(201,169,122,.4); }
+
+/* ═══════════════════════════════════════════
+   FAB WHATSAPP
+═══════════════════════════════════════════ */
+.fab-wa {
+  position:fixed; bottom:28px; right:28px; z-index:900;
+  width:60px; height:60px; border-radius:50%; border:none; cursor:pointer;
+  background:linear-gradient(135deg,#25D366,#128C7E);
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 6px 28px rgba(37,211,102,.45);
+  text-decoration:none;
+  animation:fabPop .6s var(--ease-back) 2s both;
+  transition:transform .25s var(--ease), box-shadow .25s;
+}
+.fab-wa:hover { transform:scale(1.12) translateY(-3px); box-shadow:0 12px 40px rgba(37,211,102,.55); }
+@keyframes fabPop { from{opacity:0;transform:scale(0)} to{opacity:1;transform:scale(1)} }
+.fab-wa svg { width:28px; height:28px; }
+.fab-tooltip {
+  position:absolute; right:72px; top:50%; transform:translateY(-50%);
+  background:rgba(6,13,31,.95); color:var(--white); border:1px solid rgba(255,255,255,.1);
+  padding:7px 14px; border-radius:8px; font-size:12px; font-weight:500;
+  white-space:nowrap; pointer-events:none;
+  opacity:0; transition:opacity .2s;
+}
+.fab-wa:hover .fab-tooltip { opacity:1; }
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════ */
+@media(max-width:1024px) {
+  .section { padding:90px 40px; }
+  .problem-inner, .comm-inner { padding:90px 40px; gap:56px; }
+  .journey-inner, .testimonials-inner, .faq-inner, .prof-inner { padding:90px 40px; }
+  .footer-inner { grid-template-columns:1fr 1fr; gap:48px; }
+  .nav { padding:18px 40px; }
+  .nav.scrolled { padding:13px 40px; }
+}
+@media(max-width:900px) {
+  .stats-bar { grid-template-columns:repeat(2,1fr); }
+  .diff-grid { grid-template-columns:1fr; }
+  .how-grid { grid-template-columns:1fr; }
+  .testi-grid { grid-template-columns:1fr; }
+  .faq-grid { grid-template-columns:1fr; }
+  .problem-inner { grid-template-columns:1fr; }
+  .comm-inner { grid-template-columns:1fr; }
+  .prof-grid { grid-template-columns:1fr; }
+  .footer-inner { grid-template-columns:1fr; gap:40px; }
+  .how-arrow { display:none; }
+  .jd-body { grid-template-columns:1fr; }
+}
+@media(max-width:768px) {
+  .nav { padding:14px 20px; }
+  .nav.scrolled { padding:12px 20px; }
+  .nav-links { display:none; }
+  .hamburger { display:flex; }
+  .section { padding:72px 20px; }
+  .problem-inner, .comm-inner { padding:72px 20px; }
+  .journey-inner, .testimonials-inner, .faq-inner, .prof-inner { padding:72px 20px; }
+  .cta-section { padding:100px 20px; }
+  footer { padding:56px 20px 32px; }
+  .footer-bottom { flex-direction:column; text-align:center; }
+  .hero-trust { display:none; }
+  .prof-card { flex-direction:column; gap:20px; }
+  .journey-path::before { display:none; }
+  .journey-path { flex-wrap:nowrap; gap:8px; }
+  .journey-step { min-width:130px; }
+  .jd-tags { min-width:auto; }
+}
+@media(max-width:480px) {
+  .btn-lg { padding:15px 28px; font-size:12px; }
+  .cta-btns { flex-direction:column; align-items:center; }
+  .fab-wa { bottom:20px; right:20px; width:54px; height:54px; }
 }
 </style>
 </head>
 <body>
 
-<!-- ══ NAV ══ -->
+<!-- ══════════ NAV ══════════ -->
 <nav class="nav" id="nav">
   <div class="nav-logo">
-    <img src="/kadima-logo.png" alt="Kadima">
+    <img src="/kadima-logo.png" alt="Kadima Academy">
     <span class="nav-wordmark">KADIMA ACADEMY</span>
   </div>
   <div class="nav-links">
     <a href="#diferenciais">Diferenciais</a>
     <a href="#cursos">Cursos</a>
-    <a href="#como-funciona">Como Funciona</a>
     <a href="#professores">Professores</a>
-    <a href="https://wa.me/5521983051035" target="_blank" rel="noopener noreferrer" class="nav-cta">Matricular-se</a>
+    <a href="#depoimentos">Depoimentos</a>
+    <a href="https://wa.me/5521983051035" target="_blank" rel="noopener" class="nav-cta">Matricular-se</a>
   </div>
+  <button class="hamburger" id="hamburger" aria-label="Menu" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
 
-<!-- ══ HERO ══ -->
+<!-- Mobile Menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#diferenciais" onclick="toggleMenu()">Diferenciais</a>
+  <a href="#cursos" onclick="toggleMenu()">Cursos</a>
+  <a href="#professores" onclick="toggleMenu()">Professores</a>
+  <a href="#depoimentos" onclick="toggleMenu()">Depoimentos</a>
+  <a href="https://wa.me/5521983051035" target="_blank" rel="noopener" class="mob-cta">Matricular-se</a>
+</div>
+
+<!-- ══════════ HERO ══════════ -->
 <section class="hero" id="hero">
   <div class="particles" id="particles"></div>
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-  <div class="orb orb-3"></div>
+  <div class="hero-grid-lines"></div>
+  <div class="hero-bg-orb o1"></div>
+  <div class="hero-bg-orb o2"></div>
+  <div class="hero-bg-orb o3"></div>
 
-  <p class="hero-eyebrow">Escola Teológica Online</p>
+  <p class="hero-eyebrow">Escola Teológica Online Premium</p>
   <img src="/kadima-logo.png" alt="Kadima Academy" class="hero-logo">
   <h1 class="hero-title">KADIMA ACADEMY</h1>
   <div class="hero-rule"></div>
   <p class="hero-tagline">Avante no Conhecimento</p>
-  <p class="hero-sub">Aprenda a Bíblia com profundidade real — através de metodologia visual única, tipologia hebraica e ensino cristocêntrico acessível a qualquer evangélico.</p>
+  <p class="hero-sub">Aprenda a Bíblia com profundidade real — metodologia visual exclusiva, tipologia hebraica e ensino cristocêntrico. Para qualquer evangélico que quer ver a Palavra de Deus como nunca antes.</p>
   <div class="hero-btns">
-    <a href="https://wa.me/5521983051035" target="_blank" rel="noopener noreferrer" class="btn btn-gold btn-lg">Quero me matricular</a>
-    <a href="#cursos" class="btn btn-outline">Ver os cursos</a>
+    <a href="https://wa.me/5521983051035" target="_blank" rel="noopener" class="btn btn-gold btn-lg">Quero me matricular</a>
+    <a href="#cursos" class="btn btn-ghost btn-lg">Conhecer os cursos</a>
   </div>
 
-  <div class="hero-scroll">
-    <span>Descubra mais</span>
-    <div class="scroll-line"></div>
+  <div class="hero-trust">
+    <div class="hero-trust-item"><span>7+</span> anos de ensino teológico</div>
+    <div class="hero-trust-dot"></div>
+    <div class="hero-trust-item"><span>5</span> cursos na jornada</div>
+    <div class="hero-trust-dot"></div>
+    <div class="hero-trust-item"><span>52</span> aulas ao vivo por ano</div>
+    <div class="hero-trust-dot"></div>
+    <div class="hero-trust-item">Metodologia <span>visual exclusiva</span></div>
   </div>
 </section>
 
-<!-- ══ STATS ══ -->
-<div class="stats">
-  <div class="stat-item reveal delay-1">
-    <div class="stat-n" data-target="7"><span class="count">7</span><span class="unit">+</span></div>
+<!-- ══════════ STATS ══════════ -->
+<div class="stats-bar">
+  <div class="stat reveal d1">
+    <div class="stat-n"><span class="count" data-target="7">7</span><span class="sup">+</span></div>
     <div class="stat-l">Anos de ensino</div>
   </div>
-  <div class="stat-item reveal delay-2">
+  <div class="stat reveal d2">
     <div class="stat-n"><span class="count" data-target="5">5</span></div>
     <div class="stat-l">Cursos na jornada</div>
   </div>
-  <div class="stat-item reveal delay-3">
-    <div class="stat-n"><span class="count" data-target="2">2</span></div>
-    <div class="stat-l">Professores especializados</div>
-  </div>
-  <div class="stat-item reveal delay-4">
+  <div class="stat reveal d3">
     <div class="stat-n"><span class="count" data-target="52">52</span></div>
     <div class="stat-l">Aulas ao vivo por ano</div>
   </div>
+  <div class="stat reveal d4">
+    <div class="stat-n"><span class="count" data-target="100">100</span><span class="sup">%</span></div>
+    <div class="stat-l">Cristocêntrico</div>
+  </div>
 </div>
 
-<!-- ══ PROBLEMA ══ -->
-<div class="problem-wrap">
+<!-- ══════════ PROBLEMA ══════════ -->
+<div class="problem-wrap" id="problema">
   <div class="problem-inner">
     <div class="problem-visual reveal left">
-      <div class="problem-glare"></div>
-      <div class="problem-visual-inner">
-        <p class="problem-q">Você frequenta a<br>igreja há anos.<br>Mas ainda sente que<br>não entende a Bíblia<br><em>de verdade.</em></p>
-        <div class="pv-rule"></div>
+      <div class="problem-visual-glow"></div>
+      <div class="problem-visual-quote">
+        <p class="pq">Você frequenta a<br>igreja há anos.<br>Mas ainda sente que<br>não entende a Bíblia<br><em>de verdade.</em></p>
+        <div class="pq-line"></div>
       </div>
     </div>
-    <div class="problem-content">
+    <div>
       <p class="chip reveal">O Problema</p>
-      <h2 class="h2 reveal delay-1">A fé sem <em>fundamento</em> é frágil</h2>
-      <div class="divider reveal delay-2"></div>
-      <ul class="problem-list">
-        <li class="pl-item reveal delay-2">
-          <div class="pl-icon">📖</div>
-          <div>
-            <div class="pl-t">Sermões sem conexão</div>
-            <div class="pl-p">Você ouve, anota, mas os pontos nunca se conectam de forma clara na sua mente.</div>
-          </div>
+      <h2 class="h2 reveal d1">A fé sem <em>fundamento</em><br>é frágil</h2>
+      <div class="divider reveal d2"></div>
+      <ul class="prob-list">
+        <li class="pl reveal d2">
+          <div class="pl-ico">📖</div>
+          <div><div class="pl-t">Sermões sem conexão</div><div class="pl-p">Você ouve, anota, mas os pontos nunca se conectam de forma clara na sua mente.</div></div>
         </li>
-        <li class="pl-item reveal delay-3">
-          <div class="pl-icon">🔍</div>
-          <div>
-            <div class="pl-t">Doutrina sem profundidade</div>
-            <div class="pl-p">O ensino superficial deixa você vulnerável a interpretações erradas e falsas doutrinas.</div>
-          </div>
+        <li class="pl reveal d3">
+          <div class="pl-ico">🔍</div>
+          <div><div class="pl-t">Doutrina sem profundidade</div><div class="pl-p">O ensino superficial deixa você vulnerável a interpretações erradas e falsas doutrinas.</div></div>
         </li>
-        <li class="pl-item reveal delay-4">
-          <div class="pl-icon">🗺️</div>
-          <div>
-            <div class="pl-t">Sem metodologia clara</div>
-            <div class="pl-p">Não existe escola acessível que ensine a Bíblia de forma visual, sequencial e profunda.</div>
-          </div>
+        <li class="pl reveal d4">
+          <div class="pl-ico">🗺️</div>
+          <div><div class="pl-t">Sem metodologia clara</div><div class="pl-p">Não existe escola acessível que ensine a Bíblia de forma visual, sequencial e profunda.</div></div>
         </li>
       </ul>
     </div>
   </div>
 </div>
 
-<!-- ══ DIFERENCIAIS ══ -->
+<!-- ══════════ DIFERENCIAIS ══════════ -->
 <section class="section" id="diferenciais">
   <p class="chip reveal">Por que a Kadima?</p>
-  <h2 class="h2 reveal delay-1">Uma escola diferente do que<br>você já conhece</h2>
-  <div class="divider reveal delay-2"></div>
-  <p class="lead reveal delay-2">Nossa metodologia combina rigor teológico com visualização — para que você não apenas aprenda a Bíblia, mas a veja como nunca antes.</p>
+  <h2 class="h2 reveal d1">Uma escola diferente do que<br>você já conhece</h2>
+  <div class="divider reveal d2"></div>
+  <p class="lead reveal d2">Nossa metodologia combina rigor teológico com visualização — para que você não apenas aprenda a Bíblia, mas a <em style="font-style:italic;color:var(--gold-d);">veja</em> como nunca antes.</p>
 
   <div class="diff-grid">
-    <div class="diff-card reveal delay-1">
-      <div class="diff-icon">🎨</div>
+    <div class="diff-card reveal d1">
+      <div class="diff-num">01</div>
+      <div class="diff-icon-wrap">🎨</div>
       <div class="diff-t">Metodologia Visual</div>
       <div class="diff-p">Mapas, diagramas e desenhos ao vivo que revelam o que está escrito. Você vê a Palavra de Deus — não apenas a ouve. Uma experiência única no mercado teológico brasileiro.</div>
       <div class="diff-bar"></div>
     </div>
-    <div class="diff-card reveal delay-2">
-      <div class="diff-icon">✡️</div>
+    <div class="diff-card reveal d2">
+      <div class="diff-num">02</div>
+      <div class="diff-icon-wrap">✡️</div>
       <div class="diff-t">Tipologia Hebraica</div>
       <div class="diff-p">Compreender as raízes hebraicas da Bíblia transforma seu entendimento. Letras, símbolos e contextos que iluminam passagens que antes pareciam obscuras.</div>
       <div class="diff-bar"></div>
     </div>
-    <div class="diff-card reveal delay-3">
-      <div class="diff-icon">✝️</div>
+    <div class="diff-card reveal d3">
+      <div class="diff-num">03</div>
+      <div class="diff-icon-wrap">✝️</div>
       <div class="diff-t">Cristocêntrico 100%</div>
       <div class="diff-p">Todo conteúdo parte de Cristo e retorna a Cristo. Ancoragem doutrinária profunda e consistente — porque a Bíblia inteira aponta para Ele.</div>
       <div class="diff-bar"></div>
@@ -627,147 +894,71 @@ footer { background: #08101F; padding: 64px 48px; }
   </div>
 </section>
 
-<!-- ══ CURSOS ══ -->
-<div class="courses-wrap" id="cursos">
-  <div class="courses-inner">
-    <p class="chip reveal">Jornada Formativa</p>
-    <h2 class="h2 reveal delay-1">Uma esteira de <em style="color:var(--gold);">crescimento</em></h2>
-    <div class="divider reveal delay-2" style="background:linear-gradient(90deg,var(--gold),var(--gold-l));"></div>
-    <p class="lead reveal delay-2">Cada curso prepara você para o próximo nível. Do iniciante ao líder ministerial — uma jornada contínua e estruturada.</p>
+<!-- ══════════ JORNADA ══════════ -->
+<div class="journey-wrap" id="cursos">
+  <div class="journey-inner">
+    <p class="chip reveal" style="color:rgba(201,169,122,.7);">Jornada Formativa</p>
+    <h2 class="h2 h2-light reveal d1">Uma esteira de <em>crescimento</em></h2>
+    <div class="divider divider-light reveal d2"></div>
+    <p class="lead lead-light reveal d2">Cada curso prepara você para o próximo nível. Do iniciante ao líder ministerial — uma jornada contínua e estruturada.</p>
 
-    <div class="accordion reveal delay-2">
-
-      <div class="acc-item open">
-        <div class="acc-head" onclick="toggleAcc(this)">
-          <div class="acc-step">1</div>
-          <div>
-            <div class="acc-title">Capelania</div>
-            <div class="acc-sub">Porta de entrada · Ticket acessível</div>
-          </div>
-          <div class="acc-arr">▾</div>
-        </div>
-        <div class="acc-body">
-          <div class="acc-content">
-            <div class="acc-desc">O ponto de entrada perfeito para quem quer começar a entender a Palavra de Deus com profundidade. Curso acessível, com certificado digital incluído. Ao concluir, você recebe acesso gratuito às primeiras 2 aulas do próximo nível como prévia da sua jornada.</div>
-            <div class="acc-meta">
-              <div class="acc-tag">Certificado Digital</div>
-              <div class="acc-tag">Credencial Impressa (opcional)</div>
-              <div class="acc-tag">Plano de Implantação Local</div>
-              <div class="acc-next">Próximo: <span>Batalha Espiritual →</span></div>
-            </div>
-          </div>
-        </div>
+    <!-- Visual path -->
+    <div class="journey-path reveal d2">
+      <div class="journey-step active" onclick="selectStep(0)" id="step-0">
+        <div class="journey-num">1<div class="journey-badge">Início</div></div>
+        <div class="journey-title">Capelania</div>
+        <div class="journey-sub">Porta de entrada</div>
       </div>
-
-      <div class="acc-item">
-        <div class="acc-head" onclick="toggleAcc(this)">
-          <div class="acc-step">2</div>
-          <div>
-            <div class="acc-title">Batalha Espiritual (1, 2 e 3)</div>
-            <div class="acc-sub">Aprofundamento ministerial</div>
-          </div>
-          <div class="acc-arr">▾</div>
-        </div>
-        <div class="acc-body">
-          <div class="acc-content">
-            <div class="acc-desc">Formação aprofundada sobre o mundo espiritual, libertação e identidade em Cristo. Este nível consolida o aluno dentro do ecossistema formativo e prepara para os próximos passos da jornada.</div>
-            <div class="acc-meta">
-              <div class="acc-tag">3 módulos progressivos</div>
-              <div class="acc-tag">Fundamentos doutrinários</div>
-              <div class="acc-tag">Certificado de Conclusão</div>
-              <div class="acc-next">Próximo: <span>Anatomia Espiritual →</span></div>
-            </div>
-          </div>
-        </div>
+      <div class="journey-step" onclick="selectStep(1)" id="step-1">
+        <div class="journey-num">2</div>
+        <div class="journey-title">Batalha Espiritual</div>
+        <div class="journey-sub">Aprofundamento</div>
       </div>
-
-      <div class="acc-item">
-        <div class="acc-head" onclick="toggleAcc(this)">
-          <div class="acc-step">3</div>
-          <div>
-            <div class="acc-title">Anatomia da Vida Espiritual</div>
-            <div class="acc-sub">Cuidado e fortalecimento interior</div>
-          </div>
-          <div class="acc-arr">▾</div>
-        </div>
-        <div class="acc-body">
-          <div class="acc-content">
-            <div class="acc-desc">Formação voltada ao entendimento da tricotomia humana (espírito, alma e corpo) e ao fortalecimento espiritual interior. Introduz a necessidade de cobertura espiritual e pastoreio como fundamentos do crescimento.</div>
-            <div class="acc-meta">
-              <div class="acc-tag">Tricotomia bíblica</div>
-              <div class="acc-tag">Vida interior</div>
-              <div class="acc-tag">Pastoreio e cobertura</div>
-              <div class="acc-next">Próximo: <span>Profeta e Sacerdote →</span></div>
-            </div>
-          </div>
-        </div>
+      <div class="journey-step" onclick="selectStep(2)" id="step-2">
+        <div class="journey-num">3</div>
+        <div class="journey-title">Anatomia da Vida</div>
+        <div class="journey-sub">Vida interior</div>
       </div>
-
-      <div class="acc-item">
-        <div class="acc-head" onclick="toggleAcc(this)">
-          <div class="acc-step">4</div>
-          <div>
-            <div class="acc-title">Profeta e Sacerdote</div>
-            <div class="acc-sub">Identidade ministerial</div>
-          </div>
-          <div class="acc-arr">▾</div>
-        </div>
-        <div class="acc-body">
-          <div class="acc-content">
-            <div class="acc-desc">Formação de alinhamento espiritual, honra, cobertura e identidade ministerial. Prepara o aluno para entender seu papel no Reino de Deus e o coloca no caminho para a formação mais avançada da jornada.</div>
-            <div class="acc-meta">
-              <div class="acc-tag">Identidade ministerial</div>
-              <div class="acc-tag">Honra e cobertura</div>
-              <div class="acc-tag">Alinhamento espiritual</div>
-              <div class="acc-next">Próximo: <span>Tesouraria do Reino →</span></div>
-            </div>
-          </div>
-        </div>
+      <div class="journey-step" onclick="selectStep(3)" id="step-3">
+        <div class="journey-num">4</div>
+        <div class="journey-title">Profeta e Sacerdote</div>
+        <div class="journey-sub">Identidade</div>
       </div>
-
-      <div class="acc-item">
-        <div class="acc-head" onclick="toggleAcc(this)">
-          <div class="acc-step">5</div>
-          <div>
-            <div class="acc-title">Tesouraria do Reino</div>
-            <div class="acc-sub">Maturidade avançada · Maior nível</div>
-          </div>
-          <div class="acc-arr">▾</div>
-        </div>
-        <div class="acc-body">
-          <div class="acc-content">
-            <div class="acc-desc">O nível mais avançado da jornada Kadima. Formação aprofundada sobre os princípios de honra, gestão e finanças do Reino de Deus. Conteúdo exclusivo para alunos que chegaram à maturidade ministerial.</div>
-            <div class="acc-meta">
-              <div class="acc-tag">Finanças do Reino</div>
-              <div class="acc-tag">Gestão ministerial</div>
-              <div class="acc-tag">Maturidade avançada</div>
-            </div>
-          </div>
-        </div>
+      <div class="journey-step" onclick="selectStep(4)" id="step-4">
+        <div class="journey-num">5</div>
+        <div class="journey-title">Tesouraria do Reino</div>
+        <div class="journey-sub">Nível avançado</div>
       </div>
-
     </div>
+
+    <!-- Detail panel -->
+    <div class="journey-detail reveal d3" id="journey-detail">
+      <!-- Rendered by JS -->
+    </div>
+
   </div>
 </div>
 
-<!-- ══ COMO FUNCIONA ══ -->
+<!-- ══════════ COMO FUNCIONA ══════════ -->
 <section class="section" id="como-funciona">
   <p class="chip reveal">Simples assim</p>
-  <h2 class="h2 reveal delay-1">Como você <em>avança</em></h2>
-  <div class="divider reveal delay-2"></div>
+  <h2 class="h2 reveal d1">Como você <em>avança</em></h2>
+  <div class="divider reveal d2"></div>
 
   <div class="how-grid">
-    <div class="how-item reveal delay-1">
+    <div class="how-item reveal d1">
+      <div class="how-arrow"></div>
       <div class="how-n">01</div>
       <div class="how-t">Escolha seu curso</div>
       <div class="how-p">Comece pela Capelania — o ponto de entrada ideal para qualquer evangélico, independente do conhecimento teológico que já tem.</div>
     </div>
-    <div class="how-item reveal delay-2">
+    <div class="how-item reveal d2">
+      <div class="how-arrow"></div>
       <div class="how-n">02</div>
       <div class="how-t">Aprenda visualmente</div>
       <div class="how-p">Aulas gravadas com metodologia visual exclusiva + aulas ao vivo toda sexta. Aprenda no seu ritmo ou em tempo real.</div>
     </div>
-    <div class="how-item reveal delay-3">
+    <div class="how-item reveal d3">
       <div class="how-n">03</div>
       <div class="how-t">Avance na jornada</div>
       <div class="how-p">Cada curso abre o próximo. Uma esteira contínua do iniciante ao líder ministerial — com comunidade ativa em cada etapa.</div>
@@ -775,33 +966,33 @@ footer { background: #08101F; padding: 64px 48px; }
   </div>
 </section>
 
-<!-- ══ COMUNIDADE ══ -->
-<div class="community-wrap">
-  <div class="community-inner">
+<!-- ══════════ COMUNIDADE ══════════ -->
+<div class="comm-wrap">
+  <div class="comm-inner">
     <div>
-      <p class="chip reveal">Mais que um curso</p>
-      <h2 class="h2 reveal delay-1">Uma <em>comunidade</em> que avança junto</h2>
-      <div class="divider reveal delay-2"></div>
-      <p class="lead reveal delay-2">Na Kadima, você não estuda sozinho. Faz parte de uma comunidade de evangélicos comprometidos com o conhecimento real da Palavra.</p>
+      <p class="chip reveal" style="color:rgba(201,169,122,.7);">Mais que um curso</p>
+      <h2 class="h2 h2-light reveal d1">Uma <em>comunidade</em><br>que avança junto</h2>
+      <div class="divider divider-light reveal d2"></div>
+      <p class="lead lead-light reveal d2">Na Kadima, você não estuda sozinho. Faz parte de uma comunidade de evangélicos comprometidos com o conhecimento real da Palavra.</p>
     </div>
     <div class="comm-cards">
-      <div class="comm-card reveal delay-1">
-        <div class="comm-icon c-gold"><span style="font-size:22px;">📡</span></div>
+      <div class="comm-card reveal d1">
+        <div class="comm-ico ico-gold">📡</div>
         <div>
           <div class="live-badge"><div class="live-dot"></div>AO VIVO</div>
-          <div class="comm-t">Aulas ao vivo toda sexta</div>
-          <div class="comm-p">Toda sexta-feira há uma aula ao vivo — para aprender, tirar dúvidas e se conectar com a comunidade em tempo real.</div>
+          <div class="comm-t">Aulas toda sexta-feira</div>
+          <div class="comm-p">Toda sexta há uma aula ao vivo — para aprender, tirar dúvidas e se conectar com a comunidade em tempo real.</div>
         </div>
       </div>
-      <div class="comm-card reveal delay-2">
-        <div class="comm-icon c-blue"><span style="font-size:22px;">🏛️</span></div>
+      <div class="comm-card reveal d2">
+        <div class="comm-ico ico-blue">🏛️</div>
         <div>
           <div class="comm-t">Plataforma própria</div>
           <div class="comm-p">Conteúdo gravado disponível 24h, área de membros organizada, certificados digitais e acesso vitalício às aulas do seu curso.</div>
         </div>
       </div>
-      <div class="comm-card reveal delay-3">
-        <div class="comm-icon c-green"><span style="font-size:22px;">🌱</span></div>
+      <div class="comm-card reveal d3">
+        <div class="comm-ico ico-green">🌱</div>
         <div>
           <div class="comm-t">Expansão local</div>
           <div class="comm-p">Alunos da Capelania recebem um Plano de Implantação para apresentar na sua igreja — levando o ensino para sua comunidade.</div>
@@ -811,73 +1002,199 @@ footer { background: #08101F; padding: 64px 48px; }
   </div>
 </div>
 
-<!-- ══ PROFESSORES ══ -->
-<section class="section" id="professores">
-  <p class="chip reveal">Quem ensina</p>
-  <h2 class="h2 reveal delay-1">Professores com <em>autoridade</em> real</h2>
-  <div class="divider reveal delay-2"></div>
-  <p class="lead reveal delay-2">7 anos de ensino teológico presencial. Metodologia visual desenvolvida e refinada na prática — com centenas de alunos formados.</p>
-
-  <div class="prof-grid">
-    <div class="prof-card reveal delay-1">
-      <div class="prof-avatar">D</div>
-      <div class="prof-name">Deyvved Mesquita</div>
-      <div class="prof-role">Fundador & Professor Principal</div>
-      <div class="prof-p">Bacharel em Teologia pela Hossana Academy. Metodologia visual de ensino bíblico. Fundador da Escola Teológica Abrigo de Deus — hoje Kadima Academy.</div>
-    </div>
-    <div class="prof-card reveal delay-2">
-      <div class="prof-avatar">A</div>
-      <div class="prof-name">Pr Adilson</div>
-      <div class="prof-role">Co-fundador & Professor</div>
-      <div class="prof-p">Pastor e professor com anos de experiência ministerial. Ensino cristocêntrico e bibliocêntrico com profundidade doutrinária e didática pastoral. Referência em formação ministerial.</div>
-    </div>
-  </div>
-</section>
-
-<!-- ══ CTA FINAL ══ -->
-<div class="cta-section" id="matricula">
-  <div class="cta-orb1"></div>
-  <div class="cta-orb2"></div>
-  <div class="cta-inner">
-    <p class="chip reveal" style="color:rgba(201,169,122,.7);">Comece hoje</p>
-    <h2 class="cta-title reveal delay-1">Está na hora de<br>avançar no conhecimento</h2>
-    <p class="cta-sub reveal delay-2">Avante no Conhecimento</p>
-    <p class="cta-p reveal delay-3">Matricule-se no curso de Capelania e dê o primeiro passo de uma jornada que vai transformar sua relação com a Palavra de Deus.</p>
-    <div class="cta-btns reveal delay-4">
-      <a href="https://wa.me/5521983051035" target="_blank" rel="noopener noreferrer" class="btn btn-gold btn-lg">Quero me matricular agora</a>
-      <a href="#cursos" class="btn btn-outline btn-lg">Ver todos os cursos</a>
+<!-- ══════════ PROFESSORES ══════════ -->
+<div class="prof-wrap" id="professores">
+  <div class="prof-inner">
+    <p class="chip reveal">Quem ensina</p>
+    <h2 class="h2 reveal d1">Professores com <em>autoridade</em> real</h2>
+    <div class="divider reveal d2"></div>
+    <p class="lead reveal d2">7 anos de ensino teológico presencial. Metodologia visual desenvolvida e refinada na prática — com centenas de alunos formados.</p>
+    <div class="prof-grid">
+      <div class="prof-card reveal d1">
+        <div class="prof-avatar">D</div>
+        <div class="prof-content">
+          <div class="prof-name">Deyvved Mesquita</div>
+          <div class="prof-role">Fundador & Professor Principal</div>
+          <div class="prof-p">Bacharel em Teologia pela Hossana Academy. Metodologia visual de ensino bíblico. Fundador da Escola Teológica Abrigo de Deus — hoje Kadima Academy. Mais de 7 anos formando líderes.</div>
+          <div class="prof-badges">
+            <span class="prof-badge">Bacharel em Teologia</span>
+            <span class="prof-badge">Metodologia Visual</span>
+            <span class="prof-badge">Tipologia Hebraica</span>
+          </div>
+        </div>
+      </div>
+      <div class="prof-card reveal d2">
+        <div class="prof-avatar">A</div>
+        <div class="prof-content">
+          <div class="prof-name">Pr. Adilson</div>
+          <div class="prof-role">Co-fundador & Professor</div>
+          <div class="prof-p">Pastor e professor com anos de experiência ministerial. Ensino cristocêntrico e bibliocêntrico com profundidade doutrinária e didática pastoral. Referência em formação ministerial.</div>
+          <div class="prof-badges">
+            <span class="prof-badge">Ensino Pastoral</span>
+            <span class="prof-badge">Doutrina Bíblica</span>
+            <span class="prof-badge">Formação Ministerial</span>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- ══ FOOTER ══ -->
+<!-- ══════════ DEPOIMENTOS ══════════ -->
+<div class="testimonials-wrap" id="depoimentos">
+  <div class="testimonials-inner">
+    <p class="chip reveal" style="color:rgba(201,169,122,.7);">O que dizem os alunos</p>
+    <h2 class="h2 h2-light reveal d1">Vidas <em>transformadas</em><br>pela Palavra</h2>
+    <div class="divider divider-light reveal d2"></div>
+
+    <div class="testi-grid">
+      <div class="testi-card reveal d1">
+        <div class="testi-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+        <p class="testi-text">"Depois de anos indo à igreja sem entender o que estava por trás dos textos, a metodologia visual da Kadima abriu minha mente de uma forma que eu nunca imaginei ser possível."</p>
+        <div class="testi-author">
+          <div class="testi-avatar">M</div>
+          <div><div class="testi-name">Maria Oliveira</div><div class="testi-city">Rio de Janeiro, RJ</div></div>
+        </div>
+      </div>
+      <div class="testi-card reveal d2">
+        <div class="testi-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+        <p class="testi-text">"O curso de Capelania mudou minha forma de ler a Bíblia. A tipologia hebraica deu um contexto que eu sentia falta há anos. Recomendo para qualquer cristão que quer crescer de verdade."</p>
+        <div class="testi-author">
+          <div class="testi-avatar">J</div>
+          <div><div class="testi-name">João Carlos</div><div class="testi-city">São Paulo, SP</div></div>
+        </div>
+      </div>
+      <div class="testi-card reveal d3">
+        <div class="testi-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+        <p class="testi-text">"A jornada da Kadima é exatamente o que precisava. Cada curso abre para o próximo de forma natural. Hoje consigo liderar estudos bíblicos na minha igreja com muito mais fundamento."</p>
+        <div class="testi-author">
+          <div class="testi-avatar">A</div>
+          <div><div class="testi-name">Ana Paula</div><div class="testi-city">Belo Horizonte, MG</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ FAQ ══════════ -->
+<div class="faq-wrap" id="faq">
+  <div class="faq-inner">
+    <p class="chip reveal">Dúvidas Frequentes</p>
+    <h2 class="h2 reveal d1">Tudo que você precisa <em>saber</em></h2>
+    <div class="divider reveal d2"></div>
+
+    <div class="faq-grid">
+      <div class="faq-item reveal d1">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          <span class="faq-q-text">Preciso ter conhecimento teológico para começar?</span>
+          <div class="faq-arr">▾</div>
+        </div>
+        <div class="faq-a"><div class="faq-a-inner">Não. O curso de Capelania é o ponto de entrada ideal para qualquer evangélico, independente do nível de conhecimento. Nossa metodologia foi desenvolvida justamente para tornar o ensino teológico acessível a todos.</div></div>
+      </div>
+      <div class="faq-item reveal d2">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          <span class="faq-q-text">As aulas são gravadas ou ao vivo?</span>
+          <div class="faq-arr">▾</div>
+        </div>
+        <div class="faq-a"><div class="faq-a-inner">As duas! Você tem acesso às aulas gravadas na plataforma para assistir quando quiser, e toda sexta-feira às 19h30 há uma aula ao vivo — aberta a todos os alunos matriculados.</div></div>
+      </div>
+      <div class="faq-item reveal d1">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          <span class="faq-q-text">Como funciona a matrícula?</span>
+          <div class="faq-arr">▾</div>
+        </div>
+        <div class="faq-a"><div class="faq-a-inner">Entre em contato pelo WhatsApp. Nossa equipe vai apresentar os cursos disponíveis, condições de pagamento e fazer sua matrícula. O processo é simples e rápido.</div></div>
+      </div>
+      <div class="faq-item reveal d2">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          <span class="faq-q-text">Recebo certificado ao concluir?</span>
+          <div class="faq-arr">▾</div>
+        </div>
+        <div class="faq-a"><div class="faq-a-inner">Sim! Cada curso concluído gera um certificado digital. Alunos da Capelania também têm a opção de credencial impressa e recebem um Plano de Implantação para usar na sua igreja.</div></div>
+      </div>
+      <div class="faq-item reveal d1">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          <span class="faq-q-text">Posso fazer mais de um curso ao mesmo tempo?</span>
+          <div class="faq-arr">▾</div>
+        </div>
+        <div class="faq-a"><div class="faq-a-inner">A jornada Kadima é estruturada em sequência — cada curso prepara para o próximo. Recomendamos seguir a ordem natural da jornada para extrair o máximo do aprendizado.</div></div>
+      </div>
+      <div class="faq-item reveal d2">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          <span class="faq-q-text">O acesso às aulas é vitalício?</span>
+          <div class="faq-arr">▾</div>
+        </div>
+        <div class="faq-a"><div class="faq-a-inner">Sim. Após a matrícula você tem acesso vitalício ao conteúdo gravado do seu curso, podendo revisitar as aulas quantas vezes quiser, sem prazo de expiração.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ CTA FINAL ══════════ -->
+<div class="cta-section" id="matricula">
+  <div class="cta-rings">
+    <div class="cta-ring"></div>
+    <div class="cta-ring"></div>
+    <div class="cta-ring"></div>
+  </div>
+  <div class="cta-inner">
+    <p class="chip reveal" style="color:rgba(201,169,122,.7);">Comece sua jornada hoje</p>
+    <h2 class="cta-title reveal d1">Está na hora de avançar<br>no conhecimento</h2>
+    <p class="cta-sub reveal d2">Avante no Conhecimento</p>
+    <p class="cta-p reveal d3">Matricule-se no curso de Capelania e dê o primeiro passo de uma jornada que vai transformar sua relação com a Palavra de Deus para sempre.</p>
+    <div class="cta-btns reveal d4">
+      <a href="https://wa.me/5521983051035" target="_blank" rel="noopener" class="btn btn-gold btn-lg">Quero me matricular agora</a>
+      <a href="#cursos" class="btn btn-ghost btn-lg">Ver todos os cursos</a>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ FOOTER ══════════ -->
 <footer>
   <div class="footer-inner">
     <div class="footer-brand">
-      <div class="footer-logo-row">
+      <div class="footer-logo-wrap">
         <img src="/kadima-logo.png" alt="Kadima">
         <span class="footer-wm">KADIMA ACADEMY</span>
       </div>
-      <p class="footer-p">Escola teológica online. Metodologia visual exclusiva. Avante no conhecimento — com profundidade, clareza e comunidade.</p>
+      <p class="footer-desc">Escola teológica online. Metodologia visual exclusiva. Avante no conhecimento — com profundidade, clareza e comunidade.</p>
+      <div class="footer-social">
+        <a href="https://wa.me/5521983051035" target="_blank" rel="noopener" class="footer-soc-btn" title="WhatsApp">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        </a>
+        <a href="#" class="footer-soc-btn" title="Instagram">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+        </a>
+        <a href="#" class="footer-soc-btn" title="YouTube">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M23.495 6.205a3.007 3.007 0 00-2.088-2.088c-1.87-.501-9.396-.501-9.396-.501s-7.507-.01-9.396.501A3.007 3.007 0 00.527 6.205a31.247 31.247 0 00-.522 5.805 31.247 31.247 0 00.522 5.783 3.007 3.007 0 002.088 2.088c1.868.502 9.396.502 9.396.502s7.506 0 9.396-.502a3.007 3.007 0 002.088-2.088 31.247 31.247 0 00.5-5.783 31.247 31.247 0 00-.5-5.805zM9.609 15.601V8.408l6.264 3.602z"/></svg>
+        </a>
+      </div>
     </div>
     <div>
       <div class="footer-col-t">Cursos</div>
       <ul class="footer-links">
-        <li><a href="#">Capelania</a></li>
-        <li><a href="#">Batalha Espiritual</a></li>
-        <li><a href="#">Anatomia da Vida Espiritual</a></li>
-        <li><a href="#">Profeta e Sacerdote</a></li>
-        <li><a href="#">Tesouraria do Reino</a></li>
+        <li><a href="#cursos">Capelania</a></li>
+        <li><a href="#cursos">Batalha Espiritual</a></li>
+        <li><a href="#cursos">Anatomia da Vida Espiritual</a></li>
+        <li><a href="#cursos">Profeta e Sacerdote</a></li>
+        <li><a href="#cursos">Tesouraria do Reino</a></li>
       </ul>
     </div>
     <div>
-      <div class="footer-col-t">Sobre</div>
+      <div class="footer-col-t">Escola</div>
       <ul class="footer-links">
-        <li><a href="#">Nossa História</a></li>
-        <li><a href="#">Professores</a></li>
-        <li><a href="#">Metodologia</a></li>
-        <li><a href="#">Comunidade</a></li>
-        <li><a href="#">Contato</a></li>
+        <li><a href="#diferenciais">Nossa Metodologia</a></li>
+        <li><a href="#professores">Professores</a></li>
+        <li><a href="#como-funciona">Como Funciona</a></li>
+        <li><a href="#depoimentos">Depoimentos</a></li>
+        <li><a href="#faq">Dúvidas Frequentes</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-t">Contato</div>
+      <ul class="footer-links">
+        <li><a href="https://wa.me/5521983051035" target="_blank" rel="noopener">WhatsApp</a></li>
+        <li><a href="#matricula">Matricular-se</a></li>
       </ul>
     </div>
   </div>
@@ -887,78 +1204,130 @@ footer { background: #08101F; padding: 64px 48px; }
   </div>
 </footer>
 
-<!-- ══════════════════════════════════════════
-     JAVASCRIPT
-══════════════════════════════════════════ -->
+<!-- ══════════ FAB WHATSAPP ══════════ -->
+<a href="https://wa.me/5521983051035" target="_blank" rel="noopener" class="fab-wa" aria-label="Fale pelo WhatsApp">
+  <div class="fab-tooltip">Fale conosco</div>
+  <svg viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+</a>
+
+<!-- ══════════ JAVASCRIPT ══════════ -->
 <script>
-/* ── NAV SCROLL ── */
+/* ── Nav scroll ── */
 const nav = document.getElementById('nav');
-window.addEventListener('scroll', () => {
-  nav.classList.toggle('scrolled', window.scrollY > 50);
-});
+window.addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 50));
 
-/* ── REVEAL ON SCROLL ── */
-const reveals = document.querySelectorAll('.reveal');
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      e.target.classList.add('visible');
-    }
-  });
-}, { threshold: 0.12 });
-reveals.forEach(el => observer.observe(el));
+/* ── Mobile menu ── */
+function toggleMenu() {
+  document.getElementById('hamburger').classList.toggle('open');
+  document.getElementById('mobileMenu').classList.toggle('open');
+  document.body.style.overflow = document.getElementById('mobileMenu').classList.contains('open') ? 'hidden' : '';
+}
 
-/* ── PARTICLES ── */
-const container = document.getElementById('particles');
-const count = 60;
-for (let i = 0; i < count; i++) {
+/* ── Reveal on scroll ── */
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+/* ── Particles ── */
+const pc = document.getElementById('particles');
+for (let i = 0; i < 70; i++) {
   const p = document.createElement('div');
   p.className = 'particle';
-  p.style.cssText = `
-    left: ${Math.random()*100}%;
-    width: ${Math.random()*3+1}px;
-    height: ${Math.random()*3+1}px;
-    animation-duration: ${Math.random()*15+8}s;
-    animation-delay: ${Math.random()*10}s;
-    opacity: ${Math.random()*.5+.1};
-  `;
-  container.appendChild(p);
+  p.style.cssText = `left:${Math.random()*100}%;width:${Math.random()*2.5+.5}px;height:${Math.random()*2.5+.5}px;animation-duration:${Math.random()*14+8}s;animation-delay:${Math.random()*12}s;`;
+  pc.appendChild(p);
 }
 
-/* ── COUNTERS ── */
-function animateCounter(el) {
-  const target = parseInt(el.dataset.target || el.textContent);
-  const duration = 1800;
-  const start = performance.now();
-  const update = (time) => {
-    const elapsed = time - start;
-    const progress = Math.min(elapsed / duration, 1);
-    const ease = 1 - Math.pow(1 - progress, 3);
-    el.textContent = Math.round(ease * target);
-    if (progress < 1) requestAnimationFrame(update);
-  };
-  requestAnimationFrame(update);
+/* ── Counter animation ── */
+function animCount(el) {
+  const t = +el.dataset.target;
+  const dur = 1800, s = performance.now();
+  (function u(now) {
+    const p = Math.min((now - s) / dur, 1);
+    el.textContent = Math.round((1 - Math.pow(1 - p, 3)) * t);
+    if (p < 1) requestAnimationFrame(u);
+  })(s);
 }
-const counterObs = new IntersectionObserver((entries) => {
+new IntersectionObserver(entries => {
   entries.forEach(e => {
     if (e.isIntersecting) {
-      e.target.querySelectorAll('.count').forEach(animateCounter);
-      counterObs.unobserve(e.target);
+      e.target.querySelectorAll('.count').forEach(animCount);
+      e.target.observer?.unobserve(e.target);
     }
   });
-}, { threshold: 0.5 });
-document.querySelectorAll('.stats').forEach(el => counterObs.observe(el));
+}, { threshold: .5 }).observe(document.querySelector('.stats-bar'));
 
-/* ── ACCORDION ── */
-function toggleAcc(head) {
-  const item = head.parentElement;
+/* ── Journey steps ── */
+const courses = [
+  {
+    n: '1', title: 'Capelania', sub: 'Porta de entrada · Ticket acessível',
+    desc: 'O ponto de entrada perfeito para quem quer começar a entender a Palavra de Deus com profundidade. Curso acessível, com certificado digital incluído. Ao concluir, você recebe acesso gratuito às primeiras 2 aulas do próximo nível como prévia da sua jornada.',
+    tags: ['Certificado Digital', 'Credencial Impressa (opcional)', 'Plano de Implantação Local'],
+    next: 'Batalha Espiritual',
+  },
+  {
+    n: '2', title: 'Batalha Espiritual (1, 2 e 3)', sub: 'Aprofundamento ministerial',
+    desc: 'Formação aprofundada sobre o mundo espiritual, libertação e identidade em Cristo. Este nível consolida o aluno dentro do ecossistema formativo e prepara para os próximos passos da jornada.',
+    tags: ['3 módulos progressivos', 'Fundamentos doutrinários', 'Certificado de Conclusão'],
+    next: 'Anatomia da Vida Espiritual',
+  },
+  {
+    n: '3', title: 'Anatomia da Vida Espiritual', sub: 'Cuidado e fortalecimento interior',
+    desc: 'Formação voltada ao entendimento da tricotomia humana (espírito, alma e corpo) e ao fortalecimento espiritual interior. Introduz a necessidade de cobertura espiritual e pastoreio como fundamentos do crescimento.',
+    tags: ['Tricotomia bíblica', 'Vida interior', 'Pastoreio e cobertura'],
+    next: 'Profeta e Sacerdote',
+  },
+  {
+    n: '4', title: 'Profeta e Sacerdote', sub: 'Identidade ministerial',
+    desc: 'Formação de alinhamento espiritual, honra, cobertura e identidade ministerial. Prepara o aluno para entender seu papel no Reino de Deus e o coloca no caminho para a formação mais avançada da jornada.',
+    tags: ['Identidade ministerial', 'Honra e cobertura', 'Alinhamento espiritual'],
+    next: 'Tesouraria do Reino',
+  },
+  {
+    n: '5', title: 'Tesouraria do Reino', sub: 'Maturidade avançada · Maior nível',
+    desc: 'O nível mais avançado da jornada Kadima. Formação aprofundada sobre os princípios de honra, gestão e finanças do Reino de Deus. Conteúdo exclusivo para alunos que chegaram à maturidade ministerial.',
+    tags: ['Finanças do Reino', 'Gestão ministerial', 'Maturidade avançada'],
+    next: null,
+  },
+];
+
+let activeStep = 0;
+
+function renderDetail(i) {
+  const c = courses[i];
+  document.getElementById('journey-detail').innerHTML = `
+    <div class="jd-head">
+      <div style="display:flex;align-items:center;gap:16px;">
+        <div class="jd-step-badge">${c.n}</div>
+        <div><div class="jd-title">${c.title}</div><div class="jd-sub">${c.sub}</div></div>
+      </div>
+      <a href="https://wa.me/5521983051035" target="_blank" rel="noopener" class="btn btn-gold" style="font-size:11px;padding:10px 22px;">Matricular-se</a>
+    </div>
+    <div class="jd-body">
+      <div>
+        <div class="jd-desc">${c.desc}</div>
+        ${c.next ? `<div class="jd-nav">Próximo nível: <a href="#">${c.next} →</a></div>` : '<div class="jd-nav">🏆 Este é o nível mais avançado da jornada</div>'}
+      </div>
+      <div class="jd-tags">${c.tags.map(t => `<div class="jd-tag">${t}</div>`).join('')}</div>
+    </div>
+  `;
+}
+
+function selectStep(i) {
+  document.querySelectorAll('.journey-step').forEach((s, idx) => s.classList.toggle('active', idx === i));
+  activeStep = i;
+  renderDetail(i);
+}
+
+renderDetail(0);
+
+/* ── FAQ ── */
+function toggleFaq(el) {
+  const item = el.parentElement;
   const isOpen = item.classList.contains('open');
-  // close all
-  document.querySelectorAll('.acc-item.open').forEach(i => i.classList.remove('open'));
-  // open clicked (if was closed)
+  document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
   if (!isOpen) item.classList.add('open');
 }
 </script>
-
 </body>
 </html>
