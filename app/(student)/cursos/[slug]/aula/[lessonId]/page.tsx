@@ -9,6 +9,7 @@ import LessonComments from "@/components/student/lesson-comments";
 import LessonRating from "@/components/student/lesson-rating";
 import HtmlContent from "@/components/student/html-content";
 import LessonThumbnail from "@/components/student/lesson-thumbnail";
+import LessonDrawer from "@/components/student/lesson-drawer";
 
 export default async function AulaPage({ params }: { params: Promise<{ slug: string; lessonId: string }> }) {
   const session = await auth();
@@ -379,6 +380,16 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
           </Link>
         </div>
       </aside>
+
+      {/* Mobile lesson drawer */}
+      <LessonDrawer
+        modules={course.modules as any}
+        currentLessonId={lessonId}
+        slug={slug}
+        daysSinceEnrollment={daysSinceEnrollment}
+        currentIndex={currentIndex}
+        total={total}
+      />
 
       <style>{`
         .hover-gold-cta:hover {

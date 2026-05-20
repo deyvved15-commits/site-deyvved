@@ -96,7 +96,7 @@ export default async function MeusProdutosPage({ searchParams }: { searchParams:
         <p className="ka-page-subtitle">Seus cursos e produtos digitais adquiridos.</p>
       </div>
 
-      <div className="ka-section" style={{ padding: "38px 44px 44px" }}>
+      <div className="ka-section">
 
         {/* ── Filtro de categoria ── */}
         {allCategories.length > 0 && <CategoryFilter categories={allCategories} />}

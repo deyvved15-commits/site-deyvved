@@ -1,10 +1,86 @@
 "use client";
 
 import { useState, useEffect } from "react";
-
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
+
+const ADMIN_PRIMARY = ["/admin", "/admin/cursos", "/admin/alunos", "/admin/financeiro", "/admin/suporte"];
+
+function AdminMobileNav({ links, pathname, onSignOut }: { links: any[]; pathname: string; onSignOut: () => void }) {
+  const [open, setOpen] = useState(false);
+  const primary = links.filter(l => ADMIN_PRIMARY.includes(l.href));
+  const secondary = links.filter(l => !ADMIN_PRIMARY.includes(l.href));
+  const anySecActive = secondary.some(l => l.exact ? pathname === l.href : pathname.startsWith(l.href));
+
+  return (
+    <>
+      {open && <div onClick={() => setOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 98, background: "rgba(0,0,0,0.60)", backdropFilter: "blur(4px)" }} />}
+
+      {/* Drawer */}
+      <div style={{
+        position: "fixed", bottom: 70, left: 0, right: 0, zIndex: 99,
+        background: "linear-gradient(180deg, #0A1129 0%, #060D1F 100%)",
+        borderTop: "1px solid rgba(201,169,122,0.20)", borderRadius: "16px 16px 0 0",
+        padding: "16px 12px 8px",
+        transform: open ? "translateY(0)" : "translateY(110%)",
+        transition: "transform 0.3s cubic-bezier(0.4,0,0.2,1)",
+        boxShadow: "0 -8px 32px rgba(0,0,0,0.50)",
+      }}>
+        <div style={{ width: 36, height: 4, borderRadius: 2, background: "rgba(201,169,122,0.30)", margin: "0 auto 16px" }} />
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8, marginBottom: 12 }}>
+          {secondary.map(({ href, label, icon, exact }) => {
+            const active = exact ? pathname === href : pathname.startsWith(href);
+            return (
+              <Link key={href} href={href} onClick={() => setOpen(false)} style={{
+                display: "flex", flexDirection: "column", alignItems: "center", gap: 6,
+                padding: "12px 8px", borderRadius: 12, textDecoration: "none",
+                background: active ? "rgba(201,169,122,0.12)" : "rgba(255,255,255,0.03)",
+                border: `1px solid ${active ? "rgba(201,169,122,0.35)" : "rgba(255,255,255,0.06)"}`,
+                color: active ? "var(--gold-light)" : "rgba(255,255,255,0.50)",
+                fontSize: 10, fontWeight: 600, fontFamily: "'Poppins',sans-serif", letterSpacing: 0.3,
+              }}>
+                {icon}
+                <span style={{ textAlign: "center", lineHeight: 1.2 }}>{label}</span>
+              </Link>
+            );
+          })}
+          <button onClick={() => { setOpen(false); onSignOut(); }} style={{
+            display: "flex", flexDirection: "column", alignItems: "center", gap: 6,
+            padding: "12px 8px", borderRadius: 12,
+            background: "rgba(230,57,70,0.06)", border: "1px solid rgba(230,57,70,0.15)",
+            color: "rgba(230,57,70,0.70)", fontSize: 10, fontWeight: 600,
+            fontFamily: "'Poppins',sans-serif", cursor: "pointer",
+          }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
+            <span>Sair</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Bar */}
+      <nav className="ka-mobile-nav" style={{ justifyContent: "space-around", overflow: "visible" }}>
+        {primary.map(({ href, label, icon, exact }) => {
+          const active = exact ? pathname === href : pathname.startsWith(href);
+          return (
+            <Link key={href} href={href} className={`ka-mobile-nav-btn${active ? " active" : ""}`}>
+              {icon}
+              <span>{label}</span>
+            </Link>
+          );
+        })}
+        <button className={`ka-mobile-nav-btn${(open || anySecActive) ? " active" : ""}`} onClick={() => setOpen(v => !v)}>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>
+          </svg>
+          <span>Mais</span>
+        </button>
+      </nav>
+    </>
+  );
+}
 
 const links = [
   {
@@ -310,25 +386,7 @@ export default function AdminSidebar({ user }: { user: { name?: string | null; e
       </aside>
 
       {/* ── Mobile Bottom Nav ── */}
-      <nav className="ka-mobile-nav">
-        {links.map(({ href, label, icon, exact }) => {
-          const active = exact ? pathname === href : pathname.startsWith(href);
-          return (
-            <Link key={href} href={href} className={`ka-mobile-nav-btn${active ? " active" : ""}`}>
-              {icon}
-              <span>{label}</span>
-            </Link>
-          );
-        })}
-        <button className="ka-mobile-nav-btn" onClick={() => signOut({ callbackUrl: "/login" })}>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-            <polyline points="16 17 21 12 16 7"/>
-            <line x1="21" y1="12" x2="9" y2="12"/>
-          </svg>
-          <span>Sair</span>
-        </button>
-      </nav>
+      <AdminMobileNav links={links} pathname={pathname} onSignOut={() => signOut({ callbackUrl: "/login" })} />
     </>
   );
 }

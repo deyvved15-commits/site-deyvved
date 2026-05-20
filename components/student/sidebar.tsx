@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import NotificationBell from "./notification-bell";
+import MobileNav from "./mobile-nav";
 
 const links = [
   {
@@ -261,35 +262,7 @@ export default function StudentSidebar({ user, streak = 0 }: { user: { name?: st
       </aside>
 
       {/* ── Mobile Bottom Nav ── */}
-      <nav className="ka-mobile-nav">
-        {allLinks.map(({ href, label, icon, exact, live }) => {
-          const active = exact ? pathname === href : pathname.startsWith(href);
-          return (
-            <Link key={href} href={href} className={`ka-mobile-nav-btn${active ? " active" : ""}`}>
-              <span style={{ position: "relative" }}>
-                {icon}
-                {live && (
-                  <span style={{
-                    position: "absolute", top: -3, right: -3,
-                    width: 8, height: 8, borderRadius: "50%",
-                    background: "var(--red)", border: "1.5px solid var(--navy-darkest)",
-                    boxShadow: "0 0 6px rgba(230,57,70,0.80)",
-                  }} />
-                )}
-              </span>
-              <span>{label}</span>
-            </Link>
-          );
-        })}
-        <button className="ka-mobile-nav-btn" onClick={() => signOut({ callbackUrl: "/login" })}>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-            <polyline points="16 17 21 12 16 7"/>
-            <line x1="21" y1="12" x2="9" y2="12"/>
-          </svg>
-          <span>Sair</span>
-        </button>
-      </nav>
+      <MobileNav allLinks={allLinks} pathname={pathname} onSignOut={() => signOut({ callbackUrl: "/login" })} />
     </>
   );
 }

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Poppins, Cinzel } from "next/font/google";
 import Providers from "@/components/providers";
 import SwRegister from "@/components/student/sw-register";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -50,6 +51,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <SwRegister />
           {children}
         </Providers>
+        <Analytics />
       </body>
     </html>
   );
