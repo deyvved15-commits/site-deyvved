@@ -233,17 +233,26 @@ export default function CourseEditor({ course: initial, teachers: allTeachers, i
     <div style={{ maxWidth: 900 }}>
 
       {/* ── Header sticky ── */}
-      <div style={{ position: "sticky", top: 0, zIndex: 10, marginBottom: 36, marginLeft: -44, marginRight: -44, padding: "16px 44px", background: "linear-gradient(180deg, rgba(6,13,31,0.98) 80%, transparent)", backdropFilter: "blur(12px)", borderBottom: "1px solid rgba(201,169,122,0.08)" }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 20, maxWidth: 900 }}>
-        <div>
+      <style>{`
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @media (max-width: 768px) {
+          .ka-course-editor-header { margin-left: -16px !important; margin-right: -16px !important; padding: 12px 16px !important; }
+          .ka-course-editor-inner { flex-direction: column !important; align-items: flex-start !important; gap: 12px !important; }
+          .ka-course-editor-title { font-size: 14px !important; letter-spacing: 1px !important; }
+          .ka-course-editor-btns { width: 100%; justify-content: flex-end; }
+        }
+      `}</style>
+      <div className="ka-course-editor-header" style={{ position: "sticky", top: 0, zIndex: 10, marginBottom: 36, marginLeft: -44, marginRight: -44, padding: "16px 44px", background: "linear-gradient(180deg, rgba(6,13,31,0.98) 80%, transparent)", backdropFilter: "blur(12px)", borderBottom: "1px solid rgba(201,169,122,0.08)" }}>
+      <div className="ka-course-editor-inner" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 20, maxWidth: 900 }}>
+        <div style={{ minWidth: 0, flex: 1 }}>
           <p style={{ fontFamily: "'Cinzel',serif", fontSize: 9, fontWeight: 600, letterSpacing: 5, textTransform: "uppercase", color: "var(--gold)", marginBottom: 4 }}>
             Editando Curso
           </p>
-          <h1 style={{ fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 20, letterSpacing: 2, color: "var(--text-primary)", lineHeight: 1.2 }}>
+          <h1 className="ka-course-editor-title" style={{ fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 20, letterSpacing: 2, color: "var(--text-primary)", lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
             {course.title}
           </h1>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+        <div className="ka-course-editor-btns" style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
           <button onClick={() => setCourse(c => ({ ...c, published: !c.published }))} style={{
             display: "flex", alignItems: "center", gap: 7, padding: "9px 16px", borderRadius: 12, cursor: "pointer", fontSize: 11, fontWeight: 600, fontFamily: "'Cinzel',serif", letterSpacing: 1.5, textTransform: "uppercase", transition: "all 0.2s",
             ...(course.published
@@ -260,7 +269,6 @@ export default function CourseEditor({ course: initial, teachers: allTeachers, i
             )}
             {saving ? "Salvando..." : "Salvar"}
           </button>
-          <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
         </div>
       </div>
       </div>

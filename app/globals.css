@@ -870,9 +870,12 @@ select.ka-input option {
   .ka-card-list-mobile { display: flex !important; flex-direction: column; gap: 12px; }
 
   /* Adjust page headers for mobile */
-  .ka-page-header { padding: 20px 16px 16px !important; }
+  .ka-page-header { padding: 20px 16px 16px !important; flex-direction: column !important; align-items: flex-start !important; gap: 12px !important; }
   .ka-page-header::before { left: 16px !important; right: 16px !important; }
   .ka-hero p { font-size: 12px !important; }
+
+  /* Course editor section padding */
+  .ka-course-editor-section { padding: 16px 16px 80px !important; }
 }
 
 /* Medium screens — keep sidebar but reduce card padding */

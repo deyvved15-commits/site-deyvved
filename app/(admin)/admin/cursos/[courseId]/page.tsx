@@ -37,7 +37,7 @@ export default async function EditCursoPage({ params }: { params: Promise<{ cour
         </svg>
         Cursos
       </Link>
-      <div className="ka-section" style={{ padding: "16px 44px 44px" }}>
+      <div className="ka-section ka-course-editor-section" style={{ padding: "16px 44px 44px" }}>
         <CourseEditor course={course as any} teachers={teachers} />
       </div>
     </div>

@@ -33,6 +33,25 @@ export default async function ProfessoresPage() {
         </Link>
       </div>
 
+      <style>{`
+        @media (max-width: 768px) {
+          .prof-table-head { display: none !important; }
+          .prof-table-row {
+            display: flex !important;
+            flex-direction: column !important;
+            padding: 14px 16px !important;
+            gap: 6px !important;
+          }
+          .prof-row-main { justify-content: space-between !important; }
+          .prof-col-email-desktop { display: none !important; }
+          .prof-col-date { display: none !important; }
+          .prof-col-action-desktop { display: none !important; }
+          .prof-row-email { display: block !important; }
+          .prof-row-action { display: inline-block !important; }
+          .prof-row-meta { padding-left: 0 !important; }
+        }
+      `}</style>
+
       <div className="ka-section" style={{ padding: "32px 44px 44px" }}>
         {teachers.length === 0 ? (
           <div style={{
@@ -55,7 +74,7 @@ export default async function ProfessoresPage() {
             boxShadow: "0 8px 32px rgba(0,0,0,0.35)",
           }}>
             {/* Table head */}
-            <div style={{
+            <div className="prof-table-head" style={{
               display: "grid", gridTemplateColumns: "2fr 2fr 2fr 1fr 80px",
               padding: "12px 24px",
               borderBottom: "1px solid rgba(201,169,122,0.10)",
@@ -72,14 +91,16 @@ export default async function ProfessoresPage() {
             {teachers.map((t, i) => {
               const initials = t.name?.split(" ").map(n => n[0]).slice(0, 2).join("").toUpperCase() ?? "?";
               return (
-                <div key={t.id} style={{
-                  display: "grid", gridTemplateColumns: "2fr 2fr 2fr 1fr 80px",
-                  alignItems: "center", padding: "14px 24px",
-                  borderTop: i > 0 ? "1px solid rgba(201,169,122,0.06)" : "none",
-                  transition: "background 0.2s",
-                }}
-                className="admin-row-hover">
-                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <div key={t.id}
+                  className="admin-row-hover prof-table-row"
+                  style={{
+                    display: "grid", gridTemplateColumns: "2fr 2fr 2fr 1fr 80px",
+                    alignItems: "center", padding: "14px 24px",
+                    borderTop: i > 0 ? "1px solid rgba(201,169,122,0.06)" : "none",
+                    transition: "background 0.2s",
+                  }}>
+                  {/* Col 1: Avatar + Name */}
+                  <div className="prof-row-main" style={{ display: "flex", alignItems: "center", gap: 10 }}>
                     <div style={{
                       width: 34, height: 34, borderRadius: "50%", flexShrink: 0,
                       background: "radial-gradient(circle at 30% 30%, var(--gold-bright), var(--gold) 50%, var(--gold-deep))",
@@ -90,14 +111,29 @@ export default async function ProfessoresPage() {
                     }}>
                       {initials}
                     </div>
-                    <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                      {t.name}
-                    </span>
+                    <div style={{ minWidth: 0 }}>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)", display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {t.name}
+                      </span>
+                      <span className="prof-row-email" style={{ display: "none", fontSize: 11, color: "var(--text-muted)" }}>
+                        {t.email}
+                      </span>
+                    </div>
+                    <Link href={`/admin/professores/${t.id}`} className="prof-row-action" style={{
+                      display: "none", padding: "6px 14px", borderRadius: 8,
+                      background: "rgba(201,169,122,0.08)", border: "1px solid var(--gold-20)",
+                      color: "var(--gold-light)", fontSize: 11, fontWeight: 600,
+                      letterSpacing: 1, textDecoration: "none", flexShrink: 0,
+                    }}>
+                      Editar
+                    </Link>
                   </div>
-                  <span style={{ fontSize: 12, color: "var(--text-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", paddingRight: 8 }}>
+                  {/* Col 2: Email (desktop) */}
+                  <span className="prof-col-email-desktop" style={{ fontSize: 12, color: "var(--text-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", paddingRight: 8 }}>
                     {t.email}
                   </span>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                  {/* Col 3: Courses */}
+                  <div className="prof-row-meta" style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
                     {t.taughtCourses.length === 0
                       ? <span style={{ fontSize: 11, color: "var(--text-muted)" }}>Nenhum curso</span>
                       : t.taughtCourses.map(ct => (
@@ -110,10 +146,12 @@ export default async function ProfessoresPage() {
                           </span>
                         ))}
                   </div>
-                  <span style={{ fontSize: 11, color: "var(--text-muted)" }}>
+                  {/* Col 4: Date (desktop) */}
+                  <span className="prof-col-date" style={{ fontSize: 11, color: "var(--text-muted)" }}>
                     {new Date(t.createdAt).toLocaleDateString("pt-BR")}
                   </span>
-                  <Link href={`/admin/professores/${t.id}`} style={{
+                  {/* Col 5: Edit button (desktop) */}
+                  <Link href={`/admin/professores/${t.id}`} className="prof-col-action-desktop" style={{
                     padding: "6px 14px", borderRadius: 8,
                     background: "rgba(201,169,122,0.08)", border: "1px solid var(--gold-20)",
                     color: "var(--gold-light)", fontSize: 11, fontWeight: 600,

@@ -107,7 +107,12 @@ export default function AdminNotificacoes() {
         <p className="ka-page-subtitle">Notificações in-app e push para alunos</p>
       </div>
 
-      <div style={{ padding: "0 44px 44px", display: "grid", gridTemplateColumns: "1fr 380px", gap: 24, alignItems: "start" }}>
+      <style>{`
+        @media (max-width: 768px) {
+          .ka-notif-grid { grid-template-columns: 1fr !important; padding: 0 16px 80px !important; }
+        }
+      `}</style>
+      <div className="ka-notif-grid" style={{ padding: "0 44px 44px", display: "grid", gridTemplateColumns: "1fr 380px", gap: 24, alignItems: "start" }}>
 
         {/* Form */}
         <div style={{
