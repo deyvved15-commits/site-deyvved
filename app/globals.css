@@ -876,6 +876,10 @@ select.ka-input option {
 
   /* Course editor section padding */
   .ka-course-editor-section { padding: 16px 16px 80px !important; }
+
+  /* Aula da Semana — margens laterais */
+  .ka-aula-semana-header { padding: 20px 16px 16px !important; }
+  .ka-aula-semana-body { padding: 16px 16px 80px !important; }
 }
 
 /* Medium screens — keep sidebar but reduce card padding */

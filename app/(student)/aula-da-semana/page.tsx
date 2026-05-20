@@ -14,7 +14,7 @@ export default async function AulaDaSemanaPage() {
     <div style={{ minHeight: "100%", background: "linear-gradient(180deg, var(--navy-darkest) 0%, var(--navy-mid) 100%)" }}>
 
       {/* ── Banner cabeçalho ── */}
-      <div style={{
+      <div className="ka-aula-semana-header" style={{
         margin: "0",
         padding: "28px 44px 24px",
         borderBottom: "1px solid rgba(201,169,122,0.10)",
@@ -55,7 +55,7 @@ export default async function AulaDaSemanaPage() {
       </div>
 
       {/* ── Conteúdo ── */}
-      <div style={{ padding: "28px 44px 44px", width: "100%" }}>
+      <div className="ka-aula-semana-body" style={{ padding: "28px 44px 44px", width: "100%" }}>
 
         {/* Vídeo */}
         {ytId ? (
