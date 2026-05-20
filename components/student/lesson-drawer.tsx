@@ -52,8 +52,6 @@ export default function LessonDrawer({ modules, currentLessonId, slug, daysSince
         transform: open ? "translateY(0)" : "translateY(100%)",
         transition: "transform 0.35s cubic-bezier(0.4,0,0.2,1)",
         display: "flex", flexDirection: "column",
-        // Only show on mobile
-        display: "none",
       }}
         className="ka-lesson-drawer"
       >
