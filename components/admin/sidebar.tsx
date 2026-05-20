@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 
-const ADMIN_PRIMARY = ["/admin", "/admin/cursos", "/admin/alunos", "/admin/financeiro", "/admin/suporte"];
+const ADMIN_PRIMARY = ["/admin", "/admin/cursos", "/admin/alunos", "/admin/financeiro"];
 
 function AdminMobileNav({ links, pathname, onSignOut }: { links: any[]; pathname: string; onSignOut: () => void }) {
   const [open, setOpen] = useState(false);

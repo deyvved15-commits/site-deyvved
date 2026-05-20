@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 
-const PRIMARY_HREFS = ["/dashboard", "/cursos", "/ao-vivo", "/loja", "/perfil"];
+const PRIMARY_HREFS = ["/dashboard", "/cursos", "/ao-vivo", "/loja"];
 
 interface NavLink {
   href: string;
