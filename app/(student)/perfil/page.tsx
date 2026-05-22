@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 
@@ -67,8 +67,9 @@ export default function PerfilPage() {
   const [name, setName] = useState("");
   const [bio, setBio] = useState("");
   const [avatar, setAvatar] = useState("");
-  const [avatarInput, setAvatarInput] = useState("");
-  const [showAvatarInput, setShowAvatarInput] = useState(false);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const [avatarError, setAvatarError] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -90,6 +91,33 @@ export default function PerfilPage() {
       });
   }, []);
 
+  async function handleAvatarFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setAvatarError("");
+    setAvatarUploading(true);
+    const fd = new FormData();
+    fd.append("file", file);
+    try {
+      const res = await fetch("/api/upload/avatar", { method: "POST", body: fd });
+      const data = await res.json();
+      if (!res.ok) { setAvatarError(data.error ?? "Erro ao fazer upload."); return; }
+      setAvatar(data.url);
+      // Salva automaticamente no perfil
+      await fetch("/api/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ avatar: data.url }),
+      });
+      await updateSession({});
+    } catch {
+      setAvatarError("Erro de conexão. Tente novamente.");
+    } finally {
+      setAvatarUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
+
   async function handleInfoSave(e: React.FormEvent) {
     e.preventDefault();
     setInfoLoading(true);
@@ -106,7 +134,6 @@ export default function PerfilPage() {
     setAvatar(data.avatar ?? "");
     await updateSession({ name: data.name });
     setInfoMsg({ type: "success", msg: "Perfil atualizado com sucesso!" });
-    setShowAvatarInput(false);
   }
 
   async function handlePasswordSave(e: React.FormEvent) {
@@ -156,17 +183,33 @@ export default function PerfilPage() {
         }}>
           {/* Avatar */}
           <div style={{ position: "relative", flexShrink: 0 }}>
-            <div style={{
-              width: 80, height: 80, borderRadius: "50%",
-              background: "radial-gradient(circle at 30% 30%, #E8D5A8 0%, #C9A97A 50%, #7A5530 100%)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 28,
-              color: "var(--navy-darkest)",
-              boxShadow: "0 0 30px rgba(201,169,122,0.40), 0 0 60px rgba(201,169,122,0.15)",
-              border: "2px solid var(--gold-light)",
-              overflow: "hidden",
-            }}>
-              {currentAvatar ? (
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              style={{ display: "none" }}
+              onChange={handleAvatarFile}
+            />
+            <div
+              onClick={() => !avatarUploading && fileInputRef.current?.click()}
+              title="Clique para trocar a foto"
+              style={{
+                width: 80, height: 80, borderRadius: "50%",
+                background: "radial-gradient(circle at 30% 30%, #E8D5A8 0%, #C9A97A 50%, #7A5530 100%)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 28,
+                color: "var(--navy-darkest)",
+                boxShadow: "0 0 30px rgba(201,169,122,0.40), 0 0 60px rgba(201,169,122,0.15)",
+                border: "2px solid var(--gold-light)",
+                overflow: "hidden",
+                cursor: avatarUploading ? "default" : "pointer",
+                opacity: avatarUploading ? 0.6 : 1,
+                transition: "opacity 0.2s",
+              }}
+            >
+              {avatarUploading ? (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#060D1F" strokeWidth="2.5" strokeLinecap="round" style={{ animation: "spin 1s linear infinite" }}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+              ) : currentAvatar ? (
                 <Image
                   src={currentAvatar}
                   alt={displayName}
@@ -174,11 +217,13 @@ export default function PerfilPage() {
                   height={80}
                   style={{ width: "100%", height: "100%", objectFit: "cover" }}
                   onError={() => setAvatar("")}
+                  unoptimized
                 />
               ) : initials}
             </div>
             <button
-              onClick={() => setShowAvatarInput(v => !v)}
+              type="button"
+              onClick={() => !avatarUploading && fileInputRef.current?.click()}
               title="Alterar foto"
               style={{
                 position: "absolute", bottom: 0, right: 0,
@@ -186,7 +231,7 @@ export default function PerfilPage() {
                 background: "linear-gradient(135deg, #C9A97A, #8B6914)",
                 border: "2px solid #060D1F",
                 display: "flex", alignItems: "center", justifyContent: "center",
-                cursor: "pointer", color: "#060D1F",
+                cursor: avatarUploading ? "default" : "pointer", color: "#060D1F",
               }}
             >
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -207,47 +252,51 @@ export default function PerfilPage() {
                 {bio}
               </div>
             )}
-          </div>
-
-          {/* Avatar URL input */}
-          {showAvatarInput && (
-            <div style={{ width: "100%", marginTop: 4 }}>
-              <label style={{ ...S.label, display: "block", marginBottom: 8 }}>URL da Foto de Perfil</label>
-              <div style={{ display: "flex", gap: 8 }}>
-                <input
-                  className="pf-input"
-                  style={{ ...S.input, flex: 1 }}
-                  value={avatarInput}
-                  onChange={e => setAvatarInput(e.target.value)}
-                  placeholder="https://exemplo.com/minha-foto.jpg"
-                  type="url"
-                />
+            <div style={{ marginTop: 8, display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+              <button
+                type="button"
+                onClick={() => !avatarUploading && fileInputRef.current?.click()}
+                style={{
+                  display: "inline-flex", alignItems: "center", gap: 5,
+                  padding: "5px 12px", borderRadius: 8,
+                  background: "rgba(201,169,122,0.08)", border: "1px solid rgba(201,169,122,0.20)",
+                  color: "rgba(201,169,122,0.80)", fontSize: 10,
+                  fontFamily: "'Cinzel',serif", letterSpacing: 1.5, textTransform: "uppercase",
+                  cursor: avatarUploading ? "default" : "pointer",
+                }}
+              >
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+                {avatarUploading ? "Enviando..." : "Trocar foto"}
+              </button>
+              {currentAvatar && !avatarUploading && (
                 <button
                   type="button"
-                  onClick={() => { setAvatar(avatarInput); setShowAvatarInput(false); }}
-                  style={{ ...S.btnPrimary, padding: "12px 16px", flexShrink: 0 }}
+                  onClick={async () => {
+                    setAvatar("");
+                    await fetch("/api/profile", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ avatar: null }) });
+                  }}
+                  style={{
+                    display: "inline-flex", alignItems: "center", gap: 5,
+                    padding: "5px 12px", borderRadius: 8,
+                    background: "rgba(230,57,70,0.06)", border: "1px solid rgba(230,57,70,0.18)",
+                    color: "rgba(255,128,136,0.70)", fontSize: 10,
+                    fontFamily: "'Cinzel',serif", letterSpacing: 1.5, textTransform: "uppercase",
+                    cursor: "pointer",
+                  }}
                 >
-                  OK
+                  Remover
                 </button>
-                {currentAvatar && (
-                  <button
-                    type="button"
-                    onClick={() => { setAvatar(""); setAvatarInput(""); setShowAvatarInput(false); }}
-                    style={{
-                      padding: "12px 16px", borderRadius: 12, border: "1px solid rgba(230,57,70,0.30)",
-                      background: "rgba(230,57,70,0.08)", color: "#FF8088", fontSize: 11,
-                      fontFamily: "'Cinzel',serif", cursor: "pointer", flexShrink: 0,
-                    }}
-                  >
-                    Remover
-                  </button>
-                )}
-              </div>
-              <p style={{ fontSize: 11, color: "rgba(255,255,255,0.30)", marginTop: 6, fontFamily: "'Poppins',sans-serif" }}>
-                Cole a URL de uma imagem. Salve o perfil para confirmar.
-              </p>
+              )}
             </div>
-          )}
+            {avatarError && (
+              <p style={{ fontSize: 11, color: "#FF8088", marginTop: 6, fontFamily: "'Poppins',sans-serif" }}>{avatarError}</p>
+            )}
+            <p style={{ fontSize: 10, color: "rgba(255,255,255,0.20)", marginTop: 6, fontFamily: "'Poppins',sans-serif" }}>
+              JPG, PNG ou WebP · Máx 2MB
+            </p>
+          </div>
         </div>
 
         {/* Info section (nome + bio) */}
