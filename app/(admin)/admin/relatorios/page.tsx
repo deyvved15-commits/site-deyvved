@@ -303,34 +303,90 @@ const muted:   React.CSSProperties = { fontSize: 11, color: "var(--text-muted)" 
 
 function AlunosTable({ data, loading }: { data: any[]; loading: boolean }) {
   if (!data.length) return <EmptyState loading={loading} />;
+
+  // Agrupa matrículas por aluno
+  const grouped = new Map<string, { user: any; enrollments: any[] }>();
+  for (const e of data) {
+    const uid = e.user?.id ?? e.id;
+    if (!grouped.has(uid)) grouped.set(uid, { user: e.user, enrollments: [] });
+    grouped.get(uid)!.enrollments.push(e);
+  }
+  const rows = Array.from(grouped.values());
+
   return (
     <>
       <div style={headRowStyle} className="rpt-head">
-        {["Aluno","E-mail","Telefone","Igreja","Curso","Matriculado em","Expira em"].map(h => <TH key={h} label={h} />)}
+        {["Aluno","Contato","Igreja","Cursos matriculados",""].map(h => <TH key={h} label={h} />)}
       </div>
       <div style={bodyStyle}>
-        {data.map((e: any, i: number) => (
-          <div key={e.id} style={row(i)} className="rpt-row">
-            <span style={{ ...primary, flex: 1 }} className="rpt-cell-primary">{e.user?.name ?? "—"}</span>
-            <span style={{ ...muted, flex: 1 }}   className="rpt-cell-muted">{e.user?.email  ?? "—"}</span>
-            <span style={{ ...muted, flex: 1 }}   className="rpt-cell-muted">{e.user?.phone  ?? "—"}</span>
-            <span style={{ ...muted, flex: 1 }}   className="rpt-cell-muted">{e.user?.church ?? "—"}</span>
-            <span style={{ ...muted, flex: 1 }}   className="rpt-cell-muted">{e.course?.title ?? "—"}</span>
-            <span style={{ ...muted, flex: 1 }}   className="rpt-cell-muted">{fmtDate(e.createdAt)}</span>
-            {(() => {
-              // Se expiresAt está null mas o curso é mensal, calcula createdAt + 30 dias
-              const expiry = e.expiresAt
-                ? new Date(e.expiresAt)
-                : e.course?.paymentType === "MONTHLY"
-                  ? new Date(new Date(e.createdAt).getTime() + 30 * 24 * 60 * 60 * 1000)
-                  : null;
-              const expired = expiry && expiry < new Date();
-              return (
-                <span style={{ flex: 1, ...muted, color: expired ? "var(--red)" : "var(--text-muted)" }} className="rpt-cell-muted">
-                  {expiry ? fmtDate(expiry) : "Vitalício"}
-                </span>
-              );
-            })()}
+        {rows.map((g, i) => (
+          <div key={g.user?.id ?? i} style={{ ...row(i), alignItems: "flex-start" }} className="rpt-row">
+
+            {/* Aluno */}
+            <div style={{ flex: 1, minWidth: 140 }}>
+              <div style={primary} className="rpt-cell-primary">{g.user?.name ?? "—"}</div>
+            </div>
+
+            {/* Contato */}
+            <div style={{ flex: 1.2, minWidth: 160 }}>
+              <div style={muted} className="rpt-cell-muted">{g.user?.email ?? "—"}</div>
+              {g.user?.phone && (
+                <div style={{ ...muted, marginTop: 3 }} className="rpt-cell-muted">{g.user.phone}</div>
+              )}
+            </div>
+
+            {/* Igreja */}
+            <div style={{ flex: 1, minWidth: 120 }}>
+              <div style={muted} className="rpt-cell-muted">{g.user?.church ?? "—"}</div>
+            </div>
+
+            {/* Cursos — um badge por matrícula */}
+            <div style={{ flex: 2.5, display: "flex", flexDirection: "column", gap: 8 }}>
+              {g.enrollments.map((e: any) => {
+                const expiry = e.expiresAt
+                  ? new Date(e.expiresAt)
+                  : e.course?.paymentType === "MONTHLY"
+                    ? new Date(new Date(e.createdAt).getTime() + 30 * 24 * 60 * 60 * 1000)
+                    : null;
+                const expired = expiry && expiry < new Date();
+                return (
+                  <div key={e.id} style={{
+                    display: "flex", alignItems: "center", flexWrap: "wrap", gap: 8,
+                    padding: "7px 12px", borderRadius: 10,
+                    background: expired ? "rgba(230,57,70,0.06)" : "rgba(201,169,122,0.07)",
+                    border: `1px solid ${expired ? "rgba(230,57,70,0.20)" : "rgba(201,169,122,0.18)"}`,
+                  }}>
+                    <span style={{
+                      fontSize: 11, fontWeight: 700,
+                      color: expired ? "var(--red)" : "var(--gold-light)",
+                    }} className="rpt-cell-primary">
+                      {e.course?.title ?? "—"}
+                    </span>
+                    <span style={{ fontSize: 10, color: "rgba(255,255,255,0.30)" }}>·</span>
+                    <span style={{ fontSize: 10, color: "var(--text-muted)" }} className="rpt-cell-muted">
+                      desde {fmtDate(e.createdAt)}
+                    </span>
+                    <span style={{ fontSize: 10, color: expired ? "rgba(230,57,70,0.80)" : "var(--text-muted)" }} className="rpt-cell-muted">
+                      {expiry ? (expired ? `Expirou ${fmtDate(expiry)}` : `até ${fmtDate(expiry)}`) : "Vitalício"}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Badge com total de cursos */}
+            <div style={{ minWidth: 60, textAlign: "right" }}>
+              <span style={{
+                display: "inline-block",
+                fontSize: 10, fontWeight: 700, padding: "3px 10px", borderRadius: 20,
+                background: "rgba(201,169,122,0.12)", border: "1px solid rgba(201,169,122,0.25)",
+                color: "var(--gold)",
+                fontFamily: "var(--font-cinzel)",
+              }}>
+                {g.enrollments.length}× curso{g.enrollments.length !== 1 ? "s" : ""}
+              </span>
+            </div>
+
           </div>
         ))}
       </div>
