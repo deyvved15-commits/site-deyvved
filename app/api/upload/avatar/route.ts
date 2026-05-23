@@ -5,6 +5,16 @@ const SUPABASE_URL = process.env.SUPABASE_URL ?? "https://hukcxhrrywtjghcocnji.s
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
 const BUCKET = "avatars";
 
+const ALLOWED: Record<string, string> = {
+  "image/jpeg": "jpg",
+  "image/jpg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+  "image/heic": "heic",
+  "image/heif": "heif",
+  "image/gif": "gif",
+};
+
 export async function POST(req: NextRequest) {
   const session = await auth();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -14,16 +24,16 @@ export async function POST(req: NextRequest) {
 
   if (!file) return NextResponse.json({ error: "Nenhum arquivo enviado." }, { status: 400 });
 
-  const allowed = ["image/jpeg", "image/png", "image/webp", "image/gif"];
-  if (!allowed.includes(file.type)) {
-    return NextResponse.json({ error: "Formato inválido. Use JPG, PNG ou WebP." }, { status: 400 });
+  const ext = ALLOWED[file.type];
+  if (!ext) {
+    console.error("[upload/avatar] tipo não suportado:", file.type);
+    return NextResponse.json({ error: `Formato não suportado (${file.type}). Use JPG, PNG ou WebP.` }, { status: 400 });
   }
 
   if (file.size > 5 * 1024 * 1024) {
     return NextResponse.json({ error: "Imagem muito grande. Máximo 5MB." }, { status: 400 });
   }
 
-  const ext = file.type.split("/")[1].replace("jpeg", "jpg");
   const path = `${session.user.id}.${ext}`;
   const bytes = await file.arrayBuffer();
 
@@ -41,8 +51,8 @@ export async function POST(req: NextRequest) {
 
   if (!uploadRes.ok) {
     const err = await uploadRes.text();
-    console.error("[upload/avatar]", err);
-    return NextResponse.json({ error: "Erro ao fazer upload. Tente novamente." }, { status: 500 });
+    console.error("[upload/avatar] Supabase error:", uploadRes.status, err);
+    return NextResponse.json({ error: "Erro ao fazer upload. Verifique o bucket no Supabase." }, { status: 500 });
   }
 
   const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${path}`;
