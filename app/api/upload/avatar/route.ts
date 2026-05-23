@@ -19,8 +19,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Formato inválido. Use JPG, PNG ou WebP." }, { status: 400 });
   }
 
-  if (file.size > 2 * 1024 * 1024) {
-    return NextResponse.json({ error: "Imagem muito grande. Máximo 2MB." }, { status: 400 });
+  if (file.size > 5 * 1024 * 1024) {
+    return NextResponse.json({ error: "Imagem muito grande. Máximo 5MB." }, { status: 400 });
   }
 
   const ext = file.type.split("/")[1].replace("jpeg", "jpg");

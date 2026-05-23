@@ -294,7 +294,7 @@ export default function PerfilPage() {
               <p style={{ fontSize: 11, color: "#FF8088", marginTop: 6, fontFamily: "'Poppins',sans-serif" }}>{avatarError}</p>
             )}
             <p style={{ fontSize: 10, color: "rgba(255,255,255,0.20)", marginTop: 6, fontFamily: "'Poppins',sans-serif" }}>
-              JPG, PNG ou WebP · Máx 2MB
+              JPG, PNG ou WebP · Máx 5MB
             </p>
           </div>
         </div>
