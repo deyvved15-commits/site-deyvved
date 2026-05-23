@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { getToken } from "next-auth/jwt";
 
 const SUPABASE_URL = process.env.SUPABASE_URL ?? "https://hukcxhrrywtjghcocnji.supabase.co";
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
@@ -16,8 +16,17 @@ const ALLOWED: Record<string, string> = {
 };
 
 export async function POST(req: NextRequest) {
-  const session = await auth();
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const token = await getToken({
+    req,
+    secret: process.env.AUTH_SECRET,
+    cookieName: req.url.startsWith("https")
+      ? "__Secure-authjs.session-token"
+      : "authjs.session-token",
+  });
+
+  if (!token?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
   const formData = await req.formData();
   const file = formData.get("file") as File | null;
@@ -34,7 +43,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Imagem muito grande. Máximo 5MB." }, { status: 400 });
   }
 
-  const path = `${session.user.id}.${ext}`;
+  const userId = token.id as string;
+  const path = `${userId}.${ext}`;
   const bytes = await file.arrayBuffer();
 
   const uploadUrl = `${SUPABASE_URL}/storage/v1/object/${BUCKET}/${path}`;

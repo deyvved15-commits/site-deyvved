@@ -100,7 +100,9 @@ export default function PerfilPage() {
     fd.append("file", file);
     try {
       const res = await fetch("/api/upload/avatar", { method: "POST", body: fd });
-      const data = await res.json();
+      const text = await res.text();
+      let data: any = {};
+      try { data = JSON.parse(text); } catch { /* resposta não era JSON */ }
       if (!res.ok) { setAvatarError(data.error ?? "Erro ao fazer upload."); return; }
       setAvatar(data.url);
       // Salva automaticamente no perfil
