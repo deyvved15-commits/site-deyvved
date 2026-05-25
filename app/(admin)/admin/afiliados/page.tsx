@@ -78,6 +78,7 @@ export default async function AdminAfiliadosPage() {
               <p style={{ fontSize: 13, color: "var(--text-muted)" }}>Nenhum afiliado cadastrado ainda.</p>
             </div>
           ) : (
+            <>
             <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
               <thead>
@@ -103,6 +104,7 @@ export default async function AdminAfiliadosPage() {
                 ))}
               </tbody>
             </table>
+            </>
           )}
         </div>
       </div>
