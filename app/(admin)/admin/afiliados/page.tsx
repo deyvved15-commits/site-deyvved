@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { Users, Wallet, TrendingUp } from "lucide-react";
+import AffiliateRow from "@/components/admin/affiliate-row";
 
 export default async function AdminAfiliadosPage() {
   const session = await auth();
@@ -14,8 +15,9 @@ export default async function AdminAfiliadosPage() {
       name: true,
       email: true,
       affiliateCode: true,
+      affiliatePercentage: true,
       walletBalance: true,
-      _count: { select: { referralsMade: true } },
+      _count: { select: { referralsMade: true, affiliateClicks: true } },
     },
     orderBy: { walletBalance: "desc" },
   });
@@ -76,38 +78,28 @@ export default async function AdminAfiliadosPage() {
               <p style={{ fontSize: 13, color: "var(--text-muted)" }}>Nenhum afiliado cadastrado ainda.</p>
             </div>
           ) : (
+            <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
               <thead>
                 <tr style={{ background: "rgba(255,255,255,0.02)", borderBottom: "1px solid rgba(201,169,122,0.08)" }}>
-                  <th style={{ padding: "16px 24px", textAlign: "left", fontFamily: "'Cinzel',serif", fontSize: 10, color: "var(--gold)", letterSpacing: 2 }}>NOME</th>
-                  <th style={{ padding: "16px 24px", textAlign: "left", fontFamily: "'Cinzel',serif", fontSize: 10, color: "var(--gold)", letterSpacing: 2 }}>CÓDIGO</th>
-                  <th style={{ padding: "16px 24px", textAlign: "center", fontFamily: "'Cinzel',serif", fontSize: 10, color: "var(--gold)", letterSpacing: 2 }}>INDICAÇÕES</th>
-                  <th style={{ padding: "16px 24px", textAlign: "right", fontFamily: "'Cinzel',serif", fontSize: 10, color: "var(--gold)", letterSpacing: 2 }}>SALDO</th>
+                  <th style={{ padding: "16px 20px", textAlign: "left", fontFamily: "'Cinzel',serif", fontSize: 10, color: "var(--gold)", letterSpacing: 2 }}>NOME</th>
+                  <th style={{ padding: "16px 20px", textAlign: "left", fontFamily: "'Cinzel',serif", fontSize: 10, color: "var(--gold)", letterSpacing: 2 }}>CÓDIGO</th>
+                  <th style={{ padding: "16px 20px", textAlign: "center", fontFamily: "'Cinzel',serif", fontSize: 10, color: "var(--gold)", letterSpacing: 2 }}>CLIQUES</th>
+                  <th style={{ padding: "16px 20px", textAlign: "center", fontFamily: "'Cinzel',serif", fontSize: 10, color: "var(--gold)", letterSpacing: 2 }}>VENDAS</th>
+                  <th style={{ padding: "16px 20px", textAlign: "left", fontFamily: "'Cinzel',serif", fontSize: 10, color: "var(--gold)", letterSpacing: 2 }}>% COMISSÃO</th>
+                  <th style={{ padding: "16px 20px", textAlign: "right", fontFamily: "'Cinzel',serif", fontSize: 10, color: "var(--gold)", letterSpacing: 2 }}>SALDO</th>
                 </tr>
               </thead>
               <tbody>
                 {affiliates.map((a, i) => (
-                  <tr key={a.id} style={{ borderBottom: i < affiliates.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
-                    <td style={{ padding: "16px 24px" }}>
-                      <p style={{ fontWeight: 500, color: "white", marginBottom: 2 }}>{a.name}</p>
-                      <p style={{ fontSize: 11, color: "var(--text-muted)" }}>{a.email}</p>
-                    </td>
-                    <td style={{ padding: "16px 24px" }}>
-                      <code style={{
-                        padding: "4px 10px", borderRadius: 8,
-                        background: "rgba(201,169,122,0.08)", border: "1px solid rgba(201,169,122,0.18)",
-                        color: "var(--gold)", fontSize: 12, fontWeight: 600,
-                      }}>
-                        {a.affiliateCode}
-                      </code>
-                    </td>
-                    <td style={{ padding: "16px 24px", textAlign: "center", color: "var(--text-secondary)", fontWeight: 600 }}>
-                      {a._count.referralsMade}
-                    </td>
-                    <td style={{ padding: "16px 24px", textAlign: "right", fontWeight: 700, color: a.walletBalance > 0 ? "#6ee7b7" : "var(--text-muted)" }}>
-                      R$ {a.walletBalance.toFixed(2).replace(".", ",")}
-                    </td>
-                  </tr>
+                  <AffiliateRow
+                    key={a.id}
+                    affiliate={{
+                      ...a,
+                      totalClicks: a._count.affiliateClicks,
+                    }}
+                    isLast={i === affiliates.length - 1}
+                  />
                 ))}
               </tbody>
             </table>
