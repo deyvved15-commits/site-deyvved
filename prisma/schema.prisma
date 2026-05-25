@@ -51,41 +51,43 @@ model PasswordResetToken {
 }
 
 model User {
-  id              String            @id @default(cuid())
-  name            String
-  email           String            @unique
-  password        String?
-  role            Role              @default(STUDENT)
-  phone           String?
-  church          String?
-  bio             String?
-  avatar          String?
-  active          Boolean           @default(true)
-  affiliateCode   String?           @unique
-  walletBalance   Float             @default(0)
-  lastLoginAt     DateTime?
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-  accounts        Account[]
-  certificates    Certificate[]
-  comments        Comment[]
-  taughtCourses   CourseTeacher[]
-  enrollments     Enrollment[]
-  progress        LessonProgress[]
-  ratings         LessonRating[]
-  liveAttendance  LiveAttendance[]
-  payments        Payment[]
-  sessions        Session[]
-  tickets         Ticket[]
-  ticketMessages  TicketMessage[]
-  achievements    UserAchievement[]
-  earnings        TeacherEarning[]
-  referralsMade   Referral[]
-  walletHistory   WalletTransaction[]
-  notifications    Notification[]
-  productPurchases ProductPurchase[]
-  bookmarks        LessonBookmark[]
-  pushSubscriptions PushSubscription[]
+  id                  String            @id @default(cuid())
+  name                String
+  email               String            @unique
+  password            String?
+  role                Role              @default(STUDENT)
+  phone               String?
+  church              String?
+  bio                 String?
+  avatar              String?
+  active              Boolean           @default(true)
+  affiliateCode       String?           @unique
+  affiliatePercentage Float?
+  walletBalance       Float             @default(0)
+  lastLoginAt         DateTime?
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  accounts            Account[]
+  certificates        Certificate[]
+  comments            Comment[]
+  taughtCourses       CourseTeacher[]
+  enrollments         Enrollment[]
+  progress            LessonProgress[]
+  ratings             LessonRating[]
+  liveAttendance      LiveAttendance[]
+  payments            Payment[]
+  sessions            Session[]
+  tickets             Ticket[]
+  ticketMessages      TicketMessage[]
+  achievements        UserAchievement[]
+  earnings            TeacherEarning[]
+  referralsMade       Referral[]
+  walletHistory       WalletTransaction[]
+  notifications       Notification[]
+  productPurchases    ProductPurchase[]
+  bookmarks           LessonBookmark[]
+  pushSubscriptions   PushSubscription[]
+  affiliateClicks     AffiliateClick[]
 }
 
 model Course {
@@ -434,6 +436,14 @@ enum ProductType {
 enum DiscountType {
   PERCENTAGE
   FIXED
+}
+
+model AffiliateClick {
+  id         String   @id @default(cuid())
+  referrerId String
+  courseSlug String?
+  createdAt  DateTime @default(now())
+  referrer   User     @relation(fields: [referrerId], references: [id], onDelete: Cascade)
 }
 
 model LessonBookmark {

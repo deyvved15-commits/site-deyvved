@@ -122,9 +122,9 @@ export async function POST(req: NextRequest) {
     let paymentType = "ONE_TIME";
 
     if (courseId) {
-      const course = await prisma.course.findUnique({ 
-        where: { id: courseId }, 
-        include: { teachers: { select: { teacherId: true, commissionPercentage: true } } } 
+      const course = await prisma.course.findUnique({
+        where: { id: courseId },
+        include: { teachers: { select: { teacherId: true, commissionPercentage: true } } }
       });
       if (course) {
         itemTitle = course.title;
@@ -132,6 +132,17 @@ export async function POST(req: NextRequest) {
         teachers = course.teachers;
         affiliatePercentage = course.affiliatePercentage;
         paymentType = course.paymentType;
+      }
+
+      // Se o afiliado tiver uma % individual definida, ela sobrepõe a do curso
+      if (affiliateId) {
+        const affiliateUser = await prisma.user.findUnique({
+          where: { id: affiliateId },
+          select: { affiliatePercentage: true },
+        });
+        if (affiliateUser?.affiliatePercentage !== null && affiliateUser?.affiliatePercentage !== undefined) {
+          affiliatePercentage = affiliateUser.affiliatePercentage;
+        }
       }
     } else if (productId) {
       const product = await prisma.product.findUnique({ where: { id: productId } });

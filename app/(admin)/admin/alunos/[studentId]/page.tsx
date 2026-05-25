@@ -6,6 +6,7 @@ import UnenrollButton from "@/components/admin/unenroll-button";
 import DeleteStudentButton from "@/components/admin/delete-student-button";
 import PromoteStudentButton from "@/components/admin/promote-student-button";
 import ResetPasswordButton from "@/components/admin/reset-password-button";
+import AffiliatePercentageEditor from "@/components/admin/affiliate-percentage-editor";
 
 export default async function StudentProfilePage({ params }: { params: Promise<{ studentId: string }> }) {
   const { studentId } = await params;
@@ -186,6 +187,16 @@ export default async function StudentProfilePage({ params }: { params: Promise<{
             })}
           </div>
         )}
+
+        {/* Afiliado */}
+        <div style={{ marginTop: 28 }}>
+          <AffiliatePercentageEditor
+            studentId={studentId}
+            affiliateCode={student.affiliateCode ?? null}
+            currentPercentage={student.affiliatePercentage ?? null}
+          />
+        </div>
+
       </div>
     </div>
   );

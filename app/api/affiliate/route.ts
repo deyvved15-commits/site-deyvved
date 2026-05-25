@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 
 function generateCode(name: string): string {
   const base = name
-    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .normalize("NFD").replace(/[̀-ͯ]/g, "")
     .replace(/[^a-zA-Z]/g, "")
     .toUpperCase()
     .slice(0, 6);
@@ -12,7 +12,6 @@ function generateCode(name: string): string {
   return `${base}${suffix}`;
 }
 
-// GET — retorna dados do afiliado logado
 export async function GET() {
   const session = await auth();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -27,7 +26,7 @@ export async function GET() {
         orderBy: { createdAt: "desc" },
         take: 10,
       },
-      _count: { select: { referralsMade: true } },
+      _count: { select: { referralsMade: true, affiliateClicks: true } },
     },
   });
 
@@ -44,17 +43,46 @@ export async function GET() {
     orderBy: { order: "asc" },
   });
 
+  // Ranking dos top 10 afiliados por total ganho
+  const ranking = await prisma.referral.groupBy({
+    by: ["referrerId"],
+    where: { status: "credited" },
+    _sum: { amount: true },
+    _count: { id: true },
+    orderBy: { _sum: { amount: "desc" } },
+    take: 10,
+  });
+
+  const rankingIds = ranking.map(r => r.referrerId);
+  const rankingUsers = await prisma.user.findMany({
+    where: { id: { in: rankingIds } },
+    select: { id: true, name: true, affiliateCode: true },
+  });
+
+  const rankingData = ranking.map((r, i) => {
+    const u = rankingUsers.find(u => u.id === r.referrerId);
+    return {
+      position: i + 1,
+      name: u?.name ?? "—",
+      affiliateCode: u?.affiliateCode ?? "—",
+      totalEarned: r._sum.amount ?? 0,
+      totalSales: r._count.id,
+      isMe: r.referrerId === session.user.id,
+    };
+  });
+
   return NextResponse.json({
     affiliateCode: user.affiliateCode,
     walletBalance: user.walletBalance,
     totalReferrals: user._count.referralsMade,
+    totalClicks: user._count.affiliateClicks,
     totalEarned: totalEarned._sum.amount ?? 0,
     recentReferrals: user.referralsMade,
     courses,
+    ranking: rankingData,
   });
 }
 
-// POST — ativa o código de afiliado
 export async function POST() {
   const session = await auth();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -69,7 +97,6 @@ export async function POST() {
     return NextResponse.json({ affiliateCode: user.affiliateCode, message: "Código já existe." });
   }
 
-  // Gera código único
   let code = generateCode(user.name ?? "USER");
   let attempts = 0;
   while (attempts < 10) {
