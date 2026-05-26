@@ -74,7 +74,6 @@ const links = [
       </svg>
     ),
   },
-/*
   {
     href: "/afiliado", label: "Afiliado",
     icon: (
@@ -84,7 +83,6 @@ const links = [
       </svg>
     ),
   },
-*/
   {
     href: "/carteira", label: "Carteira",
     icon: (
