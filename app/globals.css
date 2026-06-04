@@ -70,7 +70,7 @@ html { scroll-behavior: smooth; }
 a, button { -webkit-tap-highlight-color: transparent; }
 
 /* Prevent horizontal overflow */
-body { overflow-x: hidden; }
+html, body { overflow-x: hidden; }
 
 select {
   appearance: none;
