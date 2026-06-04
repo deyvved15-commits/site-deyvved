@@ -467,3 +467,12 @@ model PushSubscription {
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
+
+model SiteConfig {
+  id           String   @id @default("singleton")
+  pixelMeta    String?
+  pixelGtm     String?
+  pixelGa      String?
+  pixelCustom  String?
+  updatedAt    DateTime @updatedAt
+}

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Poppins, Cinzel } from "next/font/google";
 import Providers from "@/components/providers";
 import SwRegister from "@/components/student/sw-register";
+import PixelInjector from "@/components/pixel-injector";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
@@ -49,6 +50,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="h-full" style={{ fontFamily: "var(--font-poppins,'Poppins',sans-serif)" }}>
         <Providers>
           <SwRegister />
+          <PixelInjector />
           {children}
         </Providers>
         <Analytics />
