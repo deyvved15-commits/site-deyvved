@@ -60,11 +60,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const valid = await bcrypt.compare(parsed.data.password, user.password);
         if (!valid) return null;
 
-        // Registra último login
-        await prisma.user.update({
-          where: { id: user.id },
-          data: { lastLoginAt: new Date() },
-        });
+        // Registra último login e log de atividade
+        await prisma.$transaction([
+          prisma.user.update({
+            where: { id: user.id },
+            data: { lastLoginAt: new Date() },
+          }),
+          prisma.activityLog.create({
+            data: { userId: user.id, type: "LOGIN" },
+          }),
+        ]);
 
         return {
           id: user.id,

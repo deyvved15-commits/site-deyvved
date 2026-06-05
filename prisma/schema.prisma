@@ -88,6 +88,7 @@ model User {
   bookmarks           LessonBookmark[]
   pushSubscriptions   PushSubscription[]
   affiliateClicks     AffiliateClick[]
+  activityLogs        ActivityLog[]
 }
 
 model Course {
@@ -470,6 +471,22 @@ model PushSubscription {
   auth      String
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ActivityLog {
+  id        String       @id @default(cuid())
+  userId    String
+  type      ActivityType
+  metadata  String?
+  createdAt DateTime     @default(now())
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum ActivityType {
+  LOGIN
+  WEEKLY_LESSON
+  LESSON_COMPLETE
+  PURCHASE
 }
 
 model SiteConfig {

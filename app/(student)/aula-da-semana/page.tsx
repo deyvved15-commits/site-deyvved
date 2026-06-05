@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { getYoutubeId } from "@/lib/utils";
 import HtmlContent from "@/components/student/html-content";
+import ActivityTracker from "@/components/student/activity-tracker";
 
 export const revalidate = 0;
 
@@ -12,6 +13,7 @@ export default async function AulaDaSemanaPage() {
 
   return (
     <div style={{ minHeight: "100%", background: "linear-gradient(180deg, var(--navy-darkest) 0%, var(--navy-mid) 100%)" }}>
+      <ActivityTracker type="WEEKLY_LESSON" metadata={{ title: data?.title ?? "Aula da Semana" }} />
 
       {/* ── Banner cabeçalho ── */}
       <div className="ka-aula-semana-header" style={{

@@ -11,7 +11,7 @@ import AffiliatePercentageEditor from "@/components/admin/affiliate-percentage-e
 export default async function StudentProfilePage({ params }: { params: Promise<{ studentId: string }> }) {
   const { studentId } = await params;
 
-  const [student, allCourses] = await Promise.all([
+  const [student, allCourses, activityLogs] = await Promise.all([
     prisma.user.findUnique({
       where: { id: studentId },
       include: {
@@ -35,6 +35,11 @@ export default async function StudentProfilePage({ params }: { params: Promise<{
       },
     }),
     prisma.course.findMany({ select: { id: true, title: true }, orderBy: { title: "asc" } }),
+    prisma.activityLog.findMany({
+      where: { userId: studentId },
+      orderBy: { createdAt: "desc" },
+      take: 50,
+    }),
   ]);
 
   if (!student) notFound();
@@ -187,6 +192,55 @@ export default async function StudentProfilePage({ params }: { params: Promise<{
             })}
           </div>
         )}
+
+        {/* Histórico de Atividade */}
+        <div style={{ marginTop: 28 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
+            <div style={{ width: 3, height: 16, background: "linear-gradient(180deg, var(--gold-light), var(--gold))", borderRadius: 2, boxShadow: "0 0 8px var(--gold)" }} />
+            <h2 style={{ fontFamily: "'Cinzel',serif", fontWeight: 600, fontSize: 13, letterSpacing: 3, textTransform: "uppercase", color: "var(--text-primary)" }}>
+              Histórico de Atividade
+            </h2>
+          </div>
+
+          {activityLogs.length === 0 ? (
+            <p style={{ fontSize: 13, color: "var(--text-muted)", padding: "16px 0" }}>Nenhuma atividade registrada ainda.</p>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 0, borderRadius: 16, overflow: "hidden", background: "linear-gradient(160deg, var(--navy-card) 0%, var(--navy-card-2) 100%)", border: "1px solid rgba(201,169,122,0.10)" }}>
+              {activityLogs.map((log, i) => {
+                const meta = (() => { try { return log.metadata ? JSON.parse(log.metadata) : null; } catch { return null; } })();
+                const config: Record<string, { label: string; icon: string; color: string }> = {
+                  LOGIN:          { label: "Login na plataforma",     icon: "M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3", color: "#60a5fa" },
+                  WEEKLY_LESSON:  { label: "Assistiu Aula da Semana", icon: "M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.4 19.6C5.12 20 12 20 12 20s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z M9.75 15.02l5.75-3.02-5.75-3.02v6.04z", color: "#a78bfa" },
+                  LESSON_COMPLETE:{ label: `Concluiu aula${meta?.lesson ? `: ${meta.lesson}` : ""}`, icon: "M22 11.08V12a10 10 0 1 1-5.93-9.14 M22 4 12 14.01 9 11.01", color: "#6ee7b7" },
+                  PURCHASE:       { label: `Compra realizada${meta?.item ? `: ${meta.item}` : ""}`, icon: "M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-8 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z", color: "#C9A97A" },
+                };
+                const c = config[log.type] ?? { label: log.type, icon: "M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z", color: "rgba(255,255,255,0.40)" };
+
+                return (
+                  <div key={log.id} style={{ display: "flex", alignItems: "center", gap: 14, padding: "12px 20px", borderBottom: i < activityLogs.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
+                    <div style={{ width: 32, height: 32, borderRadius: 9, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", background: `${c.color}14`, border: `1px solid ${c.color}30` }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={c.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d={c.icon}/>
+                      </svg>
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ fontSize: 13, color: "var(--text-secondary)", fontWeight: 500 }}>{c.label}</p>
+                      {meta?.title && <p style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 1 }}>{meta.title}</p>}
+                    </div>
+                    <div style={{ textAlign: "right", flexShrink: 0 }}>
+                      <p style={{ fontSize: 11, color: "var(--text-muted)" }}>
+                        {new Date(log.createdAt).toLocaleDateString("pt-BR")}
+                      </p>
+                      <p style={{ fontSize: 10, color: "rgba(255,255,255,0.20)" }}>
+                        {new Date(log.createdAt).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
 
         {/* Afiliado */}
         <div style={{ marginTop: 28 }}>
