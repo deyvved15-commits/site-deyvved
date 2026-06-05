@@ -3,11 +3,12 @@
 import { useState, useEffect, useCallback } from "react";
 
 const TABS = [
-  { id: "alunos",     label: "Alunos Matriculados" },
-  { id: "financeiro", label: "Financeiro" },
-  { id: "formados",   label: "Formados / Certificados" },
-  { id: "progresso",  label: "Progresso por Curso" },
-  { id: "log",        label: "Log dos Alunos" },
+  { id: "alunos",      label: "Alunos Matriculados" },
+  { id: "financeiro",  label: "Financeiro" },
+  { id: "formados",    label: "Formados / Certificados" },
+  { id: "progresso",   label: "Progresso por Curso" },
+  { id: "log",         label: "Log dos Alunos" },
+  { id: "atividades",  label: "Atividades" },
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
@@ -48,9 +49,9 @@ export default function RelatoriosPage() {
       .catch(() => {});
   }, []);
 
-  // Carrega lista de alunos (só quando tab = log)
+  // Carrega lista de alunos (quando tab = log ou atividades)
   useEffect(() => {
-    if (tab !== "log") return;
+    if (tab !== "log" && tab !== "atividades") return;
     fetch("/api/admin/students-list")
       .then(r => r.json())
       .then(d => setStudents(d.students ?? []))
@@ -205,8 +206,8 @@ export default function RelatoriosPage() {
             </select>
           )}
 
-          {/* Filtro aluno — só no log */}
-          {tab === "log" && (
+          {/* Filtro aluno — log e atividades */}
+          {(tab === "log" || tab === "atividades") && (
             <select value={userId} onChange={e => setUserId(e.target.value)} style={{ ...selectStyle, minWidth: 220 }}>
               <option value="">Todos os alunos</option>
               {students.map(s => <option key={s.id} value={s.id}>{s.name} — {s.email}</option>)}
@@ -253,11 +254,12 @@ export default function RelatoriosPage() {
 
         {/* Tabela */}
         <div style={{ borderRadius: 20, overflow: "hidden", border: "1px solid rgba(201,169,122,0.12)", boxShadow: "0 8px 32px rgba(0,0,0,0.35)" }} className="rpt-wrap">
-          {tab === "alunos"     && <AlunosTable     data={data} loading={loading} />}
-          {tab === "financeiro" && <FinanceiroTable data={data} loading={loading} />}
-          {tab === "formados"   && <FormadosTable   data={data} loading={loading} />}
-          {tab === "progresso"  && <ProgressoTable  data={data} loading={loading} />}
-          {tab === "log"        && <LogTable        data={data} loading={loading} />}
+          {tab === "alunos"      && <AlunosTable      data={data} loading={loading} />}
+          {tab === "financeiro"  && <FinanceiroTable  data={data} loading={loading} />}
+          {tab === "formados"    && <FormadosTable    data={data} loading={loading} />}
+          {tab === "progresso"   && <ProgressoTable   data={data} loading={loading} />}
+          {tab === "log"         && <LogTable         data={data} loading={loading} />}
+          {tab === "atividades"  && <AtividadesTable  data={data} loading={loading} />}
         </div>
       </div>
     </div>
@@ -476,6 +478,64 @@ function ProgressoTable({ data, loading }: { data: any[]; loading: boolean }) {
             </div>
           </div>
         ))}
+      </div>
+    </>
+  );
+}
+
+const ACTIVITY_CONFIG: Record<string, { label: string; color: string }> = {
+  LOGIN:           { label: "Login na plataforma",     color: "#60a5fa" },
+  WEEKLY_LESSON:   { label: "Assistiu Aula da Semana", color: "#a78bfa" },
+  LESSON_COMPLETE: { label: "Aula concluída",          color: "#6ee7b7" },
+  PURCHASE:        { label: "Compra realizada",        color: "#C9A97A" },
+};
+
+function AtividadesTable({ data, loading }: { data: any[]; loading: boolean }) {
+  if (!data.length) return <EmptyState loading={loading} />;
+
+  return (
+    <>
+      <div style={headRowStyle} className="rpt-head">
+        {["Aluno", "Tipo", "Detalhes", "Data / Hora"].map(h => <TH key={h} label={h} />)}
+      </div>
+      <div style={bodyStyle}>
+        {data.map((log: any, i: number) => {
+          const meta = (() => { try { return log.metadata ? JSON.parse(log.metadata) : null; } catch { return null; } })();
+          const cfg = ACTIVITY_CONFIG[log.type] ?? { label: log.type, color: "rgba(255,255,255,0.4)" };
+
+          return (
+            <div key={log.id} style={row(i)} className="rpt-row">
+              <div style={{ flex: 1.2 }}>
+                <div style={primary} className="rpt-cell-primary">{log.user?.name ?? "—"}</div>
+                <div style={muted}   className="rpt-cell-muted">{log.user?.email ?? "—"}</div>
+              </div>
+
+              <div style={{ flex: 1, display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{
+                  display: "inline-block", width: 8, height: 8, borderRadius: "50%",
+                  background: cfg.color, boxShadow: `0 0 6px ${cfg.color}`, flexShrink: 0,
+                }} />
+                <span style={{ fontSize: 12, fontWeight: 600, color: cfg.color }}>{cfg.label}</span>
+              </div>
+
+              <div style={{ flex: 1.5 }}>
+                {meta?.lesson  && <div style={muted} className="rpt-cell-muted">{meta.lesson}</div>}
+                {meta?.title   && <div style={muted} className="rpt-cell-muted">{meta.title}</div>}
+                {meta?.item    && <div style={muted} className="rpt-cell-muted">{meta.item}</div>}
+                {!meta?.lesson && !meta?.title && !meta?.item && <div style={muted}>—</div>}
+              </div>
+
+              <div style={{ flex: 1, textAlign: "right" }}>
+                <div style={{ ...primary, fontSize: 12 }} className="rpt-cell-primary">
+                  {new Date(log.createdAt).toLocaleDateString("pt-BR")}
+                </div>
+                <div style={{ ...muted, fontSize: 10 }} className="rpt-cell-muted">
+                  {new Date(log.createdAt).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </>
   );

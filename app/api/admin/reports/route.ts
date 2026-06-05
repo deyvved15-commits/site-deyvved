@@ -187,6 +187,29 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ data });
     }
 
+    // ── ATIVIDADES ────────────────────────────────────────────────────────────
+    if (type === "atividades") {
+      const where: Record<string, unknown> = {};
+      if (userId) where.userId = userId;
+      if (from || to) {
+        const range: Record<string, Date> = {};
+        if (from) range.gte = from;
+        if (to)   range.lte = to;
+        where.createdAt = range;
+      }
+
+      const logs = await prisma.activityLog.findMany({
+        where,
+        orderBy: { createdAt: "desc" },
+        take: 500,
+        include: {
+          user: { select: { id: true, name: true, email: true } },
+        },
+      });
+
+      return NextResponse.json({ data: logs });
+    }
+
     return NextResponse.json({ error: "Tipo inválido" }, { status: 400 });
   } catch (err) {
     console.error("[reports]", err);
