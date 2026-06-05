@@ -9,7 +9,7 @@ import { Plus, Trash2, ChevronDown, ChevronRight, Eye, EyeOff, Pencil, X, Check,
 
 type Lesson = { id: string; title: string; youtubeUrl: string; duration: string | null; content: string | null; order: number; releaseAfterDays: number; attachments?: { title: string; url: string }[] };
 type Module = { id: string; title: string; description: string | null; thumbnail: string | null; isBonus: boolean; order: number; lessons: Lesson[] };
-type Course = { id: string; title: string; description: string | null; thumbnail: string | null; price: number | null; paymentType: "ONE_TIME" | "MONTHLY"; published: boolean; category: string | null; modules: Module[]; teachers: { teacherId: string; commissionPercentage: number; teacher: { id: string; name: string } }[]; hasCertificate: boolean; affiliatePercentage: number; certificateBg?: string | null; certificatePrimaryColor?: string | null; certificateSecondaryColor?: string | null; certificateCustomText?: string | null };
+type Course = { id: string; slug: string; title: string; description: string | null; thumbnail: string | null; price: number | null; paymentType: "ONE_TIME" | "MONTHLY"; published: boolean; category: string | null; modules: Module[]; teachers: { teacherId: string; commissionPercentage: number; teacher: { id: string; name: string } }[]; hasCertificate: boolean; affiliatePercentage: number; certificateBg?: string | null; certificatePrimaryColor?: string | null; certificateSecondaryColor?: string | null; certificateCustomText?: string | null; salesHeadline?: string | null; learningOutcomes?: string[]; targetAudience?: string | null; teacherBio?: string | null };
 
 const textareaClass = "w-full bg-[rgba(255,255,255,0.04)] border border-[rgba(201,169,122,0.18)] rounded-xl px-4 py-3 text-sm text-white placeholder-[rgba(255,255,255,0.2)] outline-none resize-none focus:border-[rgba(201,169,122,0.5)] focus:bg-[rgba(255,255,255,0.06)] transition-all";
 const labelClass = "text-[10px] tracking-[3px] uppercase text-[rgba(201,169,122,0.7)] font-medium mb-2 block";
@@ -54,6 +54,10 @@ export default function CourseEditor({ course: initial, teachers: allTeachers, i
         certificatePrimaryColor: course.certificatePrimaryColor,
         certificateSecondaryColor: course.certificateSecondaryColor,
         certificateCustomText: course.certificateCustomText,
+        salesHeadline: course.salesHeadline,
+        learningOutcomes: course.learningOutcomes ?? [],
+        targetAudience: course.targetAudience,
+        teacherBio: course.teacherBio,
       }),
     });
     if (res.ok) router.refresh();
@@ -489,6 +493,89 @@ export default function CourseEditor({ course: initial, teachers: allTeachers, i
               </div>
             </div>
           )}
+        </div>
+      </div>
+
+      {/* ── Página de Vendas ── */}
+      <div style={{ ...S.card, padding: 28, marginBottom: 24 }}>
+        <div style={{ ...S.sectionHeader, marginBottom: 20 }}>
+          <div style={S.goldBar} />
+          <span style={{ fontFamily: "'Cinzel',serif", fontSize: 11, fontWeight: 600, letterSpacing: 4, textTransform: "uppercase", color: "var(--gold)" }}>
+            Página de Vendas
+          </span>
+          <a href={`/curso/${course.slug}`} target="_blank" rel="noopener noreferrer" style={{ marginLeft: "auto", fontSize: 10, color: "var(--gold)", fontFamily: "'Cinzel',serif", letterSpacing: 2, textDecoration: "none", display: "flex", alignItems: "center", gap: 6 }}>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Ver página
+          </a>
+        </div>
+
+        <div style={{ display: "grid", gap: 20 }}>
+          <div style={S.field}>
+            <label style={S.label}>Headline Principal</label>
+            <input
+              className="ka-input"
+              value={course.salesHeadline ?? ""}
+              onChange={e => setCourse(c => ({ ...c, salesHeadline: e.target.value || null }))}
+              placeholder="Ex: Formação Teológica Completa para Líderes"
+            />
+            <p style={{ fontSize: 9, color: "var(--text-muted)", marginTop: 4 }}>Aparece no hero da página. Se vazio, usa o título do curso.</p>
+          </div>
+
+          <div style={S.field}>
+            <label style={S.label}>Para quem é este curso</label>
+            <textarea
+              className={textareaClass}
+              rows={3}
+              value={course.targetAudience ?? ""}
+              onChange={e => setCourse(c => ({ ...c, targetAudience: e.target.value || null }))}
+              placeholder="Ex: Este curso é para pastores, líderes e estudiosos que desejam..."
+            />
+          </div>
+
+          <div style={S.field}>
+            <label style={S.label}>Bio do Professor (exibida na página)</label>
+            <textarea
+              className={textareaClass}
+              rows={3}
+              value={course.teacherBio ?? ""}
+              onChange={e => setCourse(c => ({ ...c, teacherBio: e.target.value || null }))}
+              placeholder="Ex: Teólogo formado pela... com mais de 20 anos de ministério..."
+            />
+          </div>
+
+          <div style={S.field}>
+            <label style={S.label}>O que você vai aprender</label>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {(course.learningOutcomes ?? []).map((item, i) => (
+                <div key={i} style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                  <input
+                    className="ka-input"
+                    value={item}
+                    onChange={e => {
+                      const arr = [...(course.learningOutcomes ?? [])];
+                      arr[i] = e.target.value;
+                      setCourse(c => ({ ...c, learningOutcomes: arr }));
+                    }}
+                    placeholder={`Tópico ${i + 1}`}
+                    style={{ flex: 1 }}
+                  />
+                  <button
+                    onClick={() => setCourse(c => ({ ...c, learningOutcomes: (c.learningOutcomes ?? []).filter((_, j) => j !== i) }))}
+                    style={{ padding: "8px", background: "none", border: "none", cursor: "pointer", color: "rgba(255,100,100,0.6)", flexShrink: 0 }}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  </button>
+                </div>
+              ))}
+              <button
+                onClick={() => setCourse(c => ({ ...c, learningOutcomes: [...(c.learningOutcomes ?? []), ""] }))}
+                style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 14px", borderRadius: 10, background: "rgba(201,169,122,0.06)", border: "1px dashed rgba(201,169,122,0.25)", color: "var(--gold)", fontSize: 11, fontFamily: "'Cinzel',serif", letterSpacing: 1, cursor: "pointer", width: "fit-content" }}
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Adicionar tópico
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 

@@ -21,6 +21,10 @@ const updateSchema = z.object({
   certificatePrimaryColor: z.string().nullable().optional(),
   certificateSecondaryColor: z.string().nullable().optional(),
   certificateCustomText: z.string().nullable().optional(),
+  salesHeadline: z.string().nullable().optional(),
+  learningOutcomes: z.array(z.string()).optional(),
+  targetAudience: z.string().nullable().optional(),
+  teacherBio: z.string().nullable().optional(),
 });
 
 export async function GET(_: NextRequest, { params }: { params: Promise<{ courseId: string }> }) {

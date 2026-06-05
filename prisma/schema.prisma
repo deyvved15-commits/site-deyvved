@@ -111,6 +111,10 @@ model Course {
   certificateSecondaryColor String?  // Cor secundária
   certificateCustomText String?      // Texto personalizado (ex: "concluiu com aproveitamento...")
   affiliatePercentage  Float         @default(0)
+  salesHeadline        String?
+  learningOutcomes     String[]
+  targetAudience       String?
+  teacherBio           String?
   certificates         Certificate[]
   teachers             CourseTeacher[]
   enrollments          Enrollment[]
