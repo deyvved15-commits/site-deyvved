@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { revalidateTag } from "next/cache";
+import { revalidatePath } from "next/cache";
 
 export async function GET() {
   const session = await auth();
@@ -28,7 +28,7 @@ export async function PATCH(req: NextRequest) {
     update: { pixelMeta, pixelGtm, pixelGa, pixelCustom },
   });
 
-  revalidateTag("site-config");
+  revalidatePath("/", "layout");
 
   return NextResponse.json(config);
 }
