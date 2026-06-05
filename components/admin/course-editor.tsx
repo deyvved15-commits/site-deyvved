@@ -509,22 +509,22 @@ export default function CourseEditor({ course: initial, teachers: allTeachers, i
           </a>
         </div>
 
-        <div style={{ display: "grid", gap: 20 }}>
+        <div style={{ display: "grid", gap: 24 }}>
           <div style={S.field}>
             <label style={S.label}>Headline Principal</label>
             <input
-              className="ka-input"
+              style={S.input}
               value={course.salesHeadline ?? ""}
               onChange={e => setCourse(c => ({ ...c, salesHeadline: e.target.value || null }))}
               placeholder="Ex: Formação Teológica Completa para Líderes"
             />
-            <p style={{ fontSize: 9, color: "var(--text-muted)", marginTop: 4 }}>Aparece no hero da página. Se vazio, usa o título do curso.</p>
+            <p style={{ fontSize: 9, color: "var(--text-muted)", marginTop: 2 }}>Aparece no hero da página. Se vazio, usa o título do curso.</p>
           </div>
 
           <div style={S.field}>
             <label style={S.label}>Para quem é este curso</label>
             <textarea
-              className={textareaClass}
+              style={S.textarea}
               rows={3}
               value={course.targetAudience ?? ""}
               onChange={e => setCourse(c => ({ ...c, targetAudience: e.target.value || null }))}
@@ -535,7 +535,7 @@ export default function CourseEditor({ course: initial, teachers: allTeachers, i
           <div style={S.field}>
             <label style={S.label}>Bio do Professor (exibida na página)</label>
             <textarea
-              className={textareaClass}
+              style={S.textarea}
               rows={3}
               value={course.teacherBio ?? ""}
               onChange={e => setCourse(c => ({ ...c, teacherBio: e.target.value || null }))}
@@ -549,7 +549,7 @@ export default function CourseEditor({ course: initial, teachers: allTeachers, i
               {(course.learningOutcomes ?? []).map((item, i) => (
                 <div key={i} style={{ display: "flex", gap: 8, alignItems: "center" }}>
                   <input
-                    className="ka-input"
+                    style={{ ...S.input, flex: 1, width: "auto" }}
                     value={item}
                     onChange={e => {
                       const arr = [...(course.learningOutcomes ?? [])];
@@ -557,7 +557,6 @@ export default function CourseEditor({ course: initial, teachers: allTeachers, i
                       setCourse(c => ({ ...c, learningOutcomes: arr }));
                     }}
                     placeholder={`Tópico ${i + 1}`}
-                    style={{ flex: 1 }}
                   />
                   <button
                     onClick={() => setCourse(c => ({ ...c, learningOutcomes: (c.learningOutcomes ?? []).filter((_, j) => j !== i) }))}
