@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { revalidateTag } from "next/cache";
 
 export async function GET() {
   const session = await auth();
@@ -26,6 +27,8 @@ export async function PATCH(req: NextRequest) {
     create: { id: "singleton", pixelMeta, pixelGtm, pixelGa, pixelCustom },
     update: { pixelMeta, pixelGtm, pixelGa, pixelCustom },
   });
+
+  revalidateTag("site-config");
 
   return NextResponse.json(config);
 }
