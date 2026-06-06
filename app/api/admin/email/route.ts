@@ -4,6 +4,15 @@ import { prisma } from "@/lib/prisma";
 import { getResend, FROM_EMAIL } from "@/lib/resend";
 import { emailCampanha } from "@/lib/email-templates";
 
+export async function GET() {
+  const session = await auth();
+  if (!session || session.user.role !== "ADMIN") {
+    return NextResponse.json({ error: "Acesso negado" }, { status: 403 });
+  }
+  const hasKey = !!process.env.RESEND_API_KEY;
+  return NextResponse.json({ configured: hasKey, from: FROM_EMAIL });
+}
+
 export async function POST(req: NextRequest) {
   const session = await auth();
   if (!session || session.user.role !== "ADMIN") {
@@ -62,6 +71,7 @@ export async function POST(req: NextRequest) {
   const resend = getResend();
   let sent = 0;
   let failed = 0;
+  const errors: string[] = [];
 
   // Envia em lotes de 50 (limite seguro do Resend)
   const BATCH = 50;
@@ -69,26 +79,34 @@ export async function POST(req: NextRequest) {
     const batch = users.slice(i, i + BATCH);
     await Promise.allSettled(
       batch.map(async (u) => {
-        try {
-          await resend.emails.send({
-            from: FROM_EMAIL,
-            to: u.email,
+        const result = await resend.emails.send({
+          from: FROM_EMAIL,
+          to: u.email,
+          subject,
+          html: emailCampanha({
+            name: u.name ?? "Aluno",
             subject,
-            html: emailCampanha({
-              name: u.name ?? "Aluno",
-              subject,
-              body,
-              ctaUrl: ctaUrl || undefined,
-              ctaLabel: ctaLabel || undefined,
-            }),
-          });
-          sent++;
-        } catch {
+            body,
+            ctaUrl: ctaUrl || undefined,
+            ctaLabel: ctaLabel || undefined,
+          }),
+        });
+
+        if (result.error) {
+          console.error(`[email] falha para ${u.email}:`, result.error);
+          errors.push(`${u.email}: ${result.error.message}`);
           failed++;
+        } else {
+          sent++;
         }
       })
     );
   }
 
-  return NextResponse.json({ ok: true, sent, failed, total: users.length });
+  // Se 100% falhou, retorna o primeiro erro para diagnóstico
+  if (sent === 0 && errors.length > 0) {
+    return NextResponse.json({ error: errors[0], sent, failed, total: users.length }, { status: 500 });
+  }
+
+  return NextResponse.json({ ok: true, sent, failed, total: users.length, errors: errors.slice(0, 3) });
 }

@@ -61,11 +61,16 @@ export default function AdminEmailPage() {
   const [preview,   setPreview]   = useState(false);
   const [result,    setResult]    = useState<{ sent: number; failed: number; total: number } | null>(null);
   const [error,     setError]     = useState("");
+  const [config,    setConfig]    = useState<{ configured: boolean; from: string } | null>(null);
 
   useEffect(() => {
     fetch("/api/admin/cursos-list")
       .then(r => r.json())
       .then(d => setCourses(d.courses ?? []))
+      .catch(() => {});
+    fetch("/api/admin/email")
+      .then(r => r.json())
+      .then(d => setConfig(d))
       .catch(() => {});
   }, []);
 
@@ -89,6 +94,7 @@ export default function AdminEmailPage() {
       });
       const json = await res.json();
       if (!res.ok) { setError(json.error ?? "Erro ao enviar."); return; }
+      if (json.errors?.length) setError(`Algumas falhas: ${json.errors[0]}`);
       setResult(json);
     } catch {
       setError("Erro de conexão.");
@@ -113,6 +119,42 @@ export default function AdminEmailPage() {
       </div>
 
       <div style={{ padding: "0 44px 60px", maxWidth: 860 }}>
+
+        {/* Status da configuração */}
+        {config && !config.configured && (
+          <div style={{
+            borderRadius: 14, padding: "16px 20px", marginBottom: 24,
+            background: "rgba(251,191,36,0.07)", border: "1px solid rgba(251,191,36,0.30)",
+            display: "flex", gap: 14, alignItems: "flex-start",
+          }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: 1 }}>
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            <div>
+              <p style={{ fontSize: 13, fontWeight: 600, color: "#fbbf24", margin: "0 0 4px" }}>
+                RESEND_API_KEY não configurada
+              </p>
+              <p style={{ fontSize: 12, color: "rgba(255,255,255,0.50)", margin: 0, lineHeight: 1.6 }}>
+                Adicione <code style={{ background: "rgba(255,255,255,0.08)", padding: "1px 6px", borderRadius: 4 }}>RESEND_API_KEY</code> nas variáveis de ambiente do projeto para enviar e-mails.
+                Crie a chave em <strong style={{ color: "#fbbf24" }}>resend.com → API Keys</strong>.
+              </p>
+            </div>
+          </div>
+        )}
+        {config?.configured && (
+          <div style={{
+            borderRadius: 14, padding: "12px 18px", marginBottom: 24,
+            background: "rgba(110,231,183,0.05)", border: "1px solid rgba(110,231,183,0.20)",
+            display: "flex", gap: 10, alignItems: "center",
+          }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6ee7b7" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+            <p style={{ fontSize: 12, color: "rgba(255,255,255,0.50)", margin: 0 }}>
+              Resend configurado · remetente: <strong style={{ color: "#6ee7b7" }}>{config.from}</strong>
+            </p>
+          </div>
+        )}
 
         {/* Resultado */}
         {result && (
