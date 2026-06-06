@@ -112,6 +112,7 @@ model Course {
   certificatePrimaryColor String?    // Cor principal (ex: #C9A97A)
   certificateSecondaryColor String?  // Cor secundária
   certificateCustomText String?      // Texto personalizado (ex: "concluiu com aproveitamento...")
+  certificateLayout    Json?          // Array de LayoutElement com posição/estilo de cada campo
   affiliatePercentage  Float         @default(0)
   salesHeadline        String?
   learningOutcomes     String[]

@@ -21,6 +21,7 @@ const updateSchema = z.object({
   certificatePrimaryColor: z.string().nullable().optional(),
   certificateSecondaryColor: z.string().nullable().optional(),
   certificateCustomText: z.string().nullable().optional(),
+  certificateLayout: z.any().nullable().optional(),
   salesHeadline: z.string().nullable().optional(),
   learningOutcomes: z.array(z.string()).optional(),
   targetAudience: z.string().nullable().optional(),

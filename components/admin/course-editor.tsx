@@ -6,10 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getYoutubeId, getGoogleDriveImageUrl } from "@/lib/utils";
 import { Plus, Trash2, ChevronDown, ChevronRight, Eye, EyeOff, Pencil, X, Check, Clock } from "lucide-react";
+import CertificateLayoutEditor, { type LayoutElement } from "@/components/admin/certificate-layout-editor";
 
 type Lesson = { id: string; title: string; youtubeUrl: string; duration: string | null; content: string | null; order: number; releaseAfterDays: number; attachments?: { title: string; url: string }[] };
 type Module = { id: string; title: string; description: string | null; thumbnail: string | null; isBonus: boolean; order: number; lessons: Lesson[] };
-type Course = { id: string; slug: string; title: string; description: string | null; thumbnail: string | null; price: number | null; paymentType: "ONE_TIME" | "MONTHLY"; published: boolean; category: string | null; modules: Module[]; teachers: { teacherId: string; commissionPercentage: number; teacher: { id: string; name: string } }[]; hasCertificate: boolean; affiliatePercentage: number; certificateBg?: string | null; certificatePrimaryColor?: string | null; certificateSecondaryColor?: string | null; certificateCustomText?: string | null; salesHeadline?: string | null; learningOutcomes?: string[]; targetAudience?: string | null; teacherBio?: string | null };
+type Course = { id: string; slug: string; title: string; description: string | null; thumbnail: string | null; price: number | null; paymentType: "ONE_TIME" | "MONTHLY"; published: boolean; category: string | null; modules: Module[]; teachers: { teacherId: string; commissionPercentage: number; teacher: { id: string; name: string } }[]; hasCertificate: boolean; affiliatePercentage: number; certificateBg?: string | null; certificatePrimaryColor?: string | null; certificateSecondaryColor?: string | null; certificateCustomText?: string | null; certificateLayout?: LayoutElement[] | null; salesHeadline?: string | null; learningOutcomes?: string[]; targetAudience?: string | null; teacherBio?: string | null };
 
 const textareaClass = "w-full bg-[rgba(255,255,255,0.04)] border border-[rgba(201,169,122,0.18)] rounded-xl px-4 py-3 text-sm text-white placeholder-[rgba(255,255,255,0.2)] outline-none resize-none focus:border-[rgba(201,169,122,0.5)] focus:bg-[rgba(255,255,255,0.06)] transition-all";
 const labelClass = "text-[10px] tracking-[3px] uppercase text-[rgba(201,169,122,0.7)] font-medium mb-2 block";
@@ -54,6 +55,7 @@ export default function CourseEditor({ course: initial, teachers: allTeachers, i
         certificatePrimaryColor: course.certificatePrimaryColor,
         certificateSecondaryColor: course.certificateSecondaryColor,
         certificateCustomText: course.certificateCustomText,
+        certificateLayout: course.certificateLayout ?? null,
         salesHeadline: course.salesHeadline,
         learningOutcomes: course.learningOutcomes ?? [],
         targetAudience: course.targetAudience,
@@ -409,6 +411,28 @@ export default function CourseEditor({ course: initial, teachers: allTeachers, i
                   className={textareaClass}
                 />
                 <p style={{ fontSize: 9, color: "var(--text-muted)", marginTop: 4 }}>Substitui o texto padrão "concluiu com aproveitamento o curso de formação em"</p>
+              </div>
+
+              {/* Editor visual de layout */}
+              <div style={S.field}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+                  <div style={{ width: 3, height: 14, background: "var(--gold)", borderRadius: 2 }} />
+                  <label style={{ ...S.label, margin: 0 }}>Layout — Posição dos Textos no Certificado</label>
+                </div>
+                <p style={{ fontSize: 9, color: "var(--text-muted)", marginBottom: 12 }}>
+                  Arraste os textos no preview para posicioná-los. Clique em um elemento para editar tamanho, cor e fonte.
+                </p>
+                <CertificateLayoutEditor
+                  bgUrl={
+                    course.certificateBg?.includes("drive.google.com")
+                      ? getGoogleDriveImageUrl(course.certificateBg)
+                      : course.certificateBg
+                  }
+                  courseTitle={course.title}
+                  customText={course.certificateCustomText}
+                  value={course.certificateLayout ?? null}
+                  onChange={layout => setCourse(c => ({ ...c, certificateLayout: layout }))}
+                />
               </div>
             </div>
           )}
