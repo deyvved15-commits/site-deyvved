@@ -159,7 +159,7 @@ export default function CertificateLayoutEditor({
                 color: el.color,
                 fontFamily: el.fontFamily === "Cinzel" ? "'Cinzel', serif" : "'Poppins', sans-serif",
                 fontWeight: el.bold ? 700 : 400,
-                whiteSpace: "pre-wrap",
+                whiteSpace: "nowrap",
                 lineHeight: 1.2,
                 cursor: "move",
                 touchAction: "none",
@@ -175,7 +175,9 @@ export default function CertificateLayoutEditor({
               onPointerUp={() => handlePointerUp(el.id)}
               onClick={() => setSelected(el.id)}
             >
-              {sampleValues[el.id] || el.label}
+              {(sampleValues[el.id] || el.label).split("\n").map((line, i, arr) => (
+                <span key={i}>{line}{i < arr.length - 1 && <br />}</span>
+              ))}
             </div>
           );
         })}

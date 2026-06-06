@@ -146,12 +146,13 @@ export default async function CertificatePage({
               color: el.color,
               fontFamily: el.fontFamily === "Cinzel" ? "'Cinzel', serif" : "'Poppins', sans-serif",
               fontWeight: el.bold ? 700 : 400,
-              whiteSpace: "pre-wrap",
+              whiteSpace: "nowrap",
               textAlign: el.align as React.CSSProperties["textAlign"],
               lineHeight: 1.35,
-              maxWidth: isMultiLine ? "75%" : undefined,
             }}>
-              {value}
+              {value.split("\n").map((line, i, arr) => (
+                <span key={i}>{line}{i < arr.length - 1 && <br />}</span>
+              ))}
             </div>
           );
         })}
