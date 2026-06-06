@@ -127,7 +127,7 @@ export default function LiveViewer({ initialSession, displayName: _displayName, 
             </div>
           </div>
 
-          {session.roomName && (
+          {session.roomName?.startsWith("http") && (
             <a
               href={session.roomName}
               target="_blank"
