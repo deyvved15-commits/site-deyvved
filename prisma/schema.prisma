@@ -485,6 +485,8 @@ model ActivityLog {
 enum ActivityType {
   LOGIN
   WEEKLY_LESSON
+  LIVE_VIEW
+  LESSON_VIEW
   LESSON_COMPLETE
   PURCHASE
 }

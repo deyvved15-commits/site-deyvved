@@ -30,11 +30,12 @@ function fmtDateTime(d: string | Date | null | undefined) {
 }
 
 export default function RelatoriosPage() {
-  const [tab,      setTab]      = useState<TabId>("alunos");
-  const [courseId, setCourseId] = useState("");
-  const [userId,   setUserId]   = useState("");
-  const [from,     setFrom]     = useState("");
-  const [to,       setTo]       = useState("");
+  const [tab,        setTab]        = useState<TabId>("alunos");
+  const [courseId,   setCourseId]   = useState("");
+  const [userId,     setUserId]     = useState("");
+  const [activityType, setActivityType] = useState("");
+  const [from,       setFrom]       = useState("");
+  const [to,         setTo]         = useState("");
   const [courses,  setCourses]  = useState<Course[]>([]);
   const [students, setStudents] = useState<Student[]>([]);
   const [data,     setData]     = useState<any[]>([]);
@@ -67,10 +68,11 @@ export default function RelatoriosPage() {
     setExtra({ total: 0, walletSum: 0 });
     try {
       const params = new URLSearchParams({ type: tab });
-      if (courseId) params.set("courseId", courseId);
-      if (userId)   params.set("userId",   userId);
-      if (from)     params.set("from",     from);
-      if (to)       params.set("to",       to);
+      if (courseId)     params.set("courseId",     courseId);
+      if (userId)       params.set("userId",       userId);
+      if (activityType) params.set("activityType", activityType);
+      if (from)         params.set("from",         from);
+      if (to)           params.set("to",           to);
       const res  = await fetch(`/api/admin/reports?${params}`);
       if (!res.ok) { console.error("[reports]", res.status, await res.text()); return; }
       const json = await res.json();
@@ -82,7 +84,7 @@ export default function RelatoriosPage() {
     } finally {
       setLoading(false);
     }
-  }, [tab, courseId, userId, from, to]);
+  }, [tab, courseId, userId, activityType, from, to]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -214,6 +216,19 @@ export default function RelatoriosPage() {
             </select>
           )}
 
+          {/* Filtro tipo de atividade */}
+          {tab === "atividades" && (
+            <select value={activityType} onChange={e => setActivityType(e.target.value)} style={selectStyle}>
+              <option value="">Todos os tipos</option>
+              <option value="LOGIN">Login na plataforma</option>
+              <option value="LIVE_VIEW">Acessou Live</option>
+              <option value="WEEKLY_LESSON">Assistiu Aula da Semana</option>
+              <option value="LESSON_VIEW">Abriu aula</option>
+              <option value="LESSON_COMPLETE">Aula concluída</option>
+              <option value="PURCHASE">Compra realizada</option>
+            </select>
+          )}
+
           {/* Intervalo de datas */}
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <label style={{ fontSize: 11, color: "var(--text-muted)" }}>De</label>
@@ -223,7 +238,7 @@ export default function RelatoriosPage() {
           </div>
 
           <button
-            onClick={() => { setCourseId(""); setUserId(""); setFrom(""); setTo(""); }}
+            onClick={() => { setCourseId(""); setUserId(""); setActivityType(""); setFrom(""); setTo(""); }}
             style={{ ...inputStyle, cursor: "pointer", color: "var(--text-muted)", fontSize: 11 }}
           >
             Limpar
@@ -486,6 +501,8 @@ function ProgressoTable({ data, loading }: { data: any[]; loading: boolean }) {
 const ACTIVITY_CONFIG: Record<string, { label: string; color: string }> = {
   LOGIN:           { label: "Login na plataforma",     color: "#60a5fa" },
   WEEKLY_LESSON:   { label: "Assistiu Aula da Semana", color: "#a78bfa" },
+  LIVE_VIEW:       { label: "Acessou Live",            color: "#34d399" },
+  LESSON_VIEW:     { label: "Abriu aula",              color: "#f59e0b" },
   LESSON_COMPLETE: { label: "Aula concluída",          color: "#6ee7b7" },
   PURCHASE:        { label: "Compra realizada",        color: "#C9A97A" },
 };

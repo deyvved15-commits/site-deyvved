@@ -7,7 +7,7 @@ export async function POST(req: NextRequest) {
   if (!token?.id) return NextResponse.json({ ok: false }, { status: 401 });
 
   const { type, metadata } = await req.json();
-  const allowed = ["WEEKLY_LESSON", "LESSON_COMPLETE", "PURCHASE"];
+  const allowed = ["WEEKLY_LESSON", "LIVE_VIEW", "LESSON_VIEW", "LESSON_COMPLETE", "PURCHASE"];
   if (!allowed.includes(type)) return NextResponse.json({ ok: false }, { status: 400 });
 
   await prisma.activityLog.create({

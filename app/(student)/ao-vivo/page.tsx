@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import LiveViewer from "@/components/student/live-viewer";
+import ActivityTracker from "@/components/student/activity-tracker";
 
 export default async function AoVivoPage() {
   const session = await auth();
@@ -14,6 +15,7 @@ export default async function AoVivoPage() {
 
   return (
     <div style={{ minHeight: "100%", background: "linear-gradient(180deg, var(--navy-darkest) 0%, var(--navy-mid) 100%)", display: "flex", flexDirection: "column" }}>
+      <ActivityTracker type="LIVE_VIEW" metadata={activeSession ? { title: activeSession.title } : undefined} />
 
       {/* Header */}
       <div className="ka-live-header">

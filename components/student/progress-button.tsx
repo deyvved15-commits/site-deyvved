@@ -6,7 +6,7 @@ import { CheckCircle, Circle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-export default function ProgressButton({ lessonId, completed: initial }: { lessonId: string; completed: boolean }) {
+export default function ProgressButton({ lessonId, completed: initial, lessonTitle }: { lessonId: string; completed: boolean; lessonTitle?: string }) {
   const router = useRouter();
   const [completed, setCompleted] = useState(initial);
   const [loading, setLoading] = useState(false);
@@ -19,6 +19,13 @@ export default function ProgressButton({ lessonId, completed: initial }: { lesso
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ lessonId, completed: next }),
     });
+    if (next) {
+      fetch("/api/activity", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "LESSON_COMPLETE", metadata: lessonTitle ? { lesson: lessonTitle } : undefined }),
+      }).catch(() => {});
+    }
     setCompleted(next);
     router.refresh();
     setLoading(false);

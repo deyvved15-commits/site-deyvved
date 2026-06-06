@@ -10,6 +10,7 @@ import LessonRating from "@/components/student/lesson-rating";
 import HtmlContent from "@/components/student/html-content";
 import LessonThumbnail from "@/components/student/lesson-thumbnail";
 import LessonDrawer from "@/components/student/lesson-drawer";
+import ActivityTracker from "@/components/student/activity-tracker";
 
 export default async function AulaPage({ params }: { params: Promise<{ slug: string; lessonId: string }> }) {
   const session = await auth();
@@ -78,6 +79,7 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
 
   return (
     <div style={{ display: "flex", height: "100%", background: "var(--navy-darkest)" }}>
+      <ActivityTracker type="LESSON_VIEW" metadata={{ lesson: lesson.title, course: course.title }} />
 
       {/* ── Main content ── */}
       <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column" }}>
@@ -213,7 +215,7 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <BookmarkButton lessonId={lesson.id} />
-              <ProgressButton lessonId={lesson.id} completed={isCompleted} />
+              <ProgressButton lessonId={lesson.id} completed={isCompleted} lessonTitle={lesson.title} />
             </div>
           </div>
 

@@ -211,6 +211,8 @@ export default async function StudentProfilePage({ params }: { params: Promise<{
                 const config: Record<string, { label: string; icon: string; color: string }> = {
                   LOGIN:          { label: "Login na plataforma",     icon: "M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3", color: "#60a5fa" },
                   WEEKLY_LESSON:  { label: "Assistiu Aula da Semana", icon: "M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.4 19.6C5.12 20 12 20 12 20s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z M9.75 15.02l5.75-3.02-5.75-3.02v6.04z", color: "#a78bfa" },
+                  LIVE_VIEW:      { label: `Acessou Live${meta?.title ? `: ${meta.title}` : ""}`, icon: "M2 6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6z M22 8l-6 4 6 4V8z", color: "#34d399" },
+                  LESSON_VIEW:    { label: `Abriu aula${meta?.lesson ? `: ${meta.lesson}` : ""}`, icon: "M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6z", color: "#f59e0b" },
                   LESSON_COMPLETE:{ label: `Concluiu aula${meta?.lesson ? `: ${meta.lesson}` : ""}`, icon: "M22 11.08V12a10 10 0 1 1-5.93-9.14 M22 4 12 14.01 9 11.01", color: "#6ee7b7" },
                   PURCHASE:       { label: `Compra realizada${meta?.item ? `: ${meta.item}` : ""}`, icon: "M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-8 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z", color: "#C9A97A" },
                 };

@@ -189,8 +189,10 @@ export async function GET(req: NextRequest) {
 
     // ── ATIVIDADES ────────────────────────────────────────────────────────────
     if (type === "atividades") {
+      const activityType = searchParams.get("activityType") || undefined;
       const where: Record<string, unknown> = {};
-      if (userId) where.userId = userId;
+      if (userId)       where.userId = userId;
+      if (activityType) where.type   = activityType;
       if (from || to) {
         const range: Record<string, Date> = {};
         if (from) range.gte = from;
