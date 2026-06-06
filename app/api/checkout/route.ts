@@ -5,6 +5,39 @@ import { mpPreference } from "@/lib/mercadopago";
 import { cookies } from "next/headers";
 import { sendWelcomeEmail } from "@/lib/emails";
 
+async function resolveAffiliatePct(affiliateId: string, fallbackPct: number): Promise<number> {
+  const aff = await prisma.user.findUnique({ where: { id: affiliateId }, select: { affiliatePercentage: true } });
+  if (aff?.affiliatePercentage != null) return aff.affiliatePercentage;
+  return fallbackPct;
+}
+
+async function creditAffiliate(
+  tx: Omit<typeof prisma, "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends">,
+  affiliateId: string,
+  buyerId: string,
+  commission: number,
+  itemTitle: string,
+  paymentId: string | null | undefined,
+  courseId: string | null,
+  productId: string | null,
+) {
+  await tx.referral.create({
+    data: {
+      referrerId: affiliateId,
+      buyerId,
+      courseId: courseId ?? undefined,
+      productId: productId ?? undefined,
+      paymentId: paymentId ?? undefined,
+      amount: commission,
+      status: "credited",
+    },
+  });
+  await tx.user.update({ where: { id: affiliateId }, data: { walletBalance: { increment: commission } } });
+  await tx.walletTransaction.create({
+    data: { userId: affiliateId, amount: commission, type: "COMMISSION", description: `Comissão: ${itemTitle}` },
+  });
+}
+
 export async function POST(req: NextRequest) {
   let session = await auth();
   const body = await req.json();
@@ -83,7 +116,13 @@ export async function POST(req: NextRequest) {
   const cookieStore = await cookies();
   const refCode = cookieStore.get("kadima_ref")?.value ?? null;
 
-  // Validar afiliado (não pode ser auto-indicação)
+  // Busca dados do comprador (incluindo referredBy já salvo)
+  const buyerUser = await prisma.user.findUnique({
+    where: { id: session!.user.id },
+    select: { walletBalance: true, referredBy: true },
+  });
+
+  // Validar afiliado do cookie (não pode ser auto-indicação)
   let affiliateId: string | null = null;
   if (refCode) {
     const affiliate = await prisma.user.findUnique({
@@ -93,6 +132,19 @@ export async function POST(req: NextRequest) {
     if (affiliate && affiliate.id !== session!.user.id) {
       affiliateId = affiliate.id;
     }
+  }
+
+  // Fallback: usar referredBy permanente do usuário
+  if (!affiliateId && buyerUser?.referredBy) {
+    affiliateId = buyerUser.referredBy;
+  }
+
+  // Salva referredBy no usuário na primeira vez que compra via link de afiliado
+  if (affiliateId && !buyerUser?.referredBy) {
+    await prisma.user.update({
+      where: { id: session!.user.id },
+      data: { referredBy: affiliateId },
+    });
   }
 
   // Validar Cupom se houver
@@ -117,11 +169,7 @@ export async function POST(req: NextRequest) {
   }
   
   // Calcula uso da carteira
-  const user = await prisma.user.findUnique({
-    where: { id: session!.user.id },
-    select: { walletBalance: true },
-  });
-  const availableBalance = user?.walletBalance ?? 0;
+  const availableBalance = buyerUser?.walletBalance ?? 0;
   
   // O desconto do cupom é aplicado primeiro sobre o preço original
   const priceAfterCoupon = Math.max(0, itemPrice - couponDiscount);
@@ -176,6 +224,12 @@ export async function POST(req: NextRequest) {
         },
       });
 
+      const walletPayment = await tx.payment.findFirst({
+        where: { userId: session!.user.id, status: "approved", externalReference: { startsWith: "wallet_" } },
+        orderBy: { createdAt: "desc" },
+      });
+      const walletPaymentId = walletPayment?.id;
+
       if (itemType === "COURSE" && courseId) {
         const course = await tx.course.findUnique({ where: { id: courseId } });
         await tx.enrollment.upsert({
@@ -194,41 +248,27 @@ export async function POST(req: NextRequest) {
           },
         });
 
-        // Credita afiliado se houver curso
-        if (affiliateId && course && course.affiliatePercentage > 0) {
-          const commission = (course.price! * course.affiliatePercentage) / 100;
-          await tx.referral.upsert({
-            where: { buyerId_courseId: { buyerId: session!.user.id, courseId } },
-            create: {
-              referrerId: affiliateId,
-              buyerId: session!.user.id,
-              courseId,
-              amount: commission,
-              status: "credited",
-            },
-            update: { amount: commission, status: "credited" },
-          });
-          await tx.user.update({
-            where: { id: affiliateId },
-            data: { walletBalance: { increment: commission } },
-          });
-          await tx.walletTransaction.create({
-            data: {
-              userId: affiliateId,
-              amount: commission,
-              type: "COMMISSION",
-              description: `Comissão: ${course.title}`,
-            },
-          });
+        // Credita afiliado
+        if (affiliateId) {
+          const affiliatePct = await resolveAffiliatePct(affiliateId, course?.affiliatePercentage ?? 0);
+          if (affiliatePct > 0) {
+            const commission = (itemPrice * affiliatePct) / 100;
+            await creditAffiliate(tx, affiliateId, session!.user.id, commission, itemTitle, walletPaymentId, courseId, null);
+          }
         }
       } else if (itemType === "PRODUCT" && productId) {
         await tx.productPurchase.create({
-          data: {
-            userId: session!.user.id,
-            productId,
-            amount: 0,
-          }
+          data: { userId: session!.user.id, productId, amount: 0 },
         });
+
+        // Credita afiliado em produto
+        if (affiliateId) {
+          const affiliatePct = await resolveAffiliatePct(affiliateId, 10);
+          if (affiliatePct > 0) {
+            const commission = (itemPrice * affiliatePct) / 100;
+            await creditAffiliate(tx, affiliateId, session!.user.id, commission, itemTitle, walletPaymentId, null, productId);
+          }
+        }
       }
     });
 

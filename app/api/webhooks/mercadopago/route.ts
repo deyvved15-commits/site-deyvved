@@ -131,6 +131,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true });
     }
 
+    // Fallback de afiliado: usa referredBy permanente do usuário
+    if (!affiliateId) {
+      const buyer = await prisma.user.findUnique({ where: { id: userId }, select: { referredBy: true } });
+      if (buyer?.referredBy) affiliateId = buyer.referredBy;
+    }
+
     let itemTitle = "";
     let itemPrice = 0;
     let teachers: any[] = [];
@@ -261,35 +267,54 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      // ── Afiliado: creditar comissão (se for curso) ──
-      if (courseId && affiliateId && affiliatePercentage > 0) {
-        const commission = (fullAmount * affiliatePercentage) / 100;
-        await prisma.$transaction([
-          prisma.referral.upsert({
-            where: { buyerId_courseId: { buyerId: userId, courseId } },
-            create: {
-              referrerId: affiliateId,
-              buyerId: userId,
-              courseId,
-              paymentId: updatedPayments[0]?.id,
-              amount: commission,
-              status: "credited",
-            },
-            update: { amount: { increment: commission }, status: "credited" },
-          }),
-          prisma.user.update({
-            where: { id: affiliateId },
-            data: { walletBalance: { increment: commission } },
-          }),
-          prisma.walletTransaction.create({
-            data: {
-              userId: affiliateId,
-              amount: commission,
-              type: "COMMISSION",
-              description: `Comissão: ${itemTitle}`,
-            },
-          }),
-        ]);
+      // ── Afiliado: creditar comissão ──
+      if (affiliateId && affiliateId !== userId) {
+        // Resolve % do afiliado: usa a individual se definida, senão a do curso/produto
+        const affiliateUser = await prisma.user.findUnique({
+          where: { id: affiliateId },
+          select: { affiliatePercentage: true },
+        });
+        const pct = affiliateUser?.affiliatePercentage != null
+          ? affiliateUser.affiliatePercentage
+          : (courseId ? affiliatePercentage : 10);
+
+        if (pct > 0) {
+          const commission = (fullAmount * pct) / 100;
+          const payId = updatedPayments[0]?.id;
+
+          // Evita duplicata: só cria se não existe referral para este pagamento
+          const alreadyCredited = payId
+            ? await prisma.referral.findUnique({ where: { paymentId: payId } })
+            : null;
+
+          if (!alreadyCredited) {
+            await prisma.$transaction([
+              prisma.referral.create({
+                data: {
+                  referrerId: affiliateId,
+                  buyerId: userId,
+                  courseId: courseId ?? undefined,
+                  productId: productId ?? undefined,
+                  paymentId: payId ?? undefined,
+                  amount: commission,
+                  status: "credited",
+                },
+              }),
+              prisma.user.update({
+                where: { id: affiliateId },
+                data: { walletBalance: { increment: commission } },
+              }),
+              prisma.walletTransaction.create({
+                data: {
+                  userId: affiliateId,
+                  amount: commission,
+                  type: "COMMISSION",
+                  description: `Comissão: ${itemTitle}`,
+                },
+              }),
+            ]);
+          }
+        }
       }
 
       // ── Cupom: incrementar uso ──

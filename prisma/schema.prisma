@@ -63,6 +63,7 @@ model User {
   active              Boolean           @default(true)
   affiliateCode       String?           @unique
   affiliatePercentage Float?
+  referredBy          String?
   walletBalance       Float             @default(0)
   lastLoginAt         DateTime?
   createdAt           DateTime          @default(now())
@@ -353,16 +354,15 @@ model Referral {
   id         String   @id @default(cuid())
   referrerId String
   buyerId    String
-  courseId   String
-  paymentId  String?
+  courseId   String?
+  productId  String?
+  paymentId  String?  @unique
   amount     Float
   status     String   @default("pending")
   createdAt  DateTime @default(now())
 
   referrer   User     @relation(fields: [referrerId], references: [id], onDelete: Cascade)
-  course     Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
-
-  @@unique([buyerId, courseId])
+  course     Course?  @relation(fields: [courseId], references: [id], onDelete: Cascade)
 }
 
 model WalletTransaction {
