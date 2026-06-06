@@ -215,6 +215,7 @@ export default async function StudentProfilePage({ params }: { params: Promise<{
                   LESSON_VIEW:    { label: `Abriu aula${meta?.lesson ? `: ${meta.lesson}` : ""}`, icon: "M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6z", color: "#f59e0b" },
                   LESSON_COMPLETE:{ label: `Concluiu aula${meta?.lesson ? `: ${meta.lesson}` : ""}`, icon: "M22 11.08V12a10 10 0 1 1-5.93-9.14 M22 4 12 14.01 9 11.01", color: "#6ee7b7" },
                   PURCHASE:       { label: `Compra realizada${meta?.item ? `: ${meta.item}` : ""}`, icon: "M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-8 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z", color: "#C9A97A" },
+                  PAYMENT_FAILED: { label: `Pagamento recusado${meta?.item ? `: ${meta.item}` : ""}${meta?.reason ? ` · ${meta.reason}` : ""}`, icon: "M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z M12 9v4 M12 17h.01", color: "#f87171" },
                 };
                 const c = config[log.type] ?? { label: log.type, icon: "M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z", color: "rgba(255,255,255,0.40)" };
 

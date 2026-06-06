@@ -46,7 +46,13 @@ export async function GET(req: NextRequest) {
 
     // ── FINANCEIRO ────────────────────────────────────────────────────────────
     if (type === "financeiro") {
-      const where: Record<string, unknown> = { status: "approved" };
+      const paymentStatus = searchParams.get("paymentStatus") || undefined;
+      const where: Record<string, unknown> = {};
+      if (paymentStatus) {
+        where.status = paymentStatus;
+      } else {
+        where.status = { in: ["approved", "rejected", "cancelled", "pending"] };
+      }
       if (courseId) where.courseId = courseId;
       Object.assign(where, dateRange("createdAt"));
 
@@ -60,9 +66,11 @@ export async function GET(req: NextRequest) {
           product: { select: { id: true, title: true } },
         },
       });
-      const total     = payments.reduce((s, p) => s + (p.amount    ?? 0), 0);
-      const walletSum = payments.reduce((s, p) => s + (p.walletUsed ?? 0), 0);
-      return NextResponse.json({ data: payments, total, walletSum });
+      const approved  = payments.filter(p => p.status === "approved");
+      const total     = approved.reduce((s, p) => s + (p.amount    ?? 0), 0);
+      const walletSum = approved.reduce((s, p) => s + (p.walletUsed ?? 0), 0);
+      const rejected  = payments.filter(p => p.status === "rejected" || p.status === "cancelled").length;
+      return NextResponse.json({ data: payments, total, walletSum, rejected });
     }
 
     // ── FORMADOS ──────────────────────────────────────────────────────────────

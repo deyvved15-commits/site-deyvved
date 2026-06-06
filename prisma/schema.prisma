@@ -231,6 +231,7 @@ model Payment {
   walletUsed       Float    @default(0)
   method           String   @default("MERCADO_PAGO") // "MERCADO_PAGO" ou "WALLET"
   status           String   @default("pending")
+  statusDetail     String?
   mpPaymentId      String?
   mpPreferenceId   String?
   externalReference String?  @unique // ID da preferência ou ref externa
@@ -489,6 +490,7 @@ enum ActivityType {
   LESSON_VIEW
   LESSON_COMPLETE
   PURCHASE
+  PAYMENT_FAILED
 }
 
 model SiteConfig {

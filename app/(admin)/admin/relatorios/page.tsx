@@ -30,16 +30,17 @@ function fmtDateTime(d: string | Date | null | undefined) {
 }
 
 export default function RelatoriosPage() {
-  const [tab,        setTab]        = useState<TabId>("alunos");
-  const [courseId,   setCourseId]   = useState("");
-  const [userId,     setUserId]     = useState("");
+  const [tab,          setTab]          = useState<TabId>("alunos");
+  const [courseId,     setCourseId]     = useState("");
+  const [userId,       setUserId]       = useState("");
   const [activityType, setActivityType] = useState("");
-  const [from,       setFrom]       = useState("");
-  const [to,         setTo]         = useState("");
+  const [paymentStatus, setPaymentStatus] = useState("");
+  const [from,         setFrom]         = useState("");
+  const [to,           setTo]           = useState("");
   const [courses,  setCourses]  = useState<Course[]>([]);
   const [students, setStudents] = useState<Student[]>([]);
   const [data,     setData]     = useState<any[]>([]);
-  const [extra,    setExtra]    = useState<Record<string, number>>({});
+  const [extra,    setExtra]    = useState<Record<string, number>>({ total: 0, walletSum: 0, rejected: 0 });
   const [loading,  setLoading]  = useState(false);
 
   // Carrega lista de cursos
@@ -71,6 +72,7 @@ export default function RelatoriosPage() {
       if (courseId)     params.set("courseId",     courseId);
       if (userId)       params.set("userId",       userId);
       if (activityType) params.set("activityType", activityType);
+      if (paymentStatus) params.set("paymentStatus", paymentStatus);
       if (from)         params.set("from",         from);
       if (to)           params.set("to",           to);
       const res  = await fetch(`/api/admin/reports?${params}`);
@@ -78,13 +80,13 @@ export default function RelatoriosPage() {
       const json = await res.json();
       if (json.error) { console.error("[reports]", json.error); return; }
       setData(Array.isArray(json.data) ? json.data : []);
-      setExtra({ total: Number(json.total) || 0, walletSum: Number(json.walletSum) || 0 });
+      setExtra({ total: Number(json.total) || 0, walletSum: Number(json.walletSum) || 0, rejected: Number(json.rejected) || 0 });
     } catch (e) {
       console.error("[reports] fetch error", e);
     } finally {
       setLoading(false);
     }
-  }, [tab, courseId, userId, activityType, from, to]);
+  }, [tab, courseId, userId, activityType, paymentStatus, from, to]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -182,9 +184,10 @@ export default function RelatoriosPage() {
         {tab === "financeiro" && !loading && data.length > 0 && (
           <div className="no-print" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: 14, marginBottom: 24 }}>
             {[
-              { label: "Total Aprovado",    value: fmt(extra.total),    color: "var(--green)" },
-              { label: "Usado da Carteira", value: fmt(extra.walletSum), color: "var(--gold-bright)" },
-              { label: "Transações",        value: String(data.length),  color: "#63B3ED" },
+              { label: "Total Aprovado",    value: fmt(extra.total),         color: "var(--green)" },
+              { label: "Usado da Carteira", value: fmt(extra.walletSum),     color: "var(--gold-bright)" },
+              { label: "Aprovados",         value: String(data.filter((p:any) => p.status === "approved").length), color: "#63B3ED" },
+              { label: "Recusados",         value: String(extra.rejected),   color: "#f87171" },
             ].map(k => (
               <div key={k.label} style={{
                 borderRadius: 14, padding: "18px 20px",
@@ -216,6 +219,17 @@ export default function RelatoriosPage() {
             </select>
           )}
 
+          {/* Filtro status — financeiro */}
+          {tab === "financeiro" && (
+            <select value={paymentStatus} onChange={e => setPaymentStatus(e.target.value)} style={selectStyle}>
+              <option value="">Todos os status</option>
+              <option value="approved">Aprovados</option>
+              <option value="rejected">Recusados</option>
+              <option value="cancelled">Cancelados</option>
+              <option value="pending">Pendentes</option>
+            </select>
+          )}
+
           {/* Filtro tipo de atividade */}
           {tab === "atividades" && (
             <select value={activityType} onChange={e => setActivityType(e.target.value)} style={selectStyle}>
@@ -226,6 +240,7 @@ export default function RelatoriosPage() {
               <option value="LESSON_VIEW">Abriu aula</option>
               <option value="LESSON_COMPLETE">Aula concluída</option>
               <option value="PURCHASE">Compra realizada</option>
+              <option value="PAYMENT_FAILED">Pagamento recusado</option>
             </select>
           )}
 
@@ -238,7 +253,7 @@ export default function RelatoriosPage() {
           </div>
 
           <button
-            onClick={() => { setCourseId(""); setUserId(""); setActivityType(""); setFrom(""); setTo(""); }}
+            onClick={() => { setCourseId(""); setUserId(""); setActivityType(""); setPaymentStatus(""); setFrom(""); setTo(""); }}
             style={{ ...inputStyle, cursor: "pointer", color: "var(--text-muted)", fontSize: 11 }}
           >
             Limpar
@@ -411,40 +426,66 @@ function AlunosTable({ data, loading }: { data: any[]; loading: boolean }) {
   );
 }
 
+const PAYMENT_STATUS_CFG: Record<string, { label: string; color: string }> = {
+  approved:  { label: "Aprovado",   color: "#6ee7b7" },
+  rejected:  { label: "Recusado",   color: "#f87171" },
+  cancelled: { label: "Cancelado",  color: "#f87171" },
+  pending:   { label: "Pendente",   color: "#f59e0b" },
+  in_process:{ label: "Processando",color: "#60a5fa" },
+};
+
 function FinanceiroTable({ data, loading }: { data: any[]; loading: boolean }) {
   if (!data.length) return <EmptyState loading={loading} />;
   return (
     <>
       <div style={headRowStyle} className="rpt-head">
-        {["Aluno","Item","Valor Total","Saldo Usado","Método","Data"].map(h => <TH key={h} label={h} />)}
+        {["Aluno","Item","Valor","Saldo Usado","Método","Status","Data"].map(h => <TH key={h} label={h} />)}
       </div>
       <div style={bodyStyle}>
-        {data.map((p: any, i: number) => (
-          <div key={p.id} style={row(i)} className="rpt-row">
-            <div style={{ flex: 1 }}>
-              <div style={primary} className="rpt-cell-primary">{p.user?.name ?? "—"}</div>
-              <div style={muted}   className="rpt-cell-muted">{p.user?.email ?? "—"}</div>
-            </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 9, fontFamily: "var(--font-cinzel)", color: "var(--gold)", letterSpacing: 1, marginBottom: 3 }}>
-                {p.courseId ? "Curso" : "Produto"}
+        {data.map((p: any, i: number) => {
+          const sc = PAYMENT_STATUS_CFG[p.status] ?? { label: p.status, color: "rgba(255,255,255,0.4)" };
+          const isRejected = p.status === "rejected" || p.status === "cancelled";
+          return (
+            <div key={p.id} style={{ ...row(i), background: isRejected ? "rgba(248,113,113,0.03)" : undefined }} className="rpt-row">
+              <div style={{ flex: 1 }}>
+                <div style={primary} className="rpt-cell-primary">{p.user?.name ?? "—"}</div>
+                <div style={muted}   className="rpt-cell-muted">{p.user?.email ?? "—"}</div>
               </div>
-              <div style={{ ...muted }} className="rpt-cell-muted">{p.course?.title ?? p.product?.title ?? "—"}</div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 9, fontFamily: "var(--font-cinzel)", color: "var(--gold)", letterSpacing: 1, marginBottom: 3 }}>
+                  {p.courseId ? "Curso" : "Produto"}
+                </div>
+                <div style={{ ...muted }} className="rpt-cell-muted">{p.course?.title ?? p.product?.title ?? "—"}</div>
+              </div>
+              <span style={{ flex: 1, fontFamily: "var(--font-cinzel)", fontWeight: 700, fontSize: 14, color: isRejected ? "#f87171" : "var(--gold-bright)" }}>
+                {fmt(p.amount)}
+              </span>
+              <span style={{ ...muted, flex: 1 }} className="rpt-cell-muted">
+                {p.walletUsed > 0 ? fmt(p.walletUsed) : "—"}
+              </span>
+              <span style={{ ...muted, flex: 1, textTransform: "uppercase", fontSize: 10 }} className="rpt-cell-muted">
+                {p.method ?? "—"}
+              </span>
+              <div style={{ flex: 1 }}>
+                <span style={{
+                  display: "inline-flex", alignItems: "center", gap: 5,
+                  fontSize: 10, fontWeight: 600, color: sc.color,
+                  padding: "3px 8px", borderRadius: 6,
+                  background: `${sc.color}14`, border: `1px solid ${sc.color}30`,
+                }}>
+                  <span style={{ width: 5, height: 5, borderRadius: "50%", background: sc.color, flexShrink: 0 }} />
+                  {sc.label}
+                </span>
+                {isRejected && p.statusDetail && (
+                  <div style={{ fontSize: 9, color: "rgba(248,113,113,0.60)", marginTop: 3 }}>{p.statusDetail}</div>
+                )}
+              </div>
+              <span style={{ ...muted, flex: 1 }} className="rpt-cell-muted">
+                {fmtDate(p.createdAt)}
+              </span>
             </div>
-            <span style={{ flex: 1, fontFamily: "var(--font-cinzel)", fontWeight: 700, fontSize: 14, color: "var(--gold-bright)" }}>
-              {fmt(p.amount)}
-            </span>
-            <span style={{ ...muted, flex: 1 }} className="rpt-cell-muted">
-              {p.walletUsed > 0 ? fmt(p.walletUsed) : "—"}
-            </span>
-            <span style={{ ...muted, flex: 1, textTransform: "uppercase", fontSize: 10 }} className="rpt-cell-muted">
-              {p.method ?? "—"}
-            </span>
-            <span style={{ ...muted, flex: 1 }} className="rpt-cell-muted">
-              {fmtDate(p.createdAt)}
-            </span>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </>
   );
@@ -505,6 +546,7 @@ const ACTIVITY_CONFIG: Record<string, { label: string; color: string }> = {
   LESSON_VIEW:     { label: "Abriu aula",              color: "#f59e0b" },
   LESSON_COMPLETE: { label: "Aula concluída",          color: "#6ee7b7" },
   PURCHASE:        { label: "Compra realizada",        color: "#C9A97A" },
+  PAYMENT_FAILED:  { label: "Pagamento recusado",      color: "#f87171" },
 };
 
 function AtividadesTable({ data, loading }: { data: any[]; loading: boolean }) {

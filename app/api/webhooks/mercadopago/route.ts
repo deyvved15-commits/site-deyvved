@@ -45,6 +45,22 @@ function verifySignature(req: NextRequest, rawBody: string): boolean {
   return expected === v1;
 }
 
+const FAILURE_LABELS: Record<string, string> = {
+  cc_rejected_insufficient_amount:      "Saldo insuficiente",
+  cc_rejected_bad_filled_security_code: "CVV incorreto",
+  cc_rejected_bad_filled_date:          "Data de validade incorreta",
+  cc_rejected_bad_filled_other:         "Dados do cartão incorretos",
+  cc_rejected_call_for_authorize:       "Ligação necessária para autorizar",
+  cc_rejected_card_disabled:            "Cartão desabilitado",
+  cc_rejected_duplicated_payment:       "Pagamento duplicado",
+  cc_rejected_high_risk:                "Recusado por risco",
+  cc_rejected_max_attempts:             "Número máximo de tentativas excedido",
+  cc_rejected_other_reason:             "Recusado pelo banco",
+  cc_amount_rate_limit_exceeded:        "Limite de valor excedido",
+  rejected_by_bank:                     "Recusado pelo banco",
+  rejected_insufficient_data:           "Dados insuficientes",
+};
+
 export async function GET() {
   return NextResponse.json({ ok: true });
 }
@@ -154,7 +170,9 @@ export async function POST(req: NextRequest) {
 
     const amount = mpData.transaction_amount ?? itemPrice;
     const fullAmount = amount + walletAmountUsed;
-    
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const statusDetail: string | null = (mpData as any).status_detail ?? null;
+
     // Calculate total commission sum
     const totalCommissionPercentage = teachers.reduce((acc, t) => acc + t.commissionPercentage, 0) || 0;
     const totalCommissionAmount = (status === "approved" && totalCommissionPercentage > 0)
@@ -169,10 +187,59 @@ export async function POST(req: NextRequest) {
       },
       data: {
         status: status ?? "pending",
+        statusDetail,
         mpPaymentId: paymentId,
         commissionAmount: totalCommissionAmount,
       },
     });
+
+    // ── Tentativa recusada / cancelada ────────────────────────────────────────
+    if (status === "rejected" || status === "cancelled") {
+      const failureLabel = FAILURE_LABELS[statusDetail ?? ""] ?? statusDetail ?? "Motivo desconhecido";
+
+      await prisma.activityLog.create({
+        data: {
+          userId,
+          type: "PAYMENT_FAILED",
+          metadata: JSON.stringify({
+            item: itemTitle,
+            reason: failureLabel,
+            statusDetail,
+            amount,
+          }),
+        },
+      });
+
+      // Churn: mensalista com matrícula já expirada ou expirando em ≤ 3 dias
+      if (courseId && paymentType === "MONTHLY") {
+        const enrollment = await prisma.enrollment.findUnique({
+          where: { userId_courseId: { userId, courseId } },
+        });
+        if (enrollment?.expiresAt) {
+          const daysLeft = Math.ceil((enrollment.expiresAt.getTime() - Date.now()) / 86_400_000);
+          if (daysLeft <= 3) {
+            const user = await prisma.user.findUnique({
+              where: { id: userId },
+              select: { name: true, email: true },
+            });
+            if (user?.email) {
+              getResend().emails.send({
+                from: FROM_EMAIL,
+                to: user.email,
+                subject: `Atenção: seu acesso à ${itemTitle} está prestes a expirar`,
+                html: `<p>Olá ${user.name ?? "Aluno"},</p>
+<p>Identificamos uma falha no seu pagamento mensal de <strong>${itemTitle}</strong>.</p>
+<p>Motivo: <strong>${failureLabel}</strong></p>
+<p>Seu acesso expira em <strong>${daysLeft <= 0 ? "hoje" : `${daysLeft} dia${daysLeft !== 1 ? "s" : ""}`}</strong>.</p>
+<p>Para manter seu acesso, <a href="${process.env.NEXTAUTH_URL}/checkout/${courseId}?renovar=1">clique aqui para renovar</a>.</p>`,
+              }).catch(() => {});
+            }
+          }
+        }
+      }
+
+      return NextResponse.json({ ok: true });
+    }
 
     // If approved, handle earnings and enrollments
     if (status === "approved") {
