@@ -200,8 +200,8 @@ export default function RelatoriosPage() {
 
         {/* Filters */}
         <div className="no-print" style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center", marginBottom: 24 }}>
-          {/* Filtro curso — não aparece no log se userId selecionado */}
-          {tab !== "progresso" && (
+          {/* Filtro curso — não aparece no log, atividades ou progresso */}
+          {tab !== "progresso" && tab !== "log" && tab !== "atividades" && (
             <select value={courseId} onChange={e => setCourseId(e.target.value)} style={selectStyle}>
               <option value="">Todos os cursos</option>
               {courses.map(c => <option key={c.id} value={c.id}>{c.title}</option>)}
