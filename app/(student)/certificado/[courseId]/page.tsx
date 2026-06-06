@@ -146,7 +146,7 @@ export default async function CertificatePage({
               color: el.color,
               fontFamily: el.fontFamily === "Cinzel" ? "'Cinzel', serif" : "'Poppins', sans-serif",
               fontWeight: el.bold ? 700 : 400,
-              whiteSpace: "pre-line",
+              whiteSpace: "pre-wrap",
               textAlign: el.align as React.CSSProperties["textAlign"],
               lineHeight: 1.35,
               maxWidth: isMultiLine ? "75%" : undefined,

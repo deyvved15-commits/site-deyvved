@@ -159,7 +159,7 @@ export default function CertificateLayoutEditor({
                 color: el.color,
                 fontFamily: el.fontFamily === "Cinzel" ? "'Cinzel', serif" : "'Poppins', sans-serif",
                 fontWeight: el.bold ? 700 : 400,
-                whiteSpace: "pre-line",
+                whiteSpace: "pre-wrap",
                 lineHeight: 1.2,
                 cursor: "move",
                 touchAction: "none",
