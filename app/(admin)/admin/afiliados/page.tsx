@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { Users, Wallet, TrendingUp } from "lucide-react";
 import AffiliateRow from "@/components/admin/affiliate-row";
+import AffiliateChart from "@/components/admin/affiliate-chart";
 
 export default async function AdminAfiliadosPage() {
   const session = await auth();
@@ -57,6 +58,23 @@ export default async function AdminAfiliadosPage() {
               <p style={{ fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 24, color: "var(--text-primary)" }}>{stat.value}</p>
             </div>
           ))}
+        </div>
+
+        {/* Relatório gráfico */}
+        <div style={{
+          borderRadius: 20, padding: "24px",
+          background: "linear-gradient(160deg, var(--navy-card) 0%, var(--navy-card-2) 100%)",
+          border: "1px solid rgba(201,169,122,0.12)",
+          boxShadow: "0 8px 32px rgba(0,0,0,0.30)",
+          marginBottom: 32,
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
+            <div style={{ width: 3, height: 16, background: "linear-gradient(180deg, var(--gold-light), var(--gold))", borderRadius: 2, boxShadow: "0 0 8px var(--gold)" }} />
+            <h2 style={{ fontFamily: "'Cinzel',serif", fontWeight: 600, fontSize: 13, letterSpacing: 3, textTransform: "uppercase", color: "var(--text-primary)", margin: 0 }}>
+              Cliques × Vendas por Período
+            </h2>
+          </div>
+          <AffiliateChart affiliates={affiliates.map(a => ({ id: a.id, name: a.name, affiliateCode: a.affiliateCode }))} />
         </div>
 
         {/* Table */}
