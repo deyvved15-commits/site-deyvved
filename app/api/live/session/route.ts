@@ -17,14 +17,16 @@ export async function POST(req: NextRequest) {
   if (!session || session.user.role !== "ADMIN")
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-  const { title, roomName } = await req.json();
+  const { title, roomName, youtubeUrl } = await req.json();
   if (!title?.trim()) return NextResponse.json({ error: "Título obrigatório" }, { status: 400 });
 
   // Encerra qualquer sessão ativa anterior
   await prisma.liveSession.updateMany({ where: { active: true }, data: { active: false, endedAt: new Date() } });
 
   const room = roomName?.trim() || `kadima-${Date.now()}`;
-  const live = await prisma.liveSession.create({ data: { title: title.trim(), roomName: room, active: true } });
+  const live = await prisma.liveSession.create({
+    data: { title: title.trim(), roomName: room, youtubeUrl: youtubeUrl?.trim() || null, active: true },
+  });
 
   return NextResponse.json(live, { status: 201 });
 }

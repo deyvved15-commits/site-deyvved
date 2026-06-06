@@ -3,29 +3,31 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-type LiveSession = { id: string; title: string; roomName: string; active: boolean; createdAt: string } | null;
+type LiveSession = { id: string; title: string; roomName: string; youtubeUrl?: string | null; active: boolean; createdAt: string } | null;
 
 export default function LiveControls({ activeSession }: { activeSession: LiveSession }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [title, setTitle] = useState("");
   const [meetingUrl, setMeetingUrl] = useState("");
+  const [youtubeUrl, setYoutubeUrl] = useState("");
   const [session, setSession] = useState(activeSession);
 
   async function createSession(e: React.FormEvent) {
     e.preventDefault();
-    if (!title.trim() || !meetingUrl.trim()) return;
+    if (!title.trim() || (!meetingUrl.trim() && !youtubeUrl.trim())) return;
     setLoading(true);
     const res = await fetch("/api/live/session", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, roomName: meetingUrl.trim() }),
+      body: JSON.stringify({ title, roomName: meetingUrl.trim(), youtubeUrl: youtubeUrl.trim() || null }),
     });
     const data = await res.json();
     if (res.ok) {
       setSession(data);
       setTitle("");
       setMeetingUrl("");
+      setYoutubeUrl("");
       router.refresh();
     }
     setLoading(false);
@@ -159,13 +161,12 @@ export default function LiveControls({ activeSession }: { activeSession: LiveSes
 
         <div>
           <label style={{ fontFamily: "'Cinzel',serif", fontSize: 9, fontWeight: 600, letterSpacing: 3, textTransform: "uppercase", color: "var(--gold)", display: "block", marginBottom: 7 }}>
-            Link da reunião *
+            Link da reunião (opcional se tiver YouTube)
           </label>
           <input
             value={meetingUrl}
             onChange={e => setMeetingUrl(e.target.value)}
             placeholder="https://meet.google.com/xxx-xxxx-xxx"
-            required
             style={{
               width: "100%", background: "rgba(255,255,255,0.04)",
               border: "1px solid rgba(201,169,122,0.20)", borderRadius: 10,
@@ -174,14 +175,34 @@ export default function LiveControls({ activeSession }: { activeSession: LiveSes
             }}
           />
           <p style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 6, fontFamily: "'Poppins',sans-serif", lineHeight: 1.6 }}>
-            Google Meet, Zoom, Teams, Jitsi — qualquer link de videochamada funciona.
+            Google Meet, Zoom, Teams — qualquer link de videochamada funciona.
+          </p>
+        </div>
+
+        <div>
+          <label style={{ fontFamily: "'Cinzel',serif", fontSize: 9, fontWeight: 600, letterSpacing: 3, textTransform: "uppercase", color: "var(--gold)", display: "block", marginBottom: 7 }}>
+            Link do YouTube Live (opcional)
+          </label>
+          <input
+            value={youtubeUrl}
+            onChange={e => setYoutubeUrl(e.target.value)}
+            placeholder="https://youtube.com/live/xxxxx ou youtu.be/xxxxx"
+            style={{
+              width: "100%", background: "rgba(255,255,255,0.04)",
+              border: "1px solid rgba(201,169,122,0.20)", borderRadius: 10,
+              padding: "10px 14px", fontSize: 13, color: "var(--text-primary)",
+              outline: "none", fontFamily: "'Poppins',sans-serif",
+            }}
+          />
+          <p style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 6, fontFamily: "'Poppins',sans-serif", lineHeight: 1.6 }}>
+            Se preenchido, a live será incorporada diretamente na página para os alunos.
           </p>
         </div>
 
         <div style={{ paddingTop: 4 }}>
           <button
             type="submit"
-            disabled={loading || !title.trim() || !meetingUrl.trim()}
+            disabled={loading || !title.trim() || (!meetingUrl.trim() && !youtubeUrl.trim())}
             style={{
               padding: "11px 28px", borderRadius: 12, cursor: "pointer",
               background: "linear-gradient(135deg, var(--gold), var(--gold-deep))",

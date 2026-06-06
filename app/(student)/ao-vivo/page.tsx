@@ -54,7 +54,7 @@ export default async function AoVivoPage() {
 
       {/* Viewer */}
       <LiveViewer
-        initialSession={activeSession ? { id: activeSession.id, title: activeSession.title, roomName: activeSession.roomName } : null}
+        initialSession={activeSession ? { id: activeSession.id, title: activeSession.title, roomName: activeSession.roomName, youtubeUrl: activeSession.youtubeUrl } : null}
         displayName={session.user.name ?? "Aluno"}
         email={session.user.email ?? ""}
       />

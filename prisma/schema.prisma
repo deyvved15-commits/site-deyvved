@@ -311,12 +311,13 @@ model WeeklyLesson {
 }
 
 model LiveSession {
-  id        String    @id @default(cuid())
-  title     String
-  roomName  String
-  active    Boolean   @default(true)
-  createdAt DateTime  @default(now())
-  endedAt   DateTime?
+  id         String    @id @default(cuid())
+  title      String
+  roomName   String
+  youtubeUrl String?
+  active     Boolean   @default(true)
+  createdAt  DateTime  @default(now())
+  endedAt    DateTime?
 }
 
 model LiveAttendance {
