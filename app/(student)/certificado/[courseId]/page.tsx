@@ -11,7 +11,8 @@ function getElementValue(
   data: { studentName: string | null; courseTitle: string; customText: string | null; issuedDate: string; teacherNames: string; certId: string }
 ): string {
   switch (id) {
-    case "studentName":  return (data.studentName ?? "Aluno").toUpperCase();
+    case "studentName":
+    case "studentName2": return (data.studentName ?? "Aluno").toUpperCase();
     case "customText":   return data.customText || "concluiu com aproveitamento o curso de formação em";
     case "courseTitle":  return data.courseTitle;
     case "date":         return data.issuedDate;
@@ -145,7 +146,7 @@ export default async function CertificatePage({
               color: el.color,
               fontFamily: el.fontFamily === "Cinzel" ? "'Cinzel', serif" : "'Poppins', sans-serif",
               fontWeight: el.bold ? 700 : 400,
-              whiteSpace: isMultiLine ? "normal" : "nowrap",
+              whiteSpace: "pre-line",
               textAlign: el.align as React.CSSProperties["textAlign"],
               lineHeight: 1.35,
               maxWidth: isMultiLine ? "75%" : undefined,

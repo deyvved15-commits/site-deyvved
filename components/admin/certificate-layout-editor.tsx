@@ -15,21 +15,23 @@ export type LayoutElement = {
 };
 
 export const DEFAULT_LAYOUT: LayoutElement[] = [
-  { id: "studentName", label: "Nome do Aluno",       x: 50, y: 43, fontSize: 32, color: "#000000", fontFamily: "Cinzel",  bold: true,  align: "center", visible: true },
-  { id: "customText",  label: "Texto Descritivo",    x: 50, y: 54, fontSize: 12, color: "#555555", fontFamily: "Poppins", bold: false, align: "center", visible: true },
-  { id: "courseTitle", label: "Título do Curso",     x: 50, y: 62, fontSize: 20, color: "#111111", fontFamily: "Cinzel",  bold: true,  align: "center", visible: true },
-  { id: "date",        label: "Data de Emissão",     x: 18, y: 85, fontSize: 11, color: "#333333", fontFamily: "Poppins", bold: false, align: "left",   visible: true },
-  { id: "teacherName", label: "Nome do Professor",   x: 50, y: 85, fontSize: 12, color: "#000000", fontFamily: "Poppins", bold: true,  align: "center", visible: true },
-  { id: "certId",      label: "ID do Certificado",  x: 82, y: 87, fontSize:  8, color: "#aaaaaa", fontFamily: "Poppins", bold: false, align: "right",  visible: true },
+  { id: "studentName",  label: "Nome do Aluno (1)",    x: 50, y: 43, fontSize: 32, color: "#000000", fontFamily: "Cinzel",  bold: true,  align: "center", visible: true },
+  { id: "studentName2", label: "Nome do Aluno (2)",    x: 50, y: 50, fontSize: 20, color: "#333333", fontFamily: "Cinzel",  bold: false, align: "center", visible: true },
+  { id: "customText",   label: "Texto Descritivo",     x: 50, y: 58, fontSize: 12, color: "#555555", fontFamily: "Poppins", bold: false, align: "center", visible: true },
+  { id: "courseTitle",  label: "Título do Curso",      x: 50, y: 66, fontSize: 20, color: "#111111", fontFamily: "Cinzel",  bold: true,  align: "center", visible: true },
+  { id: "date",         label: "Data de Emissão",      x: 18, y: 85, fontSize: 11, color: "#333333", fontFamily: "Poppins", bold: false, align: "left",   visible: true },
+  { id: "teacherName",  label: "Nome do Professor",    x: 50, y: 85, fontSize: 12, color: "#000000", fontFamily: "Poppins", bold: true,  align: "center", visible: true },
+  { id: "certId",       label: "ID do Certificado",   x: 82, y: 87, fontSize:  8, color: "#aaaaaa", fontFamily: "Poppins", bold: false, align: "right",  visible: true },
 ];
 
 const SAMPLE: Record<string, string> = {
-  studentName: "NOME DO ALUNO",
-  customText:  "concluiu com aproveitamento o curso de formação em",
-  courseTitle: "Título do Curso",
-  date:        "01 de junho de 2026",
-  teacherName: "Prof. Nome do Professor",
-  certId:      "ID: CERT-XXXXXXXX",
+  studentName:  "NOME DO ALUNO",
+  studentName2: "NOME DO ALUNO",
+  customText:   "concluiu com aproveitamento o curso de formação em",
+  courseTitle:  "Título do Curso",
+  date:         "01 de junho de 2026",
+  teacherName:  "Prof. Nome do Professor",
+  certId:       "ID: CERT-XXXXXXXX",
 };
 
 const LS: React.CSSProperties = {
@@ -157,7 +159,7 @@ export default function CertificateLayoutEditor({
                 color: el.color,
                 fontFamily: el.fontFamily === "Cinzel" ? "'Cinzel', serif" : "'Poppins', sans-serif",
                 fontWeight: el.bold ? 700 : 400,
-                whiteSpace: "nowrap",
+                whiteSpace: "pre-line",
                 lineHeight: 1.2,
                 cursor: "move",
                 touchAction: "none",
