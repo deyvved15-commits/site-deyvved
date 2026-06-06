@@ -9,8 +9,8 @@ export async function GET() {
   if (!session || session.user.role !== "ADMIN") {
     return NextResponse.json({ error: "Acesso negado" }, { status: 403 });
   }
-  const hasKey = !!process.env.RESEND_API_KEY;
-  return NextResponse.json({ configured: hasKey, from: FROM_EMAIL });
+  const configured = !!process.env.SMTP_USER && !!process.env.SMTP_PASS;
+  return NextResponse.json({ configured, from: FROM_EMAIL });
 }
 
 export async function POST(req: NextRequest) {

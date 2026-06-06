@@ -132,11 +132,10 @@ export default function AdminEmailPage() {
             </svg>
             <div>
               <p style={{ fontSize: 13, fontWeight: 600, color: "#fbbf24", margin: "0 0 4px" }}>
-                RESEND_API_KEY não configurada
+                SMTP não configurado
               </p>
               <p style={{ fontSize: 12, color: "rgba(255,255,255,0.50)", margin: 0, lineHeight: 1.6 }}>
-                Adicione <code style={{ background: "rgba(255,255,255,0.08)", padding: "1px 6px", borderRadius: 4 }}>RESEND_API_KEY</code> nas variáveis de ambiente do projeto para enviar e-mails.
-                Crie a chave em <strong style={{ color: "#fbbf24" }}>resend.com → API Keys</strong>.
+                Adicione <code style={{ background: "rgba(255,255,255,0.08)", padding: "1px 6px", borderRadius: 4 }}>SMTP_USER</code> e <code style={{ background: "rgba(255,255,255,0.08)", padding: "1px 6px", borderRadius: 4 }}>SMTP_PASS</code> nas variáveis de ambiente da Vercel.
               </p>
             </div>
           </div>
