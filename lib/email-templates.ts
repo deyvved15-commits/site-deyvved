@@ -112,6 +112,40 @@ export function emailConfirmacaoPagamento({
   `);
 }
 
+export function emailCampanha({
+  name,
+  subject,
+  body,
+  ctaUrl,
+  ctaLabel,
+}: {
+  name: string;
+  subject: string;
+  body: string;
+  ctaUrl?: string;
+  ctaLabel?: string;
+}) {
+  const appUrl = process.env.AUTH_URL ?? "https://kadimaacademy.com.br";
+  const bodyHtml = body
+    .split("\n\n")
+    .map(p => `<p style="font-size:14px;color:rgba(255,255,255,0.70);line-height:1.85;margin:0 0 16px;">${p.replace(/\n/g, "<br/>")}</p>`)
+    .join("");
+
+  return base(`
+    <h1 style="font-size:22px;font-weight:700;letter-spacing:2px;color:#F5ECD7;margin:0 0 20px;text-transform:uppercase;line-height:1.3;">
+      ${subject}
+    </h1>
+    <p style="font-size:12px;color:rgba(201,169,122,0.70);margin:0 0 20px;">Olá, <strong style="color:#C9A97A;">${name}</strong> — aqui está uma mensagem da Kadima Academy:</p>
+    ${divider}
+    <div style="margin:8px 0 28px;">${bodyHtml}</div>
+    ${ctaUrl && ctaLabel ? `<div style="text-align:center;margin-bottom:8px;">${btn(ctaUrl, ctaLabel)}</div>` : ""}
+    ${divider}
+    <p style="font-size:11px;color:rgba(255,255,255,0.25);text-align:center;margin:0;line-height:1.7;">
+      Para acessar a plataforma: <a href="${appUrl}/dashboard" style="color:#C9A97A;text-decoration:none;">${appUrl}</a>
+    </p>
+  `);
+}
+
 export function emailAvisoRenovacao({
   name,
   courseName,
