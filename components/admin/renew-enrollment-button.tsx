@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { createPortal } from "react-dom";
 
 interface Props {
   enrollmentId: string;
@@ -22,15 +23,41 @@ export default function RenewEnrollmentButton({ enrollmentId, courseName, curren
   const [loading, setLoading] = useState(false);
   const [customDate, setCustomDate] = useState("");
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
-  const ref = useRef<HTMLDivElement>(null);
+  const [dropPos, setDropPos] = useState({ top: 0, right: 0 });
+  const btnRef = useRef<HTMLButtonElement>(null);
+  const dropRef = useRef<HTMLDivElement>(null);
+
+  const calcPos = useCallback(() => {
+    if (!btnRef.current) return;
+    const r = btnRef.current.getBoundingClientRect();
+    setDropPos({
+      top: r.bottom + window.scrollY + 8,
+      right: window.innerWidth - r.right,
+    });
+  }, []);
+
+  function handleOpen() {
+    calcPos();
+    setOpen(o => !o);
+  }
 
   useEffect(() => {
-    function handler(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    if (!open) return;
+    function onMouseDown(e: MouseEvent) {
+      if (
+        btnRef.current?.contains(e.target as Node) ||
+        dropRef.current?.contains(e.target as Node)
+      ) return;
+      setOpen(false);
     }
-    if (open) document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [open]);
+    function onScroll() { calcPos(); }
+    document.addEventListener("mousedown", onMouseDown);
+    window.addEventListener("scroll", onScroll, true);
+    return () => {
+      document.removeEventListener("mousedown", onMouseDown);
+      window.removeEventListener("scroll", onScroll, true);
+    };
+  }, [open, calcPos]);
 
   async function renew(expiresAt: string | null) {
     setLoading(true);
@@ -58,10 +85,123 @@ export default function RenewEnrollmentButton({ enrollmentId, courseName, curren
     return base.toISOString();
   }
 
+  const dropdown = open ? (
+    <div
+      ref={dropRef}
+      style={{
+        position: "absolute",
+        top: dropPos.top,
+        right: dropPos.right,
+        zIndex: 9999,
+        width: 260,
+        borderRadius: 16,
+        overflow: "hidden",
+        background: "linear-gradient(160deg, #0F1A3D 0%, #0A122D 100%)",
+        border: "1px solid rgba(110,231,183,0.20)",
+        boxShadow: "0 16px 48px rgba(0,0,0,0.70)",
+      }}
+    >
+      {/* Header */}
+      <div style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,0.06)", background: "rgba(110,231,183,0.05)" }}>
+        <p style={{ fontFamily: "'Cinzel',serif", fontSize: 9, fontWeight: 700, letterSpacing: 3, textTransform: "uppercase", color: "#6ee7b7", marginBottom: 2 }}>
+          Renovar Acesso
+        </p>
+        <p style={{ fontSize: 11, color: "rgba(255,255,255,0.40)", fontFamily: "'Poppins',sans-serif", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+          {courseName}
+        </p>
+        {currentExpiresAt && (
+          <p style={{ fontSize: 10, color: "rgba(255,255,255,0.30)", fontFamily: "'Poppins',sans-serif", marginTop: 2 }}>
+            Atual: {new Date(currentExpiresAt) < new Date() ? "⚠ Expirado" : `válido até ${new Date(currentExpiresAt).toLocaleDateString("pt-BR")}`}
+          </p>
+        )}
+      </div>
+
+      <div style={{ padding: "12px 14px", display: "flex", flexDirection: "column", gap: 8 }}>
+        {/* Opções rápidas */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+          {QUICK_OPTIONS.map(opt => (
+            <button
+              key={opt.days}
+              onClick={() => renew(addDays(opt.days))}
+              disabled={loading}
+              style={{
+                padding: "8px 10px", borderRadius: 10, cursor: "pointer",
+                background: "rgba(110,231,183,0.08)", border: "1px solid rgba(110,231,183,0.20)",
+                color: "#6ee7b7", fontFamily: "'Cinzel',serif", fontWeight: 600,
+                fontSize: 10, letterSpacing: 1, textTransform: "uppercase",
+                transition: "all 0.15s", opacity: loading ? 0.6 : 1,
+              }}
+            >
+              + {opt.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Data personalizada */}
+        <div style={{ display: "flex", gap: 6 }}>
+          <input
+            type="date"
+            value={customDate}
+            onChange={e => setCustomDate(e.target.value)}
+            min={new Date().toISOString().split("T")[0]}
+            style={{
+              flex: 1, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(201,169,122,0.20)",
+              borderRadius: 10, padding: "7px 10px", fontSize: 12, color: "#fff",
+              outline: "none", fontFamily: "'Poppins',sans-serif",
+              colorScheme: "dark",
+            }}
+          />
+          <button
+            onClick={() => customDate && renew(new Date(customDate).toISOString())}
+            disabled={!customDate || loading}
+            style={{
+              padding: "7px 12px", borderRadius: 10, cursor: "pointer",
+              background: "linear-gradient(135deg, #C9A97A, #A07840)", border: "none",
+              color: "#060D1F", fontFamily: "'Cinzel',serif", fontWeight: 700,
+              fontSize: 10, letterSpacing: 1,
+              opacity: !customDate || loading ? 0.5 : 1,
+            }}
+          >
+            OK
+          </button>
+        </div>
+
+        {/* Vitalício */}
+        <button
+          onClick={() => renew(null)}
+          disabled={loading}
+          style={{
+            padding: "8px", borderRadius: 10, cursor: "pointer",
+            background: "rgba(201,169,122,0.06)", border: "1px solid rgba(201,169,122,0.15)",
+            color: "rgba(201,169,122,0.70)", fontFamily: "'Cinzel',serif", fontWeight: 600,
+            fontSize: 9, letterSpacing: 2, textTransform: "uppercase",
+            opacity: loading ? 0.6 : 1,
+          }}
+        >
+          ∞ Tornar Vitalício
+        </button>
+
+        {/* Feedback */}
+        {msg && (
+          <p style={{
+            fontSize: 11, textAlign: "center", padding: "6px 10px", borderRadius: 8,
+            fontFamily: "'Poppins',sans-serif",
+            color: msg.ok ? "#6ee7b7" : "#FF8088",
+            background: msg.ok ? "rgba(110,231,183,0.08)" : "rgba(230,57,70,0.08)",
+            border: `1px solid ${msg.ok ? "rgba(110,231,183,0.20)" : "rgba(230,57,70,0.20)"}`,
+          }}>
+            {loading ? "Salvando..." : msg.text}
+          </p>
+        )}
+      </div>
+    </div>
+  ) : null;
+
   return (
-    <div ref={ref} style={{ position: "relative" }}>
+    <>
       <button
-        onClick={() => setOpen(o => !o)}
+        ref={btnRef}
+        onClick={handleOpen}
         title="Renovar acesso"
         style={{
           display: "inline-flex", alignItems: "center", gap: 6,
@@ -78,109 +218,7 @@ export default function RenewEnrollmentButton({ enrollmentId, courseName, curren
         Renovar
       </button>
 
-      {open && (
-        <div style={{
-          position: "absolute", top: "calc(100% + 8px)", right: 0, zIndex: 50,
-          width: 260, borderRadius: 16, overflow: "hidden",
-          background: "linear-gradient(160deg, #0F1A3D 0%, #0A122D 100%)",
-          border: "1px solid rgba(110,231,183,0.20)",
-          boxShadow: "0 16px 48px rgba(0,0,0,0.60)",
-        }}>
-          {/* Header */}
-          <div style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,0.06)", background: "rgba(110,231,183,0.05)" }}>
-            <p style={{ fontFamily: "'Cinzel',serif", fontSize: 9, fontWeight: 700, letterSpacing: 3, textTransform: "uppercase", color: "#6ee7b7", marginBottom: 2 }}>
-              Renovar Acesso
-            </p>
-            <p style={{ fontSize: 11, color: "rgba(255,255,255,0.40)", fontFamily: "'Poppins',sans-serif", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-              {courseName}
-            </p>
-            {currentExpiresAt && (
-              <p style={{ fontSize: 10, color: "rgba(255,255,255,0.30)", fontFamily: "'Poppins',sans-serif", marginTop: 2 }}>
-                Atual: {new Date(currentExpiresAt) < new Date() ? "⚠ Expirado" : `válido até ${new Date(currentExpiresAt).toLocaleDateString("pt-BR")}`}
-              </p>
-            )}
-          </div>
-
-          <div style={{ padding: "12px 14px", display: "flex", flexDirection: "column", gap: 8 }}>
-            {/* Opções rápidas */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
-              {QUICK_OPTIONS.map(opt => (
-                <button
-                  key={opt.days}
-                  onClick={() => renew(addDays(opt.days))}
-                  disabled={loading}
-                  style={{
-                    padding: "8px 10px", borderRadius: 10, cursor: "pointer",
-                    background: "rgba(110,231,183,0.08)", border: "1px solid rgba(110,231,183,0.20)",
-                    color: "#6ee7b7", fontFamily: "'Cinzel',serif", fontWeight: 600,
-                    fontSize: 10, letterSpacing: 1, textTransform: "uppercase",
-                    transition: "all 0.15s", opacity: loading ? 0.6 : 1,
-                  }}
-                >
-                  + {opt.label}
-                </button>
-              ))}
-            </div>
-
-            {/* Data personalizada */}
-            <div style={{ display: "flex", gap: 6 }}>
-              <input
-                type="date"
-                value={customDate}
-                onChange={e => setCustomDate(e.target.value)}
-                min={new Date().toISOString().split("T")[0]}
-                style={{
-                  flex: 1, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(201,169,122,0.20)",
-                  borderRadius: 10, padding: "7px 10px", fontSize: 12, color: "#fff",
-                  outline: "none", fontFamily: "'Poppins',sans-serif",
-                  colorScheme: "dark",
-                }}
-              />
-              <button
-                onClick={() => customDate && renew(new Date(customDate).toISOString())}
-                disabled={!customDate || loading}
-                style={{
-                  padding: "7px 12px", borderRadius: 10, cursor: "pointer",
-                  background: "linear-gradient(135deg, #C9A97A, #A07840)", border: "none",
-                  color: "#060D1F", fontFamily: "'Cinzel',serif", fontWeight: 700,
-                  fontSize: 10, letterSpacing: 1,
-                  opacity: !customDate || loading ? 0.5 : 1,
-                }}
-              >
-                OK
-              </button>
-            </div>
-
-            {/* Vitalício */}
-            <button
-              onClick={() => renew(null)}
-              disabled={loading}
-              style={{
-                padding: "8px", borderRadius: 10, cursor: "pointer",
-                background: "rgba(201,169,122,0.06)", border: "1px solid rgba(201,169,122,0.15)",
-                color: "rgba(201,169,122,0.70)", fontFamily: "'Cinzel',serif", fontWeight: 600,
-                fontSize: 9, letterSpacing: 2, textTransform: "uppercase",
-                opacity: loading ? 0.6 : 1,
-              }}
-            >
-              ∞ Tornar Vitalício
-            </button>
-
-            {/* Feedback */}
-            {msg && (
-              <p style={{
-                fontSize: 11, textAlign: "center", padding: "6px 10px", borderRadius: 8,
-                fontFamily: "'Poppins',sans-serif",
-                color: msg.ok ? "#6ee7b7" : "#FF8088",
-                background: msg.ok ? "rgba(110,231,183,0.08)" : "rgba(230,57,70,0.08)",
-                border: `1px solid ${msg.ok ? "rgba(110,231,183,0.20)" : "rgba(230,57,70,0.20)"}`,
-              }}>
-                {loading ? "Salvando..." : msg.text}
-              </p>
-            )}
-          </div>
-        </div>
-      )}
-    </div>
+      {typeof window !== "undefined" && createPortal(dropdown, document.body)}
+    </>
   );
 }
