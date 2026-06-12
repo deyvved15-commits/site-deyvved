@@ -19,3 +19,26 @@ export async function DELETE(
 
   return NextResponse.json({ ok: true });
 }
+
+// PATCH — admin define/renova expiresAt de uma matrícula
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: Promise<{ enrollmentId: string }> }
+) {
+  const session = await auth();
+  if (!session || session.user.role !== "ADMIN")
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
+  const { enrollmentId } = await params;
+  const { expiresAt } = await req.json(); // null = vitalício, ISO string = data
+
+  const enrollment = await prisma.enrollment.findUnique({ where: { id: enrollmentId } });
+  if (!enrollment) return NextResponse.json({ error: "Matrícula não encontrada" }, { status: 404 });
+
+  const updated = await prisma.enrollment.update({
+    where: { id: enrollmentId },
+    data: { expiresAt: expiresAt ? new Date(expiresAt) : null },
+  });
+
+  return NextResponse.json(updated);
+}

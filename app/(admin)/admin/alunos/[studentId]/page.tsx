@@ -7,6 +7,7 @@ import DeleteStudentButton from "@/components/admin/delete-student-button";
 import PromoteStudentButton from "@/components/admin/promote-student-button";
 import ResetPasswordButton from "@/components/admin/reset-password-button";
 import AffiliatePercentageEditor from "@/components/admin/affiliate-percentage-editor";
+import RenewEnrollmentButton from "@/components/admin/renew-enrollment-button";
 
 export default async function StudentProfilePage({ params }: { params: Promise<{ studentId: string }> }) {
   const { studentId } = await params;
@@ -149,10 +150,26 @@ export default async function StudentProfilePage({ params }: { params: Promise<{
                       </h3>
                       <p style={{ fontSize: 11, color: "var(--text-muted)" }}>{doneLessons}/{totalLessons} aulas concluídas</p>
                     </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
                       <span style={{ fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 22, color: "var(--gold-light)" }}>
                         {pct}%
                       </span>
+                      {enrollment.expiresAt && (
+                        <span style={{
+                          fontSize: 10, padding: "3px 9px", borderRadius: 999,
+                          fontFamily: "'Poppins',sans-serif",
+                          background: new Date(enrollment.expiresAt) < new Date() ? "rgba(230,57,70,0.12)" : "rgba(110,231,183,0.10)",
+                          border: `1px solid ${new Date(enrollment.expiresAt) < new Date() ? "rgba(230,57,70,0.25)" : "rgba(110,231,183,0.25)"}`,
+                          color: new Date(enrollment.expiresAt) < new Date() ? "#FF8088" : "#6ee7b7",
+                        }}>
+                          {new Date(enrollment.expiresAt) < new Date() ? "⚠ Expirado" : `até ${new Date(enrollment.expiresAt).toLocaleDateString("pt-BR")}`}
+                        </span>
+                      )}
+                      <RenewEnrollmentButton
+                        enrollmentId={enrollment.id}
+                        courseName={course.title}
+                        currentExpiresAt={enrollment.expiresAt ? enrollment.expiresAt.toISOString() : null}
+                      />
                       <UnenrollButton enrollmentId={enrollment.id} courseName={course.title} />
                     </div>
                   </div>
