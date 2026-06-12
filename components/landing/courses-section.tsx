@@ -189,7 +189,7 @@ function CourseModal({ course, onClose }: { course: Course; onClose: () => void 
         }}
       >
         {/* Close */}
-        <button onClick={onClose} style={{
+        <button onClick={onClose} aria-label="Fechar" style={{
           position: "absolute", top: 16, right: 16, zIndex: 10,
           width: 36, height: 36, borderRadius: "50%", border: "1px solid rgba(255,255,255,0.15)",
           background: "rgba(0,0,0,0.50)", color: "rgba(255,255,255,0.70)",

@@ -48,7 +48,7 @@ export default async function LandingPage() {
         <div style={{ position: "relative", zIndex: 1, textAlign: "center", maxWidth: 800 }}>
           <div style={{ marginBottom: 32, display: "inline-block" }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo-nova.png" alt="Kadima Academy" style={{
+            <img src="/logo-nova.png" alt="Kadima Academy" fetchPriority="high" style={{
               width: 100, height: 100, objectFit: "contain",
               filter: "drop-shadow(0 0 24px rgba(201,169,122,0.55)) drop-shadow(0 0 48px rgba(201,169,122,0.25))",
             }} />

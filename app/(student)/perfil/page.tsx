@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
+import Link from "next/link";
 
 const S = {
   field: { display: "flex", flexDirection: "column" as const, gap: 8 },
@@ -60,6 +61,13 @@ function Alert({ type, msg }: { type: "error" | "success"; msg: string }) {
 
 interface UserData { id: string; name: string | null; email: string | null; bio: string | null; avatar: string | null }
 
+interface Enrollment {
+  id: string;
+  expiresAt: string | null;
+  createdAt: string;
+  course: { id: string; title: string; slug: string; price: number | null; thumbnail: string | null };
+}
+
 export default function PerfilPage() {
   const { update: updateSession } = useSession();
   const [user, setUser] = useState<UserData | null>(null);
@@ -69,6 +77,8 @@ export default function PerfilPage() {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
 
   const [infoLoading, setInfoLoading] = useState(false);
   const [infoMsg, setInfoMsg] = useState<{ type: "error" | "success"; msg: string } | null>(null);
@@ -83,6 +93,9 @@ export default function PerfilPage() {
         setName(data.name ?? "");
         setBio(data.bio ?? "");
       });
+    fetch("/api/enrollments")
+      .then(r => r.json())
+      .then((data: Enrollment[]) => setEnrollments(data));
   }, []);
 
   async function handleInfoSave(e: React.FormEvent) {
@@ -171,6 +184,79 @@ export default function PerfilPage() {
             )}
           </div>
         </div>
+
+        {/* Meus Cursos */}
+        {enrollments.length > 0 && (
+          <div style={{
+            borderRadius: 20, padding: "28px 32px", marginBottom: 24,
+            background: "linear-gradient(160deg, rgba(15,26,61,0.7) 0%, rgba(10,18,45,0.7) 100%)",
+            border: "1px solid rgba(201,169,122,0.14)",
+            boxShadow: "0 16px 40px rgba(0,0,0,0.30)",
+          }}>
+            <div style={S.sectionTitle}>
+              <div style={S.sectionBar} />
+              <span style={S.sectionLabel}>Meus Cursos</span>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              {enrollments.map(e => {
+                const expired = e.expiresAt ? new Date(e.expiresAt) < new Date() : false;
+                const expiresDate = e.expiresAt
+                  ? new Date(e.expiresAt).toLocaleDateString("pt-BR")
+                  : null;
+
+                return (
+                  <div key={e.id} style={{
+                    display: "flex", alignItems: "center", justifyContent: "space-between",
+                    gap: 16, padding: "14px 18px", borderRadius: 14,
+                    background: expired
+                      ? "rgba(230,57,70,0.06)"
+                      : "rgba(255,255,255,0.03)",
+                    border: `1px solid ${expired ? "rgba(230,57,70,0.20)" : "rgba(201,169,122,0.10)"}`,
+                    flexWrap: "wrap",
+                  }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ fontFamily: "'Cinzel',serif", fontWeight: 600, fontSize: 13, color: "var(--text-primary)", marginBottom: 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {e.course.title}
+                      </p>
+                      {expiresDate && (
+                        <p style={{ fontSize: 11, color: expired ? "#FF8088" : "var(--text-muted)", fontFamily: "'Poppins',sans-serif" }}>
+                          {expired ? "⚠ Expirado em " : "Válido até "}{expiresDate}
+                        </p>
+                      )}
+                      {!expiresDate && (
+                        <p style={{ fontSize: 11, color: "#6ee7b7", fontFamily: "'Poppins',sans-serif" }}>
+                          Acesso vitalício
+                        </p>
+                      )}
+                    </div>
+                    <Link
+                      href={`/checkout/${e.course.id}`}
+                      style={{
+                        display: "inline-flex", alignItems: "center", gap: 6,
+                        padding: "8px 16px", borderRadius: 10, textDecoration: "none",
+                        background: expired
+                          ? "linear-gradient(135deg, #C9A97A, #A07840)"
+                          : "rgba(201,169,122,0.08)",
+                        border: `1px solid ${expired ? "transparent" : "rgba(201,169,122,0.25)"}`,
+                        color: expired ? "#060D1F" : "var(--gold)",
+                        fontFamily: "'Cinzel',serif", fontWeight: 700,
+                        fontSize: 10, letterSpacing: 1.5, textTransform: "uppercase",
+                        flexShrink: 0,
+                        boxShadow: expired ? "0 4px 14px rgba(201,169,122,0.35)" : "none",
+                      }}
+                    >
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                      </svg>
+                      Renovar Curso
+                    </Link>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Info section */}
         <div style={{

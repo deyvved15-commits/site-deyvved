@@ -134,7 +134,7 @@ export default async function CursoPublicoPage({ params }: { params: Promise<{ s
               <div style={{ paddingBottom: 0, display: "flex", justifyContent: "center" }}>
                 <div style={{ width: "100%", maxWidth: 340, borderRadius: "20px 20px 0 0", overflow: "hidden", border: "1px solid rgba(201,169,122,0.18)", borderBottom: "none", boxShadow: "0 -8px 60px rgba(0,0,0,0.60)", background: "#080E22" }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={thumbUrl} alt={course.title} style={{ width: "100%", aspectRatio: "4/3", objectFit: "contain", display: "block" }} />
+                  <img src={thumbUrl} alt={course.title} fetchPriority="high" style={{ width: "100%", aspectRatio: "4/3", objectFit: "contain", display: "block" }} />
                 </div>
               </div>
             )}

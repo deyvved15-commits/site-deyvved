@@ -354,7 +354,7 @@ export default function ProductCheckoutPage({ params: paramsPromise }: { params:
                   display: "flex", alignItems: "center", justifyContent: "center", gap: 10, transition: "all 0.2s",
                 }}
               >
-                {loading ? "Processando..." : finalPrice <= 0 ? "Comprar com Saldo" : "Pagar com Mercado Pago"}
+                {loading ? "Processando..." : finalPrice <= 0 ? "Comprar com Saldo" : "Liberar Acesso"}
               </button>
 
               <p style={{ fontSize: 10, color: "var(--text-muted)", textAlign: "center", marginTop: 12 }}>
