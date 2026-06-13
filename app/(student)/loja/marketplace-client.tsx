@@ -175,6 +175,14 @@ export default function MarketplaceClient({
             overflow-y: visible;
             padding: 20px 16px 32px;
           }
+          .mk-products-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 12px !important;
+          }
+          .mk-courses-grid {
+            grid-template-columns: 1fr !important;
+            gap: 16px !important;
+          }
         }
       `}</style>
 
@@ -258,7 +266,7 @@ export default function MarketplaceClient({
               {(activeTab === "all" || activeTab === "courses") && filteredCourses.length > 0 && (
                 <div style={{ marginBottom: 52 }}>
                   <SectionHeader title="Cursos" highlight="Premium" icon={<BookOpen size={20} />} />
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(240px, 100%), 1fr))", gap: 24 }}>
+                  <div className="mk-courses-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(240px, 100%), 1fr))", gap: 24 }}>
                     {filteredCourses.map(course => (
                       <CourseCard key={course.id} course={course} isEnrolled={false} />
                     ))}
@@ -270,7 +278,7 @@ export default function MarketplaceClient({
               {(activeTab === "all" || activeTab === "products") && filteredProducts.length > 0 && (
                 <div style={{ marginBottom: 40 }}>
                   <SectionHeader title="Produtos" highlight="Digitais" icon={<Package size={20} />} />
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(200px, 100%), 1fr))", gap: 24 }}>
+                  <div className="mk-products-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(200px, 100%), 1fr))", gap: 24 }}>
                     {filteredProducts.map(product => (
                       <ProductCard
                         key={product.id}
