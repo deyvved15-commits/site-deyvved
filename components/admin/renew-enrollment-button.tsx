@@ -143,7 +143,6 @@ export default function RenewEnrollmentButton({ enrollmentId, courseName, curren
             type="date"
             value={customDate}
             onChange={e => setCustomDate(e.target.value)}
-            min={new Date().toISOString().split("T")[0]}
             style={{
               flex: 1, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(201,169,122,0.20)",
               borderRadius: 10, padding: "7px 10px", fontSize: 12, color: "#fff",
@@ -165,6 +164,21 @@ export default function RenewEnrollmentButton({ enrollmentId, courseName, curren
             OK
           </button>
         </div>
+
+        {/* Bloquear imediatamente */}
+        <button
+          onClick={() => renew(new Date(Date.now() - 1000).toISOString())}
+          disabled={loading}
+          style={{
+            padding: "8px", borderRadius: 10, cursor: "pointer",
+            background: "rgba(230,57,70,0.08)", border: "1px solid rgba(230,57,70,0.25)",
+            color: "#FF8088", fontFamily: "'Cinzel',serif", fontWeight: 600,
+            fontSize: 9, letterSpacing: 2, textTransform: "uppercase",
+            opacity: loading ? 0.6 : 1,
+          }}
+        >
+          🔒 Bloquear Acesso Agora
+        </button>
 
         {/* Vitalício */}
         <button
