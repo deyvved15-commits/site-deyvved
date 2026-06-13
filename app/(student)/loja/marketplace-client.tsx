@@ -194,7 +194,12 @@ export default function MarketplaceClient({
 
           /* Card compacto dentro do scroll de produtos */
           .mk-products-grid .ka-thumb {
-            height: 200px !important;
+            height: 220px !important;
+            aspect-ratio: unset !important;
+          }
+          .mk-products-grid .ka-thumb-img {
+            object-fit: cover !important;
+            object-position: center top !important;
           }
           .mk-products-grid .ka-card-body {
             padding: 18px 20px 20px !important;
