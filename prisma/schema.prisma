@@ -76,6 +76,8 @@ model User {
   progress            LessonProgress[]
   ratings             LessonRating[]
   liveAttendance      LiveAttendance[]
+  liveMessages        LiveMessage[]
+  liveMutes           LiveMute[]
   payments            Payment[]
   sessions            Session[]
   tickets             Ticket[]
@@ -311,13 +313,38 @@ model WeeklyLesson {
 }
 
 model LiveSession {
-  id         String    @id @default(cuid())
+  id         String        @id @default(cuid())
   title      String
   roomName   String
   youtubeUrl String?
-  active     Boolean   @default(true)
-  createdAt  DateTime  @default(now())
+  active     Boolean       @default(true)
+  createdAt  DateTime      @default(now())
   endedAt    DateTime?
+  messages   LiveMessage[]
+}
+
+model LiveMessage {
+  id        String      @id @default(cuid())
+  sessionId String
+  userId    String
+  text      String      @db.Text
+  pinned    Boolean     @default(false)
+  deleted   Boolean     @default(false)
+  isAnnouncement Boolean @default(false)
+  createdAt DateTime    @default(now())
+  session   LiveSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model LiveMute {
+  id         String   @id @default(cuid())
+  userId     String
+  sessionId  String
+  mutedUntil DateTime
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, sessionId])
 }
 
 model LiveAttendance {

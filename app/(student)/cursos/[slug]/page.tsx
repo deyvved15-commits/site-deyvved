@@ -37,6 +37,10 @@ export default async function CursoPage({ params }: { params: Promise<{ slug: st
     redirect("/dashboard");
   }
 
+  if (enrollment?.expiresAt && enrollment.expiresAt < new Date()) {
+    redirect(`/checkout/${course.id}?renovar=1`);
+  }
+
   const modules = course.modules || [];
   const mainModules = modules.filter(m => !m.isBonus);
   const allLessons = mainModules.flatMap(m => m.lessons || []);
