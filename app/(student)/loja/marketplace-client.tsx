@@ -179,6 +179,27 @@ export default function MarketplaceClient({
             grid-template-columns: repeat(2, 1fr) !important;
             gap: 12px !important;
           }
+          .mk-products-grid .ka-card-body {
+            align-items: center !important;
+            text-align: center !important;
+          }
+          .mk-products-grid .ka-card-title {
+            text-align: center !important;
+          }
+          .mk-products-grid .ka-card-desc {
+            text-align: center !important;
+          }
+          .mk-products-grid .ka-card-footer {
+            flex-direction: column !important;
+            align-items: center !important;
+            gap: 10px !important;
+            width: 100% !important;
+          }
+          .mk-products-grid .ka-card-btn {
+            width: 100% !important;
+            text-align: center !important;
+            box-sizing: border-box !important;
+          }
 
           .mk-courses-grid {
             grid-template-columns: 1fr !important;
