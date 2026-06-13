@@ -186,49 +186,49 @@ export default function MarketplaceClient({
             -webkit-overflow-scrolling: touch;
           }
           .mk-products-grid > * {
-            flex: 0 0 160px !important;
-            width: 160px !important;
+            flex: 0 0 200px !important;
+            width: 200px !important;
             scroll-snap-align: start;
           }
           .mk-products-grid::-webkit-scrollbar { display: none; }
 
           /* Card compacto dentro do scroll de produtos */
           .mk-products-grid .ka-thumb {
-            height: 130px !important;
+            height: 170px !important;
           }
           .mk-products-grid .ka-card-body {
-            padding: 10px 12px 12px !important;
+            padding: 14px 16px 16px !important;
           }
           .mk-products-grid .ka-card-title {
-            font-size: 11px !important;
-            letter-spacing: 0.3px !important;
-            margin-bottom: 4px !important;
-            line-height: 1.25 !important;
+            font-size: 13px !important;
+            letter-spacing: 0.5px !important;
+            margin-bottom: 5px !important;
+            line-height: 1.3 !important;
             -webkit-line-clamp: 3 !important;
             display: -webkit-box !important;
             -webkit-box-orient: vertical !important;
             overflow: hidden !important;
           }
           .mk-products-grid .ka-card-desc {
-            font-size: 10px !important;
-            line-height: 1.4 !important;
-            margin-bottom: 8px !important;
+            font-size: 11px !important;
+            line-height: 1.5 !important;
+            margin-bottom: 10px !important;
             -webkit-line-clamp: 2 !important;
           }
           .mk-products-grid .ka-card-footer {
             flex-direction: column !important;
             align-items: flex-start !important;
-            gap: 6px !important;
+            gap: 8px !important;
           }
           .mk-products-grid .ka-card-price {
-            font-size: 14px !important;
+            font-size: 16px !important;
           }
           .mk-products-grid .ka-card-btn {
             width: 100% !important;
             text-align: center !important;
-            padding: 7px 10px !important;
-            font-size: 9px !important;
-            letter-spacing: 1px !important;
+            padding: 9px 10px !important;
+            font-size: 10px !important;
+            letter-spacing: 1.5px !important;
             box-sizing: border-box !important;
           }
 
