@@ -35,7 +35,7 @@ export default async function StudentProfilePage({ params }: { params: Promise<{
         },
       },
     }),
-    prisma.course.findMany({ select: { id: true, title: true }, orderBy: { title: "asc" } }),
+    prisma.course.findMany({ select: { id: true, title: true, paymentType: true }, orderBy: { title: "asc" } }),
     prisma.activityLog.findMany({
       where: { userId: studentId },
       orderBy: { createdAt: "desc" },
@@ -154,7 +154,7 @@ export default async function StudentProfilePage({ params }: { params: Promise<{
                       <span style={{ fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 22, color: "var(--gold-light)" }}>
                         {pct}%
                       </span>
-                      {enrollment.expiresAt && (
+                      {enrollment.expiresAt ? (
                         <span style={{
                           fontSize: 10, padding: "3px 9px", borderRadius: 999,
                           fontFamily: "'Poppins',sans-serif",
@@ -164,7 +164,17 @@ export default async function StudentProfilePage({ params }: { params: Promise<{
                         }}>
                           {new Date(enrollment.expiresAt) < new Date() ? "⚠ Expirado" : `até ${new Date(enrollment.expiresAt).toLocaleDateString("pt-BR")}`}
                         </span>
-                      )}
+                      ) : course.paymentType === "MONTHLY" ? (
+                        <span style={{
+                          fontSize: 10, padding: "3px 9px", borderRadius: 999,
+                          fontFamily: "'Poppins',sans-serif",
+                          background: "rgba(251,191,36,0.10)",
+                          border: "1px solid rgba(251,191,36,0.30)",
+                          color: "#fbbf24",
+                        }}>
+                          ⚠ Mensal sem prazo
+                        </span>
+                      ) : null}
                       <RenewEnrollmentButton
                         enrollmentId={enrollment.id}
                         courseName={course.title}

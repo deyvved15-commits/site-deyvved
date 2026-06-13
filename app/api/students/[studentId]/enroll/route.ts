@@ -15,10 +15,18 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ stu
   const parsed = schema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
 
+  const course = await prisma.course.findUnique({
+    where: { id: parsed.data.courseId },
+    select: { paymentType: true },
+  });
+  const expiresAt = course?.paymentType === "MONTHLY"
+    ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+    : null;
+
   const enrollment = await prisma.enrollment.upsert({
     where: { userId_courseId: { userId: studentId, courseId: parsed.data.courseId } },
     update: {},
-    create: { userId: studentId, courseId: parsed.data.courseId },
+    create: { userId: studentId, courseId: parsed.data.courseId, expiresAt },
   });
   return NextResponse.json(enrollment, { status: 201 });
 }

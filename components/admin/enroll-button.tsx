@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-export default function EnrollButton({ studentId, courses }: { studentId: string; courses: { id: string; title: string }[] }) {
+export default function EnrollButton({ studentId, courses }: { studentId: string; courses: { id: string; title: string; paymentType?: string }[] }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -81,11 +81,17 @@ export default function EnrollButton({ studentId, courses }: { studentId: string
                 background: "none", border: "none", cursor: loading ? "default" : "pointer",
                 borderTop: i > 0 ? "1px solid rgba(255,255,255,0.04)" : "none",
                 transition: "all 0.15s",
+                display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8,
               }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "rgba(201,169,122,0.08)"; (e.currentTarget as HTMLElement).style.color = "#fff"; }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "none"; (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.75)"; }}
             >
-              {c.title}
+              <span>{c.title}</span>
+              {c.paymentType === "MONTHLY" && (
+                <span style={{ fontSize: 9, padding: "2px 6px", borderRadius: 999, background: "rgba(251,191,36,0.12)", border: "1px solid rgba(251,191,36,0.25)", color: "#fbbf24", fontFamily: "'Poppins',sans-serif", whiteSpace: "nowrap", flexShrink: 0 }}>
+                  ⟳ 30d
+                </span>
+              )}
             </button>
           ))}
         </div>
