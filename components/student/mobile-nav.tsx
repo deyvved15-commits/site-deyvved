@@ -53,6 +53,8 @@ export default function MobileNav({ allLinks, pathname, onSignOut }: Props) {
         transform: drawerOpen ? "translateY(0)" : "translateY(110%)",
         transition: "transform 0.3s cubic-bezier(0.4,0,0.2,1)",
         boxShadow: "0 -8px 32px rgba(0,0,0,0.50)",
+        pointerEvents: drawerOpen ? "auto" : "none",
+        visibility: drawerOpen ? "visible" : "hidden",
       }}>
         {/* Handle */}
         <div style={{ width: 36, height: 4, borderRadius: 2, background: "rgba(201,169,122,0.30)", margin: "0 auto 16px" }} />

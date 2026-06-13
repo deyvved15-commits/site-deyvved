@@ -111,9 +111,9 @@ export default function LiveViewer({ initialSession, displayName, currentUserId,
   /* ── YouTube embed ── */
   if (embedUrl) {
     return (
-      <div style={{ flex: 1, display: "flex", overflow: "hidden" }}>
+      <div style={{ flex: 1, display: "flex", overflow: "hidden", minHeight: 0 }}>
         {/* Coluna esquerda: vídeo + info */}
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0, overflowY: "auto" }}>
           <div style={{ width: "100%", background: "#000", position: "relative", paddingBottom: "56.25%" }}>
             <iframe
               src={embedUrl}
@@ -146,7 +146,9 @@ export default function LiveViewer({ initialSession, displayName, currentUserId,
 
         {/* Chat */}
         <div style={{ width: 300, flexShrink: 0, position: "relative" }}>
-          <LiveChat sessionId={session.id} currentUser={chatUser} />
+          <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column" }}>
+            <LiveChat sessionId={session.id} currentUser={chatUser} />
+          </div>
         </div>
       </div>
     );
@@ -154,9 +156,9 @@ export default function LiveViewer({ initialSession, displayName, currentUserId,
 
   /* ── Somente Meet / link externo ── */
   return (
-    <div style={{ flex: 1, display: "flex", overflow: "hidden" }}>
+    <div style={{ flex: 1, display: "flex", overflow: "hidden", minHeight: 0 }}>
       {/* Card central */}
-      <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 32px" }}>
+      <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 32px", overflowY: "auto" }}>
         <div style={{
           borderRadius: "var(--radius-2xl)", padding: "48px 44px", textAlign: "center", maxWidth: 440,
           background: "linear-gradient(160deg, var(--navy-card) 0%, var(--navy-card-2) 100%)",
@@ -183,7 +185,9 @@ export default function LiveViewer({ initialSession, displayName, currentUserId,
 
       {/* Chat */}
       <div style={{ width: 300, flexShrink: 0, position: "relative" }}>
-        <LiveChat sessionId={session.id} currentUser={chatUser} />
+        <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column" }}>
+          <LiveChat sessionId={session.id} currentUser={chatUser} />
+        </div>
       </div>
     </div>
   );

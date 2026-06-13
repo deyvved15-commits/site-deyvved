@@ -13,7 +13,7 @@ export default async function AoVivoPage() {
   });
 
   return (
-    <div style={{ minHeight: "100%", background: "linear-gradient(180deg, var(--navy-darkest) 0%, var(--navy-mid) 100%)", display: "flex", flexDirection: "column" }}>
+    <div style={{ height: "100%", background: "linear-gradient(180deg, var(--navy-darkest) 0%, var(--navy-mid) 100%)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
       {/* Header */}
       <div className="ka-live-header">
         <div style={{
