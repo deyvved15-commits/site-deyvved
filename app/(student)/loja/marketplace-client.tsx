@@ -176,13 +176,37 @@ export default function MarketplaceClient({
             padding: 20px 16px 32px;
           }
           .mk-products-grid {
-            grid-template-columns: repeat(2, 1fr) !important;
-            gap: 12px !important;
+            display: flex !important;
+            flex-direction: row !important;
+            overflow-x: auto !important;
+            overflow-y: visible !important;
+            gap: 14px !important;
+            padding-bottom: 12px !important;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
           }
+          .mk-products-grid > * {
+            flex: 0 0 160px !important;
+            width: 160px !important;
+            scroll-snap-align: start;
+          }
+          .mk-products-grid::-webkit-scrollbar { display: none; }
           .mk-courses-grid {
-            grid-template-columns: 1fr !important;
-            gap: 16px !important;
+            display: flex !important;
+            flex-direction: row !important;
+            overflow-x: auto !important;
+            overflow-y: visible !important;
+            gap: 14px !important;
+            padding-bottom: 12px !important;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
           }
+          .mk-courses-grid > * {
+            flex: 0 0 220px !important;
+            width: 220px !important;
+            scroll-snap-align: start;
+          }
+          .mk-courses-grid::-webkit-scrollbar { display: none; }
         }
       `}</style>
 
