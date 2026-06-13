@@ -21,7 +21,7 @@ export default async function SupportPage() {
   };
 
   return (
-    <div className="ka-support-page" style={{ minHeight: "100%", padding: "44px", background: "linear-gradient(180deg, var(--navy-darkest) 0%, var(--navy-mid) 100%)", position: "relative", overflow: "hidden" }}>
+    <div className="ka-section" style={{ minHeight: "100%", background: "linear-gradient(180deg, var(--navy-darkest) 0%, var(--navy-mid) 100%)", position: "relative", overflow: "hidden" }}>
       {/* Decorative Rings (Branding Book Style) */}
       <div style={{ position: "absolute", width: 600, height: 600, border: "1px solid rgba(201,169,122,0.05)", borderRadius: "50%", top: -200, right: -200, pointerEvents: "none" }} />
       <div style={{ position: "absolute", width: 400, height: 400, border: "1px solid rgba(201,169,122,0.03)", borderRadius: "50%", bottom: -100, left: -100, pointerEvents: "none" }} />
@@ -33,7 +33,7 @@ export default async function SupportPage() {
               <MessageSquare size={18} color="var(--gold)" />
               <span style={{ fontSize: 10, fontFamily: "'Cinzel',serif", letterSpacing: 4, textTransform: "uppercase", color: "var(--gold)" }}>Central de Ajuda</span>
             </div>
-            <h1 style={{ fontFamily: "'Cinzel',serif", fontSize: 32, fontWeight: 700, letterSpacing: 2, color: "var(--white)", margin: 0 }}>
+            <h1 style={{ fontFamily: "'Cinzel',serif", fontSize: "clamp(22px, 5vw, 32px)", fontWeight: 700, letterSpacing: 2, color: "var(--text-primary)", margin: 0 }}>
               Suporte ao <span style={{ color: "var(--gold)" }}>Aluno</span>
             </h1>
             <div style={{ width: 60, height: 2, background: "linear-gradient(90deg, var(--gold), transparent)", marginTop: 16 }} />

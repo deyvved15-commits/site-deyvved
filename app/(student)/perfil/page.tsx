@@ -140,16 +140,12 @@ export default function PerfilPage() {
       <style>{`@keyframes spin { to { transform: rotate(360deg); } } .pf-input:focus, .pf-textarea:focus { border-color: rgba(201,169,122,0.55) !important; background: rgba(255,255,255,0.07) !important; }`}</style>
 
       {/* Header */}
-      <div style={{ padding: "28px 32px 0" }}>
-        <p style={{ fontFamily: "'Cinzel',serif", fontSize: 10, fontWeight: 600, letterSpacing: 5, textTransform: "uppercase", color: "var(--gold)", marginBottom: 6 }}>
-          Conta
-        </p>
-        <h1 style={{ fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 26, letterSpacing: 3, color: "var(--text-primary)", textTransform: "uppercase", marginBottom: 28 }}>
-          Meu <span style={{ color: "var(--gold-light)" }}>Perfil</span>
-        </h1>
+      <div className="ka-page-header">
+        <div className="ka-page-eyebrow">Conta</div>
+        <h1 className="ka-page-title">Meu <span>Perfil</span></h1>
       </div>
 
-      <div style={{ padding: "0 32px 56px", maxWidth: 640 }}>
+      <div className="ka-section" style={{ maxWidth: 640 }}>
 
         {/* Avatar + nome */}
         <div style={{

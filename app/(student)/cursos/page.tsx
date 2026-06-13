@@ -126,7 +126,7 @@ export default async function MeusProdutosPage({ searchParams }: { searchParams:
             </Link>
           </div>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 32, marginBottom: 48 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(280px, 100%), 1fr))", gap: 24, marginBottom: 48 }}>
             {filteredMyCourses.map((course: any) => (
               <CourseCard
                 key={course.id}
@@ -151,7 +151,7 @@ export default async function MeusProdutosPage({ searchParams }: { searchParams:
               highlight="Digitais"
               icon={<Package size={20} />}
             />
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 280px))", gap: 24, marginBottom: 56 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(240px, 100%), 1fr))", gap: 24, marginBottom: 56 }}>
               {myProducts.map(product => (
                 <ProductCard key={product.id} product={product} isPurchased={true} />
               ))}
@@ -181,7 +181,7 @@ export default async function MeusProdutosPage({ searchParams }: { searchParams:
                 </svg>
               }
             />
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 32 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(280px, 100%), 1fr))", gap: 24 }}>
               {filteredOtherCourses.map((course: any) => (
                 <CourseCard key={course.id} course={course} isEnrolled={false} />
               ))}

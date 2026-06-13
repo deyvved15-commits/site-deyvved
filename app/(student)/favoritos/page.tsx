@@ -57,21 +57,17 @@ export default function FavoritosPage() {
   return (
     <div style={{ minHeight: "100%", background: "linear-gradient(180deg, var(--navy-darkest) 0%, var(--navy-mid) 100%)", paddingBottom: 60 }}>
       {/* Header */}
-      <div style={{ padding: "28px 32px 0" }}>
-        <p style={{ fontFamily: "'Cinzel',serif", fontSize: 10, fontWeight: 600, letterSpacing: 5, textTransform: "uppercase", color: "var(--gold)", marginBottom: 6 }}>
-          Biblioteca
-        </p>
-        <h1 style={{ fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 26, letterSpacing: 3, color: "var(--text-primary)", textTransform: "uppercase", marginBottom: 4 }}>
-          Aulas <span style={{ color: "var(--gold-light)" }}>Favoritas</span>
-        </h1>
+      <div className="ka-page-header">
+        <div className="ka-page-eyebrow">Biblioteca</div>
+        <h1 className="ka-page-title">Aulas <span>Favoritas</span></h1>
         {!loading && (
-          <p style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 28 }}>
+          <p className="ka-page-subtitle">
             {bookmarks.length} aula{bookmarks.length !== 1 ? "s" : ""} salva{bookmarks.length !== 1 ? "s" : ""}
           </p>
         )}
       </div>
 
-      <div style={{ padding: "0 32px" }}>
+      <div className="ka-section" style={{ paddingTop: 20 }}>
         {loading ? (
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {[...Array(4)].map((_, i) => (

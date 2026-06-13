@@ -149,7 +149,7 @@ export default async function DashboardPage() {
             </Link>
           </div>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(250px, 280px))", gap: 24 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(250px, 100%), 1fr))", gap: 24 }}>
             {combinedCourses.map(({ course, expiresAt, enrolledAt }) => (
               course ? <CourseCard key={course.id} course={course} isEnrolled={true} expiresAt={expiresAt} enrolledAt={enrolledAt} /> : null
             ))}
@@ -180,7 +180,7 @@ export default async function DashboardPage() {
             } 
           />
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(250px, 280px))", gap: 24 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(250px, 100%), 1fr))", gap: 24 }}>
             {otherCourses.map(course => (
               <CourseCard key={course.id} course={course} isEnrolled={false} />
             ))}

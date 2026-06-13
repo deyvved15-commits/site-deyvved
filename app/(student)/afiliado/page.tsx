@@ -301,7 +301,7 @@ export default function AfiliadoPage() {
                   <p style={{ fontSize: 13, color: "var(--text-muted)" }}>Nenhuma indicação ainda. Comece a compartilhar seus links!</p>
                 </div>
               ) : (
-                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+                <div className="ka-table-responsive"><table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
                   <thead>
                     <tr style={{ background: "rgba(255,255,255,0.02)", borderBottom: "1px solid rgba(201,169,122,0.08)" }}>
                       <th style={{ padding: "14px 24px", textAlign: "left", fontFamily: "'Cinzel',serif", fontSize: 9, color: "var(--gold)", letterSpacing: 2 }}>DATA</th>
@@ -331,7 +331,7 @@ export default function AfiliadoPage() {
                       </tr>
                     ))}
                   </tbody>
-                </table>
+                </table></div>
               )}
             </div>
           </>

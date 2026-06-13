@@ -105,16 +105,12 @@ export default function BuscaPage() {
       `}</style>
 
       {/* Header */}
-      <div style={{ padding: "28px 32px 0" }}>
-        <p style={{ fontFamily: "'Cinzel',serif", fontSize: 10, fontWeight: 600, letterSpacing: 5, textTransform: "uppercase", color: "var(--gold)", marginBottom: 6 }}>
-          Plataforma
-        </p>
-        <h1 style={{ fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 26, letterSpacing: 3, color: "var(--text-primary)", textTransform: "uppercase", marginBottom: 28 }}>
-          <span style={{ color: "var(--gold-light)" }}>Busca</span> Global
-        </h1>
+      <div className="ka-page-header">
+        <div className="ka-page-eyebrow">Plataforma</div>
+        <h1 className="ka-page-title"><span>Busca</span> Global</h1>
       </div>
 
-      <div style={{ padding: "0 32px", maxWidth: 720 }}>
+      <div className="ka-section" style={{ paddingTop: 20, maxWidth: 720 }}>
         {/* Search input */}
         <div style={{ position: "relative", marginBottom: 32 }}>
           <div style={{ position: "absolute", left: 16, top: "50%", transform: "translateY(-50%)", color: "rgba(201,169,122,0.45)", pointerEvents: "none" }}>

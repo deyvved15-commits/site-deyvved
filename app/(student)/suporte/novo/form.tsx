@@ -57,7 +57,7 @@ export default function CreateTicketForm({ courses }: { courses: { id: string; t
 
   return (
     <form onSubmit={handleSubmit} style={{ display: "grid", gap: 24 }}>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(300px, 100%), 1fr))", gap: 24 }}>
         <div>
           <label style={S.label}>Assunto da Mensagem</label>
           <input 

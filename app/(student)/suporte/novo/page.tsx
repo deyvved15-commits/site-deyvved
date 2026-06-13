@@ -18,7 +18,7 @@ export default async function NewTicketPage() {
   const courses = enrollments.map(e => e.course);
 
   return (
-    <div style={{ minHeight: "100%", padding: "44px", background: "linear-gradient(180deg, var(--navy-darkest) 0%, var(--navy-mid) 100%)", position: "relative", overflow: "hidden" }}>
+    <div className="ka-section" style={{ minHeight: "100%", background: "linear-gradient(180deg, var(--navy-darkest) 0%, var(--navy-mid) 100%)", position: "relative", overflow: "hidden" }}>
       {/* Decorative Elements */}
       <div style={{ position: "absolute", width: 600, height: 600, border: "1px solid rgba(201,169,122,0.05)", borderRadius: "50%", top: -200, left: -200, pointerEvents: "none" }} />
       
@@ -35,7 +35,7 @@ export default async function NewTicketPage() {
             <MessageSquare size={18} color="var(--gold)" />
             <span style={{ fontSize: 10, fontFamily: "'Cinzel',serif", letterSpacing: 4, textTransform: "uppercase", color: "var(--gold)" }}>Novo Atendimento</span>
           </div>
-          <h1 style={{ fontFamily: "'Cinzel',serif", fontSize: 28, fontWeight: 700, letterSpacing: 2, color: "var(--white)", margin: 0 }}>
+          <h1 style={{ fontFamily: "'Cinzel',serif", fontSize: "clamp(20px, 5vw, 28px)", fontWeight: 700, letterSpacing: 2, color: "var(--text-primary)", margin: 0 }}>
             Fazer uma <span style={{ color: "var(--gold)" }}>Pergunta</span>
           </h1>
           <p style={{ color: "rgba(255,255,255,0.5)", marginTop: 12, fontSize: 15 }}>

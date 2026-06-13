@@ -26,7 +26,7 @@ export default async function StudentTicketDetailPage({ params }: { params: Prom
   }
 
   return (
-    <div style={{ minHeight: "100%", padding: "44px", background: "linear-gradient(180deg, var(--navy-darkest) 0%, var(--navy-mid) 100%)" }}>
+    <div className="ka-section" style={{ minHeight: "100%", background: "linear-gradient(180deg, var(--navy-darkest) 0%, var(--navy-mid) 100%)" }}>
       <div style={{ maxWidth: 800, margin: "0 auto" }}>
         
         <Link href="/suporte" style={{ display: "inline-flex", alignItems: "center", gap: 8, color: "var(--gold)", textDecoration: "none", fontSize: 12, fontWeight: 600, textTransform: "uppercase", letterSpacing: 2, marginBottom: 32 }}>

@@ -61,7 +61,7 @@ export default async function CursoPage({ params }: { params: Promise<{ slug: st
       </Link>
 
       {/* Course header strip */}
-      <div style={{ margin: "16px 44px 0", borderRadius: 20, overflow: "hidden", position: "relative" }}>
+      <div style={{ margin: "16px clamp(16px, 4vw, 44px) 0", borderRadius: 20, overflow: "hidden", position: "relative" }}>
         <div style={{
           height: 120, position: "relative",
           background: "linear-gradient(135deg, #060D1F, #0F1A3D 50%, #060D1F)",

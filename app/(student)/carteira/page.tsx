@@ -47,11 +47,11 @@ export default function CarteiraPage() {
 
         {/* Saldo Card */}
         <div style={{
-          borderRadius: 24, padding: "40px",
+          borderRadius: 24, padding: "28px 24px",
           background: "linear-gradient(135deg, rgba(110,231,183,0.08) 0%, rgba(201,169,122,0.05) 100%)",
           border: "1px solid rgba(110,231,183,0.20)",
           boxShadow: "0 16px 48px rgba(0,0,0,0.35)",
-          display: "flex", alignItems: "center", gap: 28,
+          display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap",
           marginBottom: 36,
         }}>
           <div style={{
@@ -64,7 +64,7 @@ export default function CarteiraPage() {
           </div>
           <div>
             <p style={{ fontFamily: "'Cinzel',serif", fontSize: 10, fontWeight: 700, letterSpacing: 4, textTransform: "uppercase", color: "#6ee7b7", marginBottom: 6 }}>Saldo Disponível</p>
-            <h2 style={{ fontFamily: "'Cinzel',serif", fontSize: 42, fontWeight: 800, color: "white", lineHeight: 1 }}>
+            <h2 style={{ fontFamily: "'Cinzel',serif", fontSize: "clamp(28px, 8vw, 42px)", fontWeight: 800, color: "white", lineHeight: 1 }}>
               R$ {balance.toFixed(2).replace(".", ",")}
             </h2>
           </div>
