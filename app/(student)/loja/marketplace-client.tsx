@@ -21,9 +21,9 @@ const TABS = [
 export default function MarketplaceClient({
   initialProducts,
   initialCourses,
-  purchasedProductIds
+  purchasedProductIds,
 }: MarketplaceClientProps) {
-  const [search, setSearch]     = useState("");
+  const [search, setSearch]       = useState("");
   const [activeTab, setActiveTab] = useState("all");
 
   const filteredCourses = useMemo(() =>
@@ -41,51 +41,74 @@ export default function MarketplaceClient({
 
   const hasResults = filteredCourses.length > 0 || filteredProducts.length > 0;
 
-  const totalCourses  = filteredCourses.length;
-  const totalProducts = filteredProducts.length;
+  const count = (id: string) =>
+    id === "courses"  ? filteredCourses.length  :
+    id === "products" ? filteredProducts.length :
+    filteredCourses.length + filteredProducts.length;
 
   return (
     <>
       <style>{`
-        /* ── Marketplace layout ── */
-        .mk-layout {
+        /* ── Layout da loja (injetado pelo page.tsx via classes mk-*) ── */
+        .mk-page-col {
+          flex: 1;
           display: flex;
-          gap: 28px;
-          align-items: flex-start;
-          padding: 28px 44px 56px;
+          flex-direction: column;
+          overflow: hidden;
+          background: linear-gradient(180deg, var(--navy-darkest) 0%, var(--navy-mid) 100%);
+        }
+        .mk-body-row {
+          flex: 1;
+          display: flex;
+          overflow: hidden;
         }
 
-        /* Sidebar */
+        /* ── Dois painéis ── */
+        .mk-outer {
+          display: flex;
+          flex: 1;
+          overflow: hidden;
+        }
+
+        /* Sidebar de filtros — scroll próprio */
         .mk-sidebar {
           width: 220px;
           flex-shrink: 0;
-          position: sticky;
-          top: 16px;
+          overflow-y: auto;
+          padding: 20px 14px 24px 20px;
+          border-right: 1px solid rgba(201,169,122,0.08);
+          background: rgba(6,13,31,0.30);
           display: flex;
           flex-direction: column;
-          gap: 12px;
+          gap: 10px;
         }
+        .mk-sidebar::-webkit-scrollbar { width: 4px; }
+        .mk-sidebar::-webkit-scrollbar-thumb { background: rgba(201,169,122,0.15); border-radius: 4px; }
 
-        /* Content area */
+        /* Conteúdo — scroll próprio */
         .mk-content {
           flex: 1;
           min-width: 0;
+          overflow-y: auto;
+          padding: 24px 44px 56px 28px;
         }
+        .mk-content::-webkit-scrollbar { width: 4px; }
+        .mk-content::-webkit-scrollbar-thumb { background: rgba(201,169,122,0.15); border-radius: 4px; }
 
-        /* Tab button */
+        /* Tab buttons */
         .mk-tab {
           display: flex;
           align-items: center;
           gap: 10px;
           width: 100%;
-          padding: 11px 14px;
+          padding: 10px 12px;
           border-radius: 12px;
           font-family: 'Cinzel', serif;
-          font-size: 12px;
+          font-size: 11px;
           font-weight: 700;
           letter-spacing: 1px;
           cursor: pointer;
-          border: 1px solid rgba(201,169,122,0.15);
+          border: 1px solid rgba(201,169,122,0.12);
           background: rgba(255,255,255,0.02);
           color: var(--text-muted);
           transition: all 0.2s;
@@ -93,14 +116,14 @@ export default function MarketplaceClient({
         }
         .mk-tab:hover {
           background: rgba(201,169,122,0.06);
-          border-color: rgba(201,169,122,0.30);
+          border-color: rgba(201,169,122,0.28);
           color: var(--text-primary);
         }
         .mk-tab.active {
-          background: linear-gradient(95deg, rgba(201,169,122,0.20) 0%, rgba(201,169,122,0.08) 100%);
-          border-color: rgba(201,169,122,0.45);
+          background: linear-gradient(95deg, rgba(201,169,122,0.18) 0%, rgba(201,169,122,0.07) 100%);
+          border-color: rgba(201,169,122,0.40);
           color: var(--gold-light);
-          box-shadow: 0 0 16px rgba(201,169,122,0.12);
+          box-shadow: 0 0 14px rgba(201,169,122,0.10);
         }
         .mk-tab-count {
           margin-left: auto;
@@ -113,41 +136,60 @@ export default function MarketplaceClient({
           font-weight: 600;
         }
 
+        /* ── Mobile: empilhado ── */
         @media (max-width: 768px) {
-          .mk-layout {
+          /* Desfaz o layout de dois painéis */
+          .mk-page-col {
+            overflow-y: auto;
+            padding-bottom: calc(70px + env(safe-area-inset-bottom, 0px));
+          }
+          .mk-body-row {
+            overflow: visible;
+            flex: none;
+            display: block;
+          }
+          .mk-outer {
             flex-direction: column;
-            padding: 20px 16px 56px;
-            gap: 20px;
+            overflow: visible;
+            flex: none;
           }
           .mk-sidebar {
             width: 100%;
-            position: static;
+            overflow-y: visible;
+            border-right: none;
+            border-bottom: 1px solid rgba(201,169,122,0.08);
+            padding: 14px 16px;
             flex-direction: row;
             flex-wrap: wrap;
+            gap: 8px;
           }
           .mk-tab {
             flex: 1;
-            min-width: 80px;
+            min-width: 70px;
             justify-content: center;
-            padding: 10px 8px;
-            font-size: 11px;
+            padding: 9px 8px;
+            font-size: 10px;
           }
           .mk-tab-count { display: none; }
+          .mk-content {
+            overflow-y: visible;
+            padding: 20px 16px 32px;
+          }
         }
       `}</style>
 
-      <div className="mk-layout">
+      <div className="mk-outer">
 
-        {/* ── Sidebar ── */}
+        {/* ── Sidebar de filtros ── */}
         <aside className="mk-sidebar">
 
           {/* Search */}
           <div style={{ position: "relative" }}>
             <div style={{
-              position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)",
-              color: "rgba(201,169,122,0.45)", pointerEvents: "none",
+              position: "absolute", left: 11, top: "50%", transform: "translateY(-50%)",
+              color: "rgba(201,169,122,0.40)", pointerEvents: "none",
             }}>
-              <Search size={16} />
+              <Search size={15} />
             </div>
             <input
               type="text"
@@ -155,46 +197,42 @@ export default function MarketplaceClient({
               value={search}
               onChange={e => setSearch(e.target.value)}
               style={{
-                width: "100%", padding: "11px 12px 11px 36px",
+                width: "100%", padding: "10px 10px 10px 32px",
                 background: "rgba(255,255,255,0.04)",
-                border: "1px solid rgba(201,169,122,0.18)",
-                borderRadius: 12, fontSize: 13, color: "#E8D5A8",
+                border: "1px solid rgba(201,169,122,0.16)",
+                borderRadius: 10, fontSize: 12, color: "#E8D5A8",
                 outline: "none", fontFamily: "'Poppins',sans-serif",
                 boxSizing: "border-box",
               }}
             />
           </div>
 
-          {/* Divider label */}
-          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 2px" }}>
-            <div style={{ width: 3, height: 14, borderRadius: 2, background: "linear-gradient(180deg, var(--gold-light), var(--gold))" }} />
-            <span style={{ fontFamily: "'Cinzel',serif", fontSize: 9, fontWeight: 600, letterSpacing: 3, textTransform: "uppercase", color: "var(--text-muted)" }}>
-              Filtrar por
+          {/* Divider */}
+          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "2px 2px 0" }}>
+            <div style={{ width: 3, height: 12, borderRadius: 2, background: "linear-gradient(180deg, var(--gold-light), var(--gold))" }} />
+            <span style={{
+              fontFamily: "'Cinzel',serif", fontSize: 8, fontWeight: 600,
+              letterSpacing: 3, textTransform: "uppercase", color: "var(--text-muted)",
+            }}>
+              Filtrar
             </span>
           </div>
 
           {/* Tabs */}
-          {TABS.map(tab => {
-            const count = tab.id === "courses"
-              ? totalCourses
-              : tab.id === "products"
-              ? totalProducts
-              : totalCourses + totalProducts;
-            return (
-              <button
-                key={tab.id}
-                className={`mk-tab${activeTab === tab.id ? " active" : ""}`}
-                onClick={() => setActiveTab(tab.id)}
-              >
-                {tab.icon}
-                {tab.label}
-                <span className="mk-tab-count">{count}</span>
-              </button>
-            );
-          })}
+          {TABS.map(tab => (
+            <button
+              key={tab.id}
+              className={`mk-tab${activeTab === tab.id ? " active" : ""}`}
+              onClick={() => setActiveTab(tab.id)}
+            >
+              {tab.icon}
+              {tab.label}
+              <span className="mk-tab-count">{count(tab.id)}</span>
+            </button>
+          ))}
         </aside>
 
-        {/* ── Content ── */}
+        {/* ── Conteúdo scrollável ── */}
         <div className="mk-content">
           {!hasResults ? (
             <div style={{ textAlign: "center", padding: "80px 20px", color: "var(--text-muted)" }}>
@@ -206,8 +244,9 @@ export default function MarketplaceClient({
               <button
                 onClick={() => { setSearch(""); setActiveTab("all"); }}
                 style={{
-                  marginTop: 24, background: "none", border: "1px solid var(--gold-35)",
-                  color: "var(--gold)", padding: "8px 24px", borderRadius: 10, cursor: "pointer",
+                  marginTop: 24, background: "none",
+                  border: "1px solid var(--gold-35)", color: "var(--gold)",
+                  padding: "8px 24px", borderRadius: 10, cursor: "pointer",
                 }}
               >
                 Limpar Busca
@@ -217,9 +256,9 @@ export default function MarketplaceClient({
             <>
               {/* Cursos */}
               {(activeTab === "all" || activeTab === "courses") && filteredCourses.length > 0 && (
-                <div style={{ marginBottom: 56 }}>
+                <div style={{ marginBottom: 52 }}>
                   <SectionHeader title="Cursos" highlight="Premium" icon={<BookOpen size={20} />} />
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(260px, 100%), 1fr))", gap: 24 }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(240px, 100%), 1fr))", gap: 24 }}>
                     {filteredCourses.map(course => (
                       <CourseCard key={course.id} course={course} isEnrolled={false} />
                     ))}
@@ -231,7 +270,7 @@ export default function MarketplaceClient({
               {(activeTab === "all" || activeTab === "products") && filteredProducts.length > 0 && (
                 <div style={{ marginBottom: 40 }}>
                   <SectionHeader title="Produtos" highlight="Digitais" icon={<Package size={20} />} />
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(220px, 100%), 1fr))", gap: 24 }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(200px, 100%), 1fr))", gap: 24 }}>
                     {filteredProducts.map(product => (
                       <ProductCard
                         key={product.id}

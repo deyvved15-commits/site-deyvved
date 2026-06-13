@@ -30,6 +30,37 @@ export default async function LojaPage() {
 
   const purchasedProductIds = new Set(productPurchases.map((p) => p.productId));
 
+  // ── Aluno logado: layout dois painéis (sidebar fixa + conteúdo scroll) ──
+  if (session) {
+    const progress = await prisma.lessonProgress.findMany({
+      where: { userId: session.user.id, completed: true },
+      select: { completedAt: true },
+    });
+    const streak = calcStreak(progress.map(p => p.completedAt));
+
+    return (
+      <div className="flex h-screen overflow-hidden" style={{ background: "var(--navy-darkest)" }}>
+        <StudentSidebar user={session.user} streak={streak} />
+        {/* Coluna direita: header fixo + corpo com dois painéis */}
+        <div className="mk-page-col">
+          <div className="ka-page-header" style={{ flexShrink: 0 }}>
+            <div className="ka-page-eyebrow">Kadima Academy</div>
+            <h1 className="ka-page-title">Loja <span>Digital</span></h1>
+            <p className="ka-page-subtitle">Cursos, materiais e recursos para o seu crescimento teológico</p>
+          </div>
+          <div className="mk-body-row">
+            <MarketplaceClient
+              initialProducts={products}
+              initialCourses={courses}
+              purchasedProductIds={purchasedProductIds}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Visitante: exibe com scroll normal ──
   const content = (
     <div style={{ minHeight: "100%", background: "linear-gradient(180deg, var(--navy-darkest) 0%, var(--navy-mid) 100%)" }}>
       <div className="ka-page-header">
@@ -44,24 +75,6 @@ export default async function LojaPage() {
       />
     </div>
   );
-
-  // ── Aluno logado: exibe com sidebar ──
-  if (session) {
-    const progress = await prisma.lessonProgress.findMany({
-      where: { userId: session.user.id, completed: true },
-      select: { completedAt: true },
-    });
-    const streak = calcStreak(progress.map(p => p.completedAt));
-
-    return (
-      <div className="flex h-screen overflow-hidden" style={{ background: "var(--navy-darkest)" }}>
-        <StudentSidebar user={session.user} streak={streak} />
-        <main className="flex-1 overflow-y-auto ka-main">
-          {content}
-        </main>
-      </div>
-    );
-  }
 
   // ── Visitante: exibe com nav pública ──
   return (
