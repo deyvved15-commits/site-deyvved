@@ -176,87 +176,14 @@ export default function MarketplaceClient({
             padding: 20px 16px 32px;
           }
           .mk-products-grid {
-            display: flex !important;
-            flex-direction: row !important;
-            overflow-x: auto !important;
-            overflow-y: visible !important;
-            gap: 14px !important;
-            padding: 0 16px 16px !important;
-            scroll-snap-type: x mandatory;
-            -webkit-overflow-scrolling: touch;
-          }
-          .mk-products-grid > * {
-            flex: 0 0 280px !important;
-            width: 280px !important;
-            scroll-snap-align: start;
-          }
-          .mk-products-grid::-webkit-scrollbar { display: none; }
-
-          /* Card compacto dentro do scroll de produtos */
-          .mk-products-grid .ka-thumb {
-            height: 220px !important;
-            aspect-ratio: unset !important;
-          }
-          .mk-products-grid .ka-thumb-img {
-            object-fit: cover !important;
-            object-position: center top !important;
-          }
-          .mk-products-grid .ka-card-body {
-            padding: 18px 20px 20px !important;
-            align-items: center !important;
-            text-align: center !important;
-          }
-          .mk-products-grid .ka-card-title {
-            font-size: 15px !important;
-            letter-spacing: 1px !important;
-            margin-bottom: 6px !important;
-            line-height: 1.3 !important;
-            -webkit-line-clamp: 2 !important;
-            display: -webkit-box !important;
-            -webkit-box-orient: vertical !important;
-            overflow: hidden !important;
-          }
-          .mk-products-grid .ka-card-desc {
-            font-size: 12px !important;
-            line-height: 1.5 !important;
-            margin-bottom: 14px !important;
-            -webkit-line-clamp: 2 !important;
-            text-align: center !important;
-          }
-          .mk-products-grid .ka-card-footer {
-            flex-direction: column !important;
-            align-items: center !important;
-            gap: 10px !important;
-            width: 100% !important;
-          }
-          .mk-products-grid .ka-card-price {
-            font-size: 20px !important;
-          }
-          .mk-products-grid .ka-card-btn {
-            width: 100% !important;
-            text-align: center !important;
-            padding: 11px 10px !important;
-            font-size: 11px !important;
-            letter-spacing: 2px !important;
-            box-sizing: border-box !important;
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 12px !important;
           }
 
           .mk-courses-grid {
-            display: flex !important;
-            flex-direction: row !important;
-            overflow-x: auto !important;
-            overflow-y: visible !important;
-            gap: 14px !important;
-            padding-bottom: 12px !important;
-            scroll-snap-type: x mandatory;
-            -webkit-overflow-scrolling: touch;
+            grid-template-columns: 1fr !important;
+            gap: 16px !important;
           }
-          .mk-courses-grid > * {
-            flex: 0 0 220px !important;
-            width: 220px !important;
-            scroll-snap-align: start;
-          }
-          .mk-courses-grid::-webkit-scrollbar { display: none; }
         }
       `}</style>
 
