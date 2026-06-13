@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { Download, FileText, Music, Video, Box, Printer, X } from "lucide-react";
 import { getGoogleDriveImageUrl } from "@/lib/utils";
@@ -124,8 +125,8 @@ export default function ProductCard({ product, isPurchased }: ProductCardProps) 
         </div>
       </article>
 
-      {/* ── Modal ── */}
-      {open && (
+      {/* ── Modal (portal no body para escapar de overflow clipping) ── */}
+      {open && createPortal(
         <div
           onClick={() => setOpen(false)}
           style={{
@@ -252,7 +253,8 @@ export default function ProductCard({ product, isPurchased }: ProductCardProps) 
               )}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );
