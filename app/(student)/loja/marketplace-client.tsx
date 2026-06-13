@@ -180,7 +180,7 @@ export default function MarketplaceClient({
             flex-direction: row !important;
             overflow-x: auto !important;
             overflow-y: visible !important;
-            gap: 14px !important;
+            gap: 12px !important;
             padding-bottom: 12px !important;
             scroll-snap-type: x mandatory;
             -webkit-overflow-scrolling: touch;
@@ -191,6 +191,47 @@ export default function MarketplaceClient({
             scroll-snap-align: start;
           }
           .mk-products-grid::-webkit-scrollbar { display: none; }
+
+          /* Card compacto dentro do scroll de produtos */
+          .mk-products-grid .ka-thumb {
+            height: 130px !important;
+          }
+          .mk-products-grid .ka-card-body {
+            padding: 10px 12px 12px !important;
+          }
+          .mk-products-grid .ka-card-title {
+            font-size: 11px !important;
+            letter-spacing: 0.3px !important;
+            margin-bottom: 4px !important;
+            line-height: 1.25 !important;
+            -webkit-line-clamp: 3 !important;
+            display: -webkit-box !important;
+            -webkit-box-orient: vertical !important;
+            overflow: hidden !important;
+          }
+          .mk-products-grid .ka-card-desc {
+            font-size: 10px !important;
+            line-height: 1.4 !important;
+            margin-bottom: 8px !important;
+            -webkit-line-clamp: 2 !important;
+          }
+          .mk-products-grid .ka-card-footer {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 6px !important;
+          }
+          .mk-products-grid .ka-card-price {
+            font-size: 14px !important;
+          }
+          .mk-products-grid .ka-card-btn {
+            width: 100% !important;
+            text-align: center !important;
+            padding: 7px 10px !important;
+            font-size: 9px !important;
+            letter-spacing: 1px !important;
+            box-sizing: border-box !important;
+          }
+
           .mk-courses-grid {
             display: flex !important;
             flex-direction: row !important;

@@ -88,15 +88,15 @@ export default function ProductCard({ product, isPurchased }: ProductCardProps) 
         </div>
 
         {/* Content */}
-        <div style={{ padding: "20px 22px 22px", display: "flex", flexDirection: "column", flex: 1 }}>
-          <h3 style={{
+        <div className="ka-card-body" style={{ padding: "20px 22px 22px", display: "flex", flexDirection: "column", flex: 1 }}>
+          <h3 className="ka-card-title" style={{
             fontFamily: "var(--font-cinzel)", fontWeight: 600, fontSize: 16,
             letterSpacing: 1.5, color: "var(--text-primary)", marginBottom: 6, lineHeight: 1.3,
           }}>
             {product.title}
           </h3>
 
-          <p style={{
+          <p className="ka-card-desc" style={{
             fontSize: 12, color: "var(--text-muted)", marginBottom: 16, lineHeight: 1.6,
             display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden",
             flex: 1,
@@ -110,14 +110,14 @@ export default function ProductCard({ product, isPurchased }: ProductCardProps) 
               JÁ ADQUIRIDO
             </div>
           ) : (
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+            <div className="ka-card-footer" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
               <div>
                 <span style={{ fontSize: 10, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 1, display: "block" }}>Valor</span>
-                <span style={{ fontSize: 18, fontWeight: 700, color: "var(--gold-bright)", fontFamily: "var(--font-cinzel)" }}>
+                <span className="ka-card-price" style={{ fontSize: 18, fontWeight: 700, color: "var(--gold-bright)", fontFamily: "var(--font-cinzel)" }}>
                   R$ {product.price.toFixed(2).replace(".", ",")}
                 </span>
               </div>
-              <span className="ka-btn-gold" style={{ padding: "8px 18px", pointerEvents: "none" }}>
+              <span className="ka-btn-gold ka-card-btn" style={{ padding: "8px 18px", pointerEvents: "none" }}>
                 Ver mais
               </span>
             </div>
