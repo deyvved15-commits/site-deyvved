@@ -79,7 +79,7 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
 
   return (
     <div style={{ display: "flex", height: "100%", background: "var(--navy-darkest)" }}>
-      <ActivityTracker type="LESSON_VIEW" metadata={{ lesson: lesson.title, course: course.title }} />
+      <ActivityTracker type="LESSON_VIEW" metadata={{ lesson: lesson.title, course: course.title, lessonId: lesson.id }} />
 
       {/* ── Main content ── */}
       <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column" }}>
