@@ -88,16 +88,16 @@ export default function ProductCard({ product, isPurchased }: ProductCardProps) 
         </div>
 
         {/* Content */}
-        <div className="ka-card-body" style={{ padding: "20px 22px 22px", display: "flex", flexDirection: "column", flex: 1 }}>
+        <div className="ka-card-body" style={{ padding: "16px 18px 20px", display: "flex", flexDirection: "column", flex: 1, alignItems: "center", textAlign: "center" }}>
           <h3 className="ka-card-title" style={{
-            fontFamily: "var(--font-cinzel)", fontWeight: 600, fontSize: 16,
-            letterSpacing: 1.5, color: "var(--text-primary)", marginBottom: 6, lineHeight: 1.3,
+            fontFamily: "var(--font-cinzel)", fontWeight: 600, fontSize: 14,
+            letterSpacing: 1, color: "var(--text-primary)", marginBottom: 6, lineHeight: 1.3,
           }}>
             {product.title}
           </h3>
 
           <p className="ka-card-desc" style={{
-            fontSize: 12, color: "var(--text-muted)", marginBottom: 16, lineHeight: 1.6,
+            fontSize: 11, color: "var(--text-muted)", marginBottom: 14, lineHeight: 1.5,
             display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden",
             flex: 1,
           }}>
@@ -110,14 +110,14 @@ export default function ProductCard({ product, isPurchased }: ProductCardProps) 
               JÁ ADQUIRIDO
             </div>
           ) : (
-            <div className="ka-card-footer" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+            <div className="ka-card-footer" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, width: "100%" }}>
               <div>
-                <span style={{ fontSize: 10, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 1, display: "block" }}>Valor</span>
-                <span className="ka-card-price" style={{ fontSize: 18, fontWeight: 700, color: "var(--gold-bright)", fontFamily: "var(--font-cinzel)" }}>
+                <span style={{ fontSize: 9, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 1, display: "block" }}>Valor</span>
+                <span className="ka-card-price" style={{ fontSize: 17, fontWeight: 700, color: "var(--gold-bright)", fontFamily: "var(--font-cinzel)", whiteSpace: "nowrap" }}>
                   R$ {product.price.toFixed(2).replace(".", ",")}
                 </span>
               </div>
-              <span className="ka-btn-gold ka-card-btn" style={{ padding: "8px 18px", pointerEvents: "none" }}>
+              <span className="ka-btn-gold ka-card-btn" style={{ width: "100%", textAlign: "center", padding: "9px 12px", pointerEvents: "none", boxSizing: "border-box", whiteSpace: "nowrap" }}>
                 Ver mais
               </span>
             </div>
