@@ -75,6 +75,15 @@ const RESPONSIVE = `
 export default function LiveViewer({ initialSession, displayName, currentUserId, currentUserRole }: Props) {
   const [session, setSession] = useState<Session>(initialSession);
 
+  // Registra presença ao entrar na página
+  useEffect(() => {
+    fetch("/api/live/attendance", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: session?.title ?? "Ao Vivo" }),
+    }).catch(() => {});
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Polling a cada 15s para checar se uma sessão foi aberta
   useEffect(() => {
     if (session) return;
