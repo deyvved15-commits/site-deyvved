@@ -10,10 +10,11 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const data = await req.json();
 
   const update: Record<string, unknown> = { ...data };
-  if ("weightG"  in data) update.weightG  = data.weightG  ? parseInt(data.weightG)  : null;
-  if ("heightCm" in data) update.heightCm = data.heightCm ? parseInt(data.heightCm) : null;
-  if ("widthCm"  in data) update.widthCm  = data.widthCm  ? parseInt(data.widthCm)  : null;
-  if ("lengthCm" in data) update.lengthCm = data.lengthCm ? parseInt(data.lengthCm) : null;
+  if ("weightG"        in data) update.weightG        = data.weightG        ? parseInt(data.weightG)        : null;
+  if ("heightCm"       in data) update.heightCm       = data.heightCm       ? parseInt(data.heightCm)       : null;
+  if ("widthCm"        in data) update.widthCm        = data.widthCm        ? parseInt(data.widthCm)        : null;
+  if ("lengthCm"       in data) update.lengthCm       = data.lengthCm       ? parseInt(data.lengthCm)       : null;
+  if ("productionDays" in data) update.productionDays = data.productionDays ? parseInt(data.productionDays) : null;
 
   const product = await prisma.product.update({
     where: { id },

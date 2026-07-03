@@ -445,10 +445,11 @@ model Product {
   createdAt     DateTime          @default(now())
   updatedAt     DateTime          @updatedAt
   // Campos para produtos físicos (PRINTED)
-  weightG       Int?              // peso em gramas
-  heightCm      Int?              // altura em cm
-  widthCm       Int?              // largura em cm
-  lengthCm      Int?              // comprimento em cm
+  weightG        Int?             // peso em gramas
+  heightCm       Int?             // altura em cm
+  widthCm        Int?             // largura em cm
+  lengthCm       Int?             // comprimento em cm
+  productionDays Int?             // dias úteis de produção antes do envio
   purchases     ProductPurchase[]
   payments      Payment[]
 }

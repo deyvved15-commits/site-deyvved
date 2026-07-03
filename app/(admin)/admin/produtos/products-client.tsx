@@ -17,6 +17,7 @@ interface Product {
   heightCm: number | null;
   widthCm: number | null;
   lengthCm: number | null;
+  productionDays: number | null;
   _count: { purchases: number };
 }
 
@@ -34,10 +35,11 @@ export default function AdminProductsClient({ initialProducts }: { initialProduc
     thumbnail: "",
     fileUrl: "",
     published: false,
-    weightG:  "",
-    heightCm: "",
-    widthCm:  "",
-    lengthCm: "",
+    weightG:        "",
+    heightCm:       "",
+    widthCm:        "",
+    lengthCm:       "",
+    productionDays: "",
   });
 
   const filtered = products.filter(p => p.title.toLowerCase().includes(search.toLowerCase()));
@@ -101,10 +103,11 @@ export default function AdminProductsClient({ initialProducts }: { initialProduc
         thumbnail: p.thumbnail || "",
         fileUrl: p.fileUrl || "",
         published: p.published,
-        weightG:  p.weightG  != null ? String(p.weightG)  : "",
-        heightCm: p.heightCm != null ? String(p.heightCm) : "",
-        widthCm:  p.widthCm  != null ? String(p.widthCm)  : "",
-        lengthCm: p.lengthCm != null ? String(p.lengthCm) : "",
+        weightG:        p.weightG        != null ? String(p.weightG)        : "",
+        heightCm:       p.heightCm       != null ? String(p.heightCm)       : "",
+        widthCm:        p.widthCm        != null ? String(p.widthCm)        : "",
+        lengthCm:       p.lengthCm       != null ? String(p.lengthCm)       : "",
+        productionDays: p.productionDays != null ? String(p.productionDays) : "",
       });
     } else {
       setEditingProduct(null);
@@ -116,10 +119,11 @@ export default function AdminProductsClient({ initialProducts }: { initialProduc
         thumbnail: "",
         fileUrl: "",
         published: false,
-        weightG:  "",
-        heightCm: "",
-        widthCm:  "",
-        lengthCm: "",
+        weightG:        "",
+        heightCm:       "",
+        widthCm:        "",
+        lengthCm:       "",
+        productionDays: "",
       });
     }
     setIsModalOpen(true);
@@ -340,6 +344,19 @@ export default function AdminProductsClient({ initialProducts }: { initialProduc
                         onChange={e => setFormData({ ...formData, lengthCm: e.target.value })}
                       />
                     </div>
+                  </div>
+                  <div style={{ marginTop: 12 }}>
+                    <label className="ka-label">Tempo de Produção (dias úteis)</label>
+                    <input
+                      type="number"
+                      className="ka-input"
+                      placeholder="ex: 5"
+                      value={formData.productionDays}
+                      onChange={e => setFormData({ ...formData, productionDays: e.target.value })}
+                    />
+                    <p style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 6 }}>
+                      Dias necessários para produzir antes de enviar. Mostrado ao cliente no checkout.
+                    </p>
                   </div>
                 </div>
               )}

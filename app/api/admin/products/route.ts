@@ -16,10 +16,11 @@ export async function POST(req: NextRequest) {
       thumbnail:   data.thumbnail,
       fileUrl:     data.fileUrl,
       published:   data.published,
-      weightG:     data.weightG  ? parseInt(data.weightG)  : null,
-      heightCm:    data.heightCm ? parseInt(data.heightCm) : null,
-      widthCm:     data.widthCm  ? parseInt(data.widthCm)  : null,
-      lengthCm:    data.lengthCm ? parseInt(data.lengthCm) : null,
+      weightG:        data.weightG        ? parseInt(data.weightG)        : null,
+      heightCm:       data.heightCm       ? parseInt(data.heightCm)       : null,
+      widthCm:        data.widthCm        ? parseInt(data.widthCm)        : null,
+      lengthCm:       data.lengthCm       ? parseInt(data.lengthCm)       : null,
+      productionDays: data.productionDays ? parseInt(data.productionDays) : null,
     },
   });
 

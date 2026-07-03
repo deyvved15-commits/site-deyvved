@@ -16,6 +16,7 @@ interface Product {
   heightCm: number | null;
   widthCm: number | null;
   lengthCm: number | null;
+  productionDays: number | null;
 }
 
 interface ShippingOption {
@@ -533,6 +534,18 @@ export default function ProductCheckoutPage({ params: paramsPromise }: { params:
                           Grátis · Horário combinado por WhatsApp após o pagamento
                         </p>
                       </div>
+                    </div>
+                  )}
+
+                  {/* Tempo de produção */}
+                  {product.productionDays != null && product.productionDays > 0 && (
+                    <div style={{ marginTop: 12, padding: "10px 14px", borderRadius: 10, background: "rgba(251,191,36,0.07)", border: "1px solid rgba(251,191,36,0.2)", display: "flex", alignItems: "center", gap: 10 }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FBBF24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                      </svg>
+                      <p style={{ fontSize: 11, color: "#FBBF24", margin: 0 }}>
+                        <strong>Tempo de produção:</strong> {product.productionDays} dia{product.productionDays > 1 ? "s" : ""} útil{product.productionDays > 1 ? "s" : ""} antes do envio
+                      </p>
                     </div>
                   )}
                 </div>
