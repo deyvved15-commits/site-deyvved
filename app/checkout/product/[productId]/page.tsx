@@ -31,6 +31,7 @@ interface ShippingAddress {
   name: string;
   cep: string;
   address: string;
+  number: string;
   city: string;
   state: string;
 }
@@ -60,7 +61,7 @@ export default function ProductCheckoutPage({ params: paramsPromise }: { params:
 
   // Frete
   const [deliveryMethod, setDeliveryMethod]     = useState<"shipping" | "pickup">("shipping");
-  const [shippingAddr, setShippingAddr]         = useState<ShippingAddress>({ name: "", cep: "", address: "", city: "", state: "" });
+  const [shippingAddr, setShippingAddr]         = useState<ShippingAddress>({ name: "", cep: "", address: "", number: "", city: "", state: "" });
   const [shippingOptions, setShippingOptions]   = useState<ShippingOption[]>([]);
   const [selectedShipping, setSelectedShipping] = useState<ShippingOption | null>(null);
   const [quotingShipping, setQuotingShipping]   = useState(false);
@@ -192,7 +193,7 @@ export default function ProductCheckoutPage({ params: paramsPromise }: { params:
             ? isPickup
               ? { name: "Retirada na loja", cep: "21730000", address: "Av. Brasil, 29010", city: "Rio de Janeiro", state: "RJ", service: "RETIRADA", price: 0, days: 0 }
               : selectedShipping
-                ? { name: shippingAddr.name, cep: shippingAddr.cep, address: shippingAddr.address, city: shippingAddr.city, state: shippingAddr.state, service: selectedShipping.name, price: selectedShipping.price, days: selectedShipping.days }
+                ? { name: shippingAddr.name, cep: shippingAddr.cep, address: `${shippingAddr.address}${shippingAddr.number ? ", " + shippingAddr.number : ""}`, city: shippingAddr.city, state: shippingAddr.state, service: selectedShipping.name, price: selectedShipping.price, days: selectedShipping.days }
                 : null
             : null,
         }),
@@ -344,6 +345,12 @@ export default function ProductCheckoutPage({ params: paramsPromise }: { params:
                           value={shippingAddr.address}
                           onChange={e => setShippingAddr(p => ({ ...p, address: e.target.value }))}
                           style={{ ...INPUT_STYLE, flex: 1 }}
+                        />
+                        <input
+                          type="text" placeholder="Nº"
+                          value={shippingAddr.number}
+                          onChange={e => setShippingAddr(p => ({ ...p, number: e.target.value }))}
+                          style={{ ...INPUT_STYLE, width: 70 }}
                         />
                       </div>
 
