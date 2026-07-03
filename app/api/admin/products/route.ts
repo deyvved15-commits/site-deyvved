@@ -9,13 +9,17 @@ export async function POST(req: NextRequest) {
   const data = await req.json();
   const product = await prisma.product.create({
     data: {
-      title: data.title,
+      title:       data.title,
       description: data.description,
-      price: data.price,
-      type: data.type,
-      thumbnail: data.thumbnail,
-      fileUrl: data.fileUrl,
-      published: data.published,
+      price:       data.price,
+      type:        data.type,
+      thumbnail:   data.thumbnail,
+      fileUrl:     data.fileUrl,
+      published:   data.published,
+      weightG:     data.weightG  ? parseInt(data.weightG)  : null,
+      heightCm:    data.heightCm ? parseInt(data.heightCm) : null,
+      widthCm:     data.widthCm  ? parseInt(data.widthCm)  : null,
+      lengthCm:    data.lengthCm ? parseInt(data.lengthCm) : null,
     },
   });
 

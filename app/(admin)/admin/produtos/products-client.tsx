@@ -13,6 +13,10 @@ interface Product {
   thumbnail: string | null;
   fileUrl: string | null;
   published: boolean;
+  weightG: number | null;
+  heightCm: number | null;
+  widthCm: number | null;
+  lengthCm: number | null;
   _count: { purchases: number };
 }
 
@@ -30,6 +34,10 @@ export default function AdminProductsClient({ initialProducts }: { initialProduc
     thumbnail: "",
     fileUrl: "",
     published: false,
+    weightG:  "",
+    heightCm: "",
+    widthCm:  "",
+    lengthCm: "",
   });
 
   const filtered = products.filter(p => p.title.toLowerCase().includes(search.toLowerCase()));
@@ -93,6 +101,10 @@ export default function AdminProductsClient({ initialProducts }: { initialProduc
         thumbnail: p.thumbnail || "",
         fileUrl: p.fileUrl || "",
         published: p.published,
+        weightG:  p.weightG  != null ? String(p.weightG)  : "",
+        heightCm: p.heightCm != null ? String(p.heightCm) : "",
+        widthCm:  p.widthCm  != null ? String(p.widthCm)  : "",
+        lengthCm: p.lengthCm != null ? String(p.lengthCm) : "",
       });
     } else {
       setEditingProduct(null);
@@ -104,6 +116,10 @@ export default function AdminProductsClient({ initialProducts }: { initialProduc
         thumbnail: "",
         fileUrl: "",
         published: false,
+        weightG:  "",
+        heightCm: "",
+        widthCm:  "",
+        lengthCm: "",
       });
     }
     setIsModalOpen(true);
@@ -275,6 +291,58 @@ export default function AdminProductsClient({ initialProducts }: { initialProduc
                   onChange={e => setFormData({ ...formData, fileUrl: e.target.value })}
                 />
               </div>
+
+              {formData.type === "PRINTED" && (
+                <div style={{ marginTop: 8 }}>
+                  <p style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 12 }}>
+                    Dimensões para cálculo de frete (obrigatório para Material Impresso)
+                  </p>
+                  <div className="ka-form-row">
+                    <div>
+                      <label className="ka-label">Peso (gramas)</label>
+                      <input
+                        type="number"
+                        className="ka-input"
+                        placeholder="ex: 300"
+                        value={formData.weightG}
+                        onChange={e => setFormData({ ...formData, weightG: e.target.value })}
+                      />
+                    </div>
+                    <div>
+                      <label className="ka-label">Altura (cm)</label>
+                      <input
+                        type="number"
+                        className="ka-input"
+                        placeholder="ex: 2"
+                        value={formData.heightCm}
+                        onChange={e => setFormData({ ...formData, heightCm: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                  <div className="ka-form-row" style={{ marginTop: 12 }}>
+                    <div>
+                      <label className="ka-label">Largura (cm)</label>
+                      <input
+                        type="number"
+                        className="ka-input"
+                        placeholder="ex: 21"
+                        value={formData.widthCm}
+                        onChange={e => setFormData({ ...formData, widthCm: e.target.value })}
+                      />
+                    </div>
+                    <div>
+                      <label className="ka-label">Comprimento (cm)</label>
+                      <input
+                        type="number"
+                        className="ka-input"
+                        placeholder="ex: 29"
+                        value={formData.lengthCm}
+                        onChange={e => setFormData({ ...formData, lengthCm: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
 
               <div className="ka-form-group" style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 24 }}>
                 <input

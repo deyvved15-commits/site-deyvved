@@ -440,22 +440,38 @@ model Product {
   price         Float
   type          ProductType       @default(EBOOK)
   thumbnail     String?
-  fileUrl       String?           // URL para download (ex: Drive ou S3)
+  fileUrl       String?
   published     Boolean           @default(false)
   createdAt     DateTime          @default(now())
   updatedAt     DateTime          @updatedAt
+  // Campos para produtos físicos (PRINTED)
+  weightG       Int?              // peso em gramas
+  heightCm      Int?              // altura em cm
+  widthCm       Int?              // largura em cm
+  lengthCm      Int?              // comprimento em cm
   purchases     ProductPurchase[]
   payments      Payment[]
 }
 
 model ProductPurchase {
-  id        String   @id @default(cuid())
-  userId    String
-  productId String
-  amount    Float
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  id              String    @id @default(cuid())
+  userId          String
+  productId       String
+  amount          Float
+  createdAt       DateTime  @default(now())
+  // Entrega física
+  shippingName    String?
+  shippingCep     String?
+  shippingAddress String?
+  shippingCity    String?
+  shippingState   String?
+  shippingService String?   // ex: "SEDEX", "PAC", "JT Express"
+  shippingPrice   Float?
+  shippingDays    Int?
+  trackingCode    String?
+  shippingStatus  String?   @default("pending") // pending | shipped | delivered
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product         Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@unique([userId, productId])
 }
