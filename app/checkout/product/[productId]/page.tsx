@@ -499,7 +499,15 @@ export default function ProductCheckoutPage({ params: paramsPromise }: { params:
                           <p style={{ fontSize: 9, color: "var(--text-muted)", letterSpacing: 2, textTransform: "uppercase", fontFamily: "'Cinzel',serif", marginBottom: 8 }}>
                             Escolha o frete
                           </p>
-                          {shippingOptions.map(opt => (
+                          {product.productionDays != null && product.productionDays > 0 && (
+                            <p style={{ fontSize: 10, color: "var(--text-muted)", marginBottom: 8, display: "flex", alignItems: "center", gap: 6 }}>
+                              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                              Prazo total = {product.productionDays} dias de produção + prazo da transportadora
+                            </p>
+                          )}
+                          {shippingOptions.map(opt => {
+                            const totalDays = (product.productionDays ?? 0) + opt.days;
+                            return (
                             <div key={opt.id} onClick={() => setSelectedShipping(opt)}
                               className="co-shipping-opt"
                               style={{
@@ -511,13 +519,17 @@ export default function ProductCheckoutPage({ params: paramsPromise }: { params:
                               </div>
                               <div style={{ flex: 1 }}>
                                 <p style={{ fontSize: 12, fontWeight: 600, color: "var(--text-primary)" }}>{opt.company} — {opt.name}</p>
-                                <p style={{ fontSize: 10, color: "var(--text-muted)" }}>Prazo: até {opt.days} dias úteis</p>
+                                <p style={{ fontSize: 10, color: "var(--text-muted)" }}>
+                                  {product.productionDays
+                                    ? `Entrega em até ${totalDays} dias úteis (${product.productionDays}d produção + ${opt.days}d envio)`
+                                    : `Prazo: até ${opt.days} dias úteis`}
+                                </p>
                               </div>
                               <span style={{ fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 13, color: "var(--gold-light)", flexShrink: 0 }}>
                                 R$ {opt.price.toFixed(2).replace(".", ",")}
                               </span>
                             </div>
-                          ))}
+                          )})}
                         </div>
                       )}
                     </div>
@@ -537,17 +549,6 @@ export default function ProductCheckoutPage({ params: paramsPromise }: { params:
                     </div>
                   )}
 
-                  {/* Tempo de produção */}
-                  {product.productionDays != null && product.productionDays > 0 && (
-                    <div style={{ marginTop: 12, padding: "10px 14px", borderRadius: 10, background: "rgba(251,191,36,0.07)", border: "1px solid rgba(251,191,36,0.2)", display: "flex", alignItems: "center", gap: 10 }}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FBBF24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-                      </svg>
-                      <p style={{ fontSize: 11, color: "#FBBF24", margin: 0 }}>
-                        <strong>Tempo de produção:</strong> {product.productionDays} dia{product.productionDays > 1 ? "s" : ""} útil{product.productionDays > 1 ? "s" : ""} antes do envio
-                      </p>
-                    </div>
-                  )}
                 </div>
               )}
 
