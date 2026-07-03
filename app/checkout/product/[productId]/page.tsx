@@ -3,7 +3,7 @@
 import { useEffect, useState, use } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Wallet, Package, Truck, MapPin, CheckCircle } from "lucide-react";
+import { Wallet, Package, Truck, MapPin, CheckCircle, Store } from "lucide-react";
 
 interface Product {
   id: string;
@@ -59,8 +59,9 @@ export default function ProductCheckoutPage({ params: paramsPromise }: { params:
   const [validatingCoupon, setValidatingCoupon] = useState(false);
 
   // Frete
-  const [shippingAddr, setShippingAddr]     = useState<ShippingAddress>({ name: "", cep: "", address: "", city: "", state: "" });
-  const [shippingOptions, setShippingOptions] = useState<ShippingOption[]>([]);
+  const [deliveryMethod, setDeliveryMethod]     = useState<"shipping" | "pickup">("shipping");
+  const [shippingAddr, setShippingAddr]         = useState<ShippingAddress>({ name: "", cep: "", address: "", city: "", state: "" });
+  const [shippingOptions, setShippingOptions]   = useState<ShippingOption[]>([]);
   const [selectedShipping, setSelectedShipping] = useState<ShippingOption | null>(null);
   const [quotingShipping, setQuotingShipping]   = useState(false);
   const [shippingError, setShippingError]       = useState("");
@@ -158,11 +159,12 @@ export default function ProductCheckoutPage({ params: paramsPromise }: { params:
         ? (product?.price ?? 0) * (appliedCoupon.discountValue / 100)
         : appliedCoupon.discountValue)
     : 0;
-  const shippingCost = selectedShipping?.price ?? 0;
+  const isPickup     = isPrinted && deliveryMethod === "pickup";
+  const shippingCost = isPickup ? 0 : (selectedShipping?.price ?? 0);
   const finalPrice   = Math.max(0, (product?.price ?? 0) + shippingCost - walletAmount - couponDiscount);
 
   async function handleCheckout() {
-    if (isPrinted) {
+    if (isPrinted && !isPickup) {
       if (!shippingAddr.name || !shippingAddr.cep || !shippingAddr.address || !shippingAddr.city || !shippingAddr.state) {
         setError("Preencha o endereço de entrega completo."); return;
       }
@@ -186,16 +188,13 @@ export default function ProductCheckoutPage({ params: paramsPromise }: { params:
           walletAmount: useWallet ? walletAmount : 0,
           couponId: appliedCoupon?.id,
           userData: !session ? userData : null,
-          shipping: isPrinted && selectedShipping ? {
-            name:    shippingAddr.name,
-            cep:     shippingAddr.cep,
-            address: shippingAddr.address,
-            city:    shippingAddr.city,
-            state:   shippingAddr.state,
-            service: selectedShipping.name,
-            price:   selectedShipping.price,
-            days:    selectedShipping.days,
-          } : null,
+          shipping: isPrinted
+            ? isPickup
+              ? { name: "Retirada na loja", cep: "21730000", address: "Av. Brasil, 29010", city: "Rio de Janeiro", state: "RJ", service: "RETIRADA", price: 0, days: 0 }
+              : selectedShipping
+                ? { name: shippingAddr.name, cep: shippingAddr.cep, address: shippingAddr.address, city: shippingAddr.city, state: shippingAddr.state, service: selectedShipping.name, price: selectedShipping.price, days: selectedShipping.days }
+                : null
+            : null,
         }),
       });
       const data = await res.json();
@@ -281,120 +280,165 @@ export default function ProductCheckoutPage({ params: paramsPromise }: { params:
                 </div>
               )}
 
-              {/* ── ENDEREÇO DE ENTREGA (apenas PRINTED) ── */}
+              {/* ── ENTREGA / RETIRADA (apenas PRINTED) ── */}
               {isPrinted && (
                 <div style={{ marginBottom: 20, padding: 20, background: "rgba(201,169,122,0.05)", borderRadius: 16, border: "1px solid rgba(201,169,122,0.15)" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
-                    <MapPin size={14} color="var(--gold)" />
+                    <Truck size={14} color="var(--gold)" />
                     <span style={{ fontFamily: "'Cinzel',serif", fontSize: 10, letterSpacing: 3, color: "var(--gold)", textTransform: "uppercase", fontWeight: 700 }}>
-                      Endereço de Entrega
+                      Método de Recebimento
                     </span>
                   </div>
 
-                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                    <input
-                      type="text" placeholder="Nome do destinatário"
-                      value={shippingAddr.name}
-                      onChange={e => setShippingAddr(p => ({ ...p, name: e.target.value }))}
-                      style={INPUT_STYLE}
-                    />
-
-                    <div style={{ display: "flex", gap: 8 }}>
-                      <input
-                        type="text" placeholder="CEP" maxLength={9}
-                        value={shippingAddr.cep}
-                        onChange={e => {
-                          const v = formatCep(e.target.value);
-                          setShippingAddr(p => ({ ...p, cep: v }));
-                          if (v.replace(/\D/g, "").length === 8) fetchAddressByCep(v);
+                  {/* Toggle Enviar / Retirar */}
+                  <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
+                    {([
+                      { key: "shipping", label: "Enviar", icon: <Truck size={13} /> },
+                      { key: "pickup",   label: "Retirar na loja", icon: <Store size={13} /> },
+                    ] as const).map(({ key, label, icon }) => (
+                      <button
+                        key={key}
+                        onClick={() => {
+                          setDeliveryMethod(key);
+                          setSelectedShipping(null);
+                          setShippingOptions([]);
+                          setShippingError("");
                         }}
-                        style={{ ...INPUT_STYLE, width: 140 }}
-                      />
-                      <input
-                        type="text" placeholder="Endereço e bairro"
-                        value={shippingAddr.address}
-                        onChange={e => setShippingAddr(p => ({ ...p, address: e.target.value }))}
-                        style={{ ...INPUT_STYLE, flex: 1 }}
-                      />
-                    </div>
-
-                    <div style={{ display: "flex", gap: 8 }}>
-                      <input
-                        type="text" placeholder="Cidade"
-                        value={shippingAddr.city}
-                        onChange={e => setShippingAddr(p => ({ ...p, city: e.target.value }))}
-                        style={{ ...INPUT_STYLE, flex: 1 }}
-                      />
-                      <input
-                        type="text" placeholder="UF" maxLength={2}
-                        value={shippingAddr.state}
-                        onChange={e => setShippingAddr(p => ({ ...p, state: e.target.value.toUpperCase() }))}
-                        style={{ ...INPUT_STYLE, width: 60 }}
-                      />
-                    </div>
-
-                    <button
-                      onClick={quoteShipping}
-                      disabled={quotingShipping}
-                      style={{
-                        padding: "10px 20px", borderRadius: 10, cursor: "pointer",
-                        background: "linear-gradient(135deg, rgba(201,169,122,0.20), rgba(201,169,122,0.08))",
-                        border: "1px solid rgba(201,169,122,0.35)", color: "var(--gold)",
-                        fontFamily: "'Cinzel',serif", fontSize: 10, fontWeight: 700,
-                        letterSpacing: 2, textTransform: "uppercase",
-                        display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-                      }}
-                    >
-                      <Truck size={14} />
-                      {quotingShipping ? "Calculando..." : "Calcular Frete"}
-                    </button>
-
-                    {shippingError && (
-                      <p style={{ color: "#FF8088", fontSize: 11 }}>{shippingError}</p>
-                    )}
-
-                    {/* Opções de frete */}
-                    {shippingOptions.length > 0 && (
-                      <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 4 }}>
-                        <p style={{ fontSize: 10, color: "var(--text-muted)", letterSpacing: 2, textTransform: "uppercase", fontFamily: "'Cinzel',serif" }}>
-                          Escolha o frete
-                        </p>
-                        {shippingOptions.map(opt => (
-                          <div
-                            key={opt.id}
-                            onClick={() => setSelectedShipping(opt)}
-                            style={{
-                              padding: "12px 16px", borderRadius: 12, cursor: "pointer",
-                              background: selectedShipping?.id === opt.id
-                                ? "rgba(201,169,122,0.12)" : "rgba(255,255,255,0.02)",
-                              border: `1px solid ${selectedShipping?.id === opt.id
-                                ? "rgba(201,169,122,0.40)" : "rgba(255,255,255,0.07)"}`,
-                              display: "flex", alignItems: "center", gap: 12,
-                              transition: "all 0.2s",
-                            }}
-                          >
-                            <div style={{
-                              width: 18, height: 18, borderRadius: "50%", flexShrink: 0,
-                              border: `2px solid ${selectedShipping?.id === opt.id ? "var(--gold)" : "rgba(255,255,255,0.2)"}`,
-                              background: selectedShipping?.id === opt.id ? "var(--gold)" : "transparent",
-                              display: "flex", alignItems: "center", justifyContent: "center",
-                            }}>
-                              {selectedShipping?.id === opt.id && (
-                                <div style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--navy-darkest)" }} />
-                              )}
-                            </div>
-                            <div style={{ flex: 1 }}>
-                              <p style={{ fontSize: 12, fontWeight: 600, color: "var(--text-primary)" }}>{opt.company} — {opt.name}</p>
-                              <p style={{ fontSize: 10, color: "var(--text-muted)" }}>Prazo: até {opt.days} dias úteis</p>
-                            </div>
-                            <span style={{ fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 14, color: "var(--gold-light)", flexShrink: 0 }}>
-                              R$ {opt.price.toFixed(2).replace(".", ",")}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                        style={{
+                          flex: 1, padding: "10px 12px", borderRadius: 12, cursor: "pointer",
+                          background: deliveryMethod === key ? "rgba(201,169,122,0.18)" : "rgba(255,255,255,0.03)",
+                          border: `1px solid ${deliveryMethod === key ? "rgba(201,169,122,0.5)" : "rgba(255,255,255,0.1)"}`,
+                          color: deliveryMethod === key ? "var(--gold)" : "var(--text-muted)",
+                          fontSize: 12, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+                          transition: "all 0.2s",
+                        }}
+                      >
+                        {icon} {label}
+                      </button>
+                    ))}
                   </div>
+
+                  {/* Formulário de endereço — apenas quando "Enviar" */}
+                  {deliveryMethod === "shipping" && (
+                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                      <input
+                        type="text" placeholder="Nome do destinatário"
+                        value={shippingAddr.name}
+                        onChange={e => setShippingAddr(p => ({ ...p, name: e.target.value }))}
+                        style={INPUT_STYLE}
+                      />
+
+                      <div style={{ display: "flex", gap: 8 }}>
+                        <input
+                          type="text" placeholder="CEP" maxLength={9}
+                          value={shippingAddr.cep}
+                          onChange={e => {
+                            const v = formatCep(e.target.value);
+                            setShippingAddr(p => ({ ...p, cep: v }));
+                            if (v.replace(/\D/g, "").length === 8) fetchAddressByCep(v);
+                          }}
+                          style={{ ...INPUT_STYLE, width: 140 }}
+                        />
+                        <input
+                          type="text" placeholder="Endereço e bairro"
+                          value={shippingAddr.address}
+                          onChange={e => setShippingAddr(p => ({ ...p, address: e.target.value }))}
+                          style={{ ...INPUT_STYLE, flex: 1 }}
+                        />
+                      </div>
+
+                      <div style={{ display: "flex", gap: 8 }}>
+                        <input
+                          type="text" placeholder="Cidade"
+                          value={shippingAddr.city}
+                          onChange={e => setShippingAddr(p => ({ ...p, city: e.target.value }))}
+                          style={{ ...INPUT_STYLE, flex: 1 }}
+                        />
+                        <input
+                          type="text" placeholder="UF" maxLength={2}
+                          value={shippingAddr.state}
+                          onChange={e => setShippingAddr(p => ({ ...p, state: e.target.value.toUpperCase() }))}
+                          style={{ ...INPUT_STYLE, width: 60 }}
+                        />
+                      </div>
+
+                      <button
+                        onClick={quoteShipping}
+                        disabled={quotingShipping}
+                        style={{
+                          padding: "10px 20px", borderRadius: 10, cursor: "pointer",
+                          background: "linear-gradient(135deg, rgba(201,169,122,0.20), rgba(201,169,122,0.08))",
+                          border: "1px solid rgba(201,169,122,0.35)", color: "var(--gold)",
+                          fontFamily: "'Cinzel',serif", fontSize: 10, fontWeight: 700,
+                          letterSpacing: 2, textTransform: "uppercase",
+                          display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                        }}
+                      >
+                        <Truck size={14} />
+                        {quotingShipping ? "Calculando..." : "Calcular Frete"}
+                      </button>
+
+                      {shippingError && (
+                        <p style={{ color: "#FF8088", fontSize: 11 }}>{shippingError}</p>
+                      )}
+
+                      {/* Opções de frete */}
+                      {shippingOptions.length > 0 && (
+                        <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 4 }}>
+                          <p style={{ fontSize: 10, color: "var(--text-muted)", letterSpacing: 2, textTransform: "uppercase", fontFamily: "'Cinzel',serif" }}>
+                            Escolha o frete
+                          </p>
+                          {shippingOptions.map(opt => (
+                            <div
+                              key={opt.id}
+                              onClick={() => setSelectedShipping(opt)}
+                              style={{
+                                padding: "12px 16px", borderRadius: 12, cursor: "pointer",
+                                background: selectedShipping?.id === opt.id
+                                  ? "rgba(201,169,122,0.12)" : "rgba(255,255,255,0.02)",
+                                border: `1px solid ${selectedShipping?.id === opt.id
+                                  ? "rgba(201,169,122,0.40)" : "rgba(255,255,255,0.07)"}`,
+                                display: "flex", alignItems: "center", gap: 12,
+                                transition: "all 0.2s",
+                              }}
+                            >
+                              <div style={{
+                                width: 18, height: 18, borderRadius: "50%", flexShrink: 0,
+                                border: `2px solid ${selectedShipping?.id === opt.id ? "var(--gold)" : "rgba(255,255,255,0.2)"}`,
+                                background: selectedShipping?.id === opt.id ? "var(--gold)" : "transparent",
+                                display: "flex", alignItems: "center", justifyContent: "center",
+                              }}>
+                                {selectedShipping?.id === opt.id && (
+                                  <div style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--navy-darkest)" }} />
+                                )}
+                              </div>
+                              <div style={{ flex: 1 }}>
+                                <p style={{ fontSize: 12, fontWeight: 600, color: "var(--text-primary)" }}>{opt.company} — {opt.name}</p>
+                                <p style={{ fontSize: 10, color: "var(--text-muted)" }}>Prazo: até {opt.days} dias úteis</p>
+                              </div>
+                              <span style={{ fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 14, color: "var(--gold-light)", flexShrink: 0 }}>
+                                R$ {opt.price.toFixed(2).replace(".", ",")}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Card de retirada */}
+                  {deliveryMethod === "pickup" && (
+                    <div style={{ padding: "16px", borderRadius: 12, background: "rgba(201,169,122,0.08)", border: "1px solid rgba(201,169,122,0.25)", display: "flex", gap: 14, alignItems: "flex-start" }}>
+                      <MapPin size={18} color="var(--gold)" style={{ flexShrink: 0, marginTop: 2 }} />
+                      <div>
+                        <p style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary)", marginBottom: 4 }}>Av. Brasil, nº 29010 — Realengo</p>
+                        <p style={{ fontSize: 12, color: "var(--text-muted)" }}>Rio de Janeiro — RJ</p>
+                        <p style={{ fontSize: 11, color: "var(--gold)", marginTop: 8, fontWeight: 600 }}>
+                          Grátis · Combinamos o horário por WhatsApp após o pagamento
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -512,31 +556,44 @@ export default function ProductCheckoutPage({ params: paramsPromise }: { params:
 
               {error && <p style={{ color: "#FF8088", fontSize: 12, marginBottom: 16, textAlign: "center" }}>{error}</p>}
 
+              {/* Retirada: badge do endereço */}
+              {isPickup && (
+                <div style={{ padding: "12px 20px", borderRadius: 14, marginBottom: 12, background: "rgba(201,169,122,0.06)", border: "1px dashed rgba(201,169,122,0.30)", display: "flex", alignItems: "center", gap: 10 }}>
+                  <Store size={14} color="var(--gold)" style={{ flexShrink: 0 }} />
+                  <div>
+                    <p style={{ fontSize: 12, fontWeight: 600, color: "var(--text-secondary)" }}>Retirada na loja — Grátis</p>
+                    <p style={{ fontSize: 11, color: "var(--text-muted)" }}>Av. Brasil, nº 29010 — Realengo, Rio de Janeiro</p>
+                  </div>
+                </div>
+              )}
+
               <button
                 onClick={handleCheckout}
-                disabled={loading || (isPrinted && !selectedShipping)}
+                disabled={loading || (isPrinted && !isPickup && !selectedShipping)}
                 style={{
                   width: "100%", padding: "14px 24px", borderRadius: 14,
                   background: loading ? "rgba(201,169,122,0.20)"
-                    : (isPrinted && !selectedShipping) ? "rgba(255,255,255,0.05)"
+                    : (isPrinted && !isPickup && !selectedShipping) ? "rgba(255,255,255,0.05)"
                     : finalPrice <= 0 ? "linear-gradient(135deg, #6ee7b7, #34d399)"
                     : "linear-gradient(135deg, #009EE3, #007BC2)",
-                  color: loading || (isPrinted && !selectedShipping) ? "rgba(255,255,255,0.30)"
+                  color: loading || (isPrinted && !isPickup && !selectedShipping) ? "rgba(255,255,255,0.30)"
                     : finalPrice <= 0 ? "#060D1F" : "#fff",
                   fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 12,
                   letterSpacing: 2, textTransform: "uppercase", border: "none",
-                  cursor: loading || (isPrinted && !selectedShipping) ? "default" : "pointer",
+                  cursor: loading || (isPrinted && !isPickup && !selectedShipping) ? "default" : "pointer",
                   display: "flex", alignItems: "center", justifyContent: "center", gap: 10, transition: "all 0.2s",
                 }}
               >
                 {loading ? "Processando..."
-                  : isPrinted && !selectedShipping ? "Calcule o frete para continuar"
+                  : (isPrinted && !isPickup && !selectedShipping) ? "Calcule o frete para continuar"
                   : finalPrice <= 0 ? "Comprar com Saldo"
                   : "Finalizar Pedido"}
               </button>
 
               <p style={{ fontSize: 10, color: "var(--text-muted)", textAlign: "center", marginTop: 12 }}>
-                {isPrinted
+                {isPickup
+                  ? "Retire após a confirmação do pagamento. Combinamos o horário por WhatsApp."
+                  : isPrinted
                   ? "Entrega via transportadora após confirmação do pagamento."
                   : "O download será liberado imediatamente após a confirmação."}
               </p>
