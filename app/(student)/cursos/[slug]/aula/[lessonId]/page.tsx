@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { notFound, redirect } from "next/navigation";
 import { getYoutubeId } from "@/lib/utils";
+import { resolveModuleAccess } from "@/lib/module-access";
 import Link from "next/link";
 import ProgressButton from "@/components/student/progress-button";
 import BookmarkButton from "@/components/student/bookmark-button";
@@ -58,14 +59,30 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
   const currentIndex = allLessons.findIndex(l => l.id === lessonId);
   if (currentIndex === -1) notFound();
 
-  // Drip content check
   const enrolledAt = enrollment?.createdAt ?? new Date(2000, 0, 1);
   const daysSinceEnrollment = Math.floor((Date.now() - enrolledAt.getTime()) / 86400000);
   const lesson = allLessons[currentIndex];
   const initialRating = (lesson as any).ratings[0]?.rating;
 
+  // Drip: bloqueio por aula
   if (!isTeacher && !isAdmin && lesson.releaseAfterDays > daysSinceEnrollment) {
     redirect(`/cursos/${slug}?bloqueada=1`);
+  }
+
+  // Bloqueio por módulo
+  if (!isTeacher && !isAdmin) {
+    const lessonModule = modules.find(m => m.lessons.some(l => l.id === lessonId));
+    if (lessonModule) {
+      const completedIds = new Set(allLessons.filter(l => l.progress[0]?.completed).map(l => l.id));
+      const rules = modules.map(m => ({ id: m.id, releaseAfterDays: (m as any).releaseAfterDays ?? null, releaseAfterModuleId: (m as any).releaseAfterModuleId ?? null, lessons: m.lessons.map(l => ({ id: l.id })) }));
+      const access = resolveModuleAccess(
+        rules.find(r => r.id === lessonModule.id)!,
+        enrolledAt,
+        completedIds,
+        rules
+      );
+      if (!access.unlocked) redirect(`/cursos/${slug}?bloqueada=1`);
+    }
   }
 
   const prev = allLessons[currentIndex - 1] ?? null;

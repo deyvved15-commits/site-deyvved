@@ -3,7 +3,14 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
-const schema = z.object({ title: z.string().min(2), description: z.string().optional(), thumbnail: z.string().optional(), isBonus: z.boolean().optional() });
+const schema = z.object({
+  title:                z.string().min(2),
+  description:          z.string().optional(),
+  thumbnail:            z.string().optional(),
+  isBonus:              z.boolean().optional(),
+  releaseAfterDays:     z.number().nullable().optional(),
+  releaseAfterModuleId: z.string().nullable().optional(),
+});
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ courseId: string }> }) {
   const session = await auth();

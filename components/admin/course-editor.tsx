@@ -9,7 +9,7 @@ import { Plus, Trash2, ChevronDown, ChevronRight, Eye, EyeOff, Pencil, X, Check,
 import CertificateLayoutEditor, { type LayoutElement } from "@/components/admin/certificate-layout-editor";
 
 type Lesson = { id: string; title: string; youtubeUrl: string; duration: string | null; content: string | null; order: number; releaseAfterDays: number; attachments?: { title: string; url: string }[] };
-type Module = { id: string; title: string; description: string | null; thumbnail: string | null; isBonus: boolean; order: number; lessons: Lesson[] };
+type Module = { id: string; title: string; description: string | null; thumbnail: string | null; isBonus: boolean; order: number; lessons: Lesson[]; releaseAfterDays: number | null; releaseAfterModuleId: string | null };
 type Course = { id: string; slug: string; title: string; description: string | null; thumbnail: string | null; price: number | null; paymentType: "ONE_TIME" | "MONTHLY"; published: boolean; category: string | null; modules: Module[]; teachers: { teacherId: string; commissionPercentage: number; teacher: { id: string; name: string } }[]; hasCertificate: boolean; affiliatePercentage: number; certificateBg?: string | null; certificatePrimaryColor?: string | null; certificateSecondaryColor?: string | null; certificateCustomText?: string | null; certificateLayout?: LayoutElement[] | null; salesHeadline?: string | null; learningOutcomes?: string[]; targetAudience?: string | null; teacherBio?: string | null };
 
 const textareaClass = "w-full bg-[rgba(255,255,255,0.04)] border border-[rgba(201,169,122,0.18)] rounded-xl px-4 py-3 text-sm text-white placeholder-[rgba(255,255,255,0.2)] outline-none resize-none focus:border-[rgba(201,169,122,0.5)] focus:bg-[rgba(255,255,255,0.06)] transition-all";
@@ -677,20 +677,105 @@ export default function CourseEditor({ course: initial, teachers: allTeachers, i
             {openModules[mod.id] && (
               <div style={{ borderTop: "1px solid rgba(201,169,122,0.08)", padding: 20 }}>
                 {/* Configurações do Módulo */}
-                <div style={{ display: "flex", alignItems: "center", gap: 24, marginBottom: 16, paddingBottom: 16, borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                <div style={{ marginBottom: 16, paddingBottom: 16, borderBottom: "1px solid rgba(255,255,255,0.05)", display: "flex", flexDirection: "column", gap: 14 }}>
+                  {/* Bônus */}
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <input 
-                      type="checkbox" 
-                      id={`bonus-${mod.id}`} 
-                      checked={mod.isBonus} 
+                    <input
+                      type="checkbox"
+                      id={`bonus-${mod.id}`}
+                      checked={mod.isBonus}
                       onChange={async e => {
                         const val = e.target.checked;
                         await fetch(`/api/courses/${course.id}/modules/${mod.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ isBonus: val }) });
                         setCourse(c => ({ ...c, modules: c.modules.map(m => m.id === mod.id ? { ...m, isBonus: val } : m) }));
-                      }} 
-                      style={{ width: 16, height: 16, cursor: "pointer", accentColor: "var(--gold)" }} 
+                      }}
+                      style={{ width: 16, height: 16, cursor: "pointer", accentColor: "var(--gold)" }}
                     />
                     <label htmlFor={`bonus-${mod.id}`} className="ka-label" style={{ margin: 0, cursor: "pointer", textTransform: "none", fontSize: 11 }}>Módulo Bônus</label>
+                  </div>
+
+                  {/* Controle de Lançamento */}
+                  <div>
+                    <span style={{ fontSize: 10, color: "rgba(201,169,122,0.7)", fontFamily: "'Cinzel',serif", letterSpacing: 2, textTransform: "uppercase", display: "block", marginBottom: 8 }}>
+                      🔒 Liberação do Módulo
+                    </span>
+                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                      {/* Imediato */}
+                      <button
+                        onClick={async () => {
+                          await fetch(`/api/courses/${course.id}/modules/${mod.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ releaseAfterDays: null, releaseAfterModuleId: null }) });
+                          setCourse(c => ({ ...c, modules: c.modules.map(m => m.id === mod.id ? { ...m, releaseAfterDays: null, releaseAfterModuleId: null } : m) }));
+                        }}
+                        style={{
+                          padding: "6px 12px", borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: "pointer", border: "1px solid",
+                          borderColor: !mod.releaseAfterDays && !mod.releaseAfterModuleId ? "rgba(201,169,122,0.6)" : "rgba(255,255,255,0.1)",
+                          background: !mod.releaseAfterDays && !mod.releaseAfterModuleId ? "rgba(201,169,122,0.15)" : "transparent",
+                          color: !mod.releaseAfterDays && !mod.releaseAfterModuleId ? "var(--gold)" : "var(--text-muted)",
+                        }}
+                      >
+                        Imediato
+                      </button>
+
+                      {/* Após módulo anterior */}
+                      <button
+                        onClick={async () => {
+                          const prevMod = course.modules[mi - 1];
+                          if (!prevMod) return;
+                          await fetch(`/api/courses/${course.id}/modules/${mod.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ releaseAfterModuleId: prevMod.id, releaseAfterDays: null }) });
+                          setCourse(c => ({ ...c, modules: c.modules.map(m => m.id === mod.id ? { ...m, releaseAfterModuleId: prevMod.id, releaseAfterDays: null } : m) }));
+                        }}
+                        disabled={mi === 0}
+                        style={{
+                          padding: "6px 12px", borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: mi === 0 ? "not-allowed" : "pointer", border: "1px solid", opacity: mi === 0 ? 0.3 : 1,
+                          borderColor: mod.releaseAfterModuleId ? "rgba(201,169,122,0.6)" : "rgba(255,255,255,0.1)",
+                          background: mod.releaseAfterModuleId ? "rgba(201,169,122,0.15)" : "transparent",
+                          color: mod.releaseAfterModuleId ? "var(--gold)" : "var(--text-muted)",
+                        }}
+                      >
+                        Após concluir módulo anterior
+                      </button>
+                    </div>
+
+                    {/* Após X dias */}
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 8 }}>
+                      <span style={{ fontSize: 11, color: "var(--text-muted)" }}>Liberar após</span>
+                      <input
+                        type="number"
+                        min={1}
+                        placeholder="ex: 7"
+                        defaultValue={mod.releaseAfterDays ?? ""}
+                        onBlur={async e => {
+                          const val = e.target.value ? parseInt(e.target.value) : null;
+                          if (val === mod.releaseAfterDays) return;
+                          await fetch(`/api/courses/${course.id}/modules/${mod.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ releaseAfterDays: val, releaseAfterModuleId: null }) });
+                          setCourse(c => ({ ...c, modules: c.modules.map(m => m.id === mod.id ? { ...m, releaseAfterDays: val, releaseAfterModuleId: null } : m) }));
+                        }}
+                        style={{ width: 70, background: "rgba(0,0,0,0.3)", border: `1px solid ${mod.releaseAfterDays ? "rgba(201,169,122,0.5)" : "rgba(255,255,255,0.1)"}`, borderRadius: 8, padding: "5px 10px", color: "white", fontSize: 12, outline: "none" }}
+                      />
+                      <span style={{ fontSize: 11, color: "var(--text-muted)" }}>dias após a matrícula</span>
+                      {mod.releaseAfterDays && (
+                        <span style={{ fontSize: 10, color: "var(--gold)", fontWeight: 600 }}>← ativo</span>
+                      )}
+                    </div>
+
+                    {/* Badge do estado atual */}
+                    <div style={{ marginTop: 8 }}>
+                      {mod.releaseAfterModuleId && (
+                        <span style={{ fontSize: 10, padding: "3px 10px", borderRadius: 20, background: "rgba(251,191,36,0.15)", color: "#FBBF24", border: "1px solid rgba(251,191,36,0.3)" }}>
+                          🔒 Liberado ao concluir: {course.modules.find(m => m.id === mod.releaseAfterModuleId)?.title ?? "módulo anterior"}
+                        </span>
+                      )}
+                      {mod.releaseAfterDays && !mod.releaseAfterModuleId && (
+                        <span style={{ fontSize: 10, padding: "3px 10px", borderRadius: 20, background: "rgba(251,191,36,0.15)", color: "#FBBF24", border: "1px solid rgba(251,191,36,0.3)" }}>
+                          📅 Liberado {mod.releaseAfterDays} dias após matrícula
+                        </span>
+                      )}
+                      {!mod.releaseAfterDays && !mod.releaseAfterModuleId && (
+                        <span style={{ fontSize: 10, padding: "3px 10px", borderRadius: 20, background: "rgba(16,185,129,0.1)", color: "#10B981", border: "1px solid rgba(16,185,129,0.3)" }}>
+                          ✓ Disponível imediatamente
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
 

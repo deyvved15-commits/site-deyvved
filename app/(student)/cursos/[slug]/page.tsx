@@ -5,6 +5,7 @@ import Link from "next/link";
 import { getGoogleDriveImageUrl } from "@/lib/utils";
 import CourseThumbnail from "@/components/student/course-thumbnail";
 import ModuleCarousel from "@/components/student/module-carousel";
+import { resolveModuleAccess } from "@/lib/module-access";
 
 export default async function CursoPage({ params }: { params: Promise<{ slug: string }> }) {
   const session = await auth();
@@ -48,6 +49,29 @@ export default async function CursoPage({ params }: { params: Promise<{ slug: st
   const total = allLessons.length;
   const coursePct = total > 0 ? Math.round((totalDone / total) * 100) : 0;
   const isConcluded = total > 0 && totalDone === total && course.paymentType === "ONE_TIME" && course.hasCertificate;
+
+  // Calcular acesso por módulo
+  const enrolledAt = enrollment?.createdAt ?? new Date();
+  const completedLessonIds = new Set(
+    allLessons.filter(l => l.progress?.[0]?.completed).map(l => l.id)
+  );
+  const moduleAccessRules = modules.map(m => ({
+    id: m.id,
+    releaseAfterDays: m.releaseAfterDays ?? null,
+    releaseAfterModuleId: m.releaseAfterModuleId ?? null,
+    lessons: m.lessons.map(l => ({ id: l.id })),
+  }));
+  const moduleAccess = Object.fromEntries(
+    modules.map(m => [
+      m.id,
+      resolveModuleAccess(
+        moduleAccessRules.find(r => r.id === m.id)!,
+        enrolledAt,
+        completedLessonIds,
+        moduleAccessRules
+      ),
+    ])
+  );
 
   return (
     <div style={{ minHeight: "100%", background: "linear-gradient(180deg, var(--navy-darkest) 0%, var(--navy-mid) 100%)" }}>
@@ -144,7 +168,7 @@ export default async function CursoPage({ params }: { params: Promise<{ slug: st
             <p style={{ fontSize: 14, color: "var(--text-muted)" }}>Nenhum módulo disponível ainda.</p>
           </div>
         ) : (
-          <ModuleCarousel modules={course.modules} slug={slug} />
+          <ModuleCarousel modules={course.modules} slug={slug} moduleAccess={moduleAccess} />
         )}
       </section>
     </div>

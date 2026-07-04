@@ -153,17 +153,22 @@ model Certificate {
 }
 
 model Module {
-  id          String   @id @default(cuid())
-  title       String
-  description String?
-  thumbnail   String?
-  order       Int      @default(0)
-  courseId    String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  lessons     Lesson[]
-  isBonus     Boolean  @default(false)
-  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  id                   String   @id @default(cuid())
+  title                String
+  description          String?
+  thumbnail            String?
+  order                Int      @default(0)
+  courseId             String
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  lessons              Lesson[]
+  isBonus              Boolean  @default(false)
+  // Controle de lançamento
+  releaseAfterDays     Int?     // libera X dias após matrícula (null = imediato)
+  releaseAfterModuleId String?  // libera quando este módulo for concluído
+  course               Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  releaseAfterModule   Module?  @relation("ModuleRelease", fields: [releaseAfterModuleId], references: [id], onDelete: SetNull)
+  dependentModules     Module[] @relation("ModuleRelease")
 }
 
 model Lesson {
