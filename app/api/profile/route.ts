@@ -10,7 +10,7 @@ export async function GET() {
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
-    select: { id: true, name: true, email: true, bio: true, avatar: true },
+    select: { id: true, name: true, email: true, bio: true, avatar: true, shippingCep: true, shippingAddress: true, shippingNumber: true, shippingCity: true, shippingState: true },
   });
 
   return NextResponse.json(user);
@@ -22,6 +22,11 @@ const updateSchema = z.object({
   avatar: z.string().url().optional().nullable(),
   currentPassword: z.string().optional(),
   newPassword: z.string().min(6).optional(),
+  shippingCep: z.string().optional().nullable(),
+  shippingAddress: z.string().optional().nullable(),
+  shippingNumber: z.string().optional().nullable(),
+  shippingCity: z.string().optional().nullable(),
+  shippingState: z.string().optional().nullable(),
 });
 
 export async function PUT(req: NextRequest) {
@@ -32,7 +37,7 @@ export async function PUT(req: NextRequest) {
   const parsed = updateSchema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
 
-  const { name, bio, avatar, currentPassword, newPassword } = parsed.data;
+  const { name, bio, avatar, currentPassword, newPassword, shippingCep, shippingAddress, shippingNumber, shippingCity, shippingState } = parsed.data;
 
   const user = await prisma.user.findUnique({ where: { id: session.user.id } });
   if (!user) return NextResponse.json({ error: "Usuário não encontrado" }, { status: 404 });
@@ -49,13 +54,18 @@ export async function PUT(req: NextRequest) {
   if (bio !== undefined) data.bio = bio;
   if (avatar !== undefined) data.avatar = avatar;
   if (newPassword) data.password = await bcrypt.hash(newPassword, 12);
+  if (shippingCep !== undefined) data.shippingCep = shippingCep;
+  if (shippingAddress !== undefined) data.shippingAddress = shippingAddress;
+  if (shippingNumber !== undefined) data.shippingNumber = shippingNumber;
+  if (shippingCity !== undefined) data.shippingCity = shippingCity;
+  if (shippingState !== undefined) data.shippingState = shippingState;
 
   if (Object.keys(data).length === 0) return NextResponse.json({ error: "Nada para atualizar" }, { status: 400 });
 
   const updated = await prisma.user.update({
     where: { id: session.user.id },
     data,
-    select: { id: true, name: true, email: true, bio: true, avatar: true },
+    select: { id: true, name: true, email: true, bio: true, avatar: true, shippingCep: true, shippingAddress: true, shippingNumber: true, shippingCity: true, shippingState: true },
   });
 
   return NextResponse.json(updated);

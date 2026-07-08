@@ -353,9 +353,10 @@ export async function POST(req: NextRequest) {
           subject: `Pagamento confirmado — ${itemTitle}`,
           html: emailConfirmacaoPagamento({
             name: user.name ?? "Aluno",
-            courseName: itemTitle,
+            itemName: itemTitle,
             amount: amount,
             isMonthly: paymentType === "MONTHLY",
+            isProduct: !!productId,
           }),
         }).catch(() => {});
       }

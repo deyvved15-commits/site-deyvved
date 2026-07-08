@@ -1,6 +1,20 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { notFound, redirect } from "next/navigation";
+import type { Metadata } from "next";
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string; lessonId: string }> }): Promise<Metadata> {
+  const { slug, lessonId } = await params;
+  const [lesson, course] = await Promise.all([
+    prisma.lesson.findUnique({ where: { id: lessonId }, select: { title: true } }),
+    prisma.course.findUnique({ where: { slug }, select: { title: true } }),
+  ]);
+  if (!lesson || !course) return {};
+  return {
+    title: `${lesson.title} — ${course.title} | Kadima Academy`,
+    robots: { index: false, follow: false },
+  };
+}
 import { getYoutubeId } from "@/lib/utils";
 import { resolveModuleAccess } from "@/lib/module-access";
 import Link from "next/link";

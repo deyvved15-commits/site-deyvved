@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { rateLimit, getIp } from "@/lib/rate-limit";
 
 export async function POST(req: NextRequest) {
+  if (!rateLimit(`coupon:${getIp(req)}`, 10, 60_000)) {
+    return NextResponse.json({ error: "Muitas tentativas. Aguarde um momento." }, { status: 429 });
+  }
+
   const { code } = await req.json();
 
   if (!code) {

@@ -37,13 +37,6 @@ interface ShippingAddress {
   state: string;
 }
 
-const INPUT: React.CSSProperties = {
-  width: "100%", background: "rgba(0,0,0,0.25)",
-  border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10,
-  padding: "11px 14px", color: "white", fontSize: 13, boxSizing: "border-box",
-  outline: "none",
-};
-
 function getThumbnailUrl(url: string | null): string | null {
   if (!url) return null;
   if (url.includes("drive.google.com")) return getGoogleDriveImageUrl(url);
@@ -90,6 +83,24 @@ export default function ProductCheckoutPage({ params: paramsPromise }: { params:
     fetch("/api/affiliate/wallet")
       .then(r => r.json())
       .then(d => setWalletBalance(d.balance ?? 0))
+      .catch(() => {});
+
+    // Pre-fill saved shipping address
+    fetch("/api/profile")
+      .then(r => r.json())
+      .then(p => {
+        if (p?.shippingCep) {
+          setShippingAddr(prev => ({
+            ...prev,
+            name: prev.name || p.name || "",
+            cep: p.shippingCep ?? "",
+            address: p.shippingAddress ?? "",
+            number: p.shippingNumber ?? "",
+            city: p.shippingCity ?? "",
+            state: p.shippingState ?? "",
+          }));
+        }
+      })
       .catch(() => {});
   }, [productId]);
 
@@ -198,6 +209,16 @@ export default function ProductCheckoutPage({ params: paramsPromise }: { params:
       });
       const data = await res.json();
       if (!res.ok) { setError(data.error ?? "Erro ao iniciar pagamento."); setLoading(false); return; }
+
+      // Save shipping address for future checkouts
+      if (isPrinted && !isPickup && shippingAddr.cep) {
+        fetch("/api/profile", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ shippingCep: shippingAddr.cep, shippingAddress: shippingAddr.address, shippingNumber: shippingAddr.number, shippingCity: shippingAddr.city, shippingState: shippingAddr.state }),
+        }).catch(() => {});
+      }
+
       if (data.paid && data.redirectUrl) { window.location.href = data.redirectUrl; return; }
       window.location.href = data.checkoutUrl;
     } catch {
@@ -279,7 +300,7 @@ export default function ProductCheckoutPage({ params: paramsPromise }: { params:
           align-items: center;
           gap: 8px;
           margin-bottom: 14px;
-          font-family: 'Cinzel', serif;
+          font-family: var(--font-cinzel, 'Cinzel', serif);
           font-size: 9px;
           letter-spacing: 3px;
           color: var(--gold);
@@ -287,6 +308,43 @@ export default function ProductCheckoutPage({ params: paramsPromise }: { params:
           font-weight: 700;
         }
         .co-row { display: flex; gap: 8px; }
+        .co-btn-back {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          background: none;
+          border: none;
+          cursor: pointer;
+          color: var(--gold);
+          font-family: var(--font-cinzel, 'Cinzel', serif);
+          font-size: 11px;
+          font-weight: 500;
+          letter-spacing: 2px;
+          text-transform: uppercase;
+          padding: 0;
+          transition: color 0.2s;
+        }
+        .co-btn-back:hover { color: var(--gold-light); }
+        .co-btn-ghost {
+          padding: 11px 20px;
+          border-radius: var(--radius-md);
+          cursor: pointer;
+          background: linear-gradient(135deg, var(--gold-20), rgba(201,169,122,0.07));
+          border: 1px solid var(--gold-35);
+          color: var(--gold);
+          font-family: var(--font-cinzel, 'Cinzel', serif);
+          font-size: 10px;
+          font-weight: 700;
+          letter-spacing: 2px;
+          text-transform: uppercase;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          transition: all 0.2s;
+        }
+        .co-btn-ghost:hover { background: linear-gradient(135deg, var(--gold-35), var(--gold-20)); box-shadow: 0 4px 12px rgba(201,169,122,0.2); }
+        .co-btn-ghost:disabled { opacity: 0.5; cursor: not-allowed; }
         .co-shipping-opt {
           display: flex;
           align-items: center;
@@ -318,11 +376,7 @@ export default function ProductCheckoutPage({ params: paramsPromise }: { params:
       <div className="co-wrap">
         {/* Voltar */}
         <div className="co-back">
-          <button onClick={() => router.back()} style={{
-            display: "flex", alignItems: "center", gap: 6, background: "none", border: "none",
-            cursor: "pointer", color: "var(--gold)", fontSize: 11, letterSpacing: 2,
-            textTransform: "uppercase", fontFamily: "'Cinzel',serif",
-          }}>
+          <button onClick={() => router.back()} className="co-btn-back">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="15 18 9 12 15 6"/>
             </svg>
@@ -348,12 +402,12 @@ export default function ProductCheckoutPage({ params: paramsPromise }: { params:
               <div className="co-product-body">
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
                   <div style={{ width: 3, height: 14, background: "linear-gradient(180deg,var(--gold-light),var(--gold))", borderRadius: 2 }} />
-                  <span style={{ fontFamily: "'Cinzel',serif", fontSize: 9, fontWeight: 700, letterSpacing: 4, textTransform: "uppercase", color: "var(--gold)" }}>
+                  <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 9, fontWeight: 700, letterSpacing: 4, textTransform: "uppercase", color: "var(--gold)" }}>
                     Resumo da Compra
                   </span>
                 </div>
 
-                <h1 style={{ fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 22, letterSpacing: 1, color: "var(--text-primary)", lineHeight: 1.3, marginBottom: 10 }}>
+                <h1 style={{ fontFamily: "var(--font-cinzel)", fontWeight: 700, fontSize: 22, letterSpacing: 1, color: "var(--text-primary)", lineHeight: 1.3, marginBottom: 10 }}>
                   {product.title}
                 </h1>
 
@@ -365,8 +419,8 @@ export default function ProductCheckoutPage({ params: paramsPromise }: { params:
 
                 {/* Preço base */}
                 <div style={{ padding: "14px 18px", borderRadius: 12, background: "rgba(201,169,122,0.07)", border: "1px solid rgba(201,169,122,0.2)", display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-                  <span style={{ fontFamily: "'Cinzel',serif", fontSize: 10, letterSpacing: 2, color: "var(--text-muted)", textTransform: "uppercase" }}>Valor do produto</span>
-                  <span style={{ fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 22, color: "var(--gold-light)" }}>
+                  <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 10, letterSpacing: 2, color: "var(--text-muted)", textTransform: "uppercase" }}>Valor do produto</span>
+                  <span style={{ fontFamily: "var(--font-cinzel)", fontWeight: 700, fontSize: 22, color: "var(--gold-light)" }}>
                     R$ {product.price.toFixed(2).replace(".", ",")}
                   </span>
                 </div>
@@ -409,8 +463,8 @@ export default function ProductCheckoutPage({ params: paramsPromise }: { params:
                 {/* Total */}
                 {(shippingCost > 0 || couponDiscount > 0 || walletAmount > 0) && (
                   <div style={{ padding: "14px 18px", borderRadius: 12, background: "rgba(201,169,122,0.1)", border: "1px solid rgba(201,169,122,0.28)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                    <span style={{ fontSize: 11, color: "var(--gold)", fontWeight: 700, fontFamily: "'Cinzel',serif", letterSpacing: 1 }}>TOTAL A PAGAR</span>
-                    <span style={{ fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 26, color: "var(--gold-light)" }}>
+                    <span style={{ fontSize: 11, color: "var(--gold)", fontWeight: 700, fontFamily: "var(--font-cinzel)", letterSpacing: 1 }}>TOTAL A PAGAR</span>
+                    <span style={{ fontFamily: "var(--font-cinzel)", fontWeight: 700, fontSize: 26, color: "var(--gold-light)" }}>
                       R$ {finalPrice.toFixed(2).replace(".", ",")}
                     </span>
                   </div>
@@ -429,9 +483,9 @@ export default function ProductCheckoutPage({ params: paramsPromise }: { params:
                     Crie sua conta para acessar
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                    <input type="text" placeholder="Nome Completo" value={userData.name} onChange={e => setUserData({ ...userData, name: e.target.value })} style={INPUT} />
-                    <input type="email" placeholder="E-mail" value={userData.email} onChange={e => setUserData({ ...userData, email: e.target.value })} style={INPUT} />
-                    <input type="password" placeholder="Crie uma Senha" value={userData.password} onChange={e => setUserData({ ...userData, password: e.target.value })} style={INPUT} />
+                    <input type="text" placeholder="Nome Completo" value={userData.name} onChange={e => setUserData({ ...userData, name: e.target.value })} className="ka-input" />
+                    <input type="email" placeholder="E-mail" value={userData.email} onChange={e => setUserData({ ...userData, email: e.target.value })} className="ka-input" />
+                    <input type="password" placeholder="Crie uma Senha" value={userData.password} onChange={e => setUserData({ ...userData, password: e.target.value })} className="ka-input" />
                     <p style={{ fontSize: 10, color: "var(--text-muted)" }}>
                       Já tem conta?{" "}
                       <a href={`/login?callbackUrl=/checkout/product/${productId}`} style={{ color: "var(--gold)", textDecoration: "none" }}>Faça login</a>
@@ -471,23 +525,22 @@ export default function ProductCheckoutPage({ params: paramsPromise }: { params:
                   {/* Formulário de endereço */}
                   {deliveryMethod === "shipping" && (
                     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                      <input type="text" placeholder="Nome do destinatário" value={shippingAddr.name} onChange={e => setShippingAddr(p => ({ ...p, name: e.target.value }))} style={INPUT} />
+                      <input type="text" placeholder="Nome do destinatário" value={shippingAddr.name} onChange={e => setShippingAddr(p => ({ ...p, name: e.target.value }))} className="ka-input" />
 
                       <div className="co-row">
                         <input type="text" placeholder="CEP" maxLength={9} value={shippingAddr.cep}
                           onChange={e => { const v = formatCep(e.target.value); setShippingAddr(p => ({ ...p, cep: v })); if (v.replace(/\D/g, "").length === 8) fetchAddressByCep(v); }}
-                          style={{ ...INPUT, width: 130 }} />
-                        <input type="text" placeholder="Endereço e bairro" value={shippingAddr.address} onChange={e => setShippingAddr(p => ({ ...p, address: e.target.value }))} style={{ ...INPUT, flex: 1 }} />
-                        <input type="text" placeholder="Nº" value={shippingAddr.number} onChange={e => setShippingAddr(p => ({ ...p, number: e.target.value }))} style={{ ...INPUT, width: 64 }} />
+                          className="ka-input" style={{ width: 130 }} />
+                        <input type="text" placeholder="Endereço e bairro" value={shippingAddr.address} onChange={e => setShippingAddr(p => ({ ...p, address: e.target.value }))} className="ka-input" style={{ flex: 1 }} />
+                        <input type="text" placeholder="Nº" value={shippingAddr.number} onChange={e => setShippingAddr(p => ({ ...p, number: e.target.value }))} className="ka-input" style={{ width: 64 }} />
                       </div>
 
                       <div className="co-row">
-                        <input type="text" placeholder="Cidade" value={shippingAddr.city} onChange={e => setShippingAddr(p => ({ ...p, city: e.target.value }))} style={{ ...INPUT, flex: 1 }} />
-                        <input type="text" placeholder="UF" maxLength={2} value={shippingAddr.state} onChange={e => setShippingAddr(p => ({ ...p, state: e.target.value.toUpperCase() }))} style={{ ...INPUT, width: 58 }} />
+                        <input type="text" placeholder="Cidade" value={shippingAddr.city} onChange={e => setShippingAddr(p => ({ ...p, city: e.target.value }))} className="ka-input" style={{ flex: 1 }} />
+                        <input type="text" placeholder="UF" maxLength={2} value={shippingAddr.state} onChange={e => setShippingAddr(p => ({ ...p, state: e.target.value.toUpperCase() }))} className="ka-input" style={{ width: 58 }} />
                       </div>
 
-                      <button onClick={quoteShipping} disabled={quotingShipping}
-                        style={{ padding: "11px 20px", borderRadius: 10, cursor: "pointer", background: "linear-gradient(135deg,rgba(201,169,122,0.2),rgba(201,169,122,0.07))", border: "1px solid rgba(201,169,122,0.35)", color: "var(--gold)", fontFamily: "'Cinzel',serif", fontSize: 10, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+                      <button onClick={quoteShipping} disabled={quotingShipping} className="co-btn-ghost">
                         <Truck size={13} />
                         {quotingShipping ? "Calculando..." : "Calcular Frete"}
                       </button>
@@ -496,7 +549,7 @@ export default function ProductCheckoutPage({ params: paramsPromise }: { params:
 
                       {shippingOptions.length > 0 && (
                         <div style={{ marginTop: 4 }}>
-                          <p style={{ fontSize: 9, color: "var(--text-muted)", letterSpacing: 2, textTransform: "uppercase", fontFamily: "'Cinzel',serif", marginBottom: 8 }}>
+                          <p style={{ fontSize: 9, color: "var(--text-muted)", letterSpacing: 2, textTransform: "uppercase", fontFamily: "var(--font-cinzel)", marginBottom: 8 }}>
                             Escolha o frete
                           </p>
                           {product.productionDays != null && product.productionDays > 0 && (
@@ -525,7 +578,7 @@ export default function ProductCheckoutPage({ params: paramsPromise }: { params:
                                     : `Prazo: até ${opt.days} dias úteis`}
                                 </p>
                               </div>
-                              <span style={{ fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 13, color: "var(--gold-light)", flexShrink: 0 }}>
+                              <span style={{ fontFamily: "var(--font-cinzel)", fontWeight: 700, fontSize: 13, color: "var(--gold-light)", flexShrink: 0 }}>
                                 R$ {opt.price.toFixed(2).replace(".", ",")}
                               </span>
                             </div>
@@ -556,9 +609,8 @@ export default function ProductCheckoutPage({ params: paramsPromise }: { params:
               <div style={{ marginBottom: 16 }}>
                 {!appliedCoupon ? (
                   <div className="co-row">
-                    <input type="text" placeholder="Tem um cupom?" value={couponCode} onChange={e => setCouponCode(e.target.value.toUpperCase())} style={{ ...INPUT, flex: 1 }} />
-                    <button onClick={handleApplyCoupon} disabled={validatingCoupon || !couponCode}
-                      style={{ padding: "11px 18px", borderRadius: 10, border: "1px solid rgba(201,169,122,0.35)", background: "rgba(201,169,122,0.1)", color: "var(--gold)", fontSize: 10, fontWeight: 700, fontFamily: "'Cinzel',serif", cursor: "pointer", textTransform: "uppercase", letterSpacing: 1, whiteSpace: "nowrap" }}>
+                    <input type="text" placeholder="Tem um cupom?" value={couponCode} onChange={e => setCouponCode(e.target.value.toUpperCase())} className="ka-input" style={{ flex: 1 }} />
+                    <button onClick={handleApplyCoupon} disabled={validatingCoupon || !couponCode} className="co-btn-ghost" style={{ whiteSpace: "nowrap" }}>
                       {validatingCoupon ? "..." : "Aplicar"}
                     </button>
                   </div>
@@ -588,7 +640,7 @@ export default function ProductCheckoutPage({ params: paramsPromise }: { params:
                       </div>
                       <p style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>Saldo: R$ {walletBalance.toFixed(2).replace(".", ",")}</p>
                     </div>
-                    {useWallet && <span style={{ fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 13, color: "#6ee7b7" }}>-R$ {walletAmount.toFixed(2).replace(".", ",")}</span>}
+                    {useWallet && <span style={{ fontFamily: "var(--font-cinzel)", fontWeight: 700, fontSize: 13, color: "#6ee7b7" }}>-R$ {walletAmount.toFixed(2).replace(".", ",")}</span>}
                   </div>
                 </div>
               )}
@@ -603,7 +655,7 @@ export default function ProductCheckoutPage({ params: paramsPromise }: { params:
                     : finalPrice <= 0 ? "linear-gradient(135deg,#6ee7b7,#34d399)"
                     : "linear-gradient(135deg,#009EE3,#007BC2)",
                   color: loading || needsShippingChoice ? "rgba(255,255,255,0.3)" : finalPrice <= 0 ? "#060D1F" : "#fff",
-                  fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 12,
+                  fontFamily: "var(--font-cinzel)", fontWeight: 700, fontSize: 12,
                   letterSpacing: 2, textTransform: "uppercase", border: "none",
                   cursor: loading || needsShippingChoice ? "default" : "pointer",
                   display: "flex", alignItems: "center", justifyContent: "center", gap: 10, transition: "all 0.2s",

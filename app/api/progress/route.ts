@@ -52,6 +52,42 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Check if this module is now complete → notify about unlocked dependent modules
+    const lessonWithModule = await prisma.lesson.findUnique({
+      where: { id: lessonId },
+      select: {
+        module: {
+          select: {
+            id: true,
+            lessons: { select: { id: true } },
+            course: { select: { slug: true } },
+            dependentModules: { select: { id: true, title: true } },
+          },
+        },
+      },
+    });
+
+    if (lessonWithModule?.module) {
+      const mod = lessonWithModule.module;
+      const allLessonIds = mod.lessons.map(l => l.id);
+      const completedCount = await prisma.lessonProgress.count({
+        where: { userId: session.user.id, lessonId: { in: allLessonIds }, completed: true },
+      });
+
+      if (completedCount === allLessonIds.length && mod.dependentModules.length > 0) {
+        await prisma.notification.createMany({
+          data: mod.dependentModules.map(dep => ({
+            userId: session.user.id,
+            title: "Novo módulo liberado!",
+            message: `O módulo "${dep.title}" agora está disponível para você.`,
+            type: "MODULE_UNLOCK",
+            link: `/cursos/${mod.course.slug}`,
+          })),
+          skipDuplicates: true,
+        });
+      }
+    }
+
     return NextResponse.json({ ...progress, streak });
   }
 

@@ -74,40 +74,48 @@ export function emailBoasVindas({ name, email, password }: { name: string; email
 
 export function emailConfirmacaoPagamento({
   name,
-  courseName,
+  itemName,
   amount,
   isMonthly,
+  isProduct,
 }: {
   name: string;
-  courseName: string;
+  itemName: string;
   amount: number;
   isMonthly: boolean;
+  isProduct?: boolean;
 }) {
   const appUrl = process.env.AUTH_URL ?? "https://kadima.academy";
   const formatted = amount.toFixed(2).replace(".", ",");
+  const itemLabel = isProduct ? "Produto" : "Curso";
+  const accessLine = isProduct
+    ? "Em breve você receberá informações sobre envio ou disponibilidade."
+    : (isMonthly ? "Mensalidade (acesso por 30 dias)" : "Pagamento único (acesso vitalício)");
+  const ctaUrl = isProduct ? `${appUrl}/dashboard` : `${appUrl}/cursos`;
+  const ctaLabel = isProduct ? "Acessar Minha Conta" : "Acessar Meus Cursos";
   return base(`
     <div style="margin-bottom:8px;">${badge("Pagamento Aprovado", "#6ee7b7")}</div>
     <h1 style="font-size:24px;font-weight:700;letter-spacing:2px;color:#F5ECD7;margin:16px 0 8px;text-transform:uppercase;">
       Pagamento confirmado!
     </h1>
     <p style="font-size:14px;color:rgba(255,255,255,0.65);line-height:1.8;margin:0 0 24px;">
-      Olá, <strong style="color:#F5ECD7;">${name}</strong>! Seu pagamento foi aprovado e seu acesso já está liberado.
+      Olá, <strong style="color:#F5ECD7;">${name}</strong>! Seu pagamento foi aprovado${isProduct ? "" : " e seu acesso já está liberado"}.
     </p>
     ${divider}
     <div style="background:rgba(110,231,183,0.06);border:1px solid rgba(110,231,183,0.15);border-radius:12px;padding:16px 20px;margin-bottom:28px;">
       <p style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#6ee7b7;font-weight:600;margin:0 0 12px;">Resumo da compra</p>
       <p style="font-size:13px;color:rgba(255,255,255,0.80);margin:0 0 6px;">
-        <strong style="color:rgba(255,255,255,0.45);font-weight:400;">Curso:</strong> ${courseName}
+        <strong style="color:rgba(255,255,255,0.45);font-weight:400;">${itemLabel}:</strong> ${itemName}
       </p>
       <p style="font-size:13px;color:rgba(255,255,255,0.80);margin:0 0 6px;">
         <strong style="color:rgba(255,255,255,0.45);font-weight:400;">Valor:</strong> R$ ${formatted}
       </p>
       <p style="font-size:13px;color:rgba(255,255,255,0.80);margin:0;">
-        <strong style="color:rgba(255,255,255,0.45);font-weight:400;">Tipo:</strong> ${isMonthly ? "Mensalidade (acesso por 30 dias)" : "Pagamento único (acesso vitalício)"}
+        <strong style="color:rgba(255,255,255,0.45);font-weight:400;">${isProduct ? "Status" : "Tipo"}:</strong> ${accessLine}
       </p>
     </div>
     <div style="text-align:center;">
-      ${btn(`${appUrl}/cursos`, "Acessar Meus Cursos")}
+      ${btn(ctaUrl, ctaLabel)}
     </div>
   `);
 }

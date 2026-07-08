@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { rateLimit, getIp } from "@/lib/rate-limit";
 
 // CEP de origem da Kadima Academy (preencher com o CEP real)
 const ORIGIN_CEP = process.env.SHIPPING_ORIGIN_CEP ?? "01310-100";
@@ -10,6 +11,10 @@ const ME_URL     = process.env.MELHOR_ENVIO_SANDBOX === "true"
   : "https://melhorenvio.com.br/api/v2/me/shipment/calculate";
 
 export async function POST(req: NextRequest) {
+  if (!rateLimit(`shipping:${getIp(req)}`, 15, 60_000)) {
+    return NextResponse.json({ error: "Muitas consultas de frete. Aguarde um momento." }, { status: 429 });
+  }
+
   if (!ME_TOKEN) {
     return NextResponse.json({ error: "Frete não configurado." }, { status: 503 });
   }

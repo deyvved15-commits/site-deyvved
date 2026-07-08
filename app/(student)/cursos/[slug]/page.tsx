@@ -6,6 +6,33 @@ import { getGoogleDriveImageUrl } from "@/lib/utils";
 import CourseThumbnail from "@/components/student/course-thumbnail";
 import ModuleCarousel from "@/components/student/module-carousel";
 import { resolveModuleAccess } from "@/lib/module-access";
+import type { Metadata } from "next";
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const course = await prisma.course.findUnique({
+    where: { slug },
+    select: { title: true, description: true, thumbnail: true },
+  });
+  if (!course) return {};
+
+  const title = `${course.title} — Kadima Academy`;
+  const description = course.description ?? "Curso teológico online na Kadima Academy";
+  const image = course.thumbnail?.includes("drive.google.com")
+    ? getGoogleDriveImageUrl(course.thumbnail)
+    : course.thumbnail;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      ...(image ? { images: [{ url: image }] } : {}),
+    },
+    twitter: { card: "summary_large_image", title, description },
+  };
+}
 
 export default async function CursoPage({ params }: { params: Promise<{ slug: string }> }) {
   const session = await auth();
@@ -52,8 +79,9 @@ export default async function CursoPage({ params }: { params: Promise<{ slug: st
 
   // Calcular acesso por módulo
   const enrolledAt = enrollment?.createdAt ?? new Date();
+  const allLessonsForAccess = modules.flatMap(m => m.lessons || []);
   const completedLessonIds = new Set(
-    allLessons.filter(l => l.progress?.[0]?.completed).map(l => l.id)
+    allLessonsForAccess.filter(l => l.progress?.[0]?.completed).map(l => l.id)
   );
   const moduleAccessRules = modules.map(m => ({
     id: m.id,
