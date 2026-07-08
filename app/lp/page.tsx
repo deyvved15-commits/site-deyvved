@@ -3,6 +3,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import LandingHeader from "@/components/landing/landing-header";
 import CoursesSection from "@/components/landing/courses-section";
+import FaqSection from "@/components/landing/faq-section";
 
 async function getData() {
   const [courses, studentCount] = await Promise.all([
@@ -121,10 +122,136 @@ export default async function LandingPage() {
         </div>
       </section>
 
+      {/* ── LOGO TICKER ── */}
+      <section style={{ padding: "48px 0", borderBottom: "1px solid rgba(201,169,122,0.08)", overflow: "hidden", position: "relative" }}>
+        <div style={{ textAlign: "center", marginBottom: 28 }}>
+          <span style={{ fontSize: 10, fontFamily: "var(--font-cinzel)", letterSpacing: 4, textTransform: "uppercase", color: "rgba(255,255,255,0.25)" }}>
+            Alunos de Igrejas e Ministérios em todo o Brasil
+          </span>
+        </div>
+        <div style={{ position: "relative", overflow: "hidden" }}>
+          <div className="lp-ticker-track">
+            {[
+              "Igreja Batista Central", "Ministério Shalom", "IPB Goiânia",
+              "Igreja Cristã Maranata", "Ministério Jovem Kadima", "Seminário Reformado",
+              "Igreja Assembleia de Deus", "Missão Palavra Viva", "ICN Brasília",
+              "Igreja Batista Central", "Ministério Shalom", "IPB Goiânia",
+              "Igreja Cristã Maranata", "Ministério Jovem Kadima", "Seminário Reformado",
+              "Igreja Assembleia de Deus", "Missão Palavra Viva", "ICN Brasília",
+            ].map((name, i) => (
+              <div key={i} style={{
+                flexShrink: 0, padding: "10px 24px", borderRadius: 10,
+                border: "1px solid rgba(201,169,122,0.12)",
+                background: "rgba(15,26,61,0.40)",
+                display: "flex", alignItems: "center", gap: 10,
+              }}>
+                <span style={{ fontSize: 15 }}>✝️</span>
+                <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, letterSpacing: 1, color: "rgba(255,255,255,0.45)", whiteSpace: "nowrap" }}>{name}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <style>{`
+          .lp-ticker-track {
+            display: flex;
+            gap: 14px;
+            width: max-content;
+            animation: lp-ticker 40s linear infinite;
+            padding: 4px 0;
+          }
+          @keyframes lp-ticker {
+            from { transform: translateX(0); }
+            to { transform: translateX(-50%); }
+          }
+          .lp-ticker-track:hover { animation-play-state: paused; }
+        `}</style>
+      </section>
+
       {/* ── COURSES SECTION ── */}
       <Suspense fallback={null}>
         <CoursesSection courses={courses} />
       </Suspense>
+
+      {/* ── TESTIMONIALS ── */}
+      <section id="depoimentos" style={{ padding: "100px 40px", background: "linear-gradient(180deg, rgba(15,26,61,0.20) 0%, var(--navy-darkest) 100%)", position: "relative", overflow: "hidden" }}>
+        <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 60% 50% at 80% 50%, rgba(201,169,122,0.04) 0%, transparent 70%)", pointerEvents: "none" }} />
+
+        <div style={{ maxWidth: 1100, margin: "0 auto", position: "relative", zIndex: 1 }}>
+          <div style={{ textAlign: "center", marginBottom: 60 }}>
+            <div style={{ fontSize: 10, fontFamily: "var(--font-cinzel)", letterSpacing: 5, textTransform: "uppercase", color: "var(--gold)", marginBottom: 16 }}>
+              Depoimentos
+            </div>
+            <h2 style={{ fontFamily: "var(--font-cinzel)", fontWeight: 700, fontSize: "clamp(24px, 3.5vw, 38px)", letterSpacing: 1.5, color: "#fff", lineHeight: 1.2, marginBottom: 16 }}>
+              O que nossos alunos dizem
+            </h2>
+            <div style={{ width: 50, height: 2, background: "linear-gradient(90deg, transparent, var(--gold), transparent)", margin: "0 auto" }} />
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 24 }} className="lp-testimonials-grid">
+            {[
+              {
+                quote: "A Kadima Academy transformou minha compreensão da Palavra. Os professores têm profundidade bíblica rara e a plataforma é incrível para estudar no ritmo que preciso.",
+                name: "Marcos Oliveira",
+                role: "Pastor, São Paulo — SP",
+                stars: 5,
+              },
+              {
+                quote: "Nunca imaginei que conseguiria estudar teologia de qualidade morando no interior. A Kadima tornou isso possível. Estou no meu segundo curso e não quero parar.",
+                name: "Ana Paula Ferreira",
+                role: "Líder de Células, Goiânia — GO",
+                stars: 5,
+              },
+              {
+                quote: "O rigor acadêmico e a profundidade exegética são impressionantes. Já frequentei seminários presenciais e a qualidade aqui é equivalente ou superior.",
+                name: "Rodrigo Santos",
+                role: "Diácono, Belo Horizonte — MG",
+                stars: 5,
+              },
+            ].map((t, i) => (
+              <div key={i} style={{
+                padding: "32px 28px",
+                borderRadius: 20,
+                background: "rgba(15,26,61,0.60)",
+                border: "1px solid rgba(201,169,122,0.12)",
+                display: "flex", flexDirection: "column", gap: 20,
+                backdropFilter: "blur(10px)",
+              }}>
+                <div style={{ display: "flex", gap: 3 }}>
+                  {Array.from({ length: t.stars }).map((_, si) => (
+                    <span key={si} style={{ color: "var(--gold)", fontSize: 14 }}>★</span>
+                  ))}
+                </div>
+                <p style={{ fontSize: 14, color: "rgba(255,255,255,0.65)", lineHeight: 1.85, margin: 0, flex: 1, fontStyle: "italic" }}>
+                  &ldquo;{t.quote}&rdquo;
+                </p>
+                <div style={{ display: "flex", alignItems: "center", gap: 14, borderTop: "1px solid rgba(201,169,122,0.10)", paddingTop: 20 }}>
+                  <div style={{
+                    width: 44, height: 44, borderRadius: "50%",
+                    background: "linear-gradient(135deg, var(--gold), rgba(201,169,122,0.4))",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontFamily: "var(--font-cinzel)", fontWeight: 700, fontSize: 16, color: "var(--navy-darkest)",
+                    flexShrink: 0,
+                  }}>
+                    {t.name[0]}
+                  </div>
+                  <div>
+                    <div style={{ fontFamily: "var(--font-cinzel)", fontSize: 13, fontWeight: 600, color: "#fff" }}>{t.name}</div>
+                    <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", marginTop: 3, letterSpacing: 0.5 }}>{t.role}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <style>{`
+          @media (max-width: 900px) {
+            .lp-testimonials-grid { grid-template-columns: 1fr !important; max-width: 480px; margin: 0 auto; }
+          }
+          @media (min-width: 901px) and (max-width: 1100px) {
+            .lp-testimonials-grid { grid-template-columns: repeat(2, 1fr) !important; }
+          }
+        `}</style>
+      </section>
 
       {/* ── ABOUT / MISSION ── */}
       <section id="sobre" style={{ padding: "100px 40px", background: "linear-gradient(180deg, var(--navy-darkest) 0%, rgba(15,26,61,0.3) 50%, var(--navy-darkest) 100%)", position: "relative", overflow: "hidden" }}>
@@ -188,6 +315,8 @@ export default async function LandingPage() {
           }
         `}</style>
       </section>
+
+      <FaqSection />
 
       {/* ── CTA BANNER ── */}
       <section style={{ padding: "80px 40px", background: "linear-gradient(135deg, rgba(15,26,61,0.8) 0%, rgba(10,18,45,0.9) 100%)", borderTop: "1px solid rgba(201,169,122,0.10)", position: "relative", overflow: "hidden" }}>

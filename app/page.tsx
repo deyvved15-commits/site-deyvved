@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 
 export default async function RootPage() {
   const session = await auth();
-  if (!session) redirect("/login");
+  if (!session) redirect("/lp");
   if (session.user.role === "ADMIN") redirect("/admin");
   if (session.user.role === "TEACHER") redirect("/professor");
   redirect("/dashboard");

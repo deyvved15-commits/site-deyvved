@@ -40,14 +40,17 @@ export default function LandingHeader() {
 
         {/* Nav — desktop */}
         <nav style={{ display: "flex", alignItems: "center", gap: 4 }} className="landing-nav-desktop">
-          <a href="#cursos" style={{ color: "rgba(255,255,255,0.65)", textDecoration: "none", fontSize: 13, fontWeight: 500, padding: "10px 14px", borderRadius: 8, transition: "color 0.2s", minHeight: 44, display: "flex", alignItems: "center" }}
-            onMouseEnter={e => (e.currentTarget.style.color = "#fff")}
-            onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.65)")}
-          >Cursos</a>
-          <a href="#sobre" style={{ color: "rgba(255,255,255,0.65)", textDecoration: "none", fontSize: 13, fontWeight: 500, padding: "10px 14px", borderRadius: 8, transition: "color 0.2s", minHeight: 44, display: "flex", alignItems: "center" }}
-            onMouseEnter={e => (e.currentTarget.style.color = "#fff")}
-            onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.65)")}
-          >Sobre</a>
+          {[
+            { href: "#cursos", label: "Cursos" },
+            { href: "#depoimentos", label: "Depoimentos" },
+            { href: "#faq", label: "FAQ" },
+            { href: "#sobre", label: "Sobre" },
+          ].map(link => (
+            <a key={link.href} href={link.href} style={{ color: "rgba(255,255,255,0.65)", textDecoration: "none", fontSize: 13, fontWeight: 500, padding: "10px 14px", borderRadius: 8, transition: "color 0.2s", minHeight: 44, display: "flex", alignItems: "center" }}
+              onMouseEnter={e => (e.currentTarget.style.color = "#fff")}
+              onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.65)")}
+            >{link.label}</a>
+          ))}
         </nav>
 
         {/* CTA */}
@@ -98,8 +101,14 @@ export default function LandingHeader() {
           padding: "16px 20px 20px",
         }}>
           <nav style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            <a href="#cursos" onClick={() => setMenuOpen(false)} style={{ color: "rgba(255,255,255,0.8)", textDecoration: "none", fontSize: 15, padding: "14px 4px", borderBottom: "1px solid rgba(255,255,255,0.05)", minHeight: 44, display: "flex", alignItems: "center" }}>Cursos</a>
-            <a href="#sobre"  onClick={() => setMenuOpen(false)} style={{ color: "rgba(255,255,255,0.8)", textDecoration: "none", fontSize: 15, padding: "14px 4px", borderBottom: "1px solid rgba(255,255,255,0.05)", minHeight: 44, display: "flex", alignItems: "center" }}>Sobre</a>
+            {[
+              { href: "#cursos", label: "Cursos" },
+              { href: "#depoimentos", label: "Depoimentos" },
+              { href: "#faq", label: "FAQ" },
+              { href: "#sobre", label: "Sobre" },
+            ].map(link => (
+              <a key={link.href} href={link.href} onClick={() => setMenuOpen(false)} style={{ color: "rgba(255,255,255,0.8)", textDecoration: "none", fontSize: 15, padding: "14px 4px", borderBottom: "1px solid rgba(255,255,255,0.05)", minHeight: 44, display: "flex", alignItems: "center" }}>{link.label}</a>
+            ))}
             <Link href="/login" onClick={() => setMenuOpen(false)} style={{ color: "var(--gold)", textDecoration: "none", fontSize: 15, padding: "14px 4px", fontWeight: 600, minHeight: 44, display: "flex", alignItems: "center" }}>Área de Membros →</Link>
           </nav>
         </div>
