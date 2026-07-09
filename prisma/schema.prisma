@@ -65,6 +65,11 @@ model User {
   affiliatePercentage Float?
   referredBy          String?
   walletBalance       Float             @default(0)
+  shippingCep         String?
+  shippingAddress     String?
+  shippingNumber      String?
+  shippingCity        String?
+  shippingState       String?
   lastLoginAt         DateTime?
   createdAt           DateTime          @default(now())
   updatedAt           DateTime          @updatedAt

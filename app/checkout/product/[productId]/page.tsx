@@ -85,6 +85,23 @@ export default function ProductCheckoutPage({ params: paramsPromise }: { params:
       .then(d => setWalletBalance(d.balance ?? 0))
       .catch(() => {});
 
+    fetch("/api/profile")
+      .then(r => r.json())
+      .then(p => {
+        if (p?.shippingCep) {
+          setShippingAddr(prev => ({
+            ...prev,
+            name: prev.name || p.name || "",
+            cep: p.shippingCep ?? "",
+            address: p.shippingAddress ?? "",
+            number: p.shippingNumber ?? "",
+            city: p.shippingCity ?? "",
+            state: p.shippingState ?? "",
+          }));
+        }
+      })
+      .catch(() => {});
+
   }, [productId]);
 
   async function fetchAddressByCep(cep: string) {
@@ -192,6 +209,14 @@ export default function ProductCheckoutPage({ params: paramsPromise }: { params:
       });
       const data = await res.json();
       if (!res.ok) { setError(data.error ?? "Erro ao iniciar pagamento."); setLoading(false); return; }
+
+      if (isPrinted && !isPickup && shippingAddr.cep) {
+        fetch("/api/profile", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ shippingCep: shippingAddr.cep, shippingAddress: shippingAddr.address, shippingNumber: shippingAddr.number, shippingCity: shippingAddr.city, shippingState: shippingAddr.state }),
+        }).catch(() => {});
+      }
 
       if (data.paid && data.redirectUrl) { window.location.href = data.redirectUrl; return; }
       window.location.href = data.checkoutUrl;
