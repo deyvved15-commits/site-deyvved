@@ -59,7 +59,7 @@ function Alert({ type, msg }: { type: "error" | "success"; msg: string }) {
   );
 }
 
-interface UserData { id: string; name: string | null; email: string | null; bio: string | null; avatar: string | null; shippingCep: string | null; shippingAddress: string | null; shippingNumber: string | null; shippingCity: string | null; shippingState: string | null }
+interface UserData { id: string; name: string | null; email: string | null; bio: string | null; avatar: string | null }
 
 interface Enrollment {
   id: string;
@@ -73,13 +73,6 @@ export default function PerfilPage() {
   const [user, setUser] = useState<UserData | null>(null);
   const [name, setName] = useState("");
   const [bio, setBio] = useState("");
-  const [addrCep, setAddrCep] = useState("");
-  const [addrStreet, setAddrStreet] = useState("");
-  const [addrNumber, setAddrNumber] = useState("");
-  const [addrCity, setAddrCity] = useState("");
-  const [addrState, setAddrState] = useState("");
-  const [addrLoading, setAddrLoading] = useState(false);
-  const [addrMsg, setAddrMsg] = useState<{ type: "error" | "success"; msg: string } | null>(null);
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -99,11 +92,6 @@ export default function PerfilPage() {
         setUser(data);
         setName(data.name ?? "");
         setBio(data.bio ?? "");
-        setAddrCep(data.shippingCep ?? "");
-        setAddrStreet(data.shippingAddress ?? "");
-        setAddrNumber(data.shippingNumber ?? "");
-        setAddrCity(data.shippingCity ?? "");
-        setAddrState(data.shippingState ?? "");
       });
     fetch("/api/enrollments")
       .then(r => r.json())
@@ -125,34 +113,6 @@ export default function PerfilPage() {
     setUser(u => u ? { ...u, name: data.name, bio: data.bio } : u);
     await updateSession({ name: data.name });
     setInfoMsg({ type: "success", msg: "Perfil atualizado com sucesso!" });
-  }
-
-  async function handleAddrSave(e: React.FormEvent) {
-    e.preventDefault();
-    setAddrLoading(true);
-    setAddrMsg(null);
-    const res = await fetch("/api/profile", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ shippingCep: addrCep || null, shippingAddress: addrStreet || null, shippingNumber: addrNumber || null, shippingCity: addrCity || null, shippingState: addrState || null }),
-    });
-    setAddrLoading(false);
-    if (!res.ok) { setAddrMsg({ type: "error", msg: "Erro ao salvar endereço." }); return; }
-    setAddrMsg({ type: "success", msg: "Endereço salvo! Será pré-preenchido no próximo checkout." });
-  }
-
-  async function fetchCep(cep: string) {
-    const digits = cep.replace(/\D/g, "");
-    if (digits.length !== 8) return;
-    try {
-      const res = await fetch(`https://viacep.com.br/ws/${digits}/json/`);
-      const data = await res.json();
-      if (!data.erro) {
-        setAddrStreet(`${data.logradouro}${data.bairro ? ", " + data.bairro : ""}`);
-        setAddrCity(data.localidade);
-        setAddrState(data.uf);
-      }
-    } catch {}
   }
 
   async function handlePasswordSave(e: React.FormEvent) {
@@ -332,57 +292,6 @@ export default function PerfilPage() {
                   ? <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" style={{ animation: "spin 1s linear infinite" }}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
                   : <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>}
                 {infoLoading ? "Salvando..." : "Salvar Perfil"}
-              </button>
-            </div>
-          </form>
-        </div>
-
-        {/* Shipping address section */}
-        <div style={{
-          borderRadius: 20, padding: "28px 32px", marginBottom: 20,
-          background: "linear-gradient(160deg, rgba(15,26,61,0.7) 0%, rgba(10,18,45,0.7) 100%)",
-          border: "1px solid rgba(201,169,122,0.14)",
-          boxShadow: "0 16px 40px rgba(0,0,0,0.30)",
-        }}>
-          <div style={S.sectionTitle}>
-            <div style={S.sectionBar} />
-            <span style={S.sectionLabel}>Endereço de Entrega</span>
-          </div>
-          <p style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 18, lineHeight: 1.6 }}>
-            Salvo aqui, será pré-preenchido automaticamente no checkout de produtos físicos.
-          </p>
-          <form onSubmit={handleAddrSave} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-            <div style={{ display: "grid", gridTemplateColumns: "140px 1fr 72px", gap: 10 }}>
-              <div style={S.field}>
-                <label style={S.label}>CEP</label>
-                <input className="pf-input ka-input" value={addrCep} onChange={e => { const v = e.target.value.replace(/\D/g,"").replace(/^(\d{5})(\d)/,"$1-$2").slice(0,9); setAddrCep(v); if (v.replace(/\D/g,"").length===8) fetchCep(v); }} placeholder="00000-000" maxLength={9} />
-              </div>
-              <div style={S.field}>
-                <label style={S.label}>Endereço e Bairro</label>
-                <input className="pf-input ka-input" value={addrStreet} onChange={e => setAddrStreet(e.target.value)} placeholder="Rua, bairro..." />
-              </div>
-              <div style={S.field}>
-                <label style={S.label}>Nº</label>
-                <input className="pf-input ka-input" value={addrNumber} onChange={e => setAddrNumber(e.target.value)} placeholder="123" />
-              </div>
-            </div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 64px", gap: 10 }}>
-              <div style={S.field}>
-                <label style={S.label}>Cidade</label>
-                <input className="pf-input ka-input" value={addrCity} onChange={e => setAddrCity(e.target.value)} placeholder="Cidade" />
-              </div>
-              <div style={S.field}>
-                <label style={S.label}>UF</label>
-                <input className="pf-input ka-input" value={addrState} onChange={e => setAddrState(e.target.value.toUpperCase())} placeholder="RJ" maxLength={2} />
-              </div>
-            </div>
-            {addrMsg && <Alert type={addrMsg.type} msg={addrMsg.msg} />}
-            <div>
-              <button type="submit" disabled={addrLoading} style={{ ...S.btnPrimary, opacity: addrLoading ? 0.7 : 1 }}>
-                {addrLoading
-                  ? <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" style={{ animation: "spin 1s linear infinite" }}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
-                  : <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>}
-                {addrLoading ? "Salvando..." : "Salvar Endereço"}
               </button>
             </div>
           </form>
