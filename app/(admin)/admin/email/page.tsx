@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { KaSelect } from "@/components/ui/ka-select";
 
 interface Course { id: string; title: string }
 
@@ -202,19 +203,28 @@ export default function AdminEmailPage() {
           <div style={{ display: "grid", gridTemplateColumns: audience === "course" ? "1fr 1fr" : "1fr", gap: 16 }}>
             <div>
               <label style={S.label}>Público-alvo</label>
-              <select value={audience} onChange={e => { setAudience(e.target.value); setCourseId(""); }} style={S.select}>
-                <option value="all">Todos os alunos</option>
-                <option value="active">Alunos com acesso ativo</option>
-                <option value="course">Alunos de um curso específico</option>
-              </select>
+              <KaSelect
+                value={audience}
+                onChange={v => { setAudience(v); setCourseId(""); }}
+                options={[
+                  { value: "all", label: "Todos os alunos" },
+                  { value: "active", label: "Alunos com acesso ativo" },
+                  { value: "course", label: "Alunos de um curso específico" },
+                ]}
+              />
             </div>
             {audience === "course" && (
               <div>
                 <label style={S.label}>Curso</label>
-                <select value={courseId} onChange={e => setCourseId(e.target.value)} style={S.select}>
-                  <option value="">Selecione o curso…</option>
-                  {courses.map(c => <option key={c.id} value={c.id}>{c.title}</option>)}
-                </select>
+                <KaSelect
+                  value={courseId}
+                  onChange={setCourseId}
+                  placeholder="Selecione o curso…"
+                  options={[
+                    { value: "", label: "Selecione o curso…" },
+                    ...courses.map(c => ({ value: c.id, label: c.title })),
+                  ]}
+                />
               </div>
             )}
           </div>

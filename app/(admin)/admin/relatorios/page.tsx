@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { KaSelect } from "@/components/ui/ka-select";
 
 const TABS = [
   { id: "alunos",      label: "Alunos Matriculados" },
@@ -205,43 +206,60 @@ export default function RelatoriosPage() {
         <div className="no-print" style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center", marginBottom: 24 }}>
           {/* Filtro curso — não aparece no log, atividades ou progresso */}
           {tab !== "progresso" && tab !== "log" && tab !== "atividades" && (
-            <select value={courseId} onChange={e => setCourseId(e.target.value)} style={selectStyle}>
-              <option value="">Todos os cursos</option>
-              {courses.map(c => <option key={c.id} value={c.id}>{c.title}</option>)}
-            </select>
+            <KaSelect
+              value={courseId}
+              onChange={setCourseId}
+              style={{ minWidth: 180 }}
+              options={[
+                { value: "", label: "Todos os cursos" },
+                ...courses.map(c => ({ value: c.id, label: c.title })),
+              ]}
+            />
           )}
 
-          {/* Filtro aluno — log e atividades */}
           {(tab === "log" || tab === "atividades") && (
-            <select value={userId} onChange={e => setUserId(e.target.value)} style={{ ...selectStyle, minWidth: 220 }}>
-              <option value="">Todos os alunos</option>
-              {students.map(s => <option key={s.id} value={s.id}>{s.name} — {s.email}</option>)}
-            </select>
+            <KaSelect
+              value={userId}
+              onChange={setUserId}
+              style={{ minWidth: 240 }}
+              options={[
+                { value: "", label: "Todos os alunos" },
+                ...students.map(s => ({ value: s.id, label: `${s.name} — ${s.email}` })),
+              ]}
+            />
           )}
 
-          {/* Filtro status — financeiro */}
           {tab === "financeiro" && (
-            <select value={paymentStatus} onChange={e => setPaymentStatus(e.target.value)} style={selectStyle}>
-              <option value="">Todos os status</option>
-              <option value="approved">Aprovados</option>
-              <option value="rejected">Recusados</option>
-              <option value="cancelled">Cancelados</option>
-              <option value="pending">Pendentes</option>
-            </select>
+            <KaSelect
+              value={paymentStatus}
+              onChange={setPaymentStatus}
+              style={{ minWidth: 180 }}
+              options={[
+                { value: "", label: "Todos os status" },
+                { value: "approved", label: "Aprovados" },
+                { value: "rejected", label: "Recusados" },
+                { value: "cancelled", label: "Cancelados" },
+                { value: "pending", label: "Pendentes" },
+              ]}
+            />
           )}
 
-          {/* Filtro tipo de atividade */}
           {tab === "atividades" && (
-            <select value={activityType} onChange={e => setActivityType(e.target.value)} style={selectStyle}>
-              <option value="">Todos os tipos</option>
-              <option value="LOGIN">Login na plataforma</option>
-              <option value="LIVE_VIEW">Acessou Live</option>
-              <option value="WEEKLY_LESSON">Assistiu Aula da Semana</option>
-              <option value="LESSON_VIEW">Abriu aula</option>
-              <option value="LESSON_COMPLETE">Aula concluída</option>
-              <option value="PURCHASE">Compra realizada</option>
-              <option value="PAYMENT_FAILED">Pagamento recusado</option>
-            </select>
+            <KaSelect
+              value={activityType}
+              onChange={setActivityType}
+              style={{ minWidth: 200 }}
+              options={[
+                { value: "", label: "Todos os tipos" },
+                { value: "LOGIN", label: "Login na plataforma" },
+                { value: "LIVE_VIEW", label: "Acessou Live" },
+                { value: "WEEKLY_LESSON", label: "Assistiu Aula da Semana" },
+                { value: "LESSON_VIEW", label: "Abriu aula" },
+                { value: "LESSON_COMPLETE", label: "Aula concluída" },
+                { value: "PURCHASE", label: "Compra realizada" },
+                { value: "PAYMENT_FAILED", label: "Pagamento recusado" },
+              ]}
+            />
           )}
 
           {/* Intervalo de datas */}

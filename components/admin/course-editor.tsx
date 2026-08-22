@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { KaSelect } from "@/components/ui/ka-select";
 import { Input } from "@/components/ui/input";
 import { getYoutubeId, getGoogleDriveImageUrl } from "@/lib/utils";
 import { Plus, Trash2, ChevronDown, ChevronRight, Eye, EyeOff, Pencil, X, Check, Clock } from "lucide-react";
@@ -330,10 +331,14 @@ export default function CourseEditor({ course: initial, teachers: allTeachers, i
             </div>
             <div className="ka-field" style={{ display: "flex", flexDirection: "column", gap: 6 }}>
               <label className="ka-label">Tipo de Acesso</label>
-              <select className="ka-input" value={course.paymentType} onChange={e => setCourse(c => ({ ...c, paymentType: e.target.value as "ONE_TIME" | "MONTHLY" }))} style={{ cursor: "pointer", appearance: "none" }}>
-                <option value="ONE_TIME" style={{ background: "#0F1A3D" }}>Pagamento Único</option>
-                <option value="MONTHLY" style={{ background: "#0F1A3D" }}>Mensalidade (30 dias)</option>
-              </select>
+              <KaSelect
+                value={course.paymentType}
+                onChange={v => setCourse(c => ({ ...c, paymentType: v as "ONE_TIME" | "MONTHLY" }))}
+                options={[
+                  { value: "ONE_TIME", label: "Pagamento Único" },
+                  { value: "MONTHLY", label: "Mensalidade (30 dias)" },
+                ]}
+              />
             </div>
           </div>
 

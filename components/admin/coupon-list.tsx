@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Trash2, Plus, Tag, Calendar, Hash, ToggleLeft, ToggleRight } from "lucide-react";
+import { KaSelect } from "@/components/ui/ka-select";
 
 interface Coupon {
   id: string;
@@ -118,14 +119,14 @@ export default function CouponList({ initialCoupons }: { initialCoupons: Coupon[
           </div>
           <div style={{ flex: "1 1 150px" }}>
             <label style={{ display: "block", fontSize: 10, fontFamily: "'Cinzel',serif", color: "var(--gold)", letterSpacing: 2, marginBottom: 8 }}>TIPO</label>
-            <select
-              className="ka-input"
+            <KaSelect
               value={form.discountType}
-              onChange={e => setForm({ ...form, discountType: e.target.value })}
-            >
-              <option value="PERCENTAGE">Porcentagem (%)</option>
-              <option value="FIXED">Valor Fixo (R$)</option>
-            </select>
+              onChange={v => setForm({ ...form, discountType: v })}
+              options={[
+                { value: "PERCENTAGE", label: "Porcentagem (%)" },
+                { value: "FIXED", label: "Valor Fixo (R$)" },
+              ]}
+            />
           </div>
           <div style={{ flex: "1 1 100px" }}>
             <label style={{ display: "block", fontSize: 10, fontFamily: "'Cinzel',serif", color: "var(--gold)", letterSpacing: 2, marginBottom: 8 }}>VALOR</label>

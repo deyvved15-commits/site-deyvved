@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { KaSelect } from "@/components/ui/ka-select";
 
 interface Serie  { date: string; clicks: number; sales: number; revenue: number }
 interface TopAff { id: string; name: string; affiliateCode: string; clicks: number; sales: number; revenue: number }
@@ -265,12 +266,15 @@ export default function AffiliateChart({ affiliates }: { affiliates: { id: strin
           ))}
         </div>
 
-        <select value={affiliateId} onChange={e => setAffiliateId(e.target.value)} style={selectStyle}>
-          <option value="">Todos os afiliados</option>
-          {affiliates.map(a => (
-            <option key={a.id} value={a.id}>{a.name} ({a.affiliateCode})</option>
-          ))}
-        </select>
+        <KaSelect
+          value={affiliateId}
+          onChange={setAffiliateId}
+          style={{ minWidth: 200 }}
+          options={[
+            { value: "", label: "Todos os afiliados" },
+            ...affiliates.map(a => ({ value: a.id, label: `${a.name} (${a.affiliateCode})` })),
+          ]}
+        />
 
         {loading && (
           <span style={{ fontSize: 11, color: "rgba(255,255,255,0.30)" }}>Carregando…</span>

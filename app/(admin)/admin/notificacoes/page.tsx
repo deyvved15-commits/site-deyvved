@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { KaSelect } from "@/components/ui/ka-select";
 
 interface Course { id: string; title: string; }
 interface Student { id: string; name: string; email: string; }
@@ -182,12 +183,15 @@ export default function AdminNotificacoes() {
           {target === "course" && (
             <div style={{ marginBottom: 20 }}>
               <Label>Curso</Label>
-              <select value={courseId} onChange={e => setCourseId(e.target.value)} className="ka-input">
-                <option value="">Selecione um curso...</option>
-                {courses.map(c => (
-                  <option key={c.id} value={c.id}>{c.title}</option>
-                ))}
-              </select>
+              <KaSelect
+                value={courseId}
+                onChange={setCourseId}
+                placeholder="Selecione um curso..."
+                options={[
+                  { value: "", label: "Selecione um curso..." },
+                  ...courses.map(c => ({ value: c.id, label: c.title })),
+                ]}
+              />
             </div>
           )}
 

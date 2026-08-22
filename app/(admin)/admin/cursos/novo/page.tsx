@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { KaSelect } from "@/components/ui/ka-select";
 import Link from "next/link";
 
 const S = {
@@ -136,11 +137,14 @@ export default function NovoCursoPage() {
               </div>
               <div style={S.field}>
                 <label style={S.label}>Tipo de Acesso</label>
-                <select value={form.paymentType} onChange={e => set("paymentType", e.target.value)}
-                  className="ka-input">
-                  <option value="ONE_TIME" style={{ background: "#0F1A3D" }}>Pagamento Único</option>
-                  <option value="MONTHLY" style={{ background: "#0F1A3D" }}>Mensalidade (30 dias)</option>
-                </select>
+                <KaSelect
+                  value={form.paymentType}
+                  onChange={v => set("paymentType", v)}
+                  options={[
+                    { value: "ONE_TIME", label: "Pagamento Único" },
+                    { value: "MONTHLY", label: "Mensalidade (30 dias)" },
+                  ]}
+                />
               </div>
             </div>
 
