@@ -182,7 +182,7 @@ export default function AdminNotificacoes() {
           {target === "course" && (
             <div style={{ marginBottom: 20 }}>
               <Label>Curso</Label>
-              <select value={courseId} onChange={e => setCourseId(e.target.value)} style={{ ...inputStyle, appearance: "none" }}>
+              <select value={courseId} onChange={e => setCourseId(e.target.value)} className="ka-input">
                 <option value="">Selecione um curso...</option>
                 {courses.map(c => (
                   <option key={c.id} value={c.id}>{c.title}</option>

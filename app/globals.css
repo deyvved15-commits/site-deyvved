@@ -74,14 +74,36 @@ html, body { overflow-x: hidden; }
 select {
   appearance: none;
   -webkit-appearance: none;
-  background-color: var(--navy-mid);
+  background-color: rgba(255,255,255,0.04);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23C9A97A' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
   color: var(--text-primary);
-  border: 1px solid rgba(201,169,122,0.18);
+  border: 1px solid rgba(201,169,122,0.20);
+  border-radius: 12px;
+  padding: 11px 40px 11px 14px;
   font-family: var(--font-poppins);
+  font-size: 13px;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+}
+select:hover {
+  border-color: rgba(201,169,122,0.38);
+  background-color: rgba(255,255,255,0.06);
+}
+select:focus {
+  border-color: rgba(201,169,122,0.55);
+  background-color: rgba(255,255,255,0.06);
+  box-shadow: 0 0 0 3px rgba(201,169,122,0.10);
 }
 select option {
-  background-color: var(--navy-mid);
+  background-color: #0F1A3D;
   color: var(--text-primary);
+  font-family: var(--font-poppins);
+  font-size: 13px;
+  padding: 10px;
 }
 body {
   font-family: var(--font-poppins, 'Poppins', sans-serif);
@@ -620,12 +642,24 @@ select.ka-input {
   background-color: rgba(255,255,255,0.04);
   padding-right: 40px;
   cursor: pointer;
+  border-radius: 12px;
+  transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+}
+select.ka-input:hover {
+  border-color: rgba(201,169,122,0.38);
+  background-color: rgba(255,255,255,0.06);
+}
+select.ka-input:focus {
+  border-color: rgba(201,169,122,0.55);
+  background-color: rgba(255,255,255,0.06);
+  box-shadow: 0 0 0 3px rgba(201,169,122,0.10);
 }
 select.ka-input option {
   background-color: #0F1A3D;
   color: #F5EFE0;
   font-family: var(--font-poppins, 'Poppins', sans-serif);
   font-size: 13px;
+  padding: 10px;
 }
 
 .ka-textarea {

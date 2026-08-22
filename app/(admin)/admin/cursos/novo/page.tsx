@@ -137,7 +137,7 @@ export default function NovoCursoPage() {
               <div style={S.field}>
                 <label style={S.label}>Tipo de Acesso</label>
                 <select value={form.paymentType} onChange={e => set("paymentType", e.target.value)}
-                  style={{ ...S.input, cursor: "pointer", appearance: "none" as const }}>
+                  className="ka-input">
                   <option value="ONE_TIME" style={{ background: "#0F1A3D" }}>Pagamento Único</option>
                   <option value="MONTHLY" style={{ background: "#0F1A3D" }}>Mensalidade (30 dias)</option>
                 </select>

@@ -119,7 +119,7 @@ export default function CouponList({ initialCoupons }: { initialCoupons: Coupon[
           <div style={{ flex: "1 1 150px" }}>
             <label style={{ display: "block", fontSize: 10, fontFamily: "'Cinzel',serif", color: "var(--gold)", letterSpacing: 2, marginBottom: 8 }}>TIPO</label>
             <select
-              style={{ width: "100%", background: "rgba(0,0,0,0.2)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, padding: 12, color: "white" }}
+              className="ka-input"
               value={form.discountType}
               onChange={e => setForm({ ...form, discountType: e.target.value })}
             >
