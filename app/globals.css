@@ -74,7 +74,7 @@ html, body { overflow-x: hidden; }
 select {
   appearance: none;
   -webkit-appearance: none;
-  background-color: rgba(255,255,255,0.04);
+  background-color: rgba(15,26,61,0.98);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23C9A97A' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 14px center;
@@ -88,22 +88,29 @@ select {
   outline: none;
   transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
   width: 100%;
+  color-scheme: dark;
 }
 select:hover {
   border-color: rgba(201,169,122,0.38);
-  background-color: rgba(255,255,255,0.06);
+  background-color: rgba(15,26,61,0.98);
 }
 select:focus {
   border-color: rgba(201,169,122,0.55);
-  background-color: rgba(255,255,255,0.06);
+  background-color: rgba(15,26,61,0.98);
   box-shadow: 0 0 0 3px rgba(201,169,122,0.10);
 }
 select option {
   background-color: #0F1A3D;
-  color: var(--text-primary);
+  color: #F5EFE0;
   font-family: var(--font-poppins);
   font-size: 13px;
-  padding: 10px;
+  padding: 10px 14px;
+}
+select option:hover,
+select option:focus,
+select option:checked {
+  background-color: #1a2a5e;
+  color: #E8D5A8;
 }
 body {
   font-family: var(--font-poppins, 'Poppins', sans-serif);
@@ -639,19 +646,20 @@ select.ka-input {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23C9A97A' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 14px center;
-  background-color: rgba(255,255,255,0.04);
+  background-color: rgba(15,26,61,0.98);
   padding-right: 40px;
   cursor: pointer;
   border-radius: 12px;
+  color-scheme: dark;
   transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
 }
 select.ka-input:hover {
   border-color: rgba(201,169,122,0.38);
-  background-color: rgba(255,255,255,0.06);
+  background-color: rgba(15,26,61,0.98);
 }
 select.ka-input:focus {
   border-color: rgba(201,169,122,0.55);
-  background-color: rgba(255,255,255,0.06);
+  background-color: rgba(15,26,61,0.98);
   box-shadow: 0 0 0 3px rgba(201,169,122,0.10);
 }
 select.ka-input option {
@@ -659,7 +667,7 @@ select.ka-input option {
   color: #F5EFE0;
   font-family: var(--font-poppins, 'Poppins', sans-serif);
   font-size: 13px;
-  padding: 10px;
+  padding: 10px 14px;
 }
 
 .ka-textarea {
