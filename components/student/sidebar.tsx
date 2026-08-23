@@ -108,6 +108,7 @@ export default function StudentSidebar({ user, streak = 0 }: { user: { name?: st
   const pathname = usePathname();
   const initials = user.name?.split(" ").map(n => n[0]).slice(0, 2).join("").toUpperCase() ?? "A";
   const [walletBalance, setWalletBalance] = useState<number | null>(null);
+  const [isLive, setIsLive] = useState(false);
 
   useEffect(() => {
     fetch("/api/affiliate/wallet")
@@ -115,8 +116,20 @@ export default function StudentSidebar({ user, streak = 0 }: { user: { name?: st
       .then(data => setWalletBalance(data.balance ?? 0))
       .catch(() => setWalletBalance(0));
   }, []);
+
+  useEffect(() => {
+    const checkLive = () =>
+      fetch("/api/live/session")
+        .then(r => r.json())
+        .then(data => setIsLive(!!data))
+        .catch(() => setIsLive(false));
+
+    checkLive();
+    const interval = setInterval(checkLive, 60_000);
+    return () => clearInterval(interval);
+  }, []);
   
-  const allLinks = [...links];
+  const allLinks = links.filter(l => l.href !== "/ao-vivo" || isLive);
   if (user.role === "ADMIN") {
     allLinks.push({
       href: "/admin", label: "Administração",
