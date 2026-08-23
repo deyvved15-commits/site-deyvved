@@ -14,6 +14,7 @@ interface PdfReaderProps {
 }
 
 export default function PdfReader({ url, title, onClose }: PdfReaderProps) {
+  const proxyUrl = `/api/pdf-proxy?url=${encodeURIComponent(url)}`;
   const [numPages, setNumPages] = useState<number>(0);
   const [page, setPage] = useState<number>(1);
   const [scale, setScale] = useState<number>(1.2);
@@ -149,7 +150,7 @@ export default function PdfReader({ url, title, onClose }: PdfReaderProps) {
         )}
 
         <Document
-          file={url}
+          file={proxyUrl}
           onLoadSuccess={({ numPages }) => { setNumPages(numPages); setLoading(false); setLoadError(false); }}
           onLoadError={() => { setLoading(false); setLoadError(true); }}
           loading={null}
