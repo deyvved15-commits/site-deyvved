@@ -26,6 +26,7 @@ import HtmlContent from "@/components/student/html-content";
 import LessonThumbnail from "@/components/student/lesson-thumbnail";
 import LessonDrawer from "@/components/student/lesson-drawer";
 import ActivityTracker from "@/components/student/activity-tracker";
+import ApostilaButton from "@/components/student/apostila-button";
 
 export default async function AulaPage({ params }: { params: Promise<{ slug: string; lessonId: string }> }) {
   const session = await auth();
@@ -304,18 +305,34 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
                   Arquivos e Downloads
                 </span>
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 10 }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 {(lesson.attachments as { title: string; url: string }[]).map((at, i) => (
-                  <a key={i} href={at.url} target="_blank" rel="noopener noreferrer" className="ka-attachment-link" style={{
+                  <div key={i} style={{
                     display: "flex", alignItems: "center", gap: 10, padding: "10px 14px",
-                    background: "rgba(255,255,255,0.05)", borderRadius: 10, border: "1px solid rgba(255,255,255,0.08)",
-                    color: "white", textDecoration: "none", fontSize: 12, transition: "all 0.2s"
+                    background: "rgba(255,255,255,0.04)", borderRadius: 12, border: "1px solid rgba(255,255,255,0.07)",
+                    flexWrap: "wrap",
                   }}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
                       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" />
                     </svg>
-                    <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{at.title || "Arquivo"}</span>
-                  </a>
+                    <span style={{ flex: 1, fontSize: 12, color: "rgba(255,255,255,0.8)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      {at.title || "Arquivo"}
+                    </span>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+                      <ApostilaButton url={at.url} title={at.title || "Apostila"} />
+                      <a href={at.url} target="_blank" rel="noopener noreferrer" className="ka-attachment-link" style={{
+                        display: "flex", alignItems: "center", gap: 6, padding: "8px 12px",
+                        background: "rgba(255,255,255,0.05)", borderRadius: 10, border: "1px solid rgba(255,255,255,0.08)",
+                        color: "rgba(255,255,255,0.55)", textDecoration: "none", fontSize: 11, transition: "all 0.2s",
+                        fontFamily: "'Cinzel',serif", letterSpacing: 1,
+                      }}>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        Download
+                      </a>
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>

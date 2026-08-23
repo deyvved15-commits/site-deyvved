@@ -23,6 +23,7 @@ const nextConfig: NextConfig = {
     imageSizes: [48, 96, 128, 256],
   },
   compress: true,
+  serverExternalPackages: ["canvas"],
   experimental: {
     optimizePackageImports: ["lucide-react"],
     staleTimes: {
