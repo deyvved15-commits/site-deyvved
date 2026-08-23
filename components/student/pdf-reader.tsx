@@ -18,6 +18,7 @@ export default function PdfReader({ url, title, onClose }: PdfReaderProps) {
   const [page, setPage] = useState<number>(1);
   const [scale, setScale] = useState<number>(1.2);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const storageKey = `pdf-page-${btoa(url).slice(0, 40)}`;
 
   useEffect(() => {
@@ -118,7 +119,7 @@ export default function PdfReader({ url, title, onClose }: PdfReaderProps) {
 
       {/* PDF area */}
       <div style={{ flex: 1, overflowY: "auto", overflowX: "auto", display: "flex", justifyContent: "center", alignItems: "flex-start", padding: "32px 24px" }}>
-        {loading && (
+        {loading && !loadError && (
           <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
             <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="rgba(201,169,122,0.6)" strokeWidth="2" strokeLinecap="round" style={{ animation: "pdf-spin 1s linear infinite" }}>
               <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
@@ -127,10 +128,30 @@ export default function PdfReader({ url, title, onClose }: PdfReaderProps) {
           </div>
         )}
 
+        {loadError && (
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 20, padding: 40, textAlign: "center" }}>
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(201,169,122,0.3)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+              <line x1="12" y1="11" x2="12" y2="15"/><line x1="12" y1="18" x2="12.01" y2="18"/>
+            </svg>
+            <div>
+              <p style={{ fontFamily: "'Cinzel',serif", fontSize: 14, color: "rgba(201,169,122,0.7)", marginBottom: 8, letterSpacing: 2 }}>Não foi possível carregar</p>
+              <p style={{ fontSize: 12, color: "rgba(255,255,255,0.3)", marginBottom: 20 }}>O arquivo pode não ser um PDF ou a URL não é pública.</p>
+              <a href={url} target="_blank" rel="noopener noreferrer" style={{
+                display: "inline-flex", alignItems: "center", gap: 8, padding: "10px 20px",
+                borderRadius: 10, background: "rgba(201,169,122,0.12)", border: "1px solid rgba(201,169,122,0.25)",
+                color: "#E8D5A8", textDecoration: "none", fontSize: 12, fontFamily: "'Cinzel',serif", letterSpacing: 1,
+              }}>
+                Baixar arquivo
+              </a>
+            </div>
+          </div>
+        )}
+
         <Document
           file={url}
-          onLoadSuccess={({ numPages }) => { setNumPages(numPages); setLoading(false); }}
-          onLoadError={() => setLoading(false)}
+          onLoadSuccess={({ numPages }) => { setNumPages(numPages); setLoading(false); setLoadError(false); }}
+          onLoadError={() => { setLoading(false); setLoadError(true); }}
           loading={null}
         >
           <div style={{

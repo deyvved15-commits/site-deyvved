@@ -9,14 +9,8 @@ interface ApostilaButtonProps {
   title: string;
 }
 
-function isPdf(url: string) {
-  return url.toLowerCase().includes(".pdf") || url.toLowerCase().includes("/pdf");
-}
-
 export default function ApostilaButton({ url, title }: ApostilaButtonProps) {
   const [open, setOpen] = useState(false);
-
-  if (!isPdf(url)) return null;
 
   return (
     <>
