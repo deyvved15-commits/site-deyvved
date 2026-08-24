@@ -46,7 +46,7 @@ export default async function DashboardPage() {
         courseId: true,
         expiresAt: true,
         createdAt: true,
-        course: courseSelect.select,
+        course: { select: courseSelect.select },
       },
       orderBy: { createdAt: "asc" },
     }) : Promise.resolve([]),
