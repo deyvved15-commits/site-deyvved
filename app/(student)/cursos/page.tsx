@@ -12,40 +12,34 @@ export default async function MeusProdutosPage({ searchParams }: { searchParams:
   if (!session) return null;
   const { categoria } = await searchParams;
 
-  const [enrollments, taughtCourses, otherCourses, productPurchases] = await Promise.all([
-    prisma.enrollment.findMany({
+  const isAdmin = session.user.role === "ADMIN";
+
+  const courseInclude = {
+    modules: {
+      orderBy: { order: "asc" as const },
+      include: {
+        lessons: {
+          orderBy: { order: "asc" as const },
+          include: { progress: { where: { userId: session.user.id } } },
+        },
+      },
+    },
+  };
+
+  const [enrollments, taughtCourses, adminCourses, otherCourses, productPurchases] = await Promise.all([
+    !isAdmin ? prisma.enrollment.findMany({
       where: { userId: session.user.id },
-      include: {
-        course: {
-          include: {
-            modules: {
-              orderBy: { order: "asc" },
-              include: {
-                lessons: {
-                  orderBy: { order: "asc" },
-                  include: { progress: { where: { userId: session.user.id } } },
-                },
-              },
-            },
-          },
-        },
-      },
-    }),
-    prisma.course.findMany({
+      include: { course: { include: courseInclude } },
+    }) : Promise.resolve([]),
+    !isAdmin ? prisma.course.findMany({
       where: { teachers: { some: { teacherId: session.user.id } } },
-      include: {
-        modules: {
-          orderBy: { order: "asc" },
-          include: {
-            lessons: {
-              orderBy: { order: "asc" },
-              include: { progress: { where: { userId: session.user.id } } },
-            },
-          },
-        },
-      },
-    }),
-    prisma.course.findMany({
+      include: courseInclude,
+    }) : Promise.resolve([]),
+    isAdmin ? prisma.course.findMany({
+      include: courseInclude,
+      orderBy: { order: "asc" },
+    }) : Promise.resolve([]),
+    !isAdmin ? prisma.course.findMany({
       where: {
         published: true,
         enrollments: { none: { userId: session.user.id } },
@@ -57,20 +51,20 @@ export default async function MeusProdutosPage({ searchParams }: { searchParams:
         modules: { include: { _count: { select: { lessons: true } } } },
       },
       orderBy: { order: "asc" },
-    }),
+    }) : Promise.resolve([]),
     prisma.productPurchase.findMany({
       where: { userId: session.user.id },
-      include: {
-        product: true,
-      },
+      include: { product: true },
       orderBy: { createdAt: "desc" },
     }),
   ]);
 
-  const combinedCourses = [
-    ...enrollments.map(e => e.course),
-    ...taughtCourses.filter(tc => !enrollments.some(e => e.courseId === tc.id)),
-  ].filter(Boolean);
+  const combinedCourses = isAdmin
+    ? adminCourses
+    : [
+        ...enrollments.map((e: any) => e.course),
+        ...taughtCourses.filter((tc: any) => !enrollments.some((e: any) => e.courseId === tc.id)),
+      ].filter(Boolean);
 
   const allCategories = Array.from(new Set([
     ...combinedCourses.map(c => (c as any).category),
