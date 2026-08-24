@@ -174,6 +174,19 @@ export default async function LandingPage() {
             to { transform: translateX(-50%); }
           }
           .lp-ticker-track:hover { animation-play-state: paused; }
+          .teacher-card {
+            width: 220px; flex-shrink: 0;
+            background: rgba(15,26,61,0.60);
+            border: 1px solid rgba(201,169,122,0.12);
+            border-radius: 20px; padding: 32px 24px 28px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            transition: border-color 0.2s, transform 0.2s;
+          }
+          .teacher-card:hover {
+            border-color: rgba(201,169,122,0.35);
+            transform: translateY(-4px);
+          }
         `}</style>
       </section>
 
@@ -202,18 +215,7 @@ export default async function LandingPage() {
                 const photo = t.avatar || t.image;
                 const initials = t.name.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase();
                 return (
-                  <div key={t.id} style={{
-                    width: 220, flexShrink: 0,
-                    background: "rgba(15,26,61,0.60)",
-                    border: "1px solid rgba(201,169,122,0.12)",
-                    borderRadius: 20, padding: "32px 24px 28px",
-                    textAlign: "center",
-                    backdropFilter: "blur(10px)",
-                    transition: "border-color 0.2s, transform 0.2s",
-                  }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(201,169,122,0.35)"; (e.currentTarget as HTMLElement).style.transform = "translateY(-4px)"; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(201,169,122,0.12)"; (e.currentTarget as HTMLElement).style.transform = "none"; }}
-                  >
+                  <div key={t.id} className="teacher-card">
                     <div style={{ width: 80, height: 80, borderRadius: "50%", margin: "0 auto 16px", border: "2px solid rgba(201,169,122,0.35)", overflow: "hidden", flexShrink: 0 }}>
                       {photo ? (
                         // eslint-disable-next-line @next/next/no-img-element
