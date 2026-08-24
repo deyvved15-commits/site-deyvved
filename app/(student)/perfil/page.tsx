@@ -80,6 +80,7 @@ export default function PerfilPage() {
   const [avatarLoading, setAvatarLoading] = useState(false);
   const [avatarMsg, setAvatarMsg] = useState<{ type: "error" | "success"; msg: string } | null>(null);
   const [dragOver, setDragOver] = useState(false);
+  const [urlPreviewOk, setUrlPreviewOk] = useState<boolean | null>(null);
   const [bio, setBio] = useState("");
   const [addrCep, setAddrCep] = useState("");
   const [addrStreet, setAddrStreet] = useState("");
@@ -259,7 +260,7 @@ export default function PerfilPage() {
                 overflow: "hidden", cursor: "pointer",
               }} onClick={() => setAvatarMode(m => m === "idle" ? "file" : "idle")}>
                 {avatarPreview
-                  ? <img src={avatarPreview} alt="Avatar" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  ? <img src={avatarPreview} alt="Avatar" style={{ width: "100%", height: "100%", objectFit: "cover" }} onError={e => { (e.currentTarget as HTMLImageElement).style.display = "none"; (e.currentTarget.parentElement as HTMLElement).dataset.broken = "1"; }} />
                   : initials}
               </div>
               {/* Botão editar */}
@@ -308,7 +309,7 @@ export default function PerfilPage() {
                 <button className={`avatar-tab${avatarMode === "file" ? " active" : ""}`} onClick={() => setAvatarMode("file")}>
                   Upload Arquivo
                 </button>
-                <button className={`avatar-tab${avatarMode === "url" ? " active" : ""}`} onClick={() => setAvatarMode("url")}>
+                <button className={`avatar-tab${avatarMode === "url" ? " active" : ""}`} onClick={() => { setAvatarMode("url"); setAvatarUrl(""); setUrlPreviewOk(null); }}>
                   Colar Link
                 </button>
               </div>
@@ -337,23 +338,52 @@ export default function PerfilPage() {
 
               {/* URL */}
               {avatarMode === "url" && (
-                <div style={{ display: "flex", gap: 10 }}>
-                  <input
-                    className="pf-input"
-                    style={{ ...S.input, flex: 1 }}
-                    placeholder="https://exemplo.com/foto.jpg"
-                    value={avatarUrl}
-                    onChange={e => setAvatarUrl(e.target.value)}
-                    onKeyDown={e => { if (e.key === "Enter" && avatarUrl.trim()) saveAvatarUrl(avatarUrl.trim()); }}
-                  />
-                  <button
-                    onClick={() => avatarUrl.trim() && saveAvatarUrl(avatarUrl.trim())}
-                    disabled={avatarLoading || !avatarUrl.trim()}
-                    style={{ ...S.btnPrimary, opacity: (avatarLoading || !avatarUrl.trim()) ? 0.6 : 1, flexShrink: 0, padding: "12px 20px" }}>
-                    {avatarLoading
-                      ? <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" style={{ animation: "spin 1s linear infinite" }}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
-                      : "Salvar"}
-                  </button>
+                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                  <div style={{ display: "flex", gap: 10 }}>
+                    <input
+                      className="pf-input"
+                      style={{ ...S.input, flex: 1 }}
+                      placeholder="https://exemplo.com/foto.jpg"
+                      value={avatarUrl}
+                      onChange={e => { setAvatarUrl(e.target.value); setUrlPreviewOk(null); }}
+                      onKeyDown={e => { if (e.key === "Enter" && avatarUrl.trim()) setUrlPreviewOk(null); }}
+                    />
+                    <button
+                      onClick={() => { if (avatarUrl.trim()) setUrlPreviewOk(null); }}
+                      disabled={!avatarUrl.trim()}
+                      style={{ ...S.btnPrimary, opacity: !avatarUrl.trim() ? 0.5 : 1, flexShrink: 0, padding: "12px 18px", background: "rgba(201,169,122,0.15)", color: "var(--gold)", border: "1px solid rgba(201,169,122,0.3)" }}>
+                      Visualizar
+                    </button>
+                  </div>
+                  {avatarUrl.trim() && (
+                    <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                      <div style={{ width: 64, height: 64, borderRadius: "50%", overflow: "hidden", border: "2px solid rgba(201,169,122,0.30)", flexShrink: 0, background: "rgba(15,26,61,0.8)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <img
+                          src={avatarUrl}
+                          alt="Preview"
+                          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                          onLoad={() => setUrlPreviewOk(true)}
+                          onError={() => setUrlPreviewOk(false)}
+                        />
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        {urlPreviewOk === true && (
+                          <p style={{ fontSize: 12, color: "#4ade80", margin: "0 0 8px" }}>✓ Imagem carregada com sucesso</p>
+                        )}
+                        {urlPreviewOk === false && (
+                          <p style={{ fontSize: 12, color: "#f87171", margin: "0 0 8px" }}>✗ Não foi possível carregar essa imagem. Tente outro link.</p>
+                        )}
+                        <button
+                          onClick={() => saveAvatarUrl(avatarUrl.trim())}
+                          disabled={avatarLoading || urlPreviewOk !== true}
+                          style={{ ...S.btnPrimary, opacity: (avatarLoading || urlPreviewOk !== true) ? 0.5 : 1, padding: "10px 20px", fontSize: 12 }}>
+                          {avatarLoading
+                            ? <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" style={{ animation: "spin 1s linear infinite" }}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+                            : "Salvar esta foto"}
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
