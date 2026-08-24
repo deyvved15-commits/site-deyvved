@@ -59,7 +59,7 @@ function Alert({ type, msg }: { type: "error" | "success"; msg: string }) {
   );
 }
 
-interface UserData { id: string; name: string | null; email: string | null; bio: string | null; avatar: string | null; shippingCep: string | null; shippingAddress: string | null; shippingNumber: string | null; shippingCity: string | null; shippingState: string | null }
+interface UserData { id: string; name: string | null; email: string | null; bio: string | null; avatar: string | null; image: string | null; shippingCep: string | null; shippingAddress: string | null; shippingNumber: string | null; shippingCity: string | null; shippingState: string | null }
 
 interface Enrollment {
   id: string;
@@ -72,6 +72,14 @@ export default function PerfilPage() {
   const { update: updateSession } = useSession();
   const [user, setUser] = useState<UserData | null>(null);
   const [name, setName] = useState("");
+
+  // Avatar state
+  const [avatarMode, setAvatarMode] = useState<"idle" | "file" | "url">("idle");
+  const [avatarUrl, setAvatarUrl] = useState("");
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [avatarLoading, setAvatarLoading] = useState(false);
+  const [avatarMsg, setAvatarMsg] = useState<{ type: "error" | "success"; msg: string } | null>(null);
+  const [dragOver, setDragOver] = useState(false);
   const [bio, setBio] = useState("");
   const [addrCep, setAddrCep] = useState("");
   const [addrStreet, setAddrStreet] = useState("");
@@ -104,11 +112,44 @@ export default function PerfilPage() {
         setAddrNumber(data.shippingNumber ?? "");
         setAddrCity(data.shippingCity ?? "");
         setAddrState(data.shippingState ?? "");
+        setAvatarPreview(data.avatar || data.image || null);
       });
     fetch("/api/enrollments")
       .then(r => r.json())
       .then((data: Enrollment[]) => setEnrollments(data));
   }, []);
+
+  async function saveAvatarUrl(url: string) {
+    setAvatarLoading(true);
+    setAvatarMsg(null);
+    const res = await fetch("/api/profile", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ avatar: url }),
+    });
+    const data = await res.json();
+    setAvatarLoading(false);
+    if (!res.ok) { setAvatarMsg({ type: "error", msg: data.error ?? "Erro ao salvar foto." }); return; }
+    setAvatarPreview(url);
+    setUser(u => u ? { ...u, avatar: url } : u);
+    setAvatarMode("idle");
+    setAvatarUrl("");
+    setAvatarMsg({ type: "success", msg: "Foto atualizada!" });
+    setTimeout(() => setAvatarMsg(null), 3000);
+  }
+
+  async function handleFileUpload(file: File) {
+    if (!file.type.startsWith("image/")) { setAvatarMsg({ type: "error", msg: "Selecione uma imagem." }); return; }
+    if (file.size > 5 * 1024 * 1024) { setAvatarMsg({ type: "error", msg: "Máximo 5MB." }); return; }
+    setAvatarLoading(true);
+    setAvatarMsg(null);
+    const fd = new FormData();
+    fd.append("file", file);
+    const res = await fetch("/api/upload/avatar", { method: "POST", body: fd });
+    const data = await res.json();
+    if (!res.ok) { setAvatarLoading(false); setAvatarMsg({ type: "error", msg: data.error ?? "Erro no upload." }); return; }
+    await saveAvatarUrl(data.url);
+  }
 
   async function handleInfoSave(e: React.FormEvent) {
     e.preventDefault();
@@ -177,7 +218,16 @@ export default function PerfilPage() {
 
   return (
     <div style={{ minHeight: "100%", background: "linear-gradient(180deg, var(--navy-darkest) 0%, var(--navy-mid) 100%)" }}>
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } } .pf-input:focus, .pf-textarea:focus { border-color: rgba(201,169,122,0.55) !important; background: rgba(255,255,255,0.07) !important; }`}</style>
+      <style>{`
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .pf-input:focus, .pf-textarea:focus { border-color: rgba(201,169,122,0.55) !important; background: rgba(255,255,255,0.07) !important; }
+        .avatar-tab { padding: 8px 16px; border-radius: 8px; font-size: 11px; font-family: 'Cinzel',serif; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; border: 1px solid rgba(201,169,122,0.20); transition: all 0.2s; }
+        .avatar-tab.active { background: linear-gradient(135deg,#C9A97A,#A07840); color: #060D1F; border-color: transparent; }
+        .avatar-tab:not(.active) { background: transparent; color: rgba(201,169,122,0.7); }
+        .avatar-tab:not(.active):hover { border-color: rgba(201,169,122,0.45); color: #E8D5A8; }
+        .drop-zone { border: 2px dashed rgba(201,169,122,0.25); border-radius: 14px; padding: 32px; text-align: center; cursor: pointer; transition: all 0.2s; }
+        .drop-zone:hover, .drop-zone.drag-over { border-color: rgba(201,169,122,0.6); background: rgba(201,169,122,0.04); }
+      `}</style>
 
       {/* Header */}
       <div className="ka-page-header">
@@ -193,32 +243,127 @@ export default function PerfilPage() {
           background: "linear-gradient(160deg, rgba(15,26,61,0.7) 0%, rgba(10,18,45,0.7) 100%)",
           border: "1px solid rgba(201,169,122,0.14)",
           boxShadow: "0 24px 60px rgba(0,0,0,0.40)",
-          display: "flex", alignItems: "center", gap: 20,
         }}>
-          <div style={{
-            width: 72, height: 72, borderRadius: "50%", flexShrink: 0,
-            background: "radial-gradient(circle at 30% 30%, #E8D5A8 0%, #C9A97A 50%, #7A5530 100%)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 26,
-            color: "var(--navy-darkest)",
-            boxShadow: "0 0 30px rgba(201,169,122,0.40)",
-            border: "2px solid var(--gold-light)",
-          }}>
-            {initials}
-          </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 18, letterSpacing: 2, color: "var(--text-primary)", marginBottom: 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-              {displayName || "Carregando..."}
-            </div>
-            <div style={{ fontSize: 13, color: "var(--text-muted)" }}>
-              {user?.email ?? ""}
-            </div>
-            {bio && (
-              <div style={{ fontSize: 12, color: "rgba(255,255,255,0.40)", lineHeight: 1.5, marginTop: 6 }}>
-                {bio}
+          {/* Linha avatar + info */}
+          <div style={{ display: "flex", alignItems: "center", gap: 20, marginBottom: avatarMode !== "idle" ? 24 : 0 }}>
+            {/* Avatar clicável */}
+            <div style={{ position: "relative", flexShrink: 0 }}>
+              <div style={{
+                width: 80, height: 80, borderRadius: "50%",
+                background: avatarPreview ? "transparent" : "radial-gradient(circle at 30% 30%, #E8D5A8 0%, #C9A97A 50%, #7A5530 100%)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 28,
+                color: "var(--navy-darkest)",
+                boxShadow: "0 0 30px rgba(201,169,122,0.35)",
+                border: "2px solid rgba(201,169,122,0.40)",
+                overflow: "hidden", cursor: "pointer",
+              }} onClick={() => setAvatarMode(m => m === "idle" ? "file" : "idle")}>
+                {avatarPreview
+                  ? <img src={avatarPreview} alt="Avatar" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  : initials}
               </div>
-            )}
+              {/* Botão editar */}
+              <button
+                onClick={() => setAvatarMode(m => m === "idle" ? "file" : "idle")}
+                title="Trocar foto"
+                style={{
+                  position: "absolute", bottom: 0, right: 0,
+                  width: 24, height: 24, borderRadius: "50%",
+                  background: "linear-gradient(135deg,#C9A97A,#A07840)",
+                  border: "2px solid #060D1F",
+                  cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                }}>
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#060D1F" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
+              </button>
+            </div>
+
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 18, letterSpacing: 2, color: "var(--text-primary)", marginBottom: 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {displayName || "Carregando..."}
+              </div>
+              <div style={{ fontSize: 13, color: "var(--text-muted)" }}>
+                {user?.email ?? ""}
+              </div>
+              {bio && (
+                <div style={{ fontSize: 12, color: "rgba(255,255,255,0.40)", lineHeight: 1.5, marginTop: 6 }}>
+                  {bio}
+                </div>
+              )}
+              <button
+                onClick={() => setAvatarMode(m => m === "idle" ? "file" : "idle")}
+                style={{ marginTop: 10, fontSize: 11, fontFamily: "'Cinzel',serif", letterSpacing: 1.5, color: "var(--gold)", background: "none", border: "none", cursor: "pointer", padding: 0, textTransform: "uppercase" as const }}>
+                {avatarMode !== "idle" ? "Cancelar" : "Trocar foto"}
+              </button>
+            </div>
           </div>
+
+          {/* Painel de troca de foto */}
+          {avatarMode !== "idle" && (
+            <div style={{ borderTop: "1px solid rgba(201,169,122,0.10)", paddingTop: 20 }}>
+              {/* Tabs */}
+              <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
+                <button className={`avatar-tab${avatarMode === "file" ? " active" : ""}`} onClick={() => setAvatarMode("file")}>
+                  Upload Arquivo
+                </button>
+                <button className={`avatar-tab${avatarMode === "url" ? " active" : ""}`} onClick={() => setAvatarMode("url")}>
+                  Colar Link
+                </button>
+              </div>
+
+              {/* Upload arquivo */}
+              {avatarMode === "file" && (
+                <div>
+                  <label
+                    className={`drop-zone${dragOver ? " drag-over" : ""}`}
+                    onDragOver={e => { e.preventDefault(); setDragOver(true); }}
+                    onDragLeave={() => setDragOver(false)}
+                    onDrop={e => { e.preventDefault(); setDragOver(false); const f = e.dataTransfer.files[0]; if (f) handleFileUpload(f); }}
+                  >
+                    <input type="file" accept="image/*" style={{ display: "none" }} onChange={e => { const f = e.target.files?.[0]; if (f) handleFileUpload(f); }} />
+                    {avatarLoading
+                      ? <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(201,169,122,0.6)" strokeWidth="2" strokeLinecap="round" style={{ animation: "spin 1s linear infinite", margin: "0 auto 10px", display: "block" }}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+                      : <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(201,169,122,0.45)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ margin: "0 auto 10px", display: "block" }}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    }
+                    <p style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", marginBottom: 4 }}>
+                      {avatarLoading ? "Enviando..." : "Arraste uma imagem ou clique para selecionar"}
+                    </p>
+                    <p style={{ fontSize: 11, color: "rgba(255,255,255,0.25)" }}>JPG, PNG, WebP — máx. 5MB</p>
+                  </label>
+                </div>
+              )}
+
+              {/* URL */}
+              {avatarMode === "url" && (
+                <div style={{ display: "flex", gap: 10 }}>
+                  <input
+                    className="pf-input"
+                    style={{ ...S.input, flex: 1 }}
+                    placeholder="https://exemplo.com/foto.jpg"
+                    value={avatarUrl}
+                    onChange={e => setAvatarUrl(e.target.value)}
+                    onKeyDown={e => { if (e.key === "Enter" && avatarUrl.trim()) saveAvatarUrl(avatarUrl.trim()); }}
+                  />
+                  <button
+                    onClick={() => avatarUrl.trim() && saveAvatarUrl(avatarUrl.trim())}
+                    disabled={avatarLoading || !avatarUrl.trim()}
+                    style={{ ...S.btnPrimary, opacity: (avatarLoading || !avatarUrl.trim()) ? 0.6 : 1, flexShrink: 0, padding: "12px 20px" }}>
+                    {avatarLoading
+                      ? <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" style={{ animation: "spin 1s linear infinite" }}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+                      : "Salvar"}
+                  </button>
+                </div>
+              )}
+
+              {avatarMsg && <div style={{ marginTop: 12 }}><Alert type={avatarMsg.type} msg={avatarMsg.msg} /></div>}
+            </div>
+          )}
+
+          {avatarMsg && avatarMode === "idle" && (
+            <div style={{ marginTop: 12 }}><Alert type={avatarMsg.type} msg={avatarMsg.msg} /></div>
+          )}
         </div>
 
         {/* Meus Cursos */}
