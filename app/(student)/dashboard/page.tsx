@@ -29,33 +29,37 @@ export default async function DashboardPage() {
     orderBy: { order: "asc" as const },
   } as const;
 
-  const [enrollments, taughtCourses, otherCourses, achievements, progressData] = await Promise.all([
-    prisma.enrollment.findMany({
+  const isAdmin = session.user.role === "ADMIN";
+
+  const courseSelect = {
+    select: {
+      id: true, title: true, slug: true, thumbnail: true,
+      price: true, paymentType: true,
+      modules: moduleSelect,
+    },
+  } as const;
+
+  const [enrollments, taughtCourses, adminCourses, otherCourses, achievements, progressData] = await Promise.all([
+    !isAdmin ? prisma.enrollment.findMany({
       where: { userId: session.user.id },
       select: {
         courseId: true,
         expiresAt: true,
         createdAt: true,
-        course: {
-          select: {
-            id: true, title: true, slug: true, thumbnail: true,
-            price: true, paymentType: true,
-            modules: moduleSelect,
-          },
-        },
+        course: courseSelect.select,
       },
       orderBy: { createdAt: "asc" },
-    }),
-    prisma.course.findMany({
+    }) : Promise.resolve([]),
+    !isAdmin ? prisma.course.findMany({
       where: { teachers: { some: { teacherId: session.user.id } } },
-      select: {
-        id: true, title: true, slug: true, thumbnail: true,
-        price: true, paymentType: true,
-        modules: moduleSelect,
-      },
+      ...courseSelect,
       orderBy: { order: "asc" },
-    }),
-    prisma.course.findMany({
+    }) : Promise.resolve([]),
+    isAdmin ? prisma.course.findMany({
+      ...courseSelect,
+      orderBy: { order: "asc" },
+    }) : Promise.resolve([]),
+    !isAdmin ? prisma.course.findMany({
       where: {
         published: true,
         enrollments: { none: { userId: session.user.id } },
@@ -71,7 +75,7 @@ export default async function DashboardPage() {
         modules: { include: { _count: { select: { lessons: true } } } },
       },
       orderBy: { order: "asc" },
-    }),
+    }) : Promise.resolve([]),
     prisma.userAchievement.findMany({
       where: { userId: session.user.id },
       include: { achievement: true },
@@ -83,11 +87,13 @@ export default async function DashboardPage() {
     }),
   ]);
 
-  const enrolledCourseIds = new Set(enrollments.map(e => e.courseId));
-  const combinedCourses = [
-    ...enrollments.map(e => ({ course: e.course, expiresAt: e.expiresAt, isTeacher: false, enrolledAt: e.createdAt })),
-    ...taughtCourses.filter(tc => !enrolledCourseIds.has(tc.id)).map(tc => ({ course: tc, expiresAt: null, isTeacher: true, enrolledAt: null })),
-  ];
+  const enrolledCourseIds = new Set((enrollments as any[]).map((e: any) => e.courseId));
+  const combinedCourses = isAdmin
+    ? (adminCourses as any[]).map((course: any) => ({ course, expiresAt: null, isTeacher: false, enrolledAt: null }))
+    : [
+        ...(enrollments as any[]).map((e: any) => ({ course: e.course, expiresAt: e.expiresAt, isTeacher: false, enrolledAt: e.createdAt })),
+        ...(taughtCourses as any[]).filter((tc: any) => !enrolledCourseIds.has(tc.id)).map((tc: any) => ({ course: tc, expiresAt: null, isTeacher: true, enrolledAt: null })),
+      ];
 
   const streak = calcStreak(progressData.map(p => p.completedAt));
 
