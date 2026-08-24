@@ -236,7 +236,7 @@ export default function PerfilPage() {
         <h1 className="ka-page-title">Meu <span>Perfil</span></h1>
       </div>
 
-      <div className="ka-section" style={{ maxWidth: 640 }}>
+      <div className="ka-section" style={{ maxWidth: 780, margin: "0 auto" }}>
 
         {/* Avatar + nome */}
         <div style={{
