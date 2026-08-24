@@ -42,9 +42,9 @@ export default function LandingHeader() {
         <nav style={{ display: "flex", alignItems: "center", gap: 4 }} className="landing-nav-desktop">
           {[
             { href: "#cursos", label: "Cursos" },
+            { href: "#professores", label: "Professores" },
             { href: "#depoimentos", label: "Depoimentos" },
             { href: "#faq", label: "FAQ" },
-            { href: "#sobre", label: "Sobre" },
           ].map(link => (
             <a key={link.href} href={link.href} style={{ color: "rgba(255,255,255,0.65)", textDecoration: "none", fontSize: 13, fontWeight: 500, padding: "10px 14px", borderRadius: 8, transition: "color 0.2s", minHeight: 44, display: "flex", alignItems: "center" }}
               onMouseEnter={e => (e.currentTarget.style.color = "#fff")}
@@ -103,9 +103,9 @@ export default function LandingHeader() {
           <nav style={{ display: "flex", flexDirection: "column", gap: 2 }}>
             {[
               { href: "#cursos", label: "Cursos" },
+              { href: "#professores", label: "Professores" },
               { href: "#depoimentos", label: "Depoimentos" },
               { href: "#faq", label: "FAQ" },
-              { href: "#sobre", label: "Sobre" },
             ].map(link => (
               <a key={link.href} href={link.href} onClick={() => setMenuOpen(false)} style={{ color: "rgba(255,255,255,0.8)", textDecoration: "none", fontSize: 15, padding: "14px 4px", borderBottom: "1px solid rgba(255,255,255,0.05)", minHeight: 44, display: "flex", alignItems: "center" }}>{link.label}</a>
             ))}

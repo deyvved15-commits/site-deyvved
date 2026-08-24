@@ -6,7 +6,7 @@ import CoursesSection from "@/components/landing/courses-section";
 import FaqSection from "@/components/landing/faq-section";
 
 async function getData() {
-  const [courses, studentCount] = await Promise.all([
+  const [courses, studentCount, teachers] = await Promise.all([
     prisma.course.findMany({
       where: { published: true },
       orderBy: { createdAt: "asc" },
@@ -22,12 +22,17 @@ async function getData() {
       },
     }),
     prisma.user.count({ where: { role: "STUDENT" } }),
+    prisma.user.findMany({
+      where: { role: "TEACHER", active: true },
+      select: { id: true, name: true, bio: true, avatar: true, image: true },
+      orderBy: { name: "asc" },
+    }),
   ]);
-  return { courses, studentCount };
+  return { courses, studentCount, teachers };
 }
 
 export default async function LandingPage() {
-  const { courses, studentCount } = await getData();
+  const { courses, studentCount, teachers } = await getData();
   const totalLessons = courses.reduce(
     (sum, c) => sum + c.modules.reduce((s, m) => s + m._count.lessons, 0),
     0
@@ -56,18 +61,23 @@ export default async function LandingPage() {
           </div>
 
           <div style={{ fontSize: 10, fontFamily: "var(--font-cinzel)", letterSpacing: 6, textTransform: "uppercase", color: "var(--gold)", marginBottom: 20 }}>
-            Formação Teológica Online
+            Escola Teológica Online
           </div>
 
-          <h1 style={{ fontFamily: "var(--font-cinzel)", fontWeight: 900, fontSize: "clamp(36px, 7vw, 72px)", letterSpacing: 3, lineHeight: 1.05, color: "#fff", marginBottom: 24 }}>
-            KADIMA<br />
-            <span style={{ color: "var(--gold)", fontSize: "0.65em", letterSpacing: 6 }}>ACADEMY</span>
+          <h1 style={{ fontFamily: "var(--font-cinzel)", fontWeight: 900, fontSize: "clamp(34px, 6.5vw, 68px)", letterSpacing: 2, lineHeight: 1.05, color: "#fff", marginBottom: 16 }}>
+            Avance no Conhecimento
+            <br />
+            <span style={{ color: "var(--gold)" }}>da Palavra de Deus</span>
           </h1>
+
+          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "clamp(11px, 1.5vw, 13px)", letterSpacing: 5, color: "rgba(201,169,122,0.5)", marginBottom: 28, textTransform: "uppercase" }}>
+            קדימה · Em Frente
+          </p>
 
           <div style={{ width: 80, height: 2, background: "linear-gradient(90deg, transparent, var(--gold), transparent)", margin: "0 auto 28px" }} />
 
-          <p style={{ fontSize: "clamp(15px, 2vw, 18px)", color: "rgba(255,255,255,0.6)", lineHeight: 1.8, maxWidth: 580, margin: "0 auto 44px" }}>
-            Construindo líderes íntegros através da Palavra. Educação teológica com profundidade bíblica e excelência acadêmica — acessível de qualquer lugar do mundo.
+          <p style={{ fontSize: "clamp(15px, 2vw, 18px)", color: "rgba(255,255,255,0.6)", lineHeight: 1.8, maxWidth: 560, margin: "0 auto 44px" }}>
+            Formação teológica séria para quem quer pregar, liderar e servir com profundidade — do iniciante ao ministro experiente.
           </p>
 
           <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
@@ -171,6 +181,65 @@ export default async function LandingPage() {
       <Suspense fallback={null}>
         <CoursesSection courses={courses} />
       </Suspense>
+
+      {/* ── PROFESSORES ── */}
+      {teachers.length > 0 && (
+        <section id="professores" style={{ padding: "100px 40px", background: "linear-gradient(180deg, var(--navy-darkest) 0%, rgba(15,26,61,0.25) 50%, var(--navy-darkest) 100%)", position: "relative", overflow: "hidden" }}>
+          <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 70% 50% at 30% 50%, rgba(201,169,122,0.04) 0%, transparent 70%)", pointerEvents: "none" }} />
+          <div style={{ maxWidth: 1100, margin: "0 auto", position: "relative", zIndex: 1 }}>
+            <div style={{ textAlign: "center", marginBottom: 60 }}>
+              <div style={{ fontSize: 10, fontFamily: "var(--font-cinzel)", letterSpacing: 5, textTransform: "uppercase", color: "var(--gold)", marginBottom: 16 }}>
+                Corpo Docente
+              </div>
+              <h2 style={{ fontFamily: "var(--font-cinzel)", fontWeight: 700, fontSize: "clamp(24px, 3.5vw, 38px)", letterSpacing: 1.5, color: "#fff", lineHeight: 1.2, marginBottom: 16 }}>
+                Aprenda com quem <span style={{ color: "var(--gold)" }}>vive a Palavra</span>
+              </h2>
+              <div style={{ width: 50, height: 2, background: "linear-gradient(90deg, transparent, var(--gold), transparent)", margin: "0 auto" }} />
+            </div>
+
+            <div style={{ display: "flex", gap: 28, flexWrap: "wrap", justifyContent: "center" }}>
+              {teachers.map(t => {
+                const photo = t.avatar || t.image;
+                const initials = t.name.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase();
+                return (
+                  <div key={t.id} style={{
+                    width: 220, flexShrink: 0,
+                    background: "rgba(15,26,61,0.60)",
+                    border: "1px solid rgba(201,169,122,0.12)",
+                    borderRadius: 20, padding: "32px 24px 28px",
+                    textAlign: "center",
+                    backdropFilter: "blur(10px)",
+                    transition: "border-color 0.2s, transform 0.2s",
+                  }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(201,169,122,0.35)"; (e.currentTarget as HTMLElement).style.transform = "translateY(-4px)"; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(201,169,122,0.12)"; (e.currentTarget as HTMLElement).style.transform = "none"; }}
+                  >
+                    <div style={{ width: 80, height: 80, borderRadius: "50%", margin: "0 auto 16px", border: "2px solid rgba(201,169,122,0.35)", overflow: "hidden", flexShrink: 0 }}>
+                      {photo ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={photo} alt={t.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      ) : (
+                        <div style={{ width: "100%", height: "100%", background: "linear-gradient(135deg, var(--gold), rgba(201,169,122,0.4))", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontWeight: 700, fontSize: 22, color: "var(--navy-darkest)" }}>
+                          {initials}
+                        </div>
+                      )}
+                    </div>
+                    <div style={{ fontFamily: "var(--font-cinzel)", fontWeight: 600, fontSize: 15, letterSpacing: 1, color: "#fff", marginBottom: 8 }}>
+                      {t.name}
+                    </div>
+                    {t.bio && (
+                      <p style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", lineHeight: 1.7, margin: 0,
+                        display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+                        {t.bio}
+                      </p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ── TESTIMONIALS ── */}
       <section id="depoimentos" style={{ padding: "100px 40px", background: "linear-gradient(180deg, rgba(15,26,61,0.20) 0%, var(--navy-darkest) 100%)", position: "relative", overflow: "hidden" }}>
@@ -322,15 +391,20 @@ export default async function LandingPage() {
       <section style={{ padding: "80px 40px", background: "linear-gradient(135deg, rgba(15,26,61,0.8) 0%, rgba(10,18,45,0.9) 100%)", borderTop: "1px solid rgba(201,169,122,0.10)", position: "relative", overflow: "hidden" }}>
         <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 70% 100% at 50% 50%, rgba(201,169,122,0.06) 0%, transparent 70%)", pointerEvents: "none" }} />
         <div style={{ position: "relative", zIndex: 1, textAlign: "center", maxWidth: 680, margin: "0 auto" }}>
-          <div style={{ fontSize: 10, fontFamily: "var(--font-cinzel)", letterSpacing: 5, textTransform: "uppercase", color: "var(--gold)", marginBottom: 16 }}>
-            Comece Hoje
+          {/* Urgência */}
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 16px", borderRadius: 20, background: "rgba(201,169,122,0.08)", border: "1px solid rgba(201,169,122,0.25)", marginBottom: 24 }}>
+            <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--gold)", boxShadow: "0 0 8px var(--gold)", display: "block", flexShrink: 0 }} />
+            <span style={{ fontSize: 11, fontFamily: "var(--font-cinzel)", letterSpacing: 2, color: "rgba(201,169,122,0.85)", textTransform: "uppercase" }}>
+              Matrículas Abertas
+            </span>
           </div>
+
           <h2 style={{ fontFamily: "var(--font-cinzel)", fontWeight: 700, fontSize: "clamp(26px, 4vw, 40px)", letterSpacing: 2, color: "#fff", marginBottom: 18, lineHeight: 1.2 }}>
-            Sua Jornada Teológica<br />
-            <span style={{ color: "var(--gold)" }}>começa aqui</span>
+            Não adie o chamado.<br />
+            <span style={{ color: "var(--gold)" }}>Avance agora.</span>
           </h2>
           <p style={{ fontSize: 15, color: "rgba(255,255,255,0.50)", lineHeight: 1.8, marginBottom: 36, maxWidth: 500, marginLeft: "auto", marginRight: "auto" }}>
-            Junte-se a centenas de alunos que estão sendo transformados pelo conhecimento profundo da Palavra de Deus.
+            Cada dia sem formação é um dia a menos servindo com profundidade. Escolha um curso e comece hoje.
           </p>
           <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
             <a href="#cursos" style={{
@@ -339,8 +413,10 @@ export default async function LandingPage() {
               color: "var(--navy-darkest)", fontFamily: "var(--font-cinzel)",
               fontWeight: 700, fontSize: 12, letterSpacing: 2, textTransform: "uppercase",
               boxShadow: "0 6px 24px rgba(201,169,122,0.40)",
+              display: "inline-flex", alignItems: "center", gap: 8,
             }}>
-              Explorar Cursos
+              Escolher Meu Curso
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </a>
             <Link href="/login" style={{
               padding: "15px 40px", borderRadius: 12, textDecoration: "none",
