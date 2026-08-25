@@ -7,6 +7,18 @@ import "react-pdf/dist/Page/TextLayer.css";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.mjs`;
 
+function buildPages(current: number, total: number): (number | "...")[] {
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+  const pages: (number | "...")[] = [];
+  const addPage = (p: number) => { if (!pages.includes(p)) pages.push(p); };
+  addPage(1);
+  if (current > 3) pages.push("...");
+  for (let p = Math.max(2, current - 1); p <= Math.min(total - 1, current + 1); p++) addPage(p);
+  if (current < total - 2) pages.push("...");
+  addPage(total);
+  return pages;
+}
+
 interface PdfReaderProps {
   url: string;
   title: string;
@@ -85,13 +97,19 @@ export default function PdfReader({ url, title, onClose }: PdfReaderProps) {
 
         {/* Navegação de páginas */}
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <CtrlBtn onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} title="Página anterior">
+          <CtrlBtn onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} title="Página anterior (←)">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
           </CtrlBtn>
-          <span style={{ fontSize: 12, color: "#F5EFE0", fontFamily: "'Cinzel',serif", fontWeight: 600, minWidth: 80, textAlign: "center", letterSpacing: 1 }}>
-            {page} <span style={{ opacity: 0.4, margin: "0 3px" }}>/</span> {numPages || "—"}
-          </span>
-          <CtrlBtn onClick={() => setPage(p => Math.min(numPages, p + 1))} disabled={page >= numPages} title="Próxima página">
+          <form onSubmit={e => { e.preventDefault(); const v = parseInt((e.currentTarget.elements.namedItem("pg") as HTMLInputElement).value, 10); if (v >= 1 && v <= numPages) setPage(v); }} style={{ display: "flex", alignItems: "center", gap: 5 }}>
+            <input
+              name="pg"
+              key={page}
+              defaultValue={page}
+              style={{ width: 40, height: 28, borderRadius: 7, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(201,169,122,0.20)", color: "#F5EFE0", fontFamily: "'Cinzel',serif", fontWeight: 600, fontSize: 12, textAlign: "center", outline: "none" }}
+            />
+            <span style={{ fontSize: 11, color: "rgba(255,255,255,0.35)" }}>/ {numPages || "—"}</span>
+          </form>
+          <CtrlBtn onClick={() => setPage(p => Math.min(numPages, p + 1))} disabled={page >= numPages} title="Próxima página (→)">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
           </CtrlBtn>
         </div>
@@ -187,21 +205,22 @@ export default function PdfReader({ url, title, onClose }: PdfReaderProps) {
           Anterior
         </button>
 
-        <div style={{ display: "flex", gap: 6 }}>
-          {Array.from({ length: Math.min(numPages, 9) }, (_, i) => {
-            const p = numPages <= 9 ? i + 1 : i === 8 ? numPages : i === 4 ? page : i + 1;
-            const active = p === page;
-            return (
-              <button key={i} onClick={() => setPage(p)} style={{
-                width: 28, height: 28, borderRadius: 8, fontSize: 10,
-                background: active ? "linear-gradient(135deg, #C9A97A, #A07840)" : "rgba(255,255,255,0.04)",
-                border: active ? "1px solid #C9A97A" : "1px solid rgba(255,255,255,0.06)",
-                color: active ? "#060D1F" : "rgba(255,255,255,0.35)",
-                cursor: "pointer", fontFamily: "'Cinzel',serif", fontWeight: active ? 700 : 400,
+        <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
+          {buildPages(page, numPages).map((p, i) =>
+            p === "..." ? (
+              <span key={`ellipsis-${i}`} style={{ width: 24, textAlign: "center", fontSize: 11, color: "rgba(255,255,255,0.25)" }}>···</span>
+            ) : (
+              <button key={p} onClick={() => setPage(p as number)} style={{
+                width: 30, height: 30, borderRadius: 8, fontSize: 11,
+                background: p === page ? "linear-gradient(135deg, #C9A97A, #A07840)" : "rgba(255,255,255,0.04)",
+                border: p === page ? "1px solid #C9A97A" : "1px solid rgba(255,255,255,0.06)",
+                color: p === page ? "#060D1F" : "rgba(255,255,255,0.35)",
+                cursor: "pointer", fontFamily: "'Cinzel',serif", fontWeight: p === page ? 700 : 400,
                 display: "flex", alignItems: "center", justifyContent: "center",
+                transition: "all 0.15s",
               }}>{p}</button>
-            );
-          })}
+            )
+          )}
         </div>
 
         <button
