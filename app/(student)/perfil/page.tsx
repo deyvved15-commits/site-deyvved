@@ -226,7 +226,7 @@ export default function PerfilPage() {
         .avatar-tab.active { background: linear-gradient(135deg,#C9A97A,#A07840); color: #060D1F; border-color: transparent; }
         .avatar-tab:not(.active) { background: transparent; color: rgba(201,169,122,0.7); }
         .avatar-tab:not(.active):hover { border-color: rgba(201,169,122,0.45); color: #E8D5A8; }
-        .drop-zone { border: 2px dashed rgba(201,169,122,0.25); border-radius: 14px; padding: 32px; text-align: center; cursor: pointer; transition: all 0.2s; }
+        .drop-zone { display: block; border: 2px dashed rgba(201,169,122,0.25); border-radius: 14px; padding: 32px; text-align: center; cursor: pointer; transition: all 0.2s; }
         .drop-zone:hover, .drop-zone.drag-over { border-color: rgba(201,169,122,0.6); background: rgba(201,169,122,0.04); }
       `}</style>
 
