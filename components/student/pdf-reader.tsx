@@ -9,14 +9,17 @@ pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pd
 
 function buildPages(current: number, total: number): (number | "...")[] {
   if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
-  const pages: (number | "...")[] = [];
-  const addPage = (p: number) => { if (!pages.includes(p)) pages.push(p); };
-  addPage(1);
-  if (current > 3) pages.push("...");
-  for (let p = Math.max(2, current - 1); p <= Math.min(total - 1, current + 1); p++) addPage(p);
-  if (current < total - 2) pages.push("...");
-  addPage(total);
-  return pages;
+  const show = new Set<number>();
+  for (let p = 1; p <= Math.min(2, total); p++) show.add(p);
+  for (let p = Math.max(1, total - 1); p <= total; p++) show.add(p);
+  for (let p = Math.max(1, current - 1); p <= Math.min(total, current + 1); p++) show.add(p);
+  const sorted = [...show].sort((a, b) => a - b);
+  const result: (number | "...")[] = [];
+  for (let i = 0; i < sorted.length; i++) {
+    if (i > 0 && sorted[i] - sorted[i - 1] > 1) result.push("...");
+    result.push(sorted[i]);
+  }
+  return result;
 }
 
 interface PdfReaderProps {
