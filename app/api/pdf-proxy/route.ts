@@ -10,14 +10,15 @@ export async function GET(req: NextRequest) {
 
   let fetchUrl = url;
 
-  // Converte link de visualização do Google Drive para link de download direto
-  const driveMatch = url.match(/drive\.google\.com\/file\/d\/([^/]+)/);
+  // Converte link do Google Drive para download direto com confirm (bypass aviso de vírus)
+  const driveMatch = url.match(/drive\.google\.com\/file\/d\/([^/?]+)/);
   if (driveMatch) {
-    fetchUrl = `https://drive.google.com/uc?export=download&id=${driveMatch[1]}`;
+    fetchUrl = `https://drive.google.com/uc?export=download&confirm=t&id=${driveMatch[1]}`;
   }
 
   try {
     const res = await fetch(fetchUrl, {
+      redirect: "follow",
       headers: {
         "User-Agent": "Mozilla/5.0 (compatible; KadimaAcademy/1.0)",
       },
@@ -28,11 +29,17 @@ export async function GET(req: NextRequest) {
     }
 
     const contentType = res.headers.get("content-type") ?? "application/pdf";
+
+    // Se o Drive retornou HTML (página de confirmação), falha com mensagem clara
+    if (contentType.includes("text/html")) {
+      return NextResponse.json({ error: "Google Drive bloqueou o download. Tente um link direto." }, { status: 502 });
+    }
+
     const buffer = await res.arrayBuffer();
 
     return new NextResponse(buffer, {
       headers: {
-        "Content-Type": contentType,
+        "Content-Type": "application/pdf",
         "Content-Disposition": "inline",
         "Cache-Control": "private, max-age=3600",
         "Access-Control-Allow-Origin": "*",

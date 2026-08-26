@@ -7,10 +7,8 @@ import { Download, FileText, Music, Video, Box, Printer, X, BookOpen } from "luc
 import { getGoogleDriveImageUrl } from "@/lib/utils";
 import PdfReader from "@/components/student/pdf-reader";
 
-function getDriveDirectUrl(url: string): string | null {
-  const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-  if (!match) return null;
-  return `https://drive.google.com/uc?export=download&id=${match[1]}`;
+function isDriveUrl(url: string): boolean {
+  return url.includes("drive.google.com");
 }
 
 interface Product {
@@ -51,8 +49,8 @@ function typeLabel(type: string) {
 export default function ProductCard({ product, isPurchased }: ProductCardProps) {
   const [open, setOpen] = useState(false);
   const [pdfOpen, setPdfOpen] = useState(false);
-  const directUrl = product.fileUrl ? getDriveDirectUrl(product.fileUrl) : null;
   const isEbook = product.type === "EBOOK";
+  const hasPdf = !!product.fileUrl && isDriveUrl(product.fileUrl);
 
   const thumbUrl = product.thumbnail?.includes("drive.google.com")
     ? getGoogleDriveImageUrl(product.thumbnail)
@@ -218,7 +216,7 @@ export default function ProductCard({ product, isPurchased }: ProductCardProps) 
                   </div>
 
                   {/* Ler PDF — apenas EBOOK com link do Drive */}
-                  {isEbook && directUrl && (
+                  {isEbook && hasPdf && (
                     <button
                       onClick={e => { e.stopPropagation(); setOpen(false); setPdfOpen(true); }}
                       style={{
@@ -287,8 +285,8 @@ export default function ProductCard({ product, isPurchased }: ProductCardProps) 
       )}
 
       {/* ── Leitor PDF (reutiliza componente das aulas) ── */}
-      {pdfOpen && directUrl && (
-        <PdfReader url={directUrl} title={product.title} onClose={() => setPdfOpen(false)} />
+      {pdfOpen && product.fileUrl && (
+        <PdfReader url={product.fileUrl} title={product.title} onClose={() => setPdfOpen(false)} />
       )}
     </>
   );
