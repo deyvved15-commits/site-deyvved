@@ -3,8 +3,14 @@
 import { useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
-import { Download, FileText, Music, Video, Box, Printer, X } from "lucide-react";
+import { Download, FileText, Music, Video, Box, Printer, X, BookOpen } from "lucide-react";
 import { getGoogleDriveImageUrl } from "@/lib/utils";
+
+function getDrivePreviewUrl(url: string): string | null {
+  const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+  if (!match) return null;
+  return `https://drive.google.com/file/d/${match[1]}/preview`;
+}
 
 interface Product {
   id: string;
@@ -43,6 +49,9 @@ function typeLabel(type: string) {
 
 export default function ProductCard({ product, isPurchased }: ProductCardProps) {
   const [open, setOpen] = useState(false);
+  const [pdfOpen, setPdfOpen] = useState(false);
+  const previewUrl = product.fileUrl ? getDrivePreviewUrl(product.fileUrl) : null;
+  const isEbook = product.type === "EBOOK";
 
   const thumbUrl = product.thumbnail?.includes("drive.google.com")
     ? getGoogleDriveImageUrl(product.thumbnail)
@@ -201,11 +210,30 @@ export default function ProductCard({ product, isPurchased }: ProductCardProps) 
               <div style={{ height: 1, background: "rgba(201,169,122,0.10)", marginBottom: 24 }} />
 
               {isPurchased ? (
-                <div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#6ee7b7", fontSize: 12, fontWeight: 700, marginBottom: 16 }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#6ee7b7", fontSize: 12, fontWeight: 700 }}>
                     <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#6ee7b7", boxShadow: "0 0 6px #6ee7b7" }} />
                     PRODUTO JÁ ADQUIRIDO
                   </div>
+
+                  {/* Ler PDF — apenas EBOOK com link do Drive */}
+                  {isEbook && previewUrl && (
+                    <button
+                      onClick={e => { e.stopPropagation(); setOpen(false); setPdfOpen(true); }}
+                      style={{
+                        display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
+                        width: "100%", padding: "14px 24px", borderRadius: 14,
+                        background: "linear-gradient(135deg, rgba(201,169,122,0.15), rgba(201,169,122,0.05))",
+                        border: "1px solid rgba(201,169,122,0.35)", color: "#E8D5A8",
+                        fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 12,
+                        letterSpacing: 2, textTransform: "uppercase", cursor: "pointer",
+                      }}
+                    >
+                      <BookOpen size={16} />
+                      Ler PDF
+                    </button>
+                  )}
+
                   <a
                     href={product.fileUrl || "#"}
                     target="_blank"
@@ -253,6 +281,58 @@ export default function ProductCard({ product, isPurchased }: ProductCardProps) 
               )}
             </div>
           </div>
+        </div>,
+        document.body
+      )}
+
+      {/* ── Modal leitor PDF ── */}
+      {pdfOpen && previewUrl && createPortal(
+        <div style={{ position: "fixed", inset: 0, zIndex: 2000, display: "flex", flexDirection: "column", background: "rgba(4,8,20,0.98)", backdropFilter: "blur(8px)" }}>
+          {/* Top bar */}
+          <div style={{
+            display: "flex", alignItems: "center", gap: 16, padding: "12px 20px", flexShrink: 0,
+            background: "linear-gradient(135deg, rgba(15,26,61,0.98), rgba(9,16,40,0.98))",
+            borderBottom: "1px solid rgba(201,169,122,0.15)",
+          }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ fontSize: 9, fontFamily: "'Cinzel',serif", letterSpacing: 4, color: "rgba(201,169,122,0.5)", textTransform: "uppercase", marginBottom: 2 }}>Leitura</p>
+              <p style={{ fontSize: 14, fontFamily: "'Cinzel',serif", fontWeight: 700, color: "#F5EFE0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {product.title}
+              </p>
+            </div>
+            <a
+              href={product.fileUrl || "#"}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: "flex", alignItems: "center", gap: 7, padding: "8px 16px", borderRadius: 9,
+                background: "rgba(201,169,122,0.08)", border: "1px solid rgba(201,169,122,0.20)",
+                color: "rgba(201,169,122,0.8)", fontSize: 11, fontFamily: "'Cinzel',serif",
+                fontWeight: 600, letterSpacing: 1.5, textDecoration: "none", textTransform: "uppercase",
+              }}
+            >
+              <Download size={13} /> Download
+            </a>
+            <button
+              onClick={() => setPdfOpen(false)}
+              title="Fechar (Esc)"
+              style={{
+                width: 34, height: 34, borderRadius: 10, cursor: "pointer",
+                background: "rgba(230,57,70,0.12)", border: "1px solid rgba(230,57,70,0.25)",
+                color: "rgba(255,128,136,0.8)", display: "flex", alignItems: "center", justifyContent: "center",
+              }}
+            >
+              <X size={15} />
+            </button>
+          </div>
+
+          {/* iframe Google Drive Preview */}
+          <iframe
+            src={previewUrl}
+            style={{ flex: 1, border: "none", display: "block", width: "100%", height: "100%" }}
+            title={product.title}
+            allow="autoplay"
+          />
         </div>,
         document.body
       )}
