@@ -5,11 +5,12 @@ import { createPortal } from "react-dom";
 import Link from "next/link";
 import { Download, FileText, Music, Video, Box, Printer, X, BookOpen } from "lucide-react";
 import { getGoogleDriveImageUrl } from "@/lib/utils";
+import PdfReader from "@/components/student/pdf-reader";
 
-function getDrivePreviewUrl(url: string): string | null {
+function getDriveDirectUrl(url: string): string | null {
   const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
   if (!match) return null;
-  return `https://drive.google.com/file/d/${match[1]}/preview`;
+  return `https://drive.google.com/uc?export=download&id=${match[1]}`;
 }
 
 interface Product {
@@ -50,7 +51,7 @@ function typeLabel(type: string) {
 export default function ProductCard({ product, isPurchased }: ProductCardProps) {
   const [open, setOpen] = useState(false);
   const [pdfOpen, setPdfOpen] = useState(false);
-  const previewUrl = product.fileUrl ? getDrivePreviewUrl(product.fileUrl) : null;
+  const directUrl = product.fileUrl ? getDriveDirectUrl(product.fileUrl) : null;
   const isEbook = product.type === "EBOOK";
 
   const thumbUrl = product.thumbnail?.includes("drive.google.com")
@@ -217,7 +218,7 @@ export default function ProductCard({ product, isPurchased }: ProductCardProps) 
                   </div>
 
                   {/* Ler PDF — apenas EBOOK com link do Drive */}
-                  {isEbook && previewUrl && (
+                  {isEbook && directUrl && (
                     <button
                       onClick={e => { e.stopPropagation(); setOpen(false); setPdfOpen(true); }}
                       style={{
@@ -285,56 +286,9 @@ export default function ProductCard({ product, isPurchased }: ProductCardProps) 
         document.body
       )}
 
-      {/* ── Modal leitor PDF ── */}
-      {pdfOpen && previewUrl && createPortal(
-        <div style={{ position: "fixed", inset: 0, zIndex: 2000, display: "flex", flexDirection: "column", background: "rgba(4,8,20,0.98)", backdropFilter: "blur(8px)" }}>
-          {/* Top bar */}
-          <div style={{
-            display: "flex", alignItems: "center", gap: 16, padding: "12px 20px", flexShrink: 0,
-            background: "linear-gradient(135deg, rgba(15,26,61,0.98), rgba(9,16,40,0.98))",
-            borderBottom: "1px solid rgba(201,169,122,0.15)",
-          }}>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ fontSize: 9, fontFamily: "'Cinzel',serif", letterSpacing: 4, color: "rgba(201,169,122,0.5)", textTransform: "uppercase", marginBottom: 2 }}>Leitura</p>
-              <p style={{ fontSize: 14, fontFamily: "'Cinzel',serif", fontWeight: 700, color: "#F5EFE0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                {product.title}
-              </p>
-            </div>
-            <a
-              href={product.fileUrl || "#"}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                display: "flex", alignItems: "center", gap: 7, padding: "8px 16px", borderRadius: 9,
-                background: "rgba(201,169,122,0.08)", border: "1px solid rgba(201,169,122,0.20)",
-                color: "rgba(201,169,122,0.8)", fontSize: 11, fontFamily: "'Cinzel',serif",
-                fontWeight: 600, letterSpacing: 1.5, textDecoration: "none", textTransform: "uppercase",
-              }}
-            >
-              <Download size={13} /> Download
-            </a>
-            <button
-              onClick={() => setPdfOpen(false)}
-              title="Fechar (Esc)"
-              style={{
-                width: 34, height: 34, borderRadius: 10, cursor: "pointer",
-                background: "rgba(230,57,70,0.12)", border: "1px solid rgba(230,57,70,0.25)",
-                color: "rgba(255,128,136,0.8)", display: "flex", alignItems: "center", justifyContent: "center",
-              }}
-            >
-              <X size={15} />
-            </button>
-          </div>
-
-          {/* iframe Google Drive Preview */}
-          <iframe
-            src={previewUrl}
-            style={{ flex: 1, border: "none", display: "block", width: "100%", height: "100%" }}
-            title={product.title}
-            allow="autoplay"
-          />
-        </div>,
-        document.body
+      {/* ── Leitor PDF (reutiliza componente das aulas) ── */}
+      {pdfOpen && directUrl && (
+        <PdfReader url={directUrl} title={product.title} onClose={() => setPdfOpen(false)} />
       )}
     </>
   );
