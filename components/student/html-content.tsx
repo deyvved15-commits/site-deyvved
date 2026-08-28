@@ -64,8 +64,8 @@ export default function HtmlContent({
     const resizeScript = `
       <script>
         function sendHeight() {
-          const height = document.documentElement.scrollHeight;
-          window.parent.postMessage({ type: "resize-iframe", height: height }, "*");
+          var h = document.documentElement.scrollHeight;
+          try { window.parent.postMessage({ type: "resize-iframe", height: h }, "*"); } catch(e) {}
         }
         window.addEventListener("load", sendHeight);
         window.addEventListener("resize", sendHeight);
@@ -75,7 +75,12 @@ export default function HtmlContent({
       </script>
     `;
 
-    const finalHtml = html.replace("</body>", `${resizeScript}</body>`);
+    // Use lastIndexOf to always inject before the real closing </body>, even if
+    // the HTML contains </body> inside a JS string or template literal.
+    const closeBodyIdx = html.lastIndexOf("</body>");
+    const finalHtml = closeBodyIdx !== -1
+      ? html.slice(0, closeBodyIdx) + resizeScript + html.slice(closeBodyIdx)
+      : html + resizeScript;
 
     return (
       <div className={className} style={{ ...style, width: "100%", borderRadius: 16, overflow: "hidden", background: "#0a0f1e", border: "1px solid rgba(201,169,122,0.15)" }}>
@@ -83,7 +88,7 @@ export default function HtmlContent({
           srcDoc={finalHtml}
           title="Custom Content"
           style={{ width: "100%", border: "none", height: iframeHeight, display: "block" }}
-          sandbox="allow-scripts allow-popups allow-forms allow-modals"
+          sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-modals"
         />
       </div>
     );
