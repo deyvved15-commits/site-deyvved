@@ -1505,16 +1505,11 @@
     let quizScore = 0;
     let quizAnswered = false;
 
-    // Initialize DOM
+    // Initialize DOM — cada setup isolado para não bloquear os outros
     document.addEventListener("DOMContentLoaded", () => {
-      renderBooksGrid('all');
-      setupVerseClickListener();
-      setupScrollProgress();
-      setupSidebar();
-      setupFontControls();
-      setupThemeToggle();
-      setupSearch();
-      setupSectionNav();
+      const fns = [renderBooksGrid.bind(null,'all'), setupVerseClickListener, setupScrollProgress,
+                   setupSidebar, setupFontControls, setupThemeToggle, setupSearch, setupSectionNav];
+      fns.forEach(fn => { try { fn(); } catch(e) { console.warn('[apostila]', fn.name, e); } });
     });
 
     // Render Books Grid
@@ -1611,16 +1606,21 @@
           body.textContent = `"${foundText}"`;
 
           btnCopy.onclick = () => {
-            const temp = document.createElement('textarea');
-            temp.value = `${verseKey} - "${foundText}"`;
-            document.body.appendChild(temp);
-            temp.select();
-            document.execCommand('copy');
-            document.body.removeChild(temp);
+            const text = `${verseKey} - "${foundText}"`;
+            try {
+              if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).catch(() => {});
+              } else {
+                const temp = document.createElement('textarea');
+                temp.value = text;
+                document.body.appendChild(temp);
+                temp.select();
+                document.execCommand('copy');
+                document.body.removeChild(temp);
+              }
+            } catch(e) {}
             btnCopy.innerHTML = `<i class="fa-solid fa-check text-emerald-500 mr-1"></i> Copiado!`;
-            setTimeout(() => {
-              btnCopy.innerHTML = `<i class="fa-regular fa-copy mr-1"></i> Copiar`;
-            }, 2000);
+            setTimeout(() => { btnCopy.innerHTML = `<i class="fa-regular fa-copy mr-1"></i> Copiar`; }, 2000);
           };
 
           openModal('modal-verse');
