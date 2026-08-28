@@ -1,0 +1,2028 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bibliologia - Apostila Digital Interativa | Kadima Academy</title>
+  
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts: Playfair Display (Headings) & Inter (Body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Inter:wght@300;400;500;600;700&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            gold: {
+              50: '#FDFBF7',
+              100: '#FBF7EE',
+              200: '#F5ECD3',
+              300: '#EEDFB2',
+              400: '#E0C575',
+              500: '#C5A038',
+              600: '#9E7E25',
+              700: '#755C17',
+              800: '#4E3C0C',
+              900: '#2A1F04'
+            },
+            primary: {
+              900: '#0F172A',
+              800: '#1E293B',
+              700: '#334155'
+            }
+          },
+          fontFamily: {
+            title: ['Cinzel', 'serif'],
+            serif: ['Merriweather', 'serif'],
+            sans: ['Inter', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.05);
+    }
+    .dark ::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #C5A038;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #9E7E25;
+    }
+
+    /* Print Optimizations */
+    @media print {
+      .no-print {
+        display: none !important;
+      }
+      body {
+        background: white !important;
+        color: black !important;
+        font-size: 12pt;
+      }
+      .page-break {
+        page-break-before: always;
+      }
+      #main-content {
+        margin: 0 !important;
+        padding: 0 !important;
+        max-width: 100% !important;
+      }
+    }
+
+    .bible-ref {
+      cursor: pointer;
+      color: #9E7E25;
+      font-weight: 600;
+      border-bottom: 1px dotted #C5A038;
+      transition: all 0.2s ease;
+    }
+    .bible-ref:hover {
+      color: #C5A038;
+      background-color: rgba(197, 160, 56, 0.1);
+      border-bottom-style: solid;
+      border-radius: 2px;
+      padding: 0 2px;
+    }
+    .dark .bible-ref {
+      color: #E0C575;
+      border-bottom-color: #E0C575;
+    }
+    .dark .bible-ref:hover {
+      color: #F5ECD3;
+    }
+    .nav-item.nav-active {
+      background-color: rgba(202,138,4,0.12);
+      color: #CA8A04;
+      font-weight: 600;
+      border-left: 3px solid #CA8A04;
+    }
+    .dark .nav-item.nav-active {
+      background-color: rgba(250,204,21,0.10);
+      color: #FACC15;
+      border-left-color: #FACC15;
+    }
+    #main-content section[id] { display: none; }
+  </style>
+</head>
+
+<body class="bg-stone-100 text-stone-900 dark:bg-slate-950 dark:text-stone-100 font-sans transition-colors duration-200 antialiased min-h-screen flex flex-col">
+
+  <!-- Progress Bar Top -->
+  <div id="progress-bar-container" class="fixed top-0 left-0 w-full h-1.5 bg-stone-200 dark:bg-slate-800 z-50 no-print">
+    <div id="progress-bar" class="h-full bg-gradient-to-r from-gold-600 via-gold-400 to-amber-500 w-0 transition-all duration-150"></div>
+  </div>
+
+  <!-- Header / Navigation Bar -->
+  <header class="sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur border-b border-stone-200 dark:border-slate-800 shadow-sm transition-colors no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      
+      <!-- Brand & Title -->
+      <div class="flex items-center space-x-3">
+        <button id="btn-toggle-sidebar" class="p-2 rounded-lg text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-slate-800 focus:outline-none lg:hidden" title="Abrir Sumário">
+          <i class="fa-solid fa-bars-staggered text-xl"></i>
+        </button>
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-gold-600 to-amber-700 flex items-center justify-center text-white shadow-md shadow-gold-600/20">
+            <i class="fa-solid fa-book-bible text-xl"></i>
+          </div>
+          <div>
+            <span class="block text-xs font-bold tracking-widest text-gold-600 dark:text-gold-400 uppercase font-title">Kadima Academy</span>
+            <h1 class="text-base font-bold text-stone-900 dark:text-white leading-none">Introdução à Bibliologia</h1>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Tools -->
+      <div class="flex items-center space-x-2 sm:space-x-3">
+        <!-- Live Search Button -->
+        <button id="btn-search-trigger" class="px-3 py-1.5 rounded-lg bg-stone-100 dark:bg-slate-800 text-stone-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-slate-700 text-xs sm:text-sm font-medium flex items-center gap-2 transition" title="Pesquisar no texto">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <span class="hidden md:inline">Buscar na apostila</span>
+        </button>
+
+        <!-- Font Size Controls with Percentage Indicator -->
+        <div class="flex items-center bg-stone-100 dark:bg-slate-800 rounded-lg p-1 border border-stone-200 dark:border-slate-700">
+          <button id="btn-font-dec" class="px-2.5 py-1 text-xs font-bold text-stone-700 dark:text-stone-300 hover:text-gold-600 dark:hover:text-gold-400 hover:bg-stone-200 dark:hover:bg-slate-700 rounded transition" title="Diminuir Fonte (todos os textos)">A-</button>
+          <button id="btn-font-reset" class="px-2 py-1 text-[11px] font-semibold text-gold-600 dark:text-gold-400 hover:bg-stone-200 dark:hover:bg-slate-700 rounded transition" title="Clique para redefinir fonte para o tamanho padrão">
+            <span id="font-scale-display">100%</span>
+          </button>
+          <button id="btn-font-inc" class="px-2.5 py-1 text-xs font-bold text-stone-700 dark:text-stone-300 hover:text-gold-600 dark:hover:text-gold-400 hover:bg-stone-200 dark:hover:bg-slate-700 rounded transition" title="Aumentar Fonte (todos os textos)">A+</button>
+        </div>
+
+        <!-- Print / PDF -->
+        <button onclick="window.print()" class="p-2 rounded-lg text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-slate-800 transition" title="Imprimir / Salvar PDF">
+          <i class="fa-solid fa-print"></i>
+        </button>
+
+        <!-- Dark Mode Toggle -->
+        <button id="btn-theme-toggle" class="p-2 rounded-lg text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-slate-800 transition" title="Alternar Tema Claro/Escuro">
+          <i class="fa-solid fa-moon dark:hidden"></i>
+          <i class="fa-solid fa-sun hidden dark:inline text-gold-400"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <div class="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 flex-1 flex gap-8">
+    
+    <!-- Sidebar / Table of Contents (Desktop + Mobile Drawer) -->
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-72 lg:w-80 bg-white dark:bg-slate-900 border-r border-stone-200 dark:border-slate-800 p-5 shadow-2xl lg:shadow-none transform -translate-x-full lg:translate-x-0 lg:static lg:block transition-transform duration-300 ease-in-out overflow-y-auto no-print">
+      
+      <!-- Mobile Close -->
+      <div class="flex items-center justify-between pb-4 border-b border-stone-100 dark:border-slate-800 lg:hidden">
+        <span class="font-bold text-stone-800 dark:text-stone-200">Sumário da Aula</span>
+        <button id="btn-close-sidebar" class="p-1 rounded text-stone-500 hover:bg-stone-100 dark:hover:bg-slate-800">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div class="mt-4 mb-6">
+        <div class="bg-gold-50 dark:bg-gold-950/40 border border-gold-200 dark:border-gold-800/60 rounded-xl p-4">
+          <p class="text-[11px] font-bold tracking-wider uppercase text-gold-700 dark:text-gold-400">Estudo de Teologia</p>
+          <h2 class="text-sm font-extrabold text-stone-900 dark:text-white font-title mt-0.5">1ª Aula - Introdução</h2>
+          <p class="text-xs text-stone-600 dark:text-stone-300 mt-1"><i class="fa-solid fa-user-tie text-gold-600 mr-1.5"></i> Autor: <strong>Pr Deyvved Mesquita</strong></p>
+        </div>
+      </div>
+
+      <!-- Quick Nav Tabs -->
+      <div class="space-y-1 text-sm font-medium">
+        <p class="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider px-3 mb-2">Seções da Apostila</p>
+        
+        <a href="#intro" class="nav-item flex items-center px-3 py-2 rounded-lg text-stone-700 dark:text-stone-300 hover:bg-gold-50 dark:hover:bg-slate-800 hover:text-gold-600 dark:hover:text-gold-400 transition group">
+          <i class="fa-solid fa-feather-pointed w-6 text-stone-400 group-hover:text-gold-500"></i>
+          <span>1. O que é Bibliologia</span>
+        </a>
+
+        <a href="#campo" class="nav-item flex items-center px-3 py-2 rounded-lg text-stone-700 dark:text-stone-300 hover:bg-gold-50 dark:hover:bg-slate-800 hover:text-gold-600 dark:hover:text-gold-400 transition group">
+          <i class="fa-solid fa-compass-drafting w-6 text-stone-400 group-hover:text-gold-500"></i>
+          <span>2. O Campo deste Assunto</span>
+        </a>
+
+        <a href="#necessidade" class="nav-item flex items-center px-3 py-2 rounded-lg text-stone-700 dark:text-stone-300 hover:bg-gold-50 dark:hover:bg-slate-800 hover:text-gold-600 dark:hover:text-gold-400 transition group">
+          <i class="fa-solid fa-seedling w-6 text-stone-400 group-hover:text-gold-500"></i>
+          <span>3. Razão das Escrituras</span>
+        </a>
+
+        <a href="#como-estudar" class="nav-item flex items-center px-3 py-2 rounded-lg text-stone-700 dark:text-stone-300 hover:bg-gold-50 dark:hover:bg-slate-800 hover:text-gold-600 dark:hover:text-gold-400 transition group">
+          <i class="fa-solid fa-graduation-cap w-6 text-stone-400 group-hover:text-gold-500"></i>
+          <span>4. Como Estudar a Bíblia</span>
+        </a>
+
+        <a href="#tema-central" class="nav-item flex items-center px-3 py-2 rounded-lg text-stone-700 dark:text-stone-300 hover:bg-gold-50 dark:hover:bg-slate-800 hover:text-gold-600 dark:hover:text-gold-400 transition group">
+          <i class="fa-solid fa-cross w-6 text-stone-400 group-hover:text-gold-500"></i>
+          <span>5. Jesus: Tema Central</span>
+        </a>
+
+        <a href="#referencias-siglas" class="nav-item flex items-center px-3 py-2 rounded-lg text-stone-700 dark:text-stone-300 hover:bg-gold-50 dark:hover:bg-slate-800 hover:text-gold-600 dark:hover:text-gold-400 transition group">
+          <i class="fa-solid fa-quote-left w-6 text-stone-400 group-hover:text-gold-500"></i>
+          <span>6. Referências & Siglas</span>
+        </a>
+
+        <a href="#biblia-livro" class="nav-item flex items-center px-3 py-2 rounded-lg text-stone-700 dark:text-stone-300 hover:bg-gold-50 dark:hover:bg-slate-800 hover:text-gold-600 dark:hover:text-gold-400 transition group">
+          <i class="fa-solid fa-scroll w-6 text-stone-400 group-hover:text-gold-500"></i>
+          <span>7. Livros Antigos & Escrita</span>
+        </a>
+
+        <a href="#terminologia" class="nav-item flex items-center px-3 py-2 rounded-lg text-stone-700 dark:text-stone-300 hover:bg-gold-50 dark:hover:bg-slate-800 hover:text-gold-600 dark:hover:text-gold-400 transition group">
+          <i class="fa-solid fa-language w-6 text-stone-400 group-hover:text-gold-500"></i>
+          <span>8. Terminologia & Nomes</span>
+        </a>
+
+        <a href="#organizacao" class="nav-item flex items-center px-3 py-2 rounded-lg text-stone-700 dark:text-stone-300 hover:bg-gold-50 dark:hover:bg-slate-800 hover:text-gold-600 dark:hover:text-gold-400 transition group">
+          <i class="fa-solid fa-folder-tree w-6 text-stone-400 group-hover:text-gold-500"></i>
+          <span>9. Organização dos Livros</span>
+        </a>
+
+        <a href="#capitulos-versiculos" class="nav-item flex items-center px-3 py-2 rounded-lg text-stone-700 dark:text-stone-300 hover:bg-gold-50 dark:hover:bg-slate-800 hover:text-gold-600 dark:hover:text-gold-400 transition group">
+          <i class="fa-solid fa-list-ol w-6 text-stone-400 group-hover:text-gold-500"></i>
+          <span>10. Capítulos & Curiosidades</span>
+        </a>
+
+        <a href="#autores" class="nav-item flex items-center px-3 py-2 rounded-lg text-stone-700 dark:text-stone-300 hover:bg-gold-50 dark:hover:bg-slate-800 hover:text-gold-600 dark:hover:text-gold-400 transition group">
+          <i class="fa-solid fa-users-viewfinder w-6 text-stone-400 group-hover:text-gold-500"></i>
+          <span>11. Autores da Bíblia</span>
+        </a>
+      </div>
+
+      <!-- Interactive Extra Tools in Sidebar -->
+      <div class="mt-8 pt-6 border-t border-stone-200 dark:border-slate-800 space-y-2">
+        <p class="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider px-3 mb-1">Laboratório de Fixação</p>
+        
+        <button onclick="openModal('modal-jesus-finder')" class="w-full text-left px-3 py-2.5 rounded-lg bg-gold-500/10 text-gold-700 dark:text-gold-300 hover:bg-gold-500/20 text-xs font-semibold flex items-center justify-between transition">
+          <span class="flex items-center gap-2"><i class="fa-solid fa-magnifying-glass-chart"></i> Guia 66 Livros em Cristo</span>
+          <i class="fa-solid fa-chevron-right text-[10px]"></i>
+        </button>
+
+        <button onclick="openModal('modal-flashcards')" class="w-full text-left px-3 py-2.5 rounded-lg bg-stone-100 dark:bg-slate-800 text-stone-700 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-slate-700 text-xs font-semibold flex items-center justify-between transition">
+          <span class="flex items-center gap-2"><i class="fa-solid fa-layer-group text-amber-500"></i> Flashcards Teológicos</span>
+          <span class="text-[10px] bg-amber-500/20 text-amber-700 dark:text-amber-300 px-1.5 py-0.5 rounded font-bold">12 Cards</span>
+        </button>
+
+        <button onclick="openModal('modal-quiz')" class="w-full text-left px-3 py-2.5 rounded-lg bg-stone-100 dark:bg-slate-800 text-stone-700 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-slate-700 text-xs font-semibold flex items-center justify-between transition">
+          <span class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-emerald-500"></i> Simulado & Quiz</span>
+          <span class="text-[10px] bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 px-1.5 py-0.5 rounded font-bold">10 Qs</span>
+        </button>
+      </div>
+
+    </aside>
+
+    <!-- Main Content Body -->
+    <main id="main-content" class="flex-1 max-w-4xl space-y-12 transition-all">
+
+      <!-- Hero Header Section -->
+      <section id="hero-cover" class="bg-gradient-to-br from-slate-900 via-primary-900 to-slate-950 text-white rounded-3xl p-8 sm:p-12 shadow-xl border border-gold-500/20 relative overflow-hidden">
+        <div class="absolute -right-16 -top-16 w-64 h-64 bg-gold-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -left-16 -bottom-16 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="relative z-10 space-y-4">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gold-500/20 border border-gold-500/30 text-gold-300 text-xs font-semibold uppercase tracking-wider">
+            <i class="fa-solid fa-graduation-cap"></i> Kadima Academy • Estudo de Teologia
+          </div>
+          
+          <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight font-title text-transparent bg-clip-text bg-gradient-to-r from-gold-200 via-gold-400 to-amber-200 leading-tight">
+            BIBLIOLOGIA
+          </h1>
+          
+          <p class="text-stone-300 text-base sm:text-lg max-w-2xl font-serif">
+            Apostila oficial do estudo introdutório e auxiliar das Sagradas Escrituras: como a Palavra de Deus chegou até nós, sua inspiração, história, formação canônica e métodos de interpretação.
+          </p>
+
+          <div class="pt-4 flex flex-wrap items-center gap-4 text-xs sm:text-sm text-stone-300 border-t border-slate-800">
+            <div class="flex items-center gap-2">
+              <span class="text-gold-400 font-bold"><i class="fa-solid fa-chalkboard-user"></i> Autor:</span>
+              <span>Pr Deyvved Mesquita</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-gold-400 font-bold"><i class="fa-solid fa-bookmark"></i> Disciplina:</span>
+              <span>Introdução / Bibliologia</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-gold-400 font-bold"><i class="fa-solid fa-file-lines"></i> Módulo:</span>
+              <span>1ª Aula</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 1: Introdução à Bibliologia -->
+      <section id="intro" class="bg-white dark:bg-slate-900 rounded-2xl p-6 sm:p-8 border border-stone-200 dark:border-slate-800 shadow-sm transition-colors space-y-6">
+        <div class="flex items-center gap-3 border-b border-stone-100 dark:border-slate-800 pb-4">
+          <span class="w-8 h-8 rounded-lg bg-gold-100 dark:bg-gold-900/50 text-gold-700 dark:text-gold-300 flex items-center justify-center font-bold text-sm">01</span>
+          <h2 class="text-2xl font-bold font-title text-stone-900 dark:text-white">1º Aula - Introdução: BIBLIOLOGIA</h2>
+        </div>
+
+        <div class="prose dark:prose-invert max-w-none text-stone-700 dark:text-stone-300 font-serif leading-relaxed space-y-4">
+          <p class="text-base sm:text-lg leading-relaxed">
+            O assunto <strong>Bibliologia</strong>, compreende o estudo introdutório e auxiliar das Sagradas Escrituras. Com ele entendemos de que maneira chegou a Bíblia até nós e como estudá-la. A necessidade desse estudo se dá pelo fato de que, sendo a Bíblia um livro divino, veio até nós por canais humanos, tornando-se <strong>divino-humana</strong>, assim como o é a Palavra Viva, Cristo, que sendo Deus, tornou-se também divino-humano (<span class="bible-ref" data-verse="Jo 1:1">Jo 1:1</span>; <span class="bible-ref" data-verse="Ap 19:13">Ap 19:13</span>).
+          </p>
+
+          <div class="bg-stone-50 dark:bg-slate-800/60 border-l-4 border-gold-500 p-4 rounded-r-xl my-4 text-stone-800 dark:text-stone-200">
+            <p class="italic text-sm sm:text-base">
+              "Através da Bíblia, Deus fala aos homens em linguagem humana, por esse motivo encontramos nela referências a montanhas, rios, mares, clima, dinheiro, comércio, política, etc. Isto é, Deus, para se fazer entender, vestiu a sua Palavra Escrita com a nossa linguagem, pois se usasse a sua linguagem, nem o mais sábio dos homens, ou o mais brilhante cientista, poderia entendê-lo."
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 2: O Campo deste Assunto -->
+      <section id="campo" class="bg-white dark:bg-slate-900 rounded-2xl p-6 sm:p-8 border border-stone-200 dark:border-slate-800 shadow-sm transition-colors space-y-6">
+        <div class="flex items-center gap-3 border-b border-stone-100 dark:border-slate-800 pb-4">
+          <span class="w-8 h-8 rounded-lg bg-gold-100 dark:bg-gold-900/50 text-gold-700 dark:text-gold-300 flex items-center justify-center font-bold text-sm">02</span>
+          <h2 class="text-2xl font-bold font-title text-stone-900 dark:text-white">O Campo deste Assunto</h2>
+        </div>
+
+        <p class="text-stone-700 dark:text-stone-300 font-serif">
+          A Bibliologia estuda a Bíblia sob os seguintes pontos de vista:
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="p-4 rounded-xl border border-stone-200 dark:border-slate-800 bg-stone-50/50 dark:bg-slate-800/30 flex items-start gap-3">
+            <div class="w-8 h-8 rounded-lg bg-gold-500/10 text-gold-600 dark:text-gold-400 flex items-center justify-center shrink-0 mt-0.5"><i class="fa-solid fa-glasses"></i></div>
+            <div>
+              <h3 class="font-bold text-sm text-stone-900 dark:text-white">1. Leitura & Estudo Geral</h3>
+              <p class="text-xs text-stone-600 dark:text-stone-400 mt-1">Observações gerais sobre sua leitura, metodologia e aplicação diária.</p>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-xl border border-stone-200 dark:border-slate-800 bg-stone-50/50 dark:bg-slate-800/30 flex items-start gap-3">
+            <div class="w-8 h-8 rounded-lg bg-gold-500/10 text-gold-600 dark:text-gold-400 flex items-center justify-center shrink-0 mt-0.5"><i class="fa-solid fa-sitemap"></i></div>
+            <div>
+              <h3 class="font-bold text-sm text-stone-900 dark:text-white">2. Estrutura & Organização</h3>
+              <p class="text-xs text-stone-600 dark:text-stone-400 mt-1">Sua divisão, classificação dos livros, capítulos, versículos, particularidades e tema central.</p>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-xl border border-stone-200 dark:border-slate-800 bg-stone-50/50 dark:bg-slate-800/30 flex items-start gap-3">
+            <div class="w-8 h-8 rounded-lg bg-gold-500/10 text-gold-600 dark:text-gold-400 flex items-center justify-center shrink-0 mt-0.5"><i class="fa-solid fa-certificate"></i></div>
+            <div>
+              <h3 class="font-bold text-sm text-stone-900 dark:text-white">3. Natureza Divina</h3>
+              <p class="text-xs text-stone-600 dark:text-stone-400 mt-1">A Bíblia considerada como livro divino: sua inspiração, infalibilidade e credibilidade.</p>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-xl border border-stone-200 dark:border-slate-800 bg-stone-50/50 dark:bg-slate-800/30 flex items-start gap-3">
+            <div class="w-8 h-8 rounded-lg bg-gold-500/10 text-gold-600 dark:text-gold-400 flex items-center justify-center shrink-0 mt-0.5"><i class="fa-solid fa-scale-balanced"></i></div>
+            <div>
+              <h3 class="font-bold text-sm text-stone-900 dark:text-white">4. Formação do Cânon Sagrado</h3>
+              <p class="text-xs text-stone-600 dark:text-stone-400 mt-1">O processo histórico de reconhecimento dos livros inspirados por Deus.</p>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-xl border border-stone-200 dark:border-slate-800 bg-stone-50/50 dark:bg-slate-800/30 flex items-start gap-3">
+            <div class="w-8 h-8 rounded-lg bg-gold-500/10 text-gold-600 dark:text-gold-400 flex items-center justify-center shrink-0 mt-0.5"><i class="fa-solid fa-language"></i></div>
+            <div>
+              <h3 class="font-bold text-sm text-stone-900 dark:text-white">5. Preservação & Tradução</h3>
+              <p class="text-xs text-stone-600 dark:text-stone-400 mt-1">A preservação textual e as traduções do texto bíblico através dos séculos.</p>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-xl border border-red-200 dark:border-red-900/40 bg-red-50/40 dark:bg-red-950/20 flex items-start gap-3">
+            <div class="w-8 h-8 rounded-lg bg-red-500/10 text-red-600 dark:text-red-400 flex items-center justify-center shrink-0 mt-0.5"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <div>
+              <h3 class="font-bold text-sm text-red-900 dark:text-red-300">6. Formas Erradas de Abordagem</h3>
+              <p class="text-xs text-red-700 dark:text-red-400 mt-1">Desvios como: <strong>a) Bibliolatria</strong> (adorar o livro físico) e <strong>b) Bibliomancia</strong> (usar a Bíblia como adivinhação/sorteio).</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 3: A Razão da Necessidade das Escrituras -->
+      <section id="necessidade" class="bg-white dark:bg-slate-900 rounded-2xl p-6 sm:p-8 border border-stone-200 dark:border-slate-800 shadow-sm transition-colors space-y-6">
+        <div class="flex items-center gap-3 border-b border-stone-100 dark:border-slate-800 pb-4">
+          <span class="w-8 h-8 rounded-lg bg-gold-100 dark:bg-gold-900/50 text-gold-700 dark:text-gold-300 flex items-center justify-center font-bold text-sm">03</span>
+          <h2 class="text-2xl font-bold font-title text-stone-900 dark:text-white">A Razão da Necessidade das Escrituras</h2>
+        </div>
+
+        <p class="text-stone-700 dark:text-stone-300 font-serif">
+          Isto está implícito em <span class="bible-ref" data-verse="Sl 119:130">Salmo 119:130</span>; <span class="bible-ref" data-verse="Is 34:16">Isaías 34:16</span>; <span class="bible-ref" data-verse="2 Tm 2:15">2 Timóteo 2:15</span>; <span class="bible-ref" data-verse="1 Pe 3:15">I Pedro 3:15</span> e nos conduz a dois pontos de suma importância:
+        </p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 my-2">
+          <div class="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-center">
+            <span class="text-xs font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider block">Ponto A</span>
+            <span class="font-bold text-base text-stone-900 dark:text-white">Porque devemos estudar a Bíblia</span>
+          </div>
+          <div class="p-4 rounded-xl bg-gold-500/10 border border-gold-500/20 text-center">
+            <span class="text-xs font-bold text-gold-700 dark:text-gold-400 uppercase tracking-wider block">Ponto B</span>
+            <span class="font-bold text-stone-900 dark:text-white text-base">Como devemos estudar a Bíblia</span>
+          </div>
+        </div>
+
+        <h3 class="text-xl font-bold text-stone-900 dark:text-white pt-2 border-t border-stone-100 dark:border-slate-800">
+          Porque devemos estudar a Bíblia:
+        </h3>
+
+        <div class="space-y-4">
+          <div class="flex gap-4 p-4 rounded-xl bg-stone-50 dark:bg-slate-800/50 border border-stone-200 dark:border-slate-800">
+            <div class="w-8 h-8 rounded-full bg-gold-500 text-white flex items-center justify-center font-bold text-sm shrink-0">1</div>
+            <div class="text-sm sm:text-base font-serif space-y-1">
+              <p class="font-bold text-stone-900 dark:text-white">Ela é o único manual do crente na vida cristã e no serviço do Senhor</p>
+              <p class="text-stone-600 dark:text-stone-300 text-sm">
+                O crente foi salvo para servir ao Senhor (<span class="bible-ref" data-verse="Ef 2:10">Ef 2:10</span>; <span class="bible-ref" data-verse="1 Pe 2:9">I Pe 2:9</span>). Desta forma, sendo a Bíblia o manual de Deus para as nossas vidas, é indispensável que aquele que o serve a conheça muito bem (<span class="bible-ref" data-verse="2 Tm 2:15">2 Tm 2:15</span>).
+              </p>
+            </div>
+          </div>
+
+          <div class="flex gap-4 p-4 rounded-xl bg-stone-50 dark:bg-slate-800/50 border border-stone-200 dark:border-slate-800">
+            <div class="w-8 h-8 rounded-full bg-gold-500 text-white flex items-center justify-center font-bold text-sm shrink-0">2</div>
+            <div class="text-sm sm:text-base font-serif space-y-1">
+              <p class="font-bold text-stone-900 dark:text-white">Ela alimenta nossa alma</p>
+              <p class="text-stone-600 dark:text-stone-300 text-sm">
+                (<span class="bible-ref" data-verse="Jr 15:16">Jr 15:16</span>; <span class="bible-ref" data-verse="Mt 4:4">Mt 4:4</span>; <span class="bible-ref" data-verse="1 Pe 2:2">I Pe 2.2</span>). Não há dúvida que a Palavra de Deus traz nutrição e crescimento espiritual.
+              </p>
+            </div>
+          </div>
+
+          <div class="flex gap-4 p-4 rounded-xl bg-stone-50 dark:bg-slate-800/50 border border-stone-200 dark:border-slate-800">
+            <div class="w-8 h-8 rounded-full bg-gold-500 text-white flex items-center justify-center font-bold text-sm shrink-0">3</div>
+            <div class="text-sm sm:text-base font-serif space-y-1">
+              <p class="font-bold text-stone-900 dark:text-white">Ela é o instrumento que o Espírito Santo usa</p>
+              <p class="text-stone-600 dark:text-stone-300 text-sm">
+                (<span class="bible-ref" data-verse="Ef 6:17">Ef 6:17</span>). Se conhecermos bem a palavra de Deus, na hora que precisarmos, o Espírito de Deus nos instrui segundo a palavra de Deus que habita em nosso coração e mente. Inclusive, um requisito essencial para que Deus responda as nossas orações é estarmos saturados da sua palavra. <em>Por quê?</em> Pois dessa forma oraremos segundo a Sua soberana vontade e não segundo as nossas.
+              </p>
+            </div>
+          </div>
+
+          <div class="flex gap-4 p-4 rounded-xl bg-stone-50 dark:bg-slate-800/50 border border-stone-200 dark:border-slate-800">
+            <div class="w-8 h-8 rounded-full bg-gold-500 text-white flex items-center justify-center font-bold text-sm shrink-0">4</div>
+            <div class="text-sm sm:text-base font-serif space-y-1">
+              <p class="font-bold text-stone-900 dark:text-white">Ela enriquece espiritualmente a vida cristã</p>
+              <p class="text-stone-600 dark:text-stone-300 text-sm">
+                (<span class="bible-ref" data-verse="Sl 119:72">Salmo 119:72</span>). Essas riquezas vêm por revelação pelo Espírito de Deus primeiramente (<span class="bible-ref" data-verse="Ef 1:17">Ef 1:17</span>). O crente que quiser entender a Bíblia com o seu intelecto, logo desistirá, pois somente o Espírito Santo de Deus conhece as coisas de Deus (<span class="bible-ref" data-verse="1 Co 2:10">I Co 2:10</span>). A Bíblia é a revelação de Deus à humanidade. Tudo que o homem precisa saber a respeito de Deus, de sua conduta espiritual, fidelidade e felicidade eterna está na Bíblia, sendo ela a única fonte de revelação escrita de Deus. Não há mais nenhum outro manual senão a Palavra de Deus.
+              </p>
+              
+              <div class="mt-3 p-3.5 rounded-xl bg-gold-500/10 dark:bg-slate-900/90 border border-gold-500/40 dark:border-gold-500/50 text-center font-sans text-xs sm:text-sm font-bold text-gold-900 dark:text-gold-300 shadow-sm">
+                ⭐ O homem deve ler a Bíblia para ser <span class="underline decoration-gold-500">sábio</span>, crer na Bíblia para ser <span class="underline decoration-gold-500">salvo</span> e praticar a Bíblia para ser <span class="underline decoration-gold-500">santo</span>.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 4: Como Devemos Estudar a Bíblia -->
+      <section id="como-estudar" class="bg-white dark:bg-slate-900 rounded-2xl p-6 sm:p-8 border border-stone-200 dark:border-slate-800 shadow-sm transition-colors space-y-6">
+        <div class="flex items-center gap-3 border-b border-stone-100 dark:border-slate-800 pb-4">
+          <span class="w-8 h-8 rounded-lg bg-gold-100 dark:bg-gold-900/50 text-gold-700 dark:text-gold-300 flex items-center justify-center font-bold text-sm">04</span>
+          <h2 class="text-2xl font-bold font-title text-stone-900 dark:text-white">Como Devemos Estudar a Bíblia</h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 font-serif">
+          <!-- Card 1 -->
+          <div class="p-5 rounded-xl border border-stone-200 dark:border-slate-800 bg-stone-50/50 dark:bg-slate-800/30 space-y-2">
+            <div class="flex items-center gap-2 text-gold-600 dark:text-gold-400 font-bold font-sans text-base">
+              <i class="fa-solid fa-person-praying"></i>
+              <h3>1. Conhecendo seu Autor</h3>
+            </div>
+            <p class="text-sm text-stone-600 dark:text-stone-300 leading-relaxed">
+              Isto é de suma importância, é a melhor maneira de se estudar a Bíblia. Ela é o único livro cujo autor está sempre presente quando é lida. Quem melhor para nos explicar aquilo que não entendemos em seu conteúdo que seu autor? Façamos como Maria, irmã de Marta, que aprendia aos pés do mestre (<span class="bible-ref" data-verse="Lc 10:39">Lc 10:39</span>). Este ainda é o melhor lugar para o aluno!
+            </p>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="p-5 rounded-xl border border-stone-200 dark:border-slate-800 bg-stone-50/50 dark:bg-slate-800/30 space-y-2">
+            <div class="flex items-center gap-2 text-gold-600 dark:text-gold-400 font-bold font-sans text-base">
+              <i class="fa-solid fa-calendar-day"></i>
+              <h3>2. Diariamente (<span class="bible-ref" data-verse="Dt 17:19">Dt 17:19</span>)</h3>
+            </div>
+            <p class="text-sm text-stone-600 dark:text-stone-300 leading-relaxed">
+              Esta regra é excelente. Presume-se que 90% dos crentes não lêem a Bíblia diariamente. Não é de admirar que haja tantos irmãos frios nas igrejas! Não apenas frios, mas raquíticos, anãos, carnais, indiferentes. Sem crescimento espiritual, Deus não pode revelar-nos suas verdades mais profundas (<span class="bible-ref" data-verse="Mc 4:33">Mc 4:33</span>; <span class="bible-ref" data-verse="Jo 16:12">Jo 16:12</span>; <span class="bible-ref" data-verse="Hb 5:12">Hb 5:12</span>). Há pessoas que acham tempo para ler, ouvir e assistir a tudo, menos para ler a Bíblia. É justo lermos outras coisas, como jornais ou revistas, mas é primordial tomar mais tempo para as Escrituras.
+            </p>
+          </div>
+
+          <!-- Card 3 -->
+          <div class="p-5 rounded-xl border border-stone-200 dark:border-slate-800 bg-stone-50/50 dark:bg-slate-800/30 space-y-2">
+            <div class="flex items-center gap-2 text-gold-600 dark:text-gold-400 font-bold font-sans text-base">
+              <i class="fa-solid fa-heart"></i>
+              <h3>3. Com a Melhor Atitude Mental e Espiritual</h3>
+            </div>
+            <p class="text-sm text-stone-600 dark:text-stone-300 leading-relaxed">
+              Isto é fundamental para que possamos estudá-la corretamente. A melhor atitude é:
+            </p>
+            <ul class="text-xs sm:text-sm space-y-1.5 text-stone-600 dark:text-stone-300 list-disc list-inside">
+              <li>Ler a Bíblia como a Palavra de Deus e não como uma obra literária qualquer (<span class="bible-ref" data-verse="2 Tm 3:16">II Tm 3:16</span>; <span class="bible-ref" data-verse="1 Pe 1:21">I Pe 1.21</span>).</li>
+              <li>Estudar com oração e não apenas com o intelecto. As riquezas da Palavra de Deus são para os simples de coração que temem ao Senhor (<span class="bible-ref" data-verse="Tg 1:21">Tg 1:21</span>). <em>"Os galhos mais carregados de frutos são os que mais se abaixam!"</em></li>
+              <li>Ler crendo em tudo o que ela ensina, inclusive no campo sobrenatural. A dúvida cega o leitor (<span class="bible-ref" data-verse="Lc 24:25">Lc 24:25</span>).</li>
+            </ul>
+          </div>
+
+          <!-- Card 4 -->
+          <div class="p-5 rounded-xl border border-stone-200 dark:border-slate-800 bg-stone-50/50 dark:bg-slate-800/30 space-y-2">
+            <div class="flex items-center gap-2 text-gold-600 dark:text-gold-400 font-bold font-sans text-base">
+              <i class="fa-solid fa-hands-praying"></i>
+              <h3>4. Com Oração, Devagar e Meditando</h3>
+            </div>
+            <p class="text-sm text-stone-600 dark:text-stone-300 leading-relaxed">
+              Assim fizeram os servos de Deus no passado: Davi (<span class="bible-ref" data-verse="Sl 119:12">Sl 119:12,18</span>); Daniel (<span class="bible-ref" data-verse="Dn 9:21-23">Dn 9:21-23</span>). Na presença do Senhor, em oração, as coisas incompreensíveis são esclarecidas (<span class="bible-ref" data-verse="Sl 73:16-17">Sl 73:16,17</span>). A meditação na Palavra aprofunda a sua compreensão (<span class="bible-ref" data-verse="Js 1:8">Js 1.8</span>). Muitos lêem a Bíblia para estabelecerem recordes de leitura. Ao ler a Bíblia, aplique-a a si próprio, caso contrário não haverá virtude alguma nisto!
+            </p>
+          </div>
+        </div>
+
+        <!-- Full Bible reading banner -->
+        <div class="p-5 rounded-xl bg-gradient-to-r from-gold-500/10 via-amber-500/10 to-transparent border border-gold-500/30 font-serif">
+          <h3 class="font-bold text-stone-900 dark:text-white font-sans flex items-center gap-2 mb-2">
+            <i class="fa-solid fa-book-open text-gold-600 dark:text-gold-400"></i>
+            5. Leia a Bíblia Toda
+          </h3>
+          <p class="text-sm text-stone-700 dark:text-stone-300 leading-relaxed">
+            É a única maneira de conhecermos toda a verdade de Deus revelada a nós. Como o leitor pensa compreender um livro que ainda não leu do princípio ao fim? Mesmo lendo a Bíblia toda, não a compreendemos totalmente. Ela, sendo a Palavra de Deus, é infinita! Nem mesmo a mente de um gênio poderia interpretá-la sem erros. Não há no mundo ninguém que possa esgotar a Bíblia. Todos somos sempre alunos (<span class="bible-ref" data-verse="Dt 29:29">Dt 29:29</span>; <span class="bible-ref" data-verse="Rm 11:33-34">Rm 11:33,34</span>; <span class="bible-ref" data-verse="1 Co 13:12">I Co 13:12</span>). Portanto na Bíblia há dificuldades, mas o erro está sempre do lado humano. O Espírito Santo, que conhece as profundezas de Deus, pode ir revelando o conhecimento da verdade, à medida que buscamos a face de Deus e andamos mais pertos Dele. Amém.
+          </p>
+        </div>
+      </section>
+
+      <!-- Section 5: O Tema Central da Bíblia -->
+      <section id="tema-central" class="bg-white dark:bg-slate-900 rounded-2xl p-6 sm:p-8 border border-stone-200 dark:border-slate-800 shadow-sm transition-colors space-y-6">
+        <div class="flex items-center gap-3 border-b border-stone-100 dark:border-slate-800 pb-4">
+          <span class="w-8 h-8 rounded-lg bg-gold-100 dark:bg-gold-900/50 text-gold-700 dark:text-gold-300 flex items-center justify-center font-bold text-sm">05</span>
+          <h2 class="text-2xl font-bold font-title text-stone-900 dark:text-white">O Tema Central da Bíblia</h2>
+        </div>
+
+        <div class="p-4 rounded-xl bg-gold-500/10 dark:bg-slate-950/80 border border-gold-300 dark:border-gold-500/40 text-stone-800 dark:text-stone-200 font-serif">
+          <p class="text-base sm:text-lg font-semibold">
+            <strong>Jesus é o Tema Central da Bíblia</strong> (<span class="bible-ref" data-verse="Lc 24:44">Lc 24:44</span>; <span class="bible-ref" data-verse="Jo 5:39">Jo 5:39</span>; <span class="bible-ref" data-verse="At 3:18">At 3:18</span>; <span class="bible-ref" data-verse="At 10:43">10:43</span>; <span class="bible-ref" data-verse="Ap 22:16">Ap 22:16</span>). Em tipos e figuras Ele aparece em todo o Antigo Testamento e sua manifestação em carne ocorre no Novo Testamento (Evangelhos).
+          </p>
+        </div>
+
+        <!-- 5 Key Words by Scofield -->
+        <div class="space-y-3">
+          <h3 class="font-bold text-sm uppercase tracking-wider text-stone-500 dark:text-stone-400 font-sans">
+            Os 66 Livros Resumidos em Cinco Palavras (Dr. C. I. Scofield):
+          </h3>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-center">
+            <div class="p-3 rounded-xl bg-stone-50 dark:bg-slate-800 border border-stone-200 dark:border-slate-700">
+              <span class="block text-xs font-bold text-gold-600 dark:text-gold-400">1. PREPARAÇÃO</span>
+              <span class="block text-xs font-semibold text-stone-800 dark:text-stone-200 mt-1">Antigo Testamento</span>
+              <span class="text-[11px] text-stone-500">Advento de Cristo</span>
+            </div>
+            <div class="p-3 rounded-xl bg-stone-50 dark:bg-slate-800 border border-stone-200 dark:border-slate-700">
+              <span class="block text-xs font-bold text-gold-600 dark:text-gold-400">2. MANIFESTAÇÃO</span>
+              <span class="block text-xs font-semibold text-stone-800 dark:text-stone-200 mt-1">Os 4 Evangelhos</span>
+              <span class="text-[11px] text-stone-500">Obra na Terra</span>
+            </div>
+            <div class="p-3 rounded-xl bg-stone-50 dark:bg-slate-800 border border-stone-200 dark:border-slate-700">
+              <span class="block text-xs font-bold text-gold-600 dark:text-gold-400">3. PROPAGAÇÃO</span>
+              <span class="block text-xs font-semibold text-stone-800 dark:text-stone-200 mt-1">Atos dos Apóstolos</span>
+              <span class="text-[11px] text-stone-500">Difusão do Evangelho</span>
+            </div>
+            <div class="p-3 rounded-xl bg-stone-50 dark:bg-slate-800 border border-stone-200 dark:border-slate-700">
+              <span class="block text-xs font-bold text-gold-600 dark:text-gold-400">4. EXPLANAÇÃO</span>
+              <span class="block text-xs font-semibold text-stone-800 dark:text-stone-200 mt-1">As 21 Epístolas</span>
+              <span class="text-[11px] text-stone-500">Explicação da Doutrina</span>
+            </div>
+            <div class="p-3 rounded-xl bg-stone-50 dark:bg-slate-800 border border-stone-200 dark:border-slate-700">
+              <span class="block text-xs font-bold text-gold-600 dark:text-gold-400">5. CONSUMAÇÃO</span>
+              <span class="block text-xs font-semibold text-stone-800 dark:text-stone-200 mt-1">Apocalipse</span>
+              <span class="text-[11px] text-stone-500">Cumprimento Final</span>
+            </div>
+          </div>
+
+          <p class="text-sm font-serif italic text-center text-stone-600 dark:text-stone-400 pt-2">
+            "Desta maneira, a Bíblia sem Jesus, seria como a física sem a matéria, ou a matemática sem os números."
+          </p>
+        </div>
+
+        <!-- Interactive Jesus in Every Book Grid Trigger -->
+        <div class="pt-4">
+          <div class="flex items-center justify-between flex-wrap gap-3 mb-4">
+            <h3 class="font-bold text-base text-stone-900 dark:text-white font-sans">
+              Esquema Tipológico: Cristo em Cada um dos 66 Livros
+            </h3>
+            <div class="flex items-center gap-2">
+              <button onclick="filterBooks('all')" class="btn-filter-book px-2.5 py-1 text-xs rounded-lg font-bold bg-gold-600 text-white" data-filter="all">Todos (66)</button>
+              <button onclick="filterBooks('AT')" class="btn-filter-book px-2.5 py-1 text-xs rounded-lg font-bold bg-stone-100 dark:bg-slate-800 text-stone-700 dark:text-stone-300" data-filter="AT">AT (39)</button>
+              <button onclick="filterBooks('NT')" class="btn-filter-book px-2.5 py-1 text-xs rounded-lg font-bold bg-stone-100 dark:bg-slate-800 text-stone-700 dark:text-stone-300" data-filter="NT">NT (27)</button>
+            </div>
+          </div>
+
+          <!-- Dynamic Container for 66 Books -->
+          <div id="books-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[520px] overflow-y-auto p-1 border border-stone-200 dark:border-slate-800 rounded-xl bg-stone-50/50 dark:bg-slate-900/50">
+            <!-- Populated via JavaScript -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 6: Sistema de referências bíblicas e Siglas -->
+      <section id="referencias-siglas" class="bg-white dark:bg-slate-900 rounded-2xl p-6 sm:p-8 border border-stone-200 dark:border-slate-800 shadow-sm transition-colors space-y-6">
+        <div class="flex items-center gap-3 border-b border-stone-100 dark:border-slate-800 pb-4">
+          <span class="w-8 h-8 rounded-lg bg-gold-100 dark:bg-gold-900/50 text-gold-700 dark:text-gold-300 flex items-center justify-center font-bold text-sm">06</span>
+          <h2 class="text-2xl font-bold font-title text-stone-900 dark:text-white">Sistema de Referências Bíblicas e Siglas</h2>
+        </div>
+
+        <p class="text-stone-700 dark:text-stone-300 font-serif">
+          O sistema mais rápido e fácil é o adotado pela <strong>Sociedade Bíblica do Brasil (SBB)</strong>: duas letras, sem ponto abreviativo, para cada livro da Bíblia. Ex: <code>Gn</code> (Gênesis), <code>At</code> (Atos). Entre capítulo e versículo põe-se apenas um ponto (Ex: <code>Gn 1.1</code>). <em class="text-xs text-stone-500">(Obs. Nesta apostila, adotamos dois pontos: Gn 1:1).</em>
+        </p>
+
+        <!-- Texto, Contexto e Referência -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 font-serif">
+          <div class="p-4 rounded-xl border border-stone-200 dark:border-slate-800 bg-stone-50 dark:bg-slate-800/40 space-y-1">
+            <span class="text-xs font-bold uppercase tracking-wider text-gold-600 dark:text-gold-400 font-sans block">Definição 1</span>
+            <h3 class="font-bold text-stone-900 dark:text-white">TEXTO</h3>
+            <p class="text-xs text-stone-600 dark:text-stone-300">
+              São as partes contidas numa determinada passagem bíblica.
+            </p>
+          </div>
+
+          <div class="p-4 rounded-xl border border-stone-200 dark:border-slate-800 bg-stone-50 dark:bg-slate-800/40 space-y-1">
+            <span class="text-xs font-bold uppercase tracking-wider text-gold-600 dark:text-gold-400 font-sans block">Definição 2</span>
+            <h3 class="font-bold text-stone-900 dark:text-white">CONTEXTO</h3>
+            <p class="text-xs text-stone-600 dark:text-stone-300">
+              As partes que ficam antes e depois do texto: <strong>imediato</strong> (versículo anterior/posterior) ou <strong>remoto</strong> (capítulo anterior/posterior, outro livro ou toda a Bíblia).
+            </p>
+          </div>
+
+          <div class="p-4 rounded-xl border border-stone-200 dark:border-slate-800 bg-stone-50 dark:bg-slate-800/40 space-y-1">
+            <span class="text-xs font-bold uppercase tracking-wider text-gold-600 dark:text-gold-400 font-sans block">Definição 3</span>
+            <h3 class="font-bold text-stone-900 dark:text-white">REFERÊNCIA</h3>
+            <p class="text-xs text-stone-600 dark:text-stone-300">
+              A conexão direta sobre determinado assunto que direciona o leitor a outros textos bíblicos correlatos.
+            </p>
+          </div>
+        </div>
+
+        <!-- Notações de Referência -->
+        <div class="space-y-3 pt-2">
+          <h3 class="font-bold text-sm text-stone-900 dark:text-white font-sans uppercase tracking-wider">
+            Indicações Especiais em Referências:
+          </h3>
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 text-xs font-mono">
+            <div class="p-2.5 rounded-lg bg-stone-100 dark:bg-slate-800 border border-stone-200 dark:border-slate-700">
+              <span class="font-bold text-gold-600 dark:text-gold-400 block text-sm">"a"</span>
+              <span class="text-stone-600 dark:text-stone-300">Início do versículo (ex: Rm 11.7a)</span>
+            </div>
+            <div class="p-2.5 rounded-lg bg-stone-100 dark:bg-slate-800 border border-stone-200 dark:border-slate-700">
+              <span class="font-bold text-gold-600 dark:text-gold-400 block text-sm">"b"</span>
+              <span class="text-stone-600 dark:text-stone-300">Final do versículo (ex: Rm 11.7b)</span>
+            </div>
+            <div class="p-2.5 rounded-lg bg-stone-100 dark:bg-slate-800 border border-stone-200 dark:border-slate-700">
+              <span class="font-bold text-gold-600 dark:text-gold-400 block text-sm">"ss"</span>
+              <span class="text-stone-600 dark:text-stone-300">Versículos seguintes (ex: Rm 11.7ss)</span>
+            </div>
+            <div class="p-2.5 rounded-lg bg-stone-100 dark:bg-slate-800 border border-stone-200 dark:border-slate-700">
+              <span class="font-bold text-gold-600 dark:text-gold-400 block text-sm">"qv"</span>
+              <span class="text-stone-600 dark:text-stone-300">Que veja (<em>quod vide</em>)</span>
+            </div>
+            <div class="p-2.5 rounded-lg bg-stone-100 dark:bg-slate-800 border border-stone-200 dark:border-slate-700">
+              <span class="font-bold text-gold-600 dark:text-gold-400 block text-sm">"cf"</span>
+              <span class="text-stone-600 dark:text-stone-300">Compare, confirme, confronte</span>
+            </div>
+            <div class="p-2.5 rounded-lg bg-stone-100 dark:bg-slate-800 border border-stone-200 dark:border-slate-700">
+              <span class="font-bold text-gold-600 dark:text-gold-400 block text-sm">"i.e"</span>
+              <span class="text-stone-600 dark:text-stone-300">Isto é (<em>id est</em>)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Versões em Vernáculo -->
+        <div class="space-y-3 pt-2">
+          <h3 class="font-bold text-sm text-stone-900 dark:text-white font-sans uppercase tracking-wider">
+            Siglas das Diferentes Versões em Vernáculo:
+          </h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+            <div class="p-3 rounded-lg border border-stone-200 dark:border-slate-800 bg-stone-50/50 dark:bg-slate-800/30">
+              <strong class="text-gold-600 dark:text-gold-400 font-bold block text-sm">ARC</strong>
+              <p class="text-stone-600 dark:text-stone-300">Almeida Revista e Corrigida. Traduzida dos originais por João Ferreira de Almeida (Versão Antiga).</p>
+            </div>
+            <div class="p-3 rounded-lg border border-stone-200 dark:border-slate-800 bg-stone-50/50 dark:bg-slate-800/30">
+              <strong class="text-gold-600 dark:text-gold-400 font-bold block text-sm">ARA</strong>
+              <p class="text-stone-600 dark:text-stone-300">Almeida Revista e Atualizada. Edição atualizada de Almeida em 1958.</p>
+            </div>
+            <div class="p-3 rounded-lg border border-stone-200 dark:border-slate-800 bg-stone-50/50 dark:bg-slate-800/30">
+              <strong class="text-gold-600 dark:text-gold-400 font-bold block text-sm">FIG</strong>
+              <p class="text-stone-600 dark:text-stone-300">Padre Antônio Pereira de Figueiredo. Impressa pela SBBE.</p>
+            </div>
+            <div class="p-3 rounded-lg border border-stone-200 dark:border-slate-800 bg-stone-50/50 dark:bg-slate-800/30">
+              <strong class="text-gold-600 dark:text-gold-400 font-bold block text-sm">SOARES</strong>
+              <p class="text-stone-600 dark:text-stone-300">Padre Matos Soares, versão popular dos católicos brasileiros.</p>
+            </div>
+            <div class="p-3 rounded-lg border border-stone-200 dark:border-slate-800 bg-stone-50/50 dark:bg-slate-800/30">
+              <strong class="text-gold-600 dark:text-gold-400 font-bold block text-sm">RHODEN</strong>
+              <p class="text-stone-600 dark:text-stone-300">Ex-padre brasileiro Huberto Rohden, versão particular (somente o NT).</p>
+            </div>
+            <div class="p-3 rounded-lg border border-stone-200 dark:border-slate-800 bg-stone-50/50 dark:bg-slate-800/30">
+              <strong class="text-gold-600 dark:text-gold-400 font-bold block text-sm">CBSP</strong>
+              <p class="text-stone-600 dark:text-stone-300">Centro Bíblico de São Paulo, Edição católica popular da Bíblia, SP.</p>
+            </div>
+            <div class="p-3 rounded-lg border border-stone-200 dark:border-slate-800 bg-stone-50/50 dark:bg-slate-800/30">
+              <strong class="text-gold-600 dark:text-gold-400 font-bold block text-sm">TRAD. BRAS.</strong>
+              <p class="text-stone-600 dark:text-stone-300">Tradução Brasileira, 1917 (Bíblia Tira-Teima).</p>
+            </div>
+            <div class="p-3 rounded-lg border border-stone-200 dark:border-slate-800 bg-stone-50/50 dark:bg-slate-800/30">
+              <strong class="text-gold-600 dark:text-gold-400 font-bold block text-sm">NVI</strong>
+              <p class="text-stone-600 dark:text-stone-300">Nova Versão Internacional (linguagem fluida e contemporânea).</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 7: A Bíblia Como um Livro -->
+      <section id="biblia-livro" class="bg-white dark:bg-slate-900 rounded-2xl p-6 sm:p-8 border border-stone-200 dark:border-slate-800 shadow-sm transition-colors space-y-6">
+        <div class="flex items-center gap-3 border-b border-stone-100 dark:border-slate-800 pb-4">
+          <span class="w-8 h-8 rounded-lg bg-gold-100 dark:bg-gold-900/50 text-gold-700 dark:text-gold-300 flex items-center justify-center font-bold text-sm">07</span>
+          <h2 class="text-2xl font-bold font-title text-stone-900 dark:text-white">A Bíblia Como um Livro: Materiais Antigos</h2>
+        </div>
+
+        <p class="text-stone-700 dark:text-stone-300 font-serif leading-relaxed">
+          A Bíblia é um livro antigo. Os livros antigos tinham a forma de <strong>rolo</strong> (<span class="bible-ref" data-verse="Jr 36:2">Jr 36.2</span>). Eram feitos principalmente de dois materiais:
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 font-serif">
+          <!-- Papiro -->
+          <div class="p-5 rounded-xl border border-stone-200 dark:border-slate-800 bg-stone-50 dark:bg-slate-800/40 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-lg text-stone-900 dark:text-white font-sans flex items-center gap-2">
+                <i class="fa-solid fa-seedling text-emerald-600"></i> PAPIRO
+              </span>
+              <span class="text-xs bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 rounded font-bold">Desde 3000 a.C.</span>
+            </div>
+            <p class="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed">
+              Planta aquática que cresce junto a rios e banhados, no Oriente Próximo, cuja entrecasca (parecida com a palha seca do milho) servia para escrever. Essa planta existe ainda hoje no Sudão, na Galiléia Superior e no vale de Sarom. As tiras extraídas do papiro eram coladas uma à outra até formarem um rolo com determinada extensão.
+            </p>
+            <div class="text-xs bg-white dark:bg-slate-900 p-2.5 rounded-lg border border-stone-200 dark:border-slate-700 text-stone-600 dark:text-stone-300">
+              <strong class="text-gold-600 dark:text-gold-400">Na Bíblia:</strong> Mencionado como junco em <span class="bible-ref" data-verse="Ex 2:3">Êxodo 2.3</span>; <span class="bible-ref" data-verse="Jo 8:11">Jó 8.11</span>; <span class="bible-ref" data-verse="Is 18:2">Isaías 18.2</span>. De <em>papiro</em> deriva-se a nossa palavra <em>papel</em>.
+            </div>
+          </div>
+
+          <!-- Pergaminho -->
+          <div class="p-5 rounded-xl border border-stone-200 dark:border-slate-800 bg-stone-50 dark:bg-slate-800/40 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-lg text-stone-900 dark:text-white font-sans flex items-center gap-2">
+                <i class="fa-solid fa-scroll text-amber-600"></i> PERGAMINHO
+              </span>
+              <span class="text-xs bg-amber-500/10 text-amber-700 dark:text-amber-300 px-2 py-0.5 rounded font-bold">Mais recente</span>
+            </div>
+            <p class="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed">
+              Pele de animais (ovelhas, cabras, bezerros), curtida e polida, utilizada na escrita. É material gráfico superior e mais durável que o papiro. Seu uso intensificou-se nos primórdios da era cristã, apesar de já ser conhecido antes.
+            </p>
+            <div class="text-xs bg-white dark:bg-slate-900 p-2.5 rounded-lg border border-stone-200 dark:border-slate-700 text-stone-600 dark:text-stone-300">
+              <strong class="text-gold-600 dark:text-gold-400">Na Bíblia:</strong> Mencionado pelo apóstolo Paulo em <span class="bible-ref" data-verse="2 Tm 4:13">II Timóteo 4.13</span> (<em>"traze a capa... e especialmente os pergaminhos"</em>).
+            </div>
+          </div>
+        </div>
+
+        <!-- Historical Milestones Timeline -->
+        <div class="p-5 rounded-xl bg-gradient-to-r from-stone-900 to-slate-900 text-white space-y-4">
+          <h3 class="font-bold text-gold-400 text-sm font-sans uppercase tracking-wider flex items-center gap-2">
+            <i class="fa-solid fa-timeline"></i> Marcos Históricos da Impressão da Bíblia
+          </h3>
+          
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+            <div class="border-l-2 border-gold-500 pl-3 space-y-1">
+              <span class="font-bold text-gold-300">Século II d.C.</span>
+              <p class="text-stone-300">Invenção do papel pelos chineses, possibilitando a substituição gradual dos rolos por códices (livros encadernados).</p>
+            </div>
+            <div class="border-l-2 border-gold-500 pl-3 space-y-1">
+              <span class="font-bold text-gold-300">Ano 1445</span>
+              <p class="text-stone-300">Invenção da imprensa de tipos móveis pelo alemão Johannes Gutenberg. Fim da era exclusiva dos manuscritos trabalhosos.</p>
+            </div>
+            <div class="border-l-2 border-gold-500 pl-3 space-y-1">
+              <span class="font-bold text-gold-300">Primeiro Livro Impresso</span>
+              <p class="text-stone-300">A Bíblia foi o primeiro livro a ser impresso no mundo! Hoje, milhões de cópias são distribuídas pelo globo.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 8: Terminologia -->
+      <section id="terminologia" class="bg-white dark:bg-slate-900 rounded-2xl p-6 sm:p-8 border border-stone-200 dark:border-slate-800 shadow-sm transition-colors space-y-6">
+        <div class="flex items-center gap-3 border-b border-stone-100 dark:border-slate-800 pb-4">
+          <span class="w-8 h-8 rounded-lg bg-gold-100 dark:bg-gold-900/50 text-gold-700 dark:text-gold-300 flex items-center justify-center font-bold text-sm">08</span>
+          <h2 class="text-2xl font-bold font-title text-stone-900 dark:text-white">A. Terminologia & Nomes Sagrados</h2>
+        </div>
+
+        <div class="space-y-4 font-serif text-stone-700 dark:text-stone-300 text-sm sm:text-base leading-relaxed">
+          <p>
+            <strong>O Nome Bíblia:</strong> Esse vocábulo não consta dos escritos sagrados originais, somente na capa. Por que e de onde vem então?
+          </p>
+
+          <div class="bg-stone-50 dark:bg-slate-800 p-5 rounded-xl border border-stone-200 dark:border-slate-700 space-y-3">
+            <p>
+              A palavra <strong>Bíblia</strong> em português vem do grego <span class="font-sans font-bold text-gold-600 dark:text-gold-400">βιβλος (biblos)</span> que era o nome que os gregos davam à folha de papiro usada para escrever (<span class="bible-ref" data-verse="Mt 1:1">Mt 1:1</span>: <em>"Livro (biblos) da genealogia..."</em>). Também deriva de <span class="font-sans font-bold text-gold-600 dark:text-gold-400">βιβλιον (biblion)</span>, que significa "rolo", "pequeno livro" ou "livro" (<span class="bible-ref" data-verse="Lc 4:17">Lc 4:17</span>: <em>"Então lhe deram o livro (biblion)..."</em>).
+            </p>
+            <p>
+              Uma coletânea de folhas era um <em>biblion</em>. E uma coletânea de "biblions" (livros no plural) formava a <strong>Biblia</strong>. Portanto:
+            </p>
+            <div class="text-center font-sans font-bold text-stone-900 dark:text-gold-300 py-2.5 px-4 bg-gold-500/10 dark:bg-slate-900 border border-gold-500/30 rounded-xl">
+              📜 Bíblia é literalmente uma "Coleção de Livros" (os 66 livros do Cânon Sagrado).
+            </div>
+            <p class="text-xs sm:text-sm text-stone-600 dark:text-stone-400">
+              É consenso geral que o nome <em>Bíblia</em> foi primeiramente aplicado às Escrituras Sagradas por <strong>João Crisóstomo</strong>, patriarca de Constantinopla, no <strong>Século IV</strong>. E porque as Escrituras formam uma unidade perfeita, a palavra que era plural passou a ser singular: <strong>O LIVRO dos livros</strong>, o Livro por excelência.
+            </p>
+          </div>
+
+          <!-- Other Biblical Designations -->
+          <div class="space-y-3 pt-2">
+            <h3 class="font-bold text-base text-stone-900 dark:text-white font-sans">
+              Outros Nomes e Títulos Utilizados nas Escrituras:
+            </h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm">
+              <div class="p-3 rounded-lg border border-stone-200 dark:border-slate-800 bg-stone-50/50 dark:bg-slate-800/30">
+                <strong class="text-stone-900 dark:text-white block font-sans">Escritura(s) / Sagradas Escrituras</strong>
+                <span class="text-stone-600 dark:text-stone-400">Termo comum no NT para os livros do AT: <span class="bible-ref" data-verse="2 Tm 3:16">2 Tm 3:16</span>; <span class="bible-ref" data-verse="Rm 1:2">Rm 1:2</span>; <span class="bible-ref" data-verse="Jo 5:39">Jo 5:39</span>; <span class="bible-ref" data-verse="Lc 24:27">Lc 24:27</span>.</span>
+              </div>
+              <div class="p-3 rounded-lg border border-stone-200 dark:border-slate-800 bg-stone-50/50 dark:bg-slate-800/30">
+                <strong class="text-stone-900 dark:text-white block font-sans">Sagradas Letras</strong>
+                <span class="text-stone-600 dark:text-stone-400">Expressão paulina dirigida ao jovem pastor Timóteo: <span class="bible-ref" data-verse="2 Tm 3:15">2 Tm 3:15</span>.</span>
+              </div>
+              <div class="p-3 rounded-lg border border-stone-200 dark:border-slate-800 bg-stone-50/50 dark:bg-slate-800/30">
+                <strong class="text-stone-900 dark:text-white block font-sans">Oráculos de Deus</strong>
+                <span class="text-stone-600 dark:text-stone-400">As revelações confiadas a Israel: <span class="bible-ref" data-verse="Rm 3:2">Rm 3:2</span>.</span>
+              </div>
+              <div class="p-3 rounded-lg border border-stone-200 dark:border-slate-800 bg-stone-50/50 dark:bg-slate-800/30">
+                <strong class="text-stone-900 dark:text-white block font-sans">Palavra de Deus / Livro do Senhor</strong>
+                <span class="text-stone-600 dark:text-stone-400">Usada para ambos os testamentos: <span class="bible-ref" data-verse="Hb 4:12">Hb 4:12</span>; <span class="bible-ref" data-verse="Mc 7:13">Mc 7:13</span>; <span class="bible-ref" data-verse="Is 34:16">Is 34:16</span>.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 9: A Organização dos Livros da Bíblia -->
+      <section id="organizacao" class="bg-white dark:bg-slate-900 rounded-2xl p-6 sm:p-8 border border-stone-200 dark:border-slate-800 shadow-sm transition-colors space-y-6">
+        <div class="flex items-center gap-3 border-b border-stone-100 dark:border-slate-800 pb-4">
+          <span class="w-8 h-8 rounded-lg bg-gold-100 dark:bg-gold-900/50 text-gold-700 dark:text-gold-300 flex items-center justify-center font-bold text-sm">09</span>
+          <h2 class="text-2xl font-bold font-title text-stone-900 dark:text-white">A Organização dos Livros da Bíblia</h2>
+        </div>
+
+        <div class="font-serif text-stone-700 dark:text-stone-300 space-y-4 text-sm sm:text-base">
+          <p>
+            A Bíblia está dividida em duas seções: <strong>Antigo Testamento (39 livros)</strong> e <strong>Novo Testamento (27 livros)</strong>, totalizando <strong>66 livros</strong>. A palavra "testamento" foi originalmente traduzida como "aliança" ou "pacto" que Deus fez com seu povo.
+          </p>
+        </div>
+
+        <!-- Interactive Canon Tab Switching -->
+        <div class="space-y-4">
+          <div class="flex border-b border-stone-200 dark:border-slate-800 text-xs sm:text-sm font-bold">
+            <button id="tab-btn-at" onclick="switchCanonTab('at')" class="py-2.5 px-4 border-b-2 border-gold-500 text-gold-600 dark:text-gold-400">Antigo Testamento (39 Livros)</button>
+            <button id="tab-btn-tanakh" onclick="switchCanonTab('tanakh')" class="py-2.5 px-4 text-stone-500 hover:text-stone-800 dark:hover:text-stone-200">Cânon Hebraico / Tanakh (24 Livros)</button>
+            <button id="tab-btn-nt" onclick="switchCanonTab('nt')" class="py-2.5 px-4 text-stone-500 hover:text-stone-800 dark:hover:text-stone-200">Novo Testamento (27 Livros)</button>
+          </div>
+
+          <!-- Tab Content: AT 39 Livros -->
+          <div id="canon-at" class="space-y-4 font-serif">
+            <p class="text-xs sm:text-sm text-stone-600 dark:text-stone-400">
+              Escritos originalmente em hebraico, com pequenos trechos em aramaico (Esdras, Jeremias e especialmente Daniel 2.4 a 7.28). Classificados em 4 grupos oriundos da <strong>Septuaginta (LXX, 250-150 a.C.)</strong>:
+            </p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+              <div class="p-3.5 rounded-xl bg-stone-50 dark:bg-slate-800 border border-stone-200 dark:border-slate-700">
+              <span class="text-xs font-bold text-gold-600 dark:text-gold-400 block font-sans uppercase">PROFECIA (17)</span>
+              <p class="text-xs text-stone-700 dark:text-stone-300 font-sans mt-1">5 Maiores (Is a Dn) + 12 Menores (Os a Ml).</p>
+              <span class="text-[11px] text-stone-500 block mt-2">Classificados pelo tamanho e ministério.</span>
+            </div>
+          </div>
+          <div class="p-3 rounded-lg bg-amber-500/10 dark:bg-amber-950/40 border border-amber-500/30 dark:border-amber-500/40 text-xs text-stone-700 dark:text-amber-200">
+            📌 <strong>Nota sobre Edições Católico-Romanas:</strong> 1 e 2 Samuel e 1 e 2 Reis são chamados de <em>1, 2, 3 e 4 Reis</em>; 1 e 2 Crônicas são <em>1 e 2 Paralipômenos</em>; Esdras e Neemias são <em>1 e 2 Esdras</em>.
+          </div>
+        </div>
+
+        <!-- Tab Content: Tanakh 24 Livros -->
+          <div id="canon-tanakh" class="hidden space-y-4 font-serif">
+            <p class="text-xs sm:text-sm text-stone-600 dark:text-stone-400">
+              O Antigo Testamento hebraico (Tanakh) é dividido em <strong>três seções</strong> totalizando <strong>24 livros</strong> (de acordo com <span class="bible-ref" data-verse="Lc 24:44">Lc 24:44</span>):
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div class="p-4 rounded-xl bg-stone-50 dark:bg-slate-800 border border-stone-200 dark:border-slate-700">
+                <h4 class="font-bold text-sm text-gold-600 dark:text-gold-400 font-sans">1. A Lei (Torah) - 5 Livros</h4>
+                <p class="text-xs text-stone-600 dark:text-stone-300 mt-2">Gênesis, Êxodo, Levítico, Números e Deuteronômio.</p>
+              </div>
+              <div class="p-4 rounded-xl bg-stone-50 dark:bg-slate-800 border border-stone-200 dark:border-slate-700">
+                <h4 class="font-bold text-sm text-gold-600 dark:text-gold-400 font-sans">2. Os Profetas (Nebhiim) - 8 Livros</h4>
+                <p class="text-xs text-stone-600 dark:text-stone-300 mt-2">
+                  • <strong>Primeiros Profetas:</strong> Josué, Juízes, Samuel (1) e Reis (1).<br>
+                  • <strong>Últimos Profetas:</strong> Isaías, Jeremias, Ezequiel e Os Doze Menores (contados como 1 só livro).
+                </p>
+              </div>
+              <div class="p-4 rounded-xl bg-stone-50 dark:bg-slate-800 border border-stone-200 dark:border-slate-700">
+                <h4 class="font-bold text-sm text-gold-600 dark:text-gold-400 font-sans">3. Os Escritos (Kethubhim) - 11 Livros</h4>
+                <p class="text-xs text-stone-600 dark:text-stone-300 mt-2">
+                  • <strong>Poéticos:</strong> Salmos, Provérbios e Jó.<br>
+                  • <strong>Megilloth (5 Rolos):</strong> Cantares, Rute, Lamentações, Ester, Eclesiastes.<br>
+                  • <strong>Históricos:</strong> Daniel, Esdras+Neemias (1) e Crônicas (1).
+                </p>
+              </div>
+            </div>
+            <p class="text-xs text-stone-500 italic">
+              * Daniel é considerado histórico para os judeus por relatar a história do povo na Babilônia.
+            </p>
+          </div>
+
+          <!-- Tab Content: NT 27 Livros -->
+          <div id="canon-nt" class="hidden space-y-4 font-serif">
+            <p class="text-xs sm:text-sm text-stone-600 dark:text-stone-400">
+              O Novo Testamento contém <strong>27 livros</strong>, escritos originalmente em <strong>Grego Koiné</strong> (a língua popular e universal da época). Classificados em 4 grupos:
+            </p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+              <div class="p-3.5 rounded-xl bg-stone-50 dark:bg-slate-800 border border-stone-200 dark:border-slate-700">
+                <span class="text-xs font-bold text-gold-600 dark:text-gold-400 block font-sans uppercase">BIOGRÁFICOS (4)</span>
+                <p class="text-xs text-stone-700 dark:text-stone-300 font-sans mt-1">Mateus, Marcos, Lucas e João.</p>
+                <span class="text-[11px] text-stone-500 block mt-2">Vida, ministério, morte e ressurreição de Cristo.</span>
+              </div>
+              <div class="p-3.5 rounded-xl bg-stone-50 dark:bg-slate-800 border border-stone-200 dark:border-slate-700">
+                <span class="text-xs font-bold text-gold-600 dark:text-gold-400 block font-sans uppercase">HISTÓRICO (1)</span>
+                <p class="text-xs text-stone-700 dark:text-stone-300 font-sans mt-1">Atos dos Apóstolos.</p>
+                <span class="text-[11px] text-stone-500 block mt-2">Início e expansão da Igreja Primitiva.</span>
+              </div>
+              <div class="p-3.5 rounded-xl bg-stone-50 dark:bg-slate-800 border border-stone-200 dark:border-slate-700">
+                <span class="text-xs font-bold text-gold-600 dark:text-gold-400 block font-sans uppercase">PEDAGÓGICOS (21)</span>
+                <p class="text-xs text-stone-700 dark:text-stone-300 font-sans mt-1">Epístolas Paulinas e Gerais (Rm a Jd).</p>
+                <span class="text-[11px] text-stone-500 block mt-2">Cartas de instrução doutrinária e pastoral.</span>
+              </div>
+              <div class="p-3.5 rounded-xl bg-stone-50 dark:bg-slate-800 border border-stone-200 dark:border-slate-700">
+                <span class="text-xs font-bold text-gold-600 dark:text-gold-400 block font-sans uppercase">PROFÉTICO (1)</span>
+                <p class="text-xs text-stone-700 dark:text-stone-300 font-sans mt-1">Apocalipse (Revelação).</p>
+                <span class="text-[11px] text-stone-500 block mt-2">A vitória final do Cordeiro e novo céu/terra.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 10: Capítulos e Versículos -->
+      <section id="capitulos-versiculos" class="bg-white dark:bg-slate-900 rounded-2xl p-6 sm:p-8 border border-stone-200 dark:border-slate-800 shadow-sm transition-colors space-y-6">
+        <div class="flex items-center gap-3 border-b border-stone-100 dark:border-slate-800 pb-4">
+          <span class="w-8 h-8 rounded-lg bg-gold-100 dark:bg-gold-900/50 text-gold-700 dark:text-gold-300 flex items-center justify-center font-bold text-sm">10</span>
+          <h2 class="text-2xl font-bold font-title text-stone-900 dark:text-white">D. Capítulos, Versículos e Estatísticas Bíblicas</h2>
+        </div>
+
+        <!-- History of division -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="p-4 rounded-xl bg-stone-50 dark:bg-slate-800 border border-stone-200 dark:border-slate-700">
+            <span class="text-xs font-bold text-gold-600 dark:text-gold-400 uppercase tracking-wider block font-sans">Divisão em Capítulos</span>
+            <p class="text-sm font-bold text-stone-900 dark:text-white mt-1">Cardeal Hugo de Saint-Cher</p>
+            <p class="text-xs text-stone-500 mt-0.5">Realizada por volta de <strong>1250 d.C.</strong></p>
+          </div>
+
+          <div class="p-4 rounded-xl bg-stone-50 dark:bg-slate-800 border border-stone-200 dark:border-slate-700">
+            <span class="text-xs font-bold text-gold-600 dark:text-gold-400 uppercase tracking-wider block font-sans">Versículos do A.T.</span>
+            <p class="text-sm font-bold text-stone-900 dark:text-white mt-1">Rabi Nathan</p>
+            <p class="text-xs text-stone-500 mt-0.5">Realizada no ano de <strong>1445 d.C.</strong></p>
+          </div>
+
+          <div class="p-4 rounded-xl bg-stone-50 dark:bg-slate-800 border border-stone-200 dark:border-slate-700">
+            <span class="text-xs font-bold text-gold-600 dark:text-gold-400 uppercase tracking-wider block font-sans">Versículos do N.T.</span>
+            <p class="text-sm font-bold text-stone-900 dark:text-white mt-1">Robert Stephans (Estienne)</p>
+            <p class="text-xs text-stone-500 mt-0.5">Realizada no ano de <strong>1551 d.C.</strong></p>
+          </div>
+        </div>
+
+        <!-- Numbers and statistics -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+          <div class="p-3 bg-stone-100 dark:bg-slate-800/80 rounded-xl">
+            <span class="text-2xl font-black text-gold-600 dark:text-gold-400">1.189</span>
+            <span class="block text-xs font-bold text-stone-700 dark:text-stone-300">Capítulos Totais</span>
+            <span class="text-[10px] text-stone-500">(929 AT / 260 NT)</span>
+          </div>
+          <div class="p-3 bg-stone-100 dark:bg-slate-800/80 rounded-xl">
+            <span class="text-2xl font-black text-gold-600 dark:text-gold-400">31.173</span>
+            <span class="block text-xs font-bold text-stone-700 dark:text-stone-300">Versículos Totais</span>
+            <span class="text-[10px] text-stone-500">(23.214 AT / 7.959 NT)</span>
+          </div>
+          <div class="p-3 bg-stone-100 dark:bg-slate-800/80 rounded-xl">
+            <span class="text-2xl font-black text-gold-600 dark:text-gold-400">1.845</span>
+            <span class="block text-xs font-bold text-stone-700 dark:text-stone-300">Vinda do Senhor</span>
+            <span class="text-[10px] text-stone-500">(1.527 AT / 318 NT)</span>
+          </div>
+          <div class="p-3 bg-stone-100 dark:bg-slate-800/80 rounded-xl">
+            <span class="text-2xl font-black text-gold-600 dark:text-gold-400">365</span>
+            <span class="block text-xs font-bold text-stone-700 dark:text-stone-300">"Não Temas"</span>
+            <span class="text-[10px] text-stone-500">(Um para cada dia do ano)</span>
+          </div>
+        </div>
+
+        <div class="p-4 rounded-xl bg-stone-50 dark:bg-slate-800/40 border border-stone-200 dark:border-slate-800 text-xs sm:text-sm font-serif space-y-2 text-stone-700 dark:text-stone-300">
+          <p>• <strong>Maior capítulo da Bíblia:</strong> Salmo 119 (com 176 versículos, divididos em 22 seções acrósticas de 8 versículos, correspondendo às 22 letras do alfabeto hebraico - caso similar em Lamentações).</p>
+          <p>• <strong>Menor capítulo da Bíblia:</strong> Salmo 117 (com apenas 2 versículos).</p>
+          <p>• <strong>Menções de Deus:</strong> Há na Bíblia cerca de 8.000 menções de Deus sob vários nomes divinos, e 177 menções ao Diabo.</p>
+        </div>
+      </section>
+
+      <!-- Section 11: Os Autores da Bíblia -->
+      <section id="autores" class="bg-white dark:bg-slate-900 rounded-2xl p-6 sm:p-8 border border-stone-200 dark:border-slate-800 shadow-sm transition-colors space-y-6">
+        <div class="flex items-center gap-3 border-b border-stone-100 dark:border-slate-800 pb-4">
+          <span class="w-8 h-8 rounded-lg bg-gold-100 dark:bg-gold-900/50 text-gold-700 dark:text-gold-300 flex items-center justify-center font-bold text-sm">11</span>
+          <h2 class="text-2xl font-bold font-title text-stone-900 dark:text-white">Os Autores da Bíblia</h2>
+        </div>
+
+        <div class="prose dark:prose-invert max-w-none font-serif text-stone-700 dark:text-stone-300 space-y-3 text-sm sm:text-base leading-relaxed">
+          <p>
+            A Bíblia é um só livro, sendo também muitos livros escritos por não menos que <strong>40 escritores diferentes</strong>, muitos dos quais nunca se conheceram, através de um período de aproximadamente <strong>1.600 anos</strong>. Todavia sua unidade e continuidade são tão evidentes que é fácil pensar que teve um só autor que não seria outro senão o próprio Deus.
+          </p>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 my-3 font-sans">
+            <div class="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs">
+              <strong class="text-emerald-700 dark:text-emerald-300 block text-sm font-bold">55 Livros Identificados</strong>
+              Identificados com facilidade através da história e tradição bíblica.
+            </div>
+            <div class="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs">
+              <strong class="text-amber-700 dark:text-amber-300 block text-sm font-bold">11 Livros Anônimos</strong>
+              Juízes, Rute, 1 e 2 Samuel, 1 e 2 Reis, 1 e 2 Crônicas, Ester, Jó e Hebreus.
+            </div>
+          </div>
+
+          <p class="text-xs sm:text-sm text-stone-600 dark:text-stone-400">
+            Alguns livros cobrem períodos tão longos da história que talvez se tratem de coleções de registros antigos reunidos e editados por algum indivíduo escolhido por Deus. Por exemplo, Moisés poderia ter compilado Gênesis a partir de tradições orais e genealogias preservadas (Abraão conheceu Sem, que conheceu Matusalém, contemporâneo de Adão).
+          </p>
+          <p class="text-xs sm:text-sm text-stone-600 dark:text-stone-400">
+            Todos os autores, com a <strong>possível exceção de Lucas</strong>, eram judeus e escreveram no contexto da fé bíblica.
+          </p>
+        </div>
+
+        <!-- Table of Authors & Occupations -->
+        <div class="space-y-3 pt-2">
+          <h3 class="font-bold text-sm uppercase tracking-wider text-stone-900 dark:text-white font-sans">
+            Tabela de Livros, Autores e Ocupações (Apostila Original):
+          </h3>
+          
+          <div class="overflow-x-auto border border-stone-200 dark:border-slate-800 rounded-xl">
+            <table class="w-full text-left text-xs sm:text-sm">
+              <thead class="bg-stone-100 dark:bg-slate-800 text-stone-700 dark:text-stone-300 font-bold uppercase tracking-wider text-[11px]">
+                <tr>
+                  <th class="p-3">Livro(s)</th>
+                  <th class="p-3">Autor</th>
+                  <th class="p-3">Ocupação / Posição</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-stone-200 dark:divide-slate-800 text-stone-700 dark:text-stone-300">
+                <tr class="hover:bg-stone-50 dark:hover:bg-slate-800/40">
+                  <td class="p-3 font-semibold text-gold-700 dark:text-gold-400">Gênesis - Deuteronômio</td>
+                  <td class="p-3 font-bold">Moisés</td>
+                  <td class="p-3">Estadista Egípcio / Pastor de Ovelhas / Legislador de Israel</td>
+                </tr>
+                <tr class="hover:bg-stone-50 dark:hover:bg-slate-800/40">
+                  <td class="p-3 font-semibold text-gold-700 dark:text-gold-400">Josué</td>
+                  <td class="p-3 font-bold">Josué</td>
+                  <td class="p-3">Líder Militar / Sucessor de Moisés</td>
+                </tr>
+                <tr class="hover:bg-stone-50 dark:hover:bg-slate-800/40">
+                  <td class="p-3 font-semibold text-gold-700 dark:text-gold-400">1 e 2 Samuel</td>
+                  <td class="p-3 font-bold">Samuel / Natã / Gade</td>
+                  <td class="p-3">Profetas / Juiz e Governante de Israel</td>
+                </tr>
+                <tr class="hover:bg-stone-50 dark:hover:bg-slate-800/40">
+                  <td class="p-3 font-semibold text-gold-700 dark:text-gold-400">Esdras</td>
+                  <td class="p-3 font-bold">Esdras</td>
+                  <td class="p-3">Sacerdote e Escriba</td>
+                </tr>
+                <tr class="hover:bg-stone-50 dark:hover:bg-slate-800/40">
+                  <td class="p-3 font-semibold text-gold-700 dark:text-gold-400">Neemias</td>
+                  <td class="p-3 font-bold">Neemias</td>
+                  <td class="p-3">Copeiro Real / Governador de Judá</td>
+                </tr>
+                <tr class="hover:bg-stone-50 dark:hover:bg-slate-800/40">
+                  <td class="p-3 font-semibold text-gold-700 dark:text-gold-400">Salmos</td>
+                  <td class="p-3 font-bold">Davi, Salomão, Filhos de Coré, Asafe, Hemã, Etã, Moisés</td>
+                  <td class="p-3">Pastor e Rei de Israel / Levitas / Cantores do Templo</td>
+                </tr>
+                <tr class="hover:bg-stone-50 dark:hover:bg-slate-800/40">
+                  <td class="p-3 font-semibold text-gold-700 dark:text-gold-400">Provérbios</td>
+                  <td class="p-3 font-bold">Salomão / Agur / Lemuel</td>
+                  <td class="p-3">Reis e Sábios</td>
+                </tr>
+                <tr class="hover:bg-stone-50 dark:hover:bg-slate-800/40">
+                  <td class="p-3 font-semibold text-gold-700 dark:text-gold-400">Eclesiastes / Cantares</td>
+                  <td class="p-3 font-bold">Salomão</td>
+                  <td class="p-3">Rei de Israel</td>
+                </tr>
+                <tr class="hover:bg-stone-50 dark:hover:bg-slate-800/40">
+                  <td class="p-3 font-semibold text-gold-700 dark:text-gold-400">Jeremias</td>
+                  <td class="p-3 font-bold">Jeremias</td>
+                  <td class="p-3">Profeta</td>
+                </tr>
+                <tr class="hover:bg-stone-50 dark:hover:bg-slate-800/40">
+                  <td class="p-3 font-semibold text-gold-700 dark:text-gold-400">Ezequiel</td>
+                  <td class="p-3 font-bold">Ezequiel</td>
+                  <td class="p-3">Sacerdote e Profeta</td>
+                </tr>
+                <tr class="hover:bg-stone-50 dark:hover:bg-slate-800/40">
+                  <td class="p-3 font-semibold text-gold-700 dark:text-gold-400">Daniel</td>
+                  <td class="p-3 font-bold">Daniel</td>
+                  <td class="p-3">Profeta e Primeiro-Ministro na Babilônia e Pérsia</td>
+                </tr>
+                <tr class="hover:bg-stone-50 dark:hover:bg-slate-800/40">
+                  <td class="p-3 font-semibold text-gold-700 dark:text-gold-400">Amós</td>
+                  <td class="p-3 font-bold">Amós</td>
+                  <td class="p-3">Boiadeiro / Cultivador de Sicômoros e Profeta</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section Navigation Bar -->
+      <div id="section-nav-bar" class="flex items-center justify-between gap-4 pt-6">
+        <button id="btn-prev-section"
+          onclick="navigateSection(-1)"
+          class="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-stone-200 dark:border-slate-700 text-stone-600 dark:text-stone-300 bg-white dark:bg-slate-900 hover:border-gold-400 hover:text-gold-600 dark:hover:text-gold-400 transition text-sm font-semibold disabled:opacity-30 disabled:cursor-not-allowed disabled:pointer-events-none"
+          disabled>
+          <i class="fa-solid fa-chevron-left text-xs"></i> Anterior
+        </button>
+        <span id="section-counter" class="text-xs text-stone-400 dark:text-stone-500 tabular-nums">1 / 11</span>
+        <button id="btn-next-section"
+          onclick="navigateSection(1)"
+          class="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gold-500 hover:bg-gold-600 text-white dark:text-slate-900 transition text-sm font-semibold disabled:opacity-30 disabled:cursor-not-allowed disabled:pointer-events-none">
+          Próximo <i class="fa-solid fa-chevron-right text-xs"></i>
+        </button>
+      </div>
+
+      <!-- Footer Branding & Credits -->
+      <footer class="text-center py-8 border-t border-stone-200 dark:border-slate-800 text-stone-500 text-xs space-y-2">
+        <div class="font-title font-bold text-gold-600 dark:text-gold-400 tracking-widest uppercase">Kadima Academy • Estudo de Teologia</div>
+        <p>Disciplina: Introdução à Bibliologia • Autor: Pr Deyvved Mesquita</p>
+        <p class="text-[11px] text-stone-400">Apostila Digital Interativa para Edificação e Capacitação Teológica.</p>
+      </footer>
+
+    </main>
+  </div>
+
+  <!-- MODAL: Bible Reference Lookup -->
+  <div id="modal-verse" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 max-w-md w-full rounded-2xl p-6 border border-stone-200 dark:border-slate-800 shadow-2xl space-y-4 animate-scale-up">
+      <div class="flex items-center justify-between border-b border-stone-100 dark:border-slate-800 pb-3">
+        <div class="flex items-center gap-2 text-gold-600 dark:text-gold-400">
+          <i class="fa-solid fa-book-bible"></i>
+          <h3 id="verse-modal-title" class="font-bold text-base font-title">Referência Bíblica</h3>
+        </div>
+        <button onclick="closeModal('modal-verse')" class="text-stone-400 hover:text-stone-600 dark:hover:text-stone-200">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3 font-serif">
+        <p id="verse-modal-body" class="text-sm sm:text-base text-stone-700 dark:text-stone-300 italic bg-stone-50 dark:bg-slate-800/50 p-4 rounded-xl border border-stone-200 dark:border-slate-700">
+          Carregando texto da passagem...
+        </p>
+        <div class="text-xs text-stone-500 flex items-center justify-between">
+          <span>Versão: Almeida Revista e Corrigida (ARC)</span>
+          <button id="btn-copy-verse" class="px-2.5 py-1 rounded bg-stone-100 dark:bg-slate-800 text-stone-700 dark:text-stone-300 hover:bg-gold-500 hover:text-white transition font-sans font-semibold">
+            <i class="fa-regular fa-copy mr-1"></i> Copiar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Jesus Finder Explorer (66 Books) -->
+  <div id="modal-jesus-finder" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 max-w-2xl w-full rounded-2xl p-6 border border-stone-200 dark:border-slate-800 shadow-2xl max-h-[85vh] flex flex-col space-y-4">
+      <div class="flex items-center justify-between border-b border-stone-100 dark:border-slate-800 pb-3">
+        <div>
+          <h3 class="font-bold text-lg font-title text-stone-900 dark:text-white">Cristo em Todos os 66 Livros</h3>
+          <p class="text-xs text-stone-500">O fio condutor e tema central de toda a Escritura Sagrada</p>
+        </div>
+        <button onclick="closeModal('modal-jesus-finder')" class="text-stone-400 hover:text-stone-600 dark:hover:text-stone-200">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div class="relative">
+        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-stone-400 text-xs"></i>
+        <input type="text" id="input-search-modal-books" placeholder="Digite o nome de um livro (ex: Gênesis, Daniel, Romanos)..." class="w-full pl-9 pr-4 py-2 text-xs sm:text-sm bg-stone-100 dark:bg-slate-800 rounded-xl border border-transparent focus:border-gold-500 focus:outline-none dark:text-white" />
+      </div>
+
+      <div id="modal-books-container" class="flex-1 overflow-y-auto space-y-2 pr-1 divide-y divide-stone-100 dark:divide-slate-800">
+        <!-- Injected via JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Interactive Flashcards -->
+  <div id="modal-flashcards" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 max-w-md w-full rounded-2xl p-6 border border-stone-200 dark:border-slate-800 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-stone-100 dark:border-slate-800 pb-3">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-layer-group text-gold-500"></i>
+          <h3 class="font-bold text-base font-title text-stone-900 dark:text-white">Flashcards de Bibliologia</h3>
+        </div>
+        <button onclick="closeModal('modal-flashcards')" class="text-stone-400 hover:text-stone-600 dark:hover:text-stone-200">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Flashcard Body (Click to Flip) -->
+      <div id="flashcard" onclick="flipCard()" class="cursor-pointer min-h-[180px] bg-gradient-to-br from-stone-50 to-stone-100 dark:from-slate-800 dark:to-slate-850 p-6 rounded-2xl border-2 border-dashed border-gold-400/50 flex flex-col items-center justify-center text-center transition-transform duration-300">
+        <span id="fc-side" class="text-[10px] uppercase font-bold tracking-widest text-gold-600 dark:text-gold-400 mb-2">Pergunta / Conceito (Clique para virar)</span>
+        <h4 id="fc-content" class="text-lg font-bold text-stone-900 dark:text-white font-title">O que significa a palavra Bíblia?</h4>
+      </div>
+
+      <div class="flex items-center justify-between text-xs text-stone-500 pt-2">
+        <button onclick="prevCard()" class="px-3 py-1.5 rounded-lg bg-stone-100 dark:bg-slate-800 hover:bg-gold-500 hover:text-white font-bold transition">
+          <i class="fa-solid fa-arrow-left mr-1"></i> Anterior
+        </button>
+        <span id="fc-counter" class="font-bold font-sans">1 / 10</span>
+        <button onclick="nextCard()" class="px-3 py-1.5 rounded-lg bg-stone-100 dark:bg-slate-800 hover:bg-gold-500 hover:text-white font-bold transition">
+          Próximo <i class="fa-solid fa-arrow-right ml-1"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Quiz & Simulado de Fixação -->
+  <div id="modal-quiz" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 max-w-lg w-full rounded-2xl p-6 border border-stone-200 dark:border-slate-800 shadow-2xl max-h-[90vh] flex flex-col space-y-4">
+      <div class="flex items-center justify-between border-b border-stone-100 dark:border-slate-800 pb-3">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-circle-check text-emerald-500"></i>
+          <div>
+            <h3 class="font-bold text-base font-title text-stone-900 dark:text-white">Simulado de Bibliologia</h3>
+            <p class="text-[11px] text-stone-500">Kadima Academy • Teste seus conhecimentos</p>
+          </div>
+        </div>
+        <button onclick="closeModal('modal-quiz')" class="text-stone-400 hover:text-stone-600 dark:hover:text-stone-200">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div id="quiz-container" class="flex-1 overflow-y-auto space-y-4 pr-1">
+        <!-- Question content injected by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Global Search in Handout -->
+  <div id="modal-search" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 max-w-xl w-full rounded-2xl p-6 border border-stone-200 dark:border-slate-800 shadow-2xl max-h-[85vh] flex flex-col space-y-4">
+      <div class="flex items-center justify-between border-b border-stone-100 dark:border-slate-800 pb-3">
+        <div class="flex items-center gap-2 text-stone-900 dark:text-white font-title font-bold">
+          <i class="fa-solid fa-magnifying-glass text-gold-500"></i>
+          <span>Pesquisar na Apostila</span>
+        </div>
+        <button onclick="closeModal('modal-search')" class="text-stone-400 hover:text-stone-600 dark:hover:text-stone-200">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div class="relative">
+        <input type="text" id="input-global-search" placeholder="Termos: papiro, pergaminho, Crisóstomo, Tanakh, versículos..." class="w-full pl-4 pr-4 py-2.5 text-sm bg-stone-100 dark:bg-slate-800 rounded-xl border border-transparent focus:border-gold-500 focus:outline-none dark:text-white" />
+      </div>
+
+      <div id="search-results" class="flex-1 overflow-y-auto space-y-2 text-xs sm:text-sm">
+        <p class="text-stone-400 text-center py-6">Digite ao menos 2 letras para encontrar trechos da aula...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript Logic -->
+  <script>
+    // Complete 66 Books Schema with Christ typology from the original handout (pages 7-9)
+    const booksData = [
+      // Antigo Testamento
+      { name: "Gênesis", test: "AT", category: "Lei", revelation: "O Descendente da mulher (a Semente da promessa)" },
+      { name: "Êxodo", test: "AT", category: "Lei", revelation: "O Cordeiro Pascal" },
+      { name: "Levítico", test: "AT", category: "Lei", revelation: "O Sacrifício Expiatório e o Sumo Sacerdote" },
+      { name: "Números", test: "AT", category: "Lei", revelation: "A Rocha Ferida e a Estrela de Jacó" },
+      { name: "Deuteronômio", test: "AT", category: "Lei", revelation: "O Profeta semelhante a Moisés" },
+      { name: "Josué", test: "AT", category: "História", revelation: "O Capitão dos Exércitos do Senhor" },
+      { name: "Juízes", test: "AT", category: "História", revelation: "O Libertador e Juiz Supremo" },
+      { name: "Rute", test: "AT", category: "História", revelation: "O Parente Redentor" },
+      { name: "1 Samuel", test: "AT", category: "História", revelation: "O Rei Ungido" },
+      { name: "2 Samuel", test: "AT", category: "História", revelation: "O Filho de Davi e Rei Eterno" },
+      { name: "1 Reis", test: "AT", category: "História", revelation: "O Governante Maior que Salomão" },
+      { name: "2 Reis", test: "AT", category: "História", revelation: "O Profeta Maior que Eliseu" },
+      { name: "1 Crônicas", test: "AT", category: "História", revelation: "A Linhagem Real e Eterna" },
+      { name: "2 Crônicas", test: "AT", category: "História", revelation: "A Glória do Templo" },
+      { name: "Esdras", test: "AT", category: "História", revelation: "O Reconstrutor da Casa de Deus" },
+      { name: "Neemias", test: "AT", category: "História", revelation: "O Restaurador dos Muros e das Vidas" },
+      { name: "Ester", test: "AT", category: "História", revelation: "Nosso Advogado e Intercessor" },
+      { name: "Jó", test: "AT", category: "Poesia", revelation: "O Redentor que Vive" },
+      { name: "Salmos", test: "AT", category: "Poesia", revelation: "O Bom Pastor, nosso Socorro e Alegria" },
+      { name: "Provérbios", test: "AT", category: "Poesia", revelation: "A Sabedoria de Deus" },
+      { name: "Eclesiastes", test: "AT", category: "Poesia", revelation: "O Verdadeiro Sentido da Vida" },
+      { name: "Cantares de Salomão", test: "AT", category: "Poesia", revelation: "O Amado da nossa alma" },
+      { name: "Isaías", test: "AT", category: "Profecia", revelation: "O Servo Sofredor e o Príncipe da Paz" },
+      { name: "Jeremias", test: "AT", category: "Profecia", revelation: "O Renovo Justo" },
+      { name: "Lamentações", test: "AT", category: "Profecia", revelation: "A Misericórdia Inesgotável de Deus" },
+      { name: "Ezequiel", test: "AT", category: "Profecia", revelation: "O Homem assentado no Trono de Glória" },
+      { name: "Daniel", test: "AT", category: "Profecia", revelation: "A Pedra cortada sem auxílio de mãos e o Filho do Homem" },
+      { name: "Oseias", test: "AT", category: "Profecia", revelation: "O Esposo Fiel" },
+      { name: "Joel", test: "AT", category: "Profecia", revelation: "O Doador do Espírito Santo" },
+      { name: "Amós", test: "AT", category: "Profecia", revelation: "O Restaurador da Tenda de Davi" },
+      { name: "Obadias", test: "AT", category: "Profecia", revelation: "O Salvador no Monte Sião" },
+      { name: "Jonas", test: "AT", category: "Profecia", revelation: "O Sinal da Ressurreição" },
+      { name: "Miqueias", test: "AT", category: "Profecia", revelation: "A Testemunha Fiel nascida em Belém" },
+      { name: "Naum", test: "AT", category: "Profecia", revelation: "O Vingador e Fortaleza no dia da angústia" },
+      { name: "Habacuque", test: "AT", category: "Profecia", revelation: "O Deus da nossa Salvação" },
+      { name: "Sofonias", test: "AT", category: "Profecia", revelation: "O Senhor Zeloso que salva e se alegra" },
+      { name: "Ageu", test: "AT", category: "Profecia", revelation: "O Desejado de Todas as Nações" },
+      { name: "Zacarias", test: "AT", category: "Profecia", revelation: "O Renovo e o Rei Manso e Justo" },
+      { name: "Malaquias", test: "AT", category: "Profecia", revelation: "O Sol da Justiça" },
+
+      // Novo Testamento
+      { name: "Mateus", test: "NT", category: "Evangelhos", revelation: "O Messias e Rei dos Judeus" },
+      { name: "Marcos", test: "NT", category: "Evangelhos", revelation: "O Servo Fiel e Obediente" },
+      { name: "Lucas", test: "NT", category: "Evangelhos", revelation: "O Filho do Homem e Salvador dos Perdidos" },
+      { name: "João", test: "NT", category: "Evangelhos", revelation: "O Verbo Eterno e Filho de Deus" },
+      { name: "Atos dos Apóstolos", test: "NT", category: "Histórico", revelation: "O Cristo Ressurreto e Vivo" },
+      { name: "Romanos", test: "NT", category: "Epístolas", revelation: "A Justiça de Deus para a Salvação" },
+      { name: "1 Coríntios", test: "NT", category: "Epístolas", revelation: "As Primícias da Ressurreição" },
+      { name: "2 Coríntios", test: "NT", category: "Epístolas", revelation: "O Conforto e a Reconciliação" },
+      { name: "Gálatas", test: "NT", category: "Epístolas", revelation: "Aquele que nos Libertou da Lei" },
+      { name: "Efésios", test: "NT", category: "Epístolas", revelation: "A Cabeça do Corpo, a Igreja" },
+      { name: "Filipenses", test: "NT", category: "Epístolas", revelation: "O Nome sobre todo Nome e nossa Alegria" },
+      { name: "Colossenses", test: "NT", category: "Epístolas", revelation: "A Plenitude da Divindade" },
+      { name: "1 Tessalonicenses", test: "NT", category: "Epístolas", revelation: "O Senhor que Virá nas Nuvens" },
+      { name: "2 Tessalonicenses", test: "NT", category: "Epístolas", revelation: "O Juiz Vencedor que Destruirá o Iníquo" },
+      { name: "1 Timóteo", test: "NT", category: "Epístolas", revelation: "O Único Mediador entre Deus e os Homens" },
+      { name: "2 Timóteo", test: "NT", category: "Epístolas", revelation: "O Galardoador dos Fiéis" },
+      { name: "Tito", test: "NT", category: "Epístolas", revelation: "A Manifestação da Graça Salvadora" },
+      { name: "Filemom", test: "NT", category: "Epístolas", revelation: "O Pagador da nossa Dívida" },
+      { name: "Hebreus", test: "NT", category: "Epístolas", revelation: "O Mediador de uma Aliança Superior" },
+      { name: "Tiago", test: "NT", category: "Epístolas", revelation: "O Autor da Fé Viva e das Boas Obras" },
+      { name: "1 Pedro", test: "NT", category: "Epístolas", revelation: "O Exemplo e Pedra Angular da Fé" },
+      { name: "2 Pedro", test: "NT", category: "Epístolas", revelation: "O Deus Longânimo e Paciente" },
+      { name: "1 João", test: "NT", category: "Epístolas", revelation: "A Vida Eterna e o Amor Perfeito" },
+      { name: "2 João", test: "NT", category: "Epístolas", revelation: "A Verdade Encarnada" },
+      { name: "3 João", test: "NT", category: "Epístolas", revelation: "O Modelo Supremo do Bem" },
+      { name: "Judas", test: "NT", category: "Epístolas", revelation: "Aquele que é Poderoso para nos Guardar de Tropeçar" },
+      { name: "Apocalipse", test: "NT", category: "Profético", revelation: "O Alfa e o Ômega, o Cordeiro Vencedor e o Rei dos reis" }
+    ];
+
+    // Bible Reference Preloaded DB for key verses in the handout
+    const verseDict = {
+      "Jo 1:1": "No princípio era o Verbo, e o Verbo estava com Deus, e o Verbo era Deus.",
+      "Ap 19:13": "E estava vestido de uma veste tingida em sangue; e o nome pelo qual se chama é a Palavra de Deus.",
+      "Sl 119:130": "A entrada das tuas palavras dá luz; dá entendimento aos símplices.",
+      "Is 34:16": "Buscai no livro do SENHOR, e lede: nenhuma destas coisas faltará, nenhuma necessitará de sua companheira; porque a minha boca o ordenou, e o seu espírito mesmo as ajuntará.",
+      "2 Tm 2:15": "Procura apresentar-te a Deus aprovado, como obreiro que não tem de que se envergonhar, que maneja bem a palavra da verdade.",
+      "1 Pe 3:15": "Antes, santificai a Cristo, como Senhor, em vossos corações; e estai sempre preparados para responder com mansidão e temor a qualquer que vos pedir a razão da esperança que há em vós.",
+      "Ef 2:10": "Porque somos feitura sua, criados em Cristo Jesus para as boas obras, as quais Deus preparou para que andássemos nelas.",
+      "1 Pe 2:9": "Mas vós sois a geração eleita, o sacerdócio real, a nação santa, o povo adquirido, para que anuncieis as virtudes daquele que vos chamou das trevas para a sua maravilhosa luz.",
+      "Jr 15:16": "Achando-se as tuas palavras, logo as comi, e a tua palavra foi para mim o gozo e alegria do meu coração; porque pelo teu nome me chamo, ó SENHOR Deus dos Exércitos.",
+      "Mt 4:4": "Ele, porém, respondendo, disse: Está escrito: Nem só de pão viverá o homem, mas de toda a palavra que sai da boca de Deus.",
+      "1 Pe 2:2": "Desejai afetuosamente, como meninos recém-nascidos, o leite racional, não falsificado, para que por ele vades crescendo.",
+      "Ef 6:17": "Tomai também o capacete da salvação, e a espada do Espírito, que é a palavra de Deus.",
+      "Sl 119:72": "Melhor é para mim a lei da tua boca do que inúmeros milhares de ouro ou de prata.",
+      "Ef 1:17": "Para que o Deus de nosso Senhor Jesus Cristo, o Pai da glória, vos dê em seu conhecimento o espírito de sabedoria e de revelação.",
+      "1 Co 2:10": "Mas Deus no-las revelou pelo seu Espírito; porque o Espírito penetra todas as coisas, ainda as profundezas de Deus.",
+      "Lc 10:39": "E tinha esta uma irmã chamada Maria, a qual, assentando-se também aos pés de Jesus, ouvia a sua palavra.",
+      "Dt 17:19": "E o terá consigo, e nele lerá todos os dias da sua vida, para que aprenda a temer ao SENHOR seu Deus, para guardar todas as palavras desta lei, e estes estatutos, para cumpri-los.",
+      "Mc 4:33": "E com muitas parábolas tais lhes dirigia a palavra, segundo o que podiam compreender.",
+      "Jo 16:12": "Ainda tenho muito que vos dizer, mas vós não o podeis suportar agora.",
+      "Hb 5:12": "Porque, devendo já ser mestres pelo tempo, ainda necessitais de que se vos torne a ensinar quais sejam os primeiros rudimentos das palavras de Deus.",
+      "2 Tm 3:16": "Toda a Escritura é divinamente inspirada, e proveitosa para ensinar, para redargüir, para corrigir, para instruir em justiça.",
+      "1 Pe 1:21": "Porque a profecia nunca foi produzida por vontade de homem algum, mas os homens santos de Deus falaram inspirados pelo Espírito Santo.",
+      "Tg 1:21": "Por isso, rejeitando toda a imundícia e acúmulo de malícia, recebei com mansidão a palavra em vós enxertada, a qual pode salvar as vossas almas.",
+      "Lc 24:25": "E ele lhes disse: Ó néscios, e tardos de coração para crer tudo o que os profetas disseram!",
+      "Sl 119:12": "Bendito és tu, ó SENHOR; ensina-me os teus estatutos.",
+      "Sl 119:18": "Desvenda os meus olhos, para que veja as maravilhas da tua lei.",
+      "Dn 9:21-23": "Estando eu, digo, ainda falando na oração, o homem Gabriel... tocou-me... e disse: Daniel, agora saí para fazer-te entender o sentido.",
+      "Sl 73:16-17": "Quando pensava em compreender isto, foi para mim mui doloroso; até que entrei no santuário de Deus; então entendi eu o fim deles.",
+      "Js 1:8": "Não se aparte da tua boca o livro desta lei; antes medita nele dia e noite, para que tenhas cuidado de fazer conforme a tudo quanto nele está escrito.",
+      "Dt 29:29": "As coisas encobertas pertencem ao SENHOR nosso Deus, porém as reveladas nos pertencem a nós e a nossos filhos para sempre.",
+      "Rm 11:33-34": "Ó profundidade das riquezas, tanto da sabedoria, como da ciência de Deus! Quão insondáveis são os seus juízos, e quão inescrutáveis os seus caminhos!",
+      "1 Co 13:12": "Porque agora vemos por espelho em enigma, mas então veremos face a face; agora conheço em parte, mas então conhecerei como também sou conhecido.",
+      "Lc 24:44": "E disse-lhes: São estas as palavras que vos disse estando ainda convosco: Que convinha que se cumprisse tudo o que de mim estava escrito na lei de Moisés, e nos profetas e nos Salmos.",
+      "Jo 5:39": "Examinais as Escrituras, porque vós cuidais ter nelas a vida eterna, e são elas que de mim testificam.",
+      "At 3:18": "Mas Deus assim cumpriu o que já dantes pela boca de todos os seus profetas havia anunciado; que o Cristo havia de padecer.",
+      "At 10:43": "A este dão testemunho todos os profetas, de que todos os que nele crêem receberão o perdão dos pecados pelo seu nome.",
+      "Ap 22:16": "Eu, Jesus, enviei o meu anjo, para vos testificar estas coisas nas igrejas. Eu sou a raiz e a geração de Davi, a resplandecente estrela da manhã.",
+      "Jr 36:2": "Toma o rolo de um livro, e escreve nele todas as palavras que te tenho falado contra Israel, e contra Judá, e contra todas as nações...",
+      "Ex 2:3": "E, não podendo mais escondê-lo, tomou uma arca de juncos (papiro), e a revestiu com betume e pez...",
+      "Jo 8:11": "Porventura cresce o junco (papiro) sem lodo? Ou cresce a espadana sem água?",
+      "Is 18:2": "Que envia embaixadores por mar em navios de junco (papiro) sobre as águas...",
+      "2 Tm 4:13": "Quando vieres, traze a capa que deixei em Trôade, em casa de Carpo, e os livros, principalmente os pergaminhos.",
+      "Mt 1:1": "Livro da geração de Jesus Cristo, filho de Davi, filho de Abraão.",
+      "Lc 4:17": "E foi-lhe dado o livro do profeta Isaías; e, quando abriu o livro, achou o lugar em que estava escrito...",
+      "Rm 1:2": "O qual dantes prometera pelos seus profetas nas santas escrituras.",
+      "2 Tm 3:15": "E que desde a tua meninice sabes as sagradas letras, que podem fazer-te sábio para a salvação, pela fé que há em Cristo Jesus.",
+      "Rm 3:2": "Muita, em toda a maneira, porque, primeiramente, lhes foram confiados os oráculos de Deus.",
+      "Hb 4:12": "Porque a palavra de Deus é viva e eficaz, e mais penetrante do que espada alguma de dois gumes...",
+      "Mc 7:13": "Invalidando assim a palavra de Deus pela vossa tradição, que vós ordenastes. E muitas coisas fazeis semelhantes a estas."
+    };
+
+    // Flashcards Collection
+    const flashcardsData = [
+      { q: "O que é Bibliologia?", a: "É o estudo introdutório e auxiliar das Sagradas Escrituras: como chegou até nós, sua inspiração, história, canonicidade e como estudá-la." },
+      { q: "Por que a Bíblia é Divino-Humana?", a: "Porque sendo a Palavra de Deus inspirada (origem divina), veio através de canais humanos e linguagem acessível aos homens (análoga a Cristo, a Palavra Viva)." },
+      { q: "O que é Bibliolatria e Bibliomancia?", a: "Bibliolatria é a adoração idólatra ao objeto físico do livro. Bibliomancia é o uso supersticioso da Bíblia como amuleto ou método de adivinhação/sorteio." },
+      { q: "Qual o Tema Central da Bíblia?", a: "O Senhor Jesus Cristo! (Lc 24:44; Jo 5:39). Sem Ele a Bíblia seria como a física sem matéria ou matemática sem números." },
+      { q: "O que significa a palavra grega 'Biblos' e 'Biblia'?", a: "Biblos era a folha do papiro; Biblion é pequeno livro/rolo; Biblia é o plural ('coleção de livros'). João Crisóstomo popularizou o nome no séc. IV." },
+      { q: "Qual a diferença entre Papiro e Pergaminho?", a: "Papiro é de origem vegetal (planta aquática/junco, 3000 a.C.). Pergaminho é feito de pele de animais curtida e polida (mais durável, comum a partir da era cristã)." },
+      { q: "Quem dividiu a Bíblia em Capítulos?", a: "O cardeal Hugo de Saint-Cher, por volta do ano 1250 d.C." },
+      { q: "Quem dividiu a Bíblia em Versículos?", a: "O Antigo Testamento pelo Rabi Nathan em 1445; o Novo Testamento por Robert Stephans (Estienne) em 1551." },
+      { q: "Quantos livros tem o Cânon Hebraico (Tanakh)?", a: "24 livros (Torah: 5, Nebhiim: 8, Kethbhim: 11), que correspondem exatamente aos mesmos 39 livros do AT protestante agrupados diferentemente." },
+      { q: "Quantos capítulos e versículos tem a Bíblia toda?", a: "1.189 capítulos (929 no AT e 260 no NT) e 31.173 versículos (23.214 no AT e 7.959 no NT)." }
+    ];
+
+    // Quiz Questions Collection
+    const quizData = [
+      {
+        question: "1. Quem foi o primeiro a aplicar o nome 'Bíblia' ao conjunto das Sagradas Escrituras no Século IV?",
+        options: ["Agostinho de Hipona", "João Crisóstomo", "Hugo de Saint-Cher", "Robert Stephans"],
+        correct: 1,
+        explanation: "É consenso geral que João Crisóstomo, patriarca de Constantinopla no século IV, aplicou primeiramente o termo às Sagradas Escrituras."
+      },
+      {
+        question: "2. Segundo o Dr. C. I. Scofield, como se resumem os 66 livros da Bíblia em 5 palavras referentes a Cristo?",
+        options: [
+          "Criação, Queda, Redenção, Graça, Glória",
+          "Preparação, Manifestação, Propagação, Explanação, Consumação",
+          "Promessa, Aliança, História, Doutrina, Profecia",
+          "Lei, Reis, Salmos, Evangelhos, Cartas"
+        ],
+        correct: 1,
+        explanation: "AT = Preparação; Evangelhos = Manifestação; Atos = Propagação; Epístolas = Explanação; Apocalipse = Consumação."
+      },
+      {
+        question: "3. Quem realizou a divisão do Novo Testamento em versículos no ano de 1551?",
+        options: ["Rabi Nathan", "Cardeal Hugo de Saint-Cher", "Robert Stephans", "Johannes Gutenberg"],
+        correct: 2,
+        explanation: "Robert Stephans (ou Robert Estienne) introduziu a divisão em versículos no Novo Testamento em 1551."
+      },
+      {
+        question: "4. A que se referem os termos 'Profetas Maiores' e 'Profetas Menores'?",
+        options: [
+          "À importância espiritual e santidade do profeta",
+          "Ao tamanho dos livros e à extensão do ministério profético",
+          "À idade cronológica com que os profetas escreveram",
+          "Ao número de milagres realizados por cada um"
+        ],
+        correct: 1,
+        explanation: "Os nomes maiores e menores não se referem ao mérito ou importância do profeta, mas ao volume/tamanho dos livros e extensão ministerial."
+      },
+      {
+        question: "5. Qual o material de escrita vegetal derivado de uma planta aquática usado desde 3000 a.C.?",
+        options: ["Pergaminho", "Papiro", "Tábua de Argila", "Velo"],
+        correct: 1,
+        explanation: "O papiro é uma planta aquática do Oriente Próximo da qual se extraíam tiras coladas em rolos, origem da palavra papel."
+      },
+      {
+        question: "6. No Cânon Hebraico (Tanakh), quantos livros são contabilizados?",
+        options: ["39 livros", "24 livros", "27 livros", "66 livros"],
+        correct: 1,
+        explanation: "Os judeus contam 24 livros no Tanakh, agrupando Samuel, Reis, Crônicas, Esdras-Neemias e os 12 profetas menores em volumes únicos."
+      },
+      {
+        question: "7. Quantos anos aproximadamente durou o período de redação da Bíblia e por cerca de quantos autores?",
+        options: ["500 anos e 12 autores", "1.000 anos e 20 autores", "1.600 anos e 40 autores", "3.000 anos e 70 autores"],
+        correct: 2,
+        explanation: "A Bíblia foi escrita ao longo de 1.600 anos por cerca de 40 escritores de diferentes épocas e ocupações."
+      },
+      {
+        question: "8. Qual é o maior e o menor capítulo de toda a Bíblia Sagrada?",
+        options: ["Maior: Salmo 119 / Menor: Salmo 117", "Maior: Isaías 53 / Menor: Salmo 23", "Maior: Mateus 1 / Menor: Judas 1", "Maior: Salmo 150 / Menor: Salmo 1"],
+        correct: 0,
+        explanation: "O maior capítulo é o Salmo 119 (176 versículos) e o menor é o Salmo 117 (2 versículos)."
+      },
+      {
+        question: "9. Em relação aos autores bíblicos, qual deles é considerado a provável única exceção não-judaica?",
+        options: ["Paulo", "Lucas", "Tiago", "Neemias"],
+        correct: 1,
+        explanation: "Todos os escritores sagrados eram judeus, com a provável exceção do médico amado Lucas."
+      },
+      {
+        question: "10. Quantas vezes aproximadamente a frase de encorajamento 'Não temas' ocorre na Bíblia?",
+        options: ["52 vezes", "100 vezes", "365 vezes (uma para cada dia do ano)", "1.845 vezes"],
+        correct: 2,
+        explanation: "A expressão 'não temas' aparece 365 vezes na Bíblia Sagrada, fornecendo uma porção diária de ânimo e fé."
+      }
+    ];
+
+    let currentCardIndex = 0;
+    let cardIsFlipped = false;
+    let currentQuizIndex = 0;
+    let quizScore = 0;
+    let quizAnswered = false;
+
+    // Initialize DOM
+    document.addEventListener("DOMContentLoaded", () => {
+      renderBooksGrid('all');
+      setupVerseClickListener();
+      setupScrollProgress();
+      setupSidebar();
+      setupFontControls();
+      setupThemeToggle();
+      setupSearch();
+      setupSectionNav();
+    });
+
+    // Render Books Grid
+    function renderBooksGrid(filter) {
+      const container = document.getElementById("books-grid");
+      if (!container) return;
+      container.innerHTML = "";
+
+      const filtered = booksData.filter(b => {
+        if (filter === 'all') return true;
+        return b.test === filter;
+      });
+
+      filtered.forEach(b => {
+        const card = document.createElement("div");
+        card.className = "p-3 rounded-lg border border-stone-200 dark:border-slate-800 bg-white dark:bg-slate-800/80 hover:border-gold-500 transition shadow-xs";
+        card.innerHTML = `
+          <div class="flex items-center justify-between gap-1">
+            <span class="font-bold text-xs text-stone-900 dark:text-white font-title">${b.name}</span>
+            <span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${b.test === 'AT' ? 'bg-amber-500/10 text-amber-700 dark:text-amber-400' : 'bg-gold-500/10 text-gold-700 dark:text-gold-400'}">${b.test} • ${b.category}</span>
+          </div>
+          <p class="text-xs text-stone-600 dark:text-stone-300 font-serif mt-1">
+            <strong class="text-gold-600 dark:text-gold-400 font-sans">Cristo:</strong> ${b.revelation}
+          </p>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function filterBooks(type) {
+      document.querySelectorAll('.btn-filter-book').forEach(btn => {
+        if (btn.getAttribute('data-filter') === type) {
+          btn.className = "btn-filter-book px-2.5 py-1 text-xs rounded-lg font-bold bg-gold-600 text-white";
+        } else {
+          btn.className = "btn-filter-book px-2.5 py-1 text-xs rounded-lg font-bold bg-stone-100 dark:bg-slate-800 text-stone-700 dark:text-stone-300";
+        }
+      });
+      renderBooksGrid(type);
+    }
+
+    // Canon Tabs Switcher
+    function switchCanonTab(tab) {
+      document.getElementById('canon-at').classList.add('hidden');
+      document.getElementById('canon-tanakh').classList.add('hidden');
+      document.getElementById('canon-nt').classList.add('hidden');
+
+      document.getElementById('tab-btn-at').className = "py-2.5 px-4 text-stone-500 hover:text-stone-800 dark:hover:text-stone-200";
+      document.getElementById('tab-btn-tanakh').className = "py-2.5 px-4 text-stone-500 hover:text-stone-800 dark:hover:text-stone-200";
+      document.getElementById('tab-btn-nt').className = "py-2.5 px-4 text-stone-500 hover:text-stone-800 dark:hover:text-stone-200";
+
+      if (tab === 'at') {
+        document.getElementById('canon-at').classList.remove('hidden');
+        document.getElementById('tab-btn-at').className = "py-2.5 px-4 border-b-2 border-gold-500 text-gold-600 dark:text-gold-400 font-bold";
+      } else if (tab === 'tanakh') {
+        document.getElementById('canon-tanakh').classList.remove('hidden');
+        document.getElementById('tab-btn-tanakh').className = "py-2.5 px-4 border-b-2 border-gold-500 text-gold-600 dark:text-gold-400 font-bold";
+      } else if (tab === 'nt') {
+        document.getElementById('canon-nt').classList.remove('hidden');
+        document.getElementById('tab-btn-nt').className = "py-2.5 px-4 border-b-2 border-gold-500 text-gold-600 dark:text-gold-400 font-bold";
+      }
+    }
+
+    // Modal Control
+    function openModal(id) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.classList.remove('hidden');
+        el.classList.add('flex');
+        if (id === 'modal-flashcards') renderFlashcard();
+        if (id === 'modal-quiz') startQuiz();
+        if (id === 'modal-jesus-finder') populateModalBooks('');
+      }
+    }
+
+    function closeModal(id) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.classList.add('hidden');
+        el.classList.remove('flex');
+      }
+    }
+
+    // Bible Verse Click Modal
+    function setupVerseClickListener() {
+      document.querySelectorAll('.bible-ref').forEach(span => {
+        span.addEventListener('click', (e) => {
+          const verseKey = span.getAttribute('data-verse');
+          const title = document.getElementById('verse-modal-title');
+          const body = document.getElementById('verse-modal-body');
+          const btnCopy = document.getElementById('btn-copy-verse');
+
+          title.textContent = `Passagem: ${verseKey}`;
+          const foundText = verseDict[verseKey] || `"${verseKey} - Texto canônico citado na aula de Bibliologia do Pr Deyvved Mesquita."`;
+          body.textContent = `"${foundText}"`;
+
+          btnCopy.onclick = () => {
+            const temp = document.createElement('textarea');
+            temp.value = `${verseKey} - "${foundText}"`;
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand('copy');
+            document.body.removeChild(temp);
+            btnCopy.innerHTML = `<i class="fa-solid fa-check text-emerald-500 mr-1"></i> Copiado!`;
+            setTimeout(() => {
+              btnCopy.innerHTML = `<i class="fa-regular fa-copy mr-1"></i> Copiar`;
+            }, 2000);
+          };
+
+          openModal('modal-verse');
+        });
+      });
+    }
+
+    // Scroll Progress Bar
+    function setupScrollProgress() {
+      window.addEventListener('scroll', () => {
+        const scrollTop = window.scrollY;
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+        const bar = document.getElementById('progress-bar');
+        if (bar) bar.style.width = `${progress}%`;
+      });
+    }
+
+    // Sidebar Mobile
+    function setupSidebar() {
+      const btnToggle = document.getElementById('btn-toggle-sidebar');
+      const btnClose = document.getElementById('btn-close-sidebar');
+      const sidebar = document.getElementById('sidebar');
+
+      if (btnToggle && sidebar) {
+        btnToggle.addEventListener('click', () => {
+          sidebar.classList.remove('-translate-x-full');
+        });
+      }
+      if (btnClose && sidebar) {
+        btnClose.addEventListener('click', () => {
+          sidebar.classList.add('-translate-x-full');
+        });
+      }
+
+      // Close sidebar when clicking links on mobile
+      document.querySelectorAll('.nav-item').forEach(link => {
+        link.addEventListener('click', () => {
+          if (window.innerWidth < 1024) {
+            sidebar.classList.add('-translate-x-full');
+          }
+        });
+      });
+    }
+
+    // Global Proportional Typography Scaling Engine
+    const FONT_BASE = 16;
+    const FONT_MIN = 12;
+    const FONT_MAX = 24;
+    const FONT_STEP = 1.5;
+
+    function _store(fn) { try { return fn(); } catch(e) { return null; } }
+
+    let currentRootFontSize = parseFloat(_store(() => localStorage.getItem('kadima_font_size'))) || FONT_BASE;
+
+    function applyGlobalFontSize(size) {
+      currentRootFontSize = Math.min(FONT_MAX, Math.max(FONT_MIN, size));
+      document.documentElement.style.fontSize = `${currentRootFontSize}px`;
+
+      const percent = Math.round((currentRootFontSize / FONT_BASE) * 100);
+      const display = document.getElementById('font-scale-display');
+      if (display) {
+        display.textContent = `${percent}%`;
+      }
+      _store(() => localStorage.setItem('kadima_font_size', currentRootFontSize));
+    }
+
+    function setupFontControls() {
+      // Apply initial stored scale on boot
+      applyGlobalFontSize(currentRootFontSize);
+
+      document.getElementById('btn-font-inc')?.addEventListener('click', () => {
+        applyGlobalFontSize(currentRootFontSize + FONT_STEP);
+      });
+
+      document.getElementById('btn-font-dec')?.addEventListener('click', () => {
+        applyGlobalFontSize(currentRootFontSize - FONT_STEP);
+      });
+
+      document.getElementById('btn-font-reset')?.addEventListener('click', () => {
+        applyGlobalFontSize(FONT_BASE);
+      });
+    }
+
+    // Theme Toggle
+    function setupThemeToggle() {
+      const savedTheme = _store(() => localStorage.getItem('kadima_theme'));
+      if (savedTheme === 'dark') document.documentElement.classList.add('dark');
+      else if (savedTheme === 'light') document.documentElement.classList.remove('dark');
+      const btn = document.getElementById('btn-theme-toggle');
+      if (btn) {
+        btn.addEventListener('click', () => {
+          document.documentElement.classList.toggle('dark');
+          _store(() => localStorage.setItem('kadima_theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light'));
+        });
+      }
+    }
+
+    // Section-based navigation (SPA-style: show one section at a time)
+    const SECTION_ORDER = ['intro','campo','necessidade','como-estudar','tema-central',
+      'referencias-siglas','biblia-livro','terminologia','organizacao','capitulos-versiculos','autores'];
+
+    function showSection(id) {
+      // Hide all named sections (excludes hero-cover)
+      document.querySelectorAll('#main-content section[id]:not(#hero-cover)').forEach(s => { s.style.display = 'none'; });
+      const target = document.getElementById(id);
+      if (target) target.style.display = 'block';
+
+      // Hero cover: only on first section
+      const hero = document.getElementById('hero-cover');
+      if (hero) hero.style.display = (id === SECTION_ORDER[0]) ? 'block' : 'none';
+
+      // Nav active state
+      document.querySelectorAll('.nav-item[href^="#"]').forEach(a => a.classList.remove('nav-active'));
+      const activeLink = document.querySelector(`.nav-item[href="#${id}"]`);
+      if (activeLink) activeLink.classList.add('nav-active');
+
+      // Prev/Next buttons
+      const idx = SECTION_ORDER.indexOf(id);
+      const btnPrev = document.getElementById('btn-prev-section');
+      const btnNext = document.getElementById('btn-next-section');
+      const counter = document.getElementById('section-counter');
+      if (btnPrev) btnPrev.disabled = idx <= 0;
+      if (btnNext) btnNext.disabled = idx >= SECTION_ORDER.length - 1;
+      if (counter) counter.textContent = `${idx + 1} / ${SECTION_ORDER.length}`;
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function navigateSection(dir) {
+      const activeLink = document.querySelector('.nav-item.nav-active');
+      const currentId = activeLink ? activeLink.getAttribute('href').replace('#', '') : SECTION_ORDER[0];
+      const idx = SECTION_ORDER.indexOf(currentId);
+      const nextIdx = idx + dir;
+      if (nextIdx >= 0 && nextIdx < SECTION_ORDER.length) showSection(SECTION_ORDER[nextIdx]);
+    }
+
+    function setupSectionNav() {
+      const sections = document.querySelectorAll('#main-content section[id]:not(#hero-cover)');
+      if (!sections.length) return;
+      // Show first section by default
+      showSection(SECTION_ORDER[0]);
+      // Intercept nav-item clicks
+      document.querySelectorAll('.nav-item[href^="#"]').forEach(a => {
+        a.addEventListener('click', e => {
+          e.preventDefault();
+          const id = a.getAttribute('href').replace('#', '');
+          showSection(id);
+        });
+      });
+    }
+
+    // Flashcard System
+    function renderFlashcard() {
+      const item = flashcardsData[currentCardIndex];
+      const side = document.getElementById('fc-side');
+      const content = document.getElementById('fc-content');
+      const counter = document.getElementById('fc-counter');
+
+      cardIsFlipped = false;
+      side.textContent = "Conceito Teológico (Clique para virar)";
+      content.textContent = item.q;
+      counter.textContent = `${currentCardIndex + 1} / ${flashcardsData.length}`;
+    }
+
+    function flipCard() {
+      const item = flashcardsData[currentCardIndex];
+      const side = document.getElementById('fc-side');
+      const content = document.getElementById('fc-content');
+
+      cardIsFlipped = !cardIsFlipped;
+      if (cardIsFlipped) {
+        side.textContent = "Resposta & Explicação:";
+        content.textContent = item.a;
+      } else {
+        side.textContent = "Conceito Teológico (Clique para virar)";
+        content.textContent = item.q;
+      }
+    }
+
+    function nextCard() {
+      if (currentCardIndex < flashcardsData.length - 1) {
+        currentCardIndex++;
+        renderFlashcard();
+      } else {
+        currentCardIndex = 0;
+        renderFlashcard();
+      }
+    }
+
+    function prevCard() {
+      if (currentCardIndex > 0) {
+        currentCardIndex--;
+        renderFlashcard();
+      } else {
+        currentCardIndex = flashcardsData.length - 1;
+        renderFlashcard();
+      }
+    }
+
+    // Quiz System
+    function startQuiz() {
+      currentQuizIndex = 0;
+      quizScore = 0;
+      renderQuizQuestion();
+    }
+
+    function renderQuizQuestion() {
+      quizAnswered = false;
+      const q = quizData[currentQuizIndex];
+      const container = document.getElementById('quiz-container');
+
+      container.innerHTML = `
+        <div class="space-y-4">
+          <div class="flex items-center justify-between text-xs text-stone-500 font-bold">
+            <span>Questão ${currentQuizIndex + 1} de ${quizData.length}</span>
+            <span class="text-gold-600 dark:text-gold-400">Pontuação: ${quizScore} acerto(s)</span>
+          </div>
+
+          <h4 class="text-sm sm:text-base font-bold text-stone-900 dark:text-white font-title leading-snug">
+            ${q.question}
+          </h4>
+
+          <div class="space-y-2 pt-1">
+            ${q.options.map((opt, i) => `
+              <button onclick="handleQuizAnswer(${i})" class="quiz-opt-btn w-full text-left p-3 rounded-xl border border-stone-200 dark:border-slate-700 bg-stone-50 dark:bg-slate-800 text-xs sm:text-sm font-medium hover:border-gold-500 text-stone-700 dark:text-stone-200 transition">
+                ${String.fromCharCode(65 + i)}) ${opt}
+              </button>
+            `).join('')}
+          </div>
+
+          <div id="quiz-feedback" class="hidden p-3.5 rounded-xl text-xs sm:text-sm space-y-2"></div>
+        </div>
+      `;
+    }
+
+    function handleQuizAnswer(index) {
+      if (quizAnswered) return;
+      quizAnswered = true;
+
+      const q = quizData[currentQuizIndex];
+      const feedback = document.getElementById('quiz-feedback');
+      const buttons = document.querySelectorAll('.quiz-opt-btn');
+
+      buttons.forEach((b, i) => {
+        if (i === q.correct) {
+          b.classList.add('bg-emerald-500/20', 'border-emerald-500', 'text-emerald-800', 'dark:text-emerald-200', 'font-bold');
+        } else if (i === index) {
+          b.classList.add('bg-red-500/20', 'border-red-500', 'text-red-800', 'dark:text-red-200');
+        }
+      });
+
+      feedback.classList.remove('hidden');
+      if (index === q.correct) {
+        quizScore++;
+        feedback.className = "p-3.5 rounded-xl text-xs sm:text-sm bg-emerald-500/10 border border-emerald-500/30 text-emerald-800 dark:text-emerald-200";
+        feedback.innerHTML = `
+          <p class="font-bold"><i class="fa-solid fa-circle-check mr-1"></i> Resposta Correta!</p>
+          <p class="mt-1 font-serif text-xs">${q.explanation}</p>
+        `;
+      } else {
+        feedback.className = "p-3.5 rounded-xl text-xs sm:text-sm bg-red-500/10 border border-red-500/30 text-red-800 dark:text-red-200";
+        feedback.innerHTML = `
+          <p class="font-bold"><i class="fa-solid fa-circle-xmark mr-1"></i> Resposta Incorreta.</p>
+          <p class="mt-1 font-serif text-xs">${q.explanation}</p>
+        `;
+      }
+
+      // Next button
+      const nextBtn = document.createElement('button');
+      nextBtn.className = "w-full py-2.5 bg-gold-600 text-white rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-gold-700 transition mt-3";
+      nextBtn.textContent = currentQuizIndex < quizData.length - 1 ? "Próxima Questão" : "Ver Resultado Final";
+      nextBtn.onclick = () => {
+        if (currentQuizIndex < quizData.length - 1) {
+          currentQuizIndex++;
+          renderQuizQuestion();
+        } else {
+          showQuizSummary();
+        }
+      };
+      feedback.appendChild(nextBtn);
+    }
+
+    function showQuizSummary() {
+      const container = document.getElementById('quiz-container');
+      const percent = Math.round((quizScore / quizData.length) * 100);
+      container.innerHTML = `
+        <div class="text-center py-6 space-y-4">
+          <div class="w-16 h-16 rounded-full mx-auto flex items-center justify-center text-2xl ${percent >= 70 ? 'bg-emerald-500/20 text-emerald-500' : 'bg-amber-500/20 text-amber-500'}">
+            <i class="fa-solid ${percent >= 70 ? 'fa-award' : 'fa-book-open-reader'}"></i>
+          </div>
+          <h4 class="text-xl font-bold font-title text-stone-900 dark:text-white">Simulado Concluído!</h4>
+          <p class="text-stone-600 dark:text-stone-300 text-sm">
+            Você acertou <strong>${quizScore}</strong> de <strong>${quizData.length}</strong> questões (<strong>${percent}%</strong> de aproveitamento).
+          </p>
+          <div class="p-3 bg-stone-100 dark:bg-slate-800 rounded-xl text-xs text-stone-500">
+            ${percent >= 70 ? 'Parabéns! Você demonstrou excelente domínio sobre a introdução à Bibliologia.' : 'Continue revisando os conceitos da apostila para aperfeiçoar seu conhecimento bíblico.'}
+          </div>
+          <button onclick="startQuiz()" class="px-5 py-2.5 bg-gold-600 text-white rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-gold-700 transition">
+            Refazer Simulado
+          </button>
+        </div>
+      `;
+    }
+
+    // Modal Search Books (Jesus in all books)
+    function populateModalBooks(query) {
+      const container = document.getElementById('modal-books-container');
+      if (!container) return;
+      container.innerHTML = "";
+
+      const filtered = booksData.filter(b => {
+        return b.name.toLowerCase().includes(query.toLowerCase()) || b.revelation.toLowerCase().includes(query.toLowerCase());
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<p class="text-xs text-stone-400 text-center py-4">Nenhum livro encontrado.</p>`;
+        return;
+      }
+
+      filtered.forEach(b => {
+        const item = document.createElement('div');
+        item.className = "py-2.5 flex items-start justify-between gap-2";
+        item.innerHTML = `
+          <div>
+            <span class="font-bold text-sm text-stone-900 dark:text-white font-title">${b.name}</span>
+            <p class="text-xs text-stone-600 dark:text-stone-300 font-serif">${b.revelation}</p>
+          </div>
+          <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-stone-100 dark:bg-slate-800 text-gold-600 dark:text-gold-400 shrink-0">${b.test}</span>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    document.getElementById('input-search-modal-books')?.addEventListener('input', (e) => {
+      populateModalBooks(e.target.value);
+    });
+
+    // Global Search Modal
+    function setupSearch() {
+      const trigger = document.getElementById('btn-search-trigger');
+      const input = document.getElementById('input-global-search');
+      const resultsBox = document.getElementById('search-results');
+
+      trigger?.addEventListener('click', () => {
+        openModal('modal-search');
+        input?.focus();
+      });
+
+      input?.addEventListener('input', () => {
+        const term = input.value.trim().toLowerCase();
+        if (term.length < 2) {
+          resultsBox.innerHTML = `<p class="text-stone-400 text-center py-6">Digite ao menos 2 letras para buscar...</p>`;
+          return;
+        }
+
+        const paragraphs = document.querySelectorAll('#main-content p, #main-content h2, #main-content h3');
+        let matches = [];
+
+        paragraphs.forEach(p => {
+          const text = p.textContent || '';
+          if (text.toLowerCase().includes(term)) {
+            const section = p.closest('section');
+            const sectionTitle = section ? (section.querySelector('h2')?.textContent || "Apostila") : "Apostila";
+            const sectionId = section ? section.id : "";
+            const snippet = text.trim();
+            matches.push({
+              title: sectionTitle,
+              id: sectionId,
+              snippet: snippet.length > 140 ? snippet.substring(0, 140) + "..." : snippet
+            });
+          }
+        });
+
+        if (matches.length === 0) {
+          resultsBox.innerHTML = `<p class="text-stone-400 text-center py-6">Nenhum resultado encontrado para "<strong>${term}</strong>".</p>`;
+          return;
+        }
+
+        resultsBox.innerHTML = matches.slice(0, 8).map(m => `
+          <a href="#${m.id}" onclick="closeModal('modal-search'); showSection('${m.id}'); return false;" class="block p-3 rounded-xl bg-stone-50 dark:bg-slate-800/60 hover:bg-gold-500/10 border border-stone-200 dark:border-slate-700 transition">
+            <span class="text-xs font-bold text-gold-600 dark:text-gold-400 uppercase block font-sans">${m.title}</span>
+            <p class="text-xs text-stone-700 dark:text-stone-300 font-serif mt-0.5">${m.snippet}</p>
+          </a>
+        `).join('');
+      });
+    }
+
+    // Auto-resize para quando embedado em iframe pela plataforma
+    (function() {
+      function sendHeight() {
+        try {
+          window.parent.postMessage({ type: 'resize-iframe', height: document.documentElement.scrollHeight }, '*');
+        } catch(e) {}
+      }
+      window.addEventListener('load', sendHeight);
+      window.addEventListener('resize', sendHeight);
+      new MutationObserver(sendHeight).observe(document.body, { childList: true, subtree: true, attributes: true });
+      sendHeight();
+      setTimeout(sendHeight, 500);
+      setTimeout(sendHeight, 1500);
+    })();
+  </script>
+</body>
+</html>

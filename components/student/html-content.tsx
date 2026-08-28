@@ -33,20 +33,34 @@ export default function HtmlContent({
   }, [html, isFullHtml]);
 
   useEffect(() => {
-    if (!isFullHtml) return;
-    
     const handleMessage = (e: MessageEvent) => {
-      if (e.data.type === "resize-iframe" && e.data.height) {
+      if (e.data?.type === "resize-iframe" && e.data.height) {
         setIframeHeight(e.data.height);
       }
     };
-
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
-  }, [isFullHtml]);
+  }, []);
+
+  // Detecta se é um único <iframe src="..."> apontando para URL interna
+  const singleIframeMatch = html.trim().match(/^<iframe\s[^>]*src=["']([^"']+)["'][^>]*><\/iframe>$/i)
+    || html.trim().match(/^<iframe\s[^>]*src=["']([^"']+)["'][^>]*\/>$/i);
+  const iframeSrc = singleIframeMatch ? singleIframeMatch[1] : null;
+
+  if (iframeSrc) {
+    return (
+      <div className={className} style={{ ...style, width: "100%", borderRadius: 16, overflow: "hidden", background: "#0a0f1e", border: "1px solid rgba(201,169,122,0.15)" }}>
+        <iframe
+          src={iframeSrc}
+          title="Material da Aula"
+          style={{ width: "100%", border: "none", height: iframeHeight, display: "block", minHeight: 600 }}
+          allow="scripts popups forms"
+        />
+      </div>
+    );
+  }
 
   if (isFullHtml) {
-    // Injeta script de redimensionamento automático no HTML do usuário
     const resizeScript = `
       <script>
         function sendHeight() {
@@ -55,15 +69,12 @@ export default function HtmlContent({
         }
         window.addEventListener("load", sendHeight);
         window.addEventListener("resize", sendHeight);
-        // Observa mudanças no DOM
-        const observer = new MutationObserver(sendHeight);
-        observer.observe(document.body, { childList: true, subtree: true, attributes: true });
-        // Envia inicialmente e após curto delay
+        new MutationObserver(sendHeight).observe(document.body, { childList: true, subtree: true, attributes: true });
         sendHeight();
         setTimeout(sendHeight, 1000);
       </script>
     `;
-    
+
     const finalHtml = html.replace("</body>", `${resizeScript}</body>`);
 
     return (
