@@ -68,15 +68,16 @@ export default function PdfReader({ url, title, onClose }: PdfReaderProps) {
       backdropFilter: "blur(8px)",
     }}>
       {/* Top bar */}
-      <div style={{
+      <div className="pdfreader-topbar" style={{
         display: "flex", alignItems: "center", gap: 16,
         padding: "12px 24px",
         background: "linear-gradient(135deg, rgba(15,26,61,0.95) 0%, rgba(9,16,40,0.95) 100%)",
         borderBottom: "1px solid rgba(201,169,122,0.18)",
         flexShrink: 0,
+        minWidth: 0,
       }}>
         {/* Título */}
-        <div style={{ flex: 1, minWidth: 0 }}>
+        <div className="pdfreader-title" style={{ flex: 1, minWidth: 0 }}>
           <p style={{ fontFamily: "'Cinzel',serif", fontSize: 9, fontWeight: 600, letterSpacing: 4, textTransform: "uppercase", color: "rgba(201,169,122,0.6)", marginBottom: 2 }}>
             Apostila
           </p>
@@ -86,11 +87,11 @@ export default function PdfReader({ url, title, onClose }: PdfReaderProps) {
         </div>
 
         {/* Controles de zoom */}
-        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+        <div className="pdfreader-zoom" style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
           <CtrlBtn onClick={() => setScale(s => Math.max(0.6, s - 0.2))} title="Diminuir zoom">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
           </CtrlBtn>
-          <span style={{ fontSize: 11, color: "rgba(201,169,122,0.7)", fontFamily: "'Poppins',sans-serif", minWidth: 38, textAlign: "center" }}>
+          <span className="pdfreader-zoom-pct" style={{ fontSize: 11, color: "rgba(201,169,122,0.7)", fontFamily: "'Poppins',sans-serif", minWidth: 38, textAlign: "center" }}>
             {Math.round(scale * 100)}%
           </span>
           <CtrlBtn onClick={() => setScale(s => Math.min(2.5, s + 0.2))} title="Aumentar zoom">
@@ -99,7 +100,7 @@ export default function PdfReader({ url, title, onClose }: PdfReaderProps) {
         </div>
 
         {/* Navegação de páginas */}
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
           <CtrlBtn onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} title="Página anterior (←)">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
           </CtrlBtn>
@@ -118,7 +119,7 @@ export default function PdfReader({ url, title, onClose }: PdfReaderProps) {
         </div>
 
         {/* Progresso de leitura */}
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <div className="pdfreader-progress" style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
           <div style={{ width: 80, height: 4, background: "rgba(255,255,255,0.08)", borderRadius: 4, overflow: "hidden" }}>
             <div style={{ height: "100%", width: `${pct}%`, background: "linear-gradient(90deg, #C9A97A, #E8D5A8)", borderRadius: 4, transition: "width 0.3s" }} />
           </div>
@@ -127,6 +128,7 @@ export default function PdfReader({ url, title, onClose }: PdfReaderProps) {
 
         {/* Fechar */}
         <button onClick={onClose} title="Fechar (Esc)" style={{
+          flexShrink: 0,
           width: 34, height: 34, borderRadius: 10,
           background: "rgba(230,57,70,0.12)", border: "1px solid rgba(230,57,70,0.25)",
           color: "rgba(255,128,136,0.8)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
@@ -192,29 +194,30 @@ export default function PdfReader({ url, title, onClose }: PdfReaderProps) {
       </div>
 
       {/* Bottom nav */}
-      <div style={{
-        display: "flex", alignItems: "center", justifyContent: "center", gap: 16,
-        padding: "12px 24px",
+      <div className="pdfreader-bottomnav" style={{
+        display: "flex", alignItems: "center", justifyContent: "center",
         background: "rgba(9,16,40,0.95)",
         borderTop: "1px solid rgba(201,169,122,0.10)",
         flexShrink: 0,
+        minWidth: 0,
       }}>
         <button
+          className="pdfreader-navbtn"
           onClick={() => setPage(p => Math.max(1, p - 1))}
           disabled={page <= 1}
           style={navBtnStyle(page <= 1)}
         >
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-          Anterior
+          <span className="pdfreader-navbtn-text">Anterior</span>
         </button>
 
-        <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
+        <div className="pdfreader-pagelist" style={{ display: "flex", gap: 4, alignItems: "center", overflowX: "auto", minWidth: 0 }}>
           {buildPages(page, numPages).map((p, i) =>
             p === "..." ? (
-              <span key={`ellipsis-${i}`} style={{ width: 24, textAlign: "center", fontSize: 11, color: "rgba(255,255,255,0.25)" }}>···</span>
+              <span key={`ellipsis-${i}`} style={{ width: 24, textAlign: "center", fontSize: 11, color: "rgba(255,255,255,0.25)", flexShrink: 0 }}>···</span>
             ) : (
               <button key={p} onClick={() => setPage(p as number)} style={{
-                width: 30, height: 30, borderRadius: 8, fontSize: 11,
+                width: 30, height: 30, borderRadius: 8, fontSize: 11, flexShrink: 0,
                 background: p === page ? "linear-gradient(135deg, #C9A97A, #A07840)" : "rgba(255,255,255,0.04)",
                 border: p === page ? "1px solid #C9A97A" : "1px solid rgba(255,255,255,0.06)",
                 color: p === page ? "#060D1F" : "rgba(255,255,255,0.35)",
@@ -227,11 +230,12 @@ export default function PdfReader({ url, title, onClose }: PdfReaderProps) {
         </div>
 
         <button
+          className="pdfreader-navbtn"
           onClick={() => setPage(p => Math.min(numPages, p + 1))}
           disabled={page >= numPages}
           style={navBtnStyle(page >= numPages)}
         >
-          Próxima
+          <span className="pdfreader-navbtn-text">Próxima</span>
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </button>
       </div>
@@ -240,6 +244,23 @@ export default function PdfReader({ url, title, onClose }: PdfReaderProps) {
         @keyframes pdf-spin { to { transform: rotate(360deg); } }
         .react-pdf__Page__textContent { color: transparent !important; }
         .react-pdf__Page__annotations a { color: #C9A97A !important; }
+
+        .pdfreader-bottomnav { gap: 16px; padding: 12px 24px; }
+        .pdfreader-pagelist { scrollbar-width: none; }
+        .pdfreader-pagelist::-webkit-scrollbar { display: none; }
+
+        @media (max-width: 640px) {
+          .pdfreader-bottomnav { gap: 8px; padding: 10px 8px; }
+          .pdfreader-navbtn { padding: 9px 10px !important; gap: 0 !important; }
+          .pdfreader-navbtn-text { display: none; }
+          .pdfreader-pagelist { flex: 1; justify-content: flex-start; }
+
+          .pdfreader-topbar { gap: 6px !important; padding: 8px 10px !important; }
+          .pdfreader-title p:first-child { display: none; }
+          .pdfreader-title p:last-child { font-size: 11px !important; }
+          .pdfreader-zoom-pct { display: none; }
+          .pdfreader-progress { display: none !important; }
+        }
       `}</style>
     </div>
   );
