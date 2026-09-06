@@ -90,7 +90,7 @@ export default async function StudentProfilePage({ params }: { params: Promise<{
     prisma.certificate.findMany({
       where: { userId: studentId },
       include: { course: { select: { title: true } } },
-      orderBy: { createdAt: "desc" },
+      orderBy: { issuedAt: "desc" },
     }),
   ]);
 
