@@ -21,6 +21,9 @@
       darkMode: 'class',
       theme: {
         extend: {
+          screens: {
+            'xs': '400px',
+          },
           colors: {
             gold: {
               50: '#FDFBF7',
@@ -123,6 +126,16 @@
       border-left-color: #FACC15;
     }
     #main-content section[id] { display: none; }
+
+    /* Mobile: impede overflow horizontal */
+    #main-content table  { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    #main-content pre    { overflow-x: auto; }
+    #main-content img    { max-width: 100%; height: auto; }
+
+    /* Botões nav menores em telas muito pequenas */
+    @media (max-width: 399px) {
+      #btn-prev-section, #btn-next-section { padding-left: 12px; padding-right: 12px; }
+    }
   </style>
 </head>
 
@@ -138,40 +151,40 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
       
       <!-- Brand & Title -->
-      <div class="flex items-center space-x-3">
-        <button id="btn-toggle-sidebar" class="p-2 rounded-lg text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-slate-800 focus:outline-none lg:hidden" title="Abrir Sumário">
+      <div class="flex items-center gap-2 min-w-0 flex-shrink">
+        <button id="btn-toggle-sidebar" class="p-2 rounded-lg text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-slate-800 focus:outline-none lg:hidden flex-shrink-0" title="Abrir Sumário">
           <i class="fa-solid fa-bars-staggered text-xl"></i>
         </button>
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-gold-600 to-amber-700 flex items-center justify-center text-white shadow-md shadow-gold-600/20">
-            <i class="fa-solid fa-book-bible text-xl"></i>
+        <div class="flex items-center gap-2 min-w-0">
+          <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-gold-600 to-amber-700 flex items-center justify-center text-white shadow-md shadow-gold-600/20 flex-shrink-0">
+            <i class="fa-solid fa-book-bible text-base sm:text-xl"></i>
           </div>
-          <div>
-            <span class="block text-xs font-bold tracking-widest text-gold-600 dark:text-gold-400 uppercase font-title">Kadima Academy</span>
-            <h1 class="text-base font-bold text-stone-900 dark:text-white leading-none">Introdução à Bibliologia</h1>
+          <div class="min-w-0">
+            <span class="block text-[10px] font-bold tracking-widest text-gold-600 dark:text-gold-400 uppercase font-title truncate">Kadima Academy</span>
+            <h1 class="text-sm font-bold text-stone-900 dark:text-white leading-none truncate hidden sm:block">Introdução à Bibliologia</h1>
           </div>
         </div>
       </div>
 
       <!-- Action Tools -->
-      <div class="flex items-center space-x-2 sm:space-x-3">
+      <div class="flex items-center gap-1 sm:gap-2 flex-shrink-0">
         <!-- Live Search Button -->
-        <button id="btn-search-trigger" class="px-3 py-1.5 rounded-lg bg-stone-100 dark:bg-slate-800 text-stone-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-slate-700 text-xs sm:text-sm font-medium flex items-center gap-2 transition" title="Pesquisar no texto">
+        <button id="btn-search-trigger" class="p-2 sm:px-3 sm:py-1.5 rounded-lg bg-stone-100 dark:bg-slate-800 text-stone-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-slate-700 text-xs sm:text-sm font-medium flex items-center gap-2 transition" title="Pesquisar no texto">
           <i class="fa-solid fa-magnifying-glass"></i>
           <span class="hidden md:inline">Buscar na apostila</span>
         </button>
 
-        <!-- Font Size Controls with Percentage Indicator -->
-        <div class="flex items-center bg-stone-100 dark:bg-slate-800 rounded-lg p-1 border border-stone-200 dark:border-slate-700">
-          <button id="btn-font-dec" class="px-2.5 py-1 text-xs font-bold text-stone-700 dark:text-stone-300 hover:text-gold-600 dark:hover:text-gold-400 hover:bg-stone-200 dark:hover:bg-slate-700 rounded transition" title="Diminuir Fonte (todos os textos)">A-</button>
-          <button id="btn-font-reset" class="px-2 py-1 text-[11px] font-semibold text-gold-600 dark:text-gold-400 hover:bg-stone-200 dark:hover:bg-slate-700 rounded transition" title="Clique para redefinir fonte para o tamanho padrão">
+        <!-- Font Size Controls -->
+        <div class="flex items-center bg-stone-100 dark:bg-slate-800 rounded-lg p-0.5 sm:p-1 border border-stone-200 dark:border-slate-700">
+          <button id="btn-font-dec" class="px-2 py-1 text-xs font-bold text-stone-700 dark:text-stone-300 hover:text-gold-600 dark:hover:text-gold-400 hover:bg-stone-200 dark:hover:bg-slate-700 rounded transition" title="Diminuir Fonte">A-</button>
+          <button id="btn-font-reset" class="hidden sm:block px-1.5 py-1 text-[11px] font-semibold text-gold-600 dark:text-gold-400 hover:bg-stone-200 dark:hover:bg-slate-700 rounded transition" title="Redefinir fonte">
             <span id="font-scale-display">100%</span>
           </button>
-          <button id="btn-font-inc" class="px-2.5 py-1 text-xs font-bold text-stone-700 dark:text-stone-300 hover:text-gold-600 dark:hover:text-gold-400 hover:bg-stone-200 dark:hover:bg-slate-700 rounded transition" title="Aumentar Fonte (todos os textos)">A+</button>
+          <button id="btn-font-inc" class="px-2 py-1 text-xs font-bold text-stone-700 dark:text-stone-300 hover:text-gold-600 dark:hover:text-gold-400 hover:bg-stone-200 dark:hover:bg-slate-700 rounded transition" title="Aumentar Fonte">A+</button>
         </div>
 
-        <!-- Print / PDF -->
-        <button onclick="window.print()" class="p-2 rounded-lg text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-slate-800 transition" title="Imprimir / Salvar PDF">
+        <!-- Print / PDF — oculto no mobile -->
+        <button onclick="window.print()" class="hidden sm:flex p-2 rounded-lg text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-slate-800 transition" title="Imprimir / Salvar PDF">
           <i class="fa-solid fa-print"></i>
         </button>
 
@@ -185,7 +198,7 @@
   </header>
 
   <!-- Main Container -->
-  <div class="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 flex-1 flex gap-8">
+  <div class="max-w-7xl mx-auto w-full px-3 sm:px-6 lg:px-8 py-4 sm:py-6 flex-1 flex gap-8">
     
     <!-- Sidebar / Table of Contents (Desktop + Mobile Drawer) -->
     <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-72 lg:w-80 bg-white dark:bg-slate-900 border-r border-stone-200 dark:border-slate-800 p-5 shadow-2xl lg:shadow-none transform -translate-x-full lg:translate-x-0 lg:static lg:block transition-transform duration-300 ease-in-out overflow-y-auto no-print">
@@ -289,7 +302,7 @@
     </aside>
 
     <!-- Main Content Body -->
-    <main id="main-content" class="flex-1 max-w-4xl space-y-12 transition-all">
+    <main id="main-content" class="flex-1 min-w-0 max-w-4xl space-y-12 transition-all">
 
       <!-- Hero Header Section -->
       <section id="hero-cover" class="bg-gradient-to-br from-slate-900 via-primary-900 to-slate-950 text-white rounded-3xl p-8 sm:p-12 shadow-xl border border-gold-500/20 relative overflow-hidden">
@@ -1131,18 +1144,20 @@
       </section>
 
       <!-- Section Navigation Bar -->
-      <div id="section-nav-bar" class="flex items-center justify-between gap-4 pt-6">
+      <div id="section-nav-bar" class="flex items-center justify-between gap-2 sm:gap-4 pt-6">
         <button id="btn-prev-section"
           onclick="navigateSection(-1)"
-          class="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-stone-200 dark:border-slate-700 text-stone-600 dark:text-stone-300 bg-white dark:bg-slate-900 hover:border-gold-400 hover:text-gold-600 dark:hover:text-gold-400 transition text-sm font-semibold disabled:opacity-30 disabled:cursor-not-allowed disabled:pointer-events-none"
+          class="flex items-center gap-1.5 sm:gap-2 px-4 sm:px-5 py-2.5 rounded-xl border border-stone-200 dark:border-slate-700 text-stone-600 dark:text-stone-300 bg-white dark:bg-slate-900 hover:border-gold-400 hover:text-gold-600 dark:hover:text-gold-400 transition text-sm font-semibold disabled:opacity-30 disabled:cursor-not-allowed disabled:pointer-events-none flex-shrink-0"
           disabled>
-          <i class="fa-solid fa-chevron-left text-xs"></i> Anterior
+          <i class="fa-solid fa-chevron-left text-xs"></i>
+          <span class="hidden xs:inline sm:inline">Anterior</span>
         </button>
-        <span id="section-counter" class="text-xs text-stone-400 dark:text-stone-500 tabular-nums">1 / 11</span>
+        <span id="section-counter" class="text-xs text-stone-400 dark:text-stone-500 tabular-nums text-center flex-shrink-0">1 / 11</span>
         <button id="btn-next-section"
           onclick="navigateSection(1)"
-          class="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gold-500 hover:bg-gold-600 text-white dark:text-slate-900 transition text-sm font-semibold disabled:opacity-30 disabled:cursor-not-allowed disabled:pointer-events-none">
-          Próximo <i class="fa-solid fa-chevron-right text-xs"></i>
+          class="flex items-center gap-1.5 sm:gap-2 px-4 sm:px-5 py-2.5 rounded-xl bg-gold-500 hover:bg-gold-600 text-white dark:text-slate-900 transition text-sm font-semibold disabled:opacity-30 disabled:cursor-not-allowed disabled:pointer-events-none flex-shrink-0">
+          <span class="hidden xs:inline sm:inline">Próximo</span>
+          <i class="fa-solid fa-chevron-right text-xs"></i>
         </button>
       </div>
 
