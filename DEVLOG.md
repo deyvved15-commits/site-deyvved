@@ -193,11 +193,30 @@ Poppins (Google Fonts) — corpo de texto, inputs
 
 ---
 
+## Sistema de Apostila em Texto — 2026-09-07
+
+**Nova funcionalidade:** Apostalas podem ser inseridas diretamente como texto/HTML na plataforma, sem precisar de arquivo externo.
+
+**Como funciona:**
+1. **Admin:** `app/(admin)/admin/cursos/[courseId]/editor` → campo "Título da Apostila" + "Apostila (Texto para Leitura)"
+2. **Banco de dados:** Campos `apostilaTitulo` e `apostilaTexto` adicionados à tabela `Lesson`
+3. **Aluno:** Na página da aula, aparece seção destacada "Apostila" com botão "📖 Ler Apostila"
+4. **Leitor:** Abre componente com: fonte ajustável, tema claro/escuro, marca d'água Kadima Academy, paginação
+
+**Arquivos envolvidos:**
+- `components/student/formatted-apostila-button.tsx` — botão e leitor de apostila
+- `components/student/course-editor.tsx` — painel admin para editar apostila
+- `app/(student)/cursos/[slug]/aula/[lessonId]/page.tsx` — exibição no aluno
+
+**Status:** ✅ Compilando sem erros, pronto para uso
+
+---
+
 ## Pendente
 
-- [ ] Fazer push das correções do HtmlContent + apostila → deploy Vercel
-- [ ] Configurar campo da aula com `<iframe src="/apostila-bibliologia-01.html"></iframe>`
-- [ ] Criar apostilas das próximas aulas do curso de Teologia no mesmo padrão
+- [ ] Testar leitor de apostila em múltiplas páginas (paginação)
+- [ ] Criar apostilas das próximas aulas do curso de Teologia
+- [ ] Decidir se remove sistema antigo de PDF (attachments) ou mantém em paralelo
 
 ---
 
