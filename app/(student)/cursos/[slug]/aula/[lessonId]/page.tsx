@@ -266,14 +266,16 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
 
         {/* Course material */}
         {lesson.content && (
-          <div style={{ margin: "16px 28px 0" }}>
+          <div style={{ margin: "16px 0", width: "100%" }}>
             <div style={{
-              borderRadius: 16, overflow: "hidden",
+              borderRadius: 0, overflow: "hidden",
               background: "rgba(15,26,61,0.5)",
-              border: "1px solid rgba(201,169,122,0.12)",
+              border: "none",
+              borderTop: "1px solid rgba(201,169,122,0.12)",
+              borderBottom: "1px solid rgba(201,169,122,0.12)",
             }}>
               <div style={{
-                padding: "11px 20px",
+                padding: "11px 28px",
                 borderBottom: "1px solid rgba(201,169,122,0.08)",
                 background: "rgba(201,169,122,0.03)",
                 display: "flex", alignItems: "center", gap: 8,
@@ -283,7 +285,7 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
                   Material da Aula
                 </span>
               </div>
-              <HtmlContent html={lesson.content} className="prose-lesson" style={{ padding: "20px 24px", color: "rgba(255,255,255,0.8)", lineHeight: 1.8, fontSize: 14 }} />
+              <HtmlContent html={lesson.content} className="prose-lesson" style={{ padding: "20px 28px", color: "rgba(255,255,255,0.8)", lineHeight: 1.8, fontSize: 14 }} />
             </div>
           </div>
         )}
