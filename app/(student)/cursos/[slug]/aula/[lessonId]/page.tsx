@@ -27,6 +27,7 @@ import LessonThumbnail from "@/components/student/lesson-thumbnail";
 import LessonDrawer from "@/components/student/lesson-drawer";
 import ActivityTracker from "@/components/student/activity-tracker";
 import ApostilaButton from "@/components/student/apostila-button";
+import FormattedApostilaButton from "@/components/student/formatted-apostila-button";
 
 export default async function AulaPage({ params }: { params: Promise<{ slug: string; lessonId: string }> }) {
   const session = await auth();
@@ -263,6 +264,35 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
             </div>
           </div>
         </div>
+
+        {/* Apostila em texto */}
+        {lesson.apostilaTexto && (
+          <div style={{ margin: "16px 0", width: "100%" }}>
+            <div style={{
+              borderRadius: 14, overflow: "hidden",
+              background: "linear-gradient(135deg, rgba(201,169,122,0.10) 0%, rgba(201,169,122,0.04) 100%)",
+              border: "1px solid rgba(201,169,122,0.25)",
+              padding: "20px 24px",
+              display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap",
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <div style={{ width: 3, height: 32, background: "var(--gold)", borderRadius: 2, boxShadow: "0 0 6px var(--gold)" }} />
+                <div>
+                  <span style={{ fontFamily: "'Cinzel',serif", fontSize: 10, fontWeight: 600, letterSpacing: 3, textTransform: "uppercase", color: "var(--gold)", display: "block", marginBottom: 4 }}>
+                    Apostila
+                  </span>
+                  <span style={{ fontSize: 14, color: "rgba(255,255,255,0.85)", fontWeight: 600 }}>
+                    {lesson.apostilaTitulo || lesson.title}
+                  </span>
+                </div>
+              </div>
+              <FormattedApostilaButton
+                title={lesson.apostilaTitulo || lesson.title}
+                text={lesson.apostilaTexto}
+              />
+            </div>
+          </div>
+        )}
 
         {/* Course material */}
         {lesson.content && (

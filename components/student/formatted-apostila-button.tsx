@@ -7,13 +7,17 @@ interface FormattedApostilaButtonProps {
   title?: string;
   buttonText?: string;
   placeholder?: string;
+  /** Se fornecido, o botão abre a leitura direto com este texto (modo aluno). Se omitido, abre um modal para colar o texto (modo admin/teste). */
+  text?: string;
 }
 
 export default function FormattedApostilaButton({
   title = "Ler Apostila",
-  buttonText = "📖 Ler Apostila (Texto)",
+  buttonText = "📖 Ler Apostila",
   placeholder = "Cole aqui o texto da apostila formatado com títulos e subtítulos...",
+  text,
 }: FormattedApostilaButtonProps) {
+  const hasFixedText = typeof text === "string" && text.trim().length > 0;
   const [isOpen, setIsOpen] = useState(false);
   const [textContent, setTextContent] = useState("");
   const [isReading, setIsReading] = useState(false);
@@ -30,7 +34,7 @@ export default function FormattedApostilaButton({
     <>
       {/* Button */}
       <button
-        onClick={() => setIsOpen(true)}
+        onClick={() => (hasFixedText ? setIsReading(true) : setIsOpen(true))}
         style={{
           display: "inline-flex",
           alignItems: "center",
@@ -60,8 +64,8 @@ export default function FormattedApostilaButton({
         {buttonText}
       </button>
 
-      {/* Modal - Input de Texto */}
-      {isOpen && !isReading && (
+      {/* Modal - Input de Texto (apenas quando não há texto fixo vindo do banco) */}
+      {!hasFixedText && isOpen && !isReading && (
         <div
           style={{
             position: "fixed",
@@ -260,11 +264,11 @@ export default function FormattedApostilaButton({
       {/* Reader Component */}
       {isReading && (
         <FormattedTextReader
-          text={textContent}
+          text={hasFixedText ? (text as string) : textContent}
           title={title}
           onClose={() => {
             setIsReading(false);
-            setTextContent("");
+            if (!hasFixedText) setTextContent("");
             setIsOpen(false);
           }}
         />

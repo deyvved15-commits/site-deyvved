@@ -183,6 +183,8 @@ model Lesson {
   title            String
   description      String?
   content          String?
+  apostilaTexto    String?
+  apostilaTitulo   String?
   youtubeUrl       String
   duration         String?
   order            Int              @default(0)

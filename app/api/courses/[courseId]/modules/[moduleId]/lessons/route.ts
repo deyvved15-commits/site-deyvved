@@ -9,6 +9,8 @@ const schema = z.object({
   youtubeUrl: z.string().min(5),
   description: z.string().optional(),
   content: z.string().optional(),
+  apostilaTexto: z.string().optional(),
+  apostilaTitulo: z.string().optional(),
   duration: z.string().optional(),
   releaseAfterDays: z.number().int().min(0).default(0),
 });

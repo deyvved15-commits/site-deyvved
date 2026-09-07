@@ -9,7 +9,7 @@ import { getYoutubeId, getGoogleDriveImageUrl } from "@/lib/utils";
 import { Plus, Trash2, ChevronDown, ChevronRight, Eye, EyeOff, Pencil, X, Check, Clock } from "lucide-react";
 import CertificateLayoutEditor, { type LayoutElement } from "@/components/admin/certificate-layout-editor";
 
-type Lesson = { id: string; title: string; youtubeUrl: string; duration: string | null; content: string | null; order: number; releaseAfterDays: number; attachments?: { title: string; url: string }[] };
+type Lesson = { id: string; title: string; youtubeUrl: string; duration: string | null; content: string | null; apostilaTexto: string | null; apostilaTitulo: string | null; order: number; releaseAfterDays: number; attachments?: { title: string; url: string }[] };
 type Module = { id: string; title: string; description: string | null; thumbnail: string | null; isBonus: boolean; order: number; lessons: Lesson[]; releaseAfterDays: number | null; releaseAfterModuleId: string | null };
 type Course = { id: string; slug: string; title: string; description: string | null; thumbnail: string | null; price: number | null; paymentType: "ONE_TIME" | "MONTHLY"; published: boolean; category: string | null; modules: Module[]; teachers: { teacherId: string; commissionPercentage: number; teacher: { id: string; name: string } }[]; hasCertificate: boolean; affiliatePercentage: number; certificateBg?: string | null; certificatePrimaryColor?: string | null; certificateSecondaryColor?: string | null; certificateCustomText?: string | null; certificateLayout?: LayoutElement[] | null; salesHeadline?: string | null; learningOutcomes?: string[]; targetAudience?: string | null; teacherBio?: string | null };
 
@@ -26,9 +26,9 @@ export default function CourseEditor({ course: initial, teachers: allTeachers, i
   const [newModuleIsBonus, setNewModuleIsBonus] = useState(false);
   const [addingModule, setAddingModule] = useState(false);
   const [addingLesson, setAddingLesson] = useState<string | null>(null);
-  const [newLesson, setNewLesson] = useState({ title: "", youtubeUrl: "", duration: "", content: "", releaseAfterDays: 0, attachments: [] as { title: string; url: string }[] });
+  const [newLesson, setNewLesson] = useState({ title: "", youtubeUrl: "", duration: "", content: "", apostilaTexto: "", apostilaTitulo: "", releaseAfterDays: 0, attachments: [] as { title: string; url: string }[] });
   const [editingLesson, setEditingLesson] = useState<string | null>(null);
-  const [editLesson, setEditLesson] = useState({ title: "", youtubeUrl: "", duration: "", content: "", releaseAfterDays: 0, attachments: [] as { title: string; url: string }[] });
+  const [editLesson, setEditLesson] = useState({ title: "", youtubeUrl: "", duration: "", content: "", apostilaTexto: "", apostilaTitulo: "", releaseAfterDays: 0, attachments: [] as { title: string; url: string }[] });
   const [editSaving, setEditSaving] = useState(false);
   const [editingModule, setEditingModule] = useState<string | null>(null);
   const [editModuleTitle, setEditModuleTitle] = useState("");
@@ -97,7 +97,7 @@ export default function CourseEditor({ course: initial, teachers: allTeachers, i
     });
     const lesson = await res.json();
     setCourse(c => ({ ...c, modules: c.modules.map(m => m.id === moduleId ? { ...m, lessons: [...m.lessons, lesson] } : m) }));
-    setNewLesson({ title: "", youtubeUrl: "", duration: "", content: "", releaseAfterDays: 0, attachments: [] });
+    setNewLesson({ title: "", youtubeUrl: "", duration: "", content: "", apostilaTexto: "", apostilaTitulo: "", releaseAfterDays: 0, attachments: [] });
     setAddingLesson(null);
   }
 
@@ -123,6 +123,8 @@ export default function CourseEditor({ course: initial, teachers: allTeachers, i
       youtubeUrl: lesson.youtubeUrl,
       duration: lesson.duration ?? "",
       content: lesson.content ?? "",
+      apostilaTexto: lesson.apostilaTexto ?? "",
+      apostilaTitulo: lesson.apostilaTitulo ?? "",
       releaseAfterDays: lesson.releaseAfterDays ?? 0,
       attachments: parseAttachments(lesson.attachments),
     });
@@ -851,6 +853,17 @@ export default function CourseEditor({ course: initial, teachers: allTeachers, i
                         <div className="ka-field" style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                           <label className="ka-label">Conteúdo (HTML)</label>
                           <textarea className="ka-textarea" value={editLesson.content || ""} onChange={e => setEditLesson(l => ({ ...l, content: e.target.value }))} rows={4} placeholder="HTML da apostila" />
+                        </div>
+                        <div className="ka-field" style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                          <label className="ka-label">Título da Apostila (Texto)</label>
+                          <input className="ka-input" value={editLesson.apostilaTitulo} onChange={e => setEditLesson(l => ({ ...l, apostilaTitulo: e.target.value }))} placeholder="Ex: Apostila - Bibliologia Aula 1" />
+                        </div>
+                        <div className="ka-field" style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                          <label className="ka-label">Apostila (Texto para Leitura)</label>
+                          <textarea className="ka-textarea" value={editLesson.apostilaTexto} onChange={e => setEditLesson(l => ({ ...l, apostilaTexto: e.target.value }))} rows={10} placeholder={"Cole aqui o texto da apostila.\n\nTÍTULOS EM MAIÚSCULAS viram títulos grandes.\nSubtítulos com Iniciais Maiúsculas viram subtítulos.\nO resto vira parágrafo normal."} />
+                          {editLesson.apostilaTexto && (
+                            <span style={{ fontSize: 11, color: "rgba(201,169,122,0.6)" }}>{editLesson.apostilaTexto.length} caracteres — o aluno verá o botão "Ler Apostila" nesta aula</span>
+                          )}
                         </div>
                             
                             {/* Anexos */}
