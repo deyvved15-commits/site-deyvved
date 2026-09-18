@@ -10,13 +10,19 @@ interface FormattedTextReaderProps {
   logoUrl?: string; // URL da logo Kadima Academy
 }
 
-type BlockType = "h1" | "h2" | "h3" | "li" | "oli" | "p";
+type BlockType = "h1" | "h2" | "h3" | "li" | "oli" | "p" | "table";
+
+interface TableRowData {
+  cells: string[];
+  isHeader: boolean;
+}
 
 interface Block {
   type: BlockType;
   html: string; // HTML pronto para dangerouslySetInnerHTML
   style?: string; // atributo style do elemento original (text-align, color, etc)
   num?: number;
+  rows?: TableRowData[]; // apenas para type === "table"
 }
 
 interface Page {
@@ -78,6 +84,19 @@ function parseBlocksFromHtml(html: string): Block[] {
       Array.from(el.children).forEach(li => {
         blocks.push({ type: "oli", html: (li as HTMLElement).innerHTML.trim(), num: n++, style: (li as HTMLElement).getAttribute("style") || undefined });
       });
+      return;
+    }
+    if (tag === "table") {
+      const rows: TableRowData[] = [];
+      el.querySelectorAll("tr").forEach(tr => {
+        const cells = Array.from(tr.children) as HTMLElement[];
+        if (cells.length === 0) return;
+        rows.push({
+          cells: cells.map(c => c.innerHTML.trim()),
+          isHeader: cells[0].tagName.toLowerCase() === "th",
+        });
+      });
+      if (rows.length > 0) blocks.push({ type: "table", html: "", rows });
       return;
     }
     blocks.push({ type: "p", html: innerHtml, style });
@@ -147,6 +166,9 @@ function parseBlocks(text: string): Block[] {
 }
 
 function blockWeight(b: Block): number {
+  if (b.type === "table" && b.rows) {
+    return b.rows.reduce((sum, r) => sum + r.cells.join("").length, 0) + b.rows.length * 400;
+  }
   const base = b.html.length;
   if (b.type === "h1") return base + 220;
   if (b.type === "h2") return base + 140;
@@ -458,6 +480,39 @@ export default function FormattedTextReader({
                     lineHeight: 1.3,
                     ...overrides,
                   }} dangerouslySetInnerHTML={html} />
+                );
+              }
+              if (b.type === "table" && b.rows) {
+                const borderColor = isDark ? "rgba(201,169,122,0.35)" : "rgba(201,169,122,0.45)";
+                return (
+                  <div key={idx} style={{ overflowX: "auto", marginBottom: "1.2em" }}>
+                    <table style={{ borderCollapse: "collapse", width: "100%", fontSize: `${fontSize * 0.9}px` }}>
+                      <tbody>
+                        {b.rows.map((row, rIdx) => (
+                          <tr key={rIdx}>
+                            {row.cells.map((cellHtml, cIdx) => {
+                              const Tag = row.isHeader ? "th" : "td";
+                              return (
+                                <Tag
+                                  key={cIdx}
+                                  style={{
+                                    border: `1px solid ${borderColor}`,
+                                    padding: "8px 12px",
+                                    textAlign: row.isHeader ? "left" : "left",
+                                    verticalAlign: "top",
+                                    background: row.isHeader ? (isDark ? "rgba(201,169,122,0.15)" : "rgba(201,169,122,0.18)") : "transparent",
+                                    color: row.isHeader ? accentLight : textColor,
+                                    fontWeight: row.isHeader ? 700 : 400,
+                                  }}
+                                  dangerouslySetInnerHTML={{ __html: cellHtml }}
+                                />
+                              );
+                            })}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 );
               }
               if (b.type === "li") {

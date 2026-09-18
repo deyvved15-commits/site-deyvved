@@ -7,9 +7,92 @@ import TextAlign from "@tiptap/extension-text-align";
 import Color from "@tiptap/extension-color";
 import TextStyle from "@tiptap/extension-text-style";
 import Link from "@tiptap/extension-link";
+import Table from "@tiptap/extension-table";
+import TableRow from "@tiptap/extension-table-row";
+import TableHeader from "@tiptap/extension-table-header";
+import TableCell from "@tiptap/extension-table-cell";
 import { useState, useEffect } from "react";
 
 const COLORS = ["#F5EFE0", "#C9A97A", "#E8D5A8", "#6ee7b7", "#FF8088", "#93C5FD", "#000000"];
+
+// Caracteres usados como "bullet" por fontes simbólicas (Wingdings/Symbol) que o Word
+// insere como texto literal em vez de gerar uma lista HTML real.
+const WORD_BULLET_CHARS = new Set(["Ø", "§", "v", "o", "•", "◦", "▪", "●", "♦", "➢", "→", "�"]);
+
+/**
+ * Normaliza HTML colado do Word:
+ * - Converte sequências de <p> com bullet literal (span Wingdings/Symbol, ou caractere
+ *   solto tipo "Ø"/"•") em <ul><li> reais.
+ * - Remove estilos inline conflitantes (cor/fundo/fonte fixos do Word, mso-*) que
+ *   quebrariam o tema escuro do leitor, preservando alinhamento.
+ */
+function cleanPastedHtml(html: string): string {
+  if (typeof window === "undefined" || typeof DOMParser === "undefined") return html;
+
+  const doc = new DOMParser().parseFromString(html, "text/html");
+
+  const isBulletSpan = (el: Element | null): boolean => {
+    if (!el || el.tagName !== "SPAN") return false;
+    const style = el.getAttribute("style") || "";
+    const isSymbolFont = /font-family:\s*['"]?(Wingdings|Symbol|Webdings)/i.test(style);
+    const txt = (el.textContent || "").trim();
+    return isSymbolFont || (txt.length === 1 && WORD_BULLET_CHARS.has(txt));
+  };
+
+  const paragraphs = Array.from(doc.body.querySelectorAll("p"));
+  let i = 0;
+  while (i < paragraphs.length) {
+    const p = paragraphs[i];
+    if (!p.isConnected) { i++; continue; }
+    const firstEl = p.firstElementChild;
+
+    if (isBulletSpan(firstEl)) {
+      const items: HTMLElement[] = [];
+      let j = i;
+      while (j < paragraphs.length) {
+        const pj = paragraphs[j];
+        if (!isBulletSpan(pj.firstElementChild)) break;
+        items.push(pj);
+        j++;
+      }
+
+      const ul = doc.createElement("ul");
+      items.forEach(pj => {
+        const li = doc.createElement("li");
+        const clone = pj.cloneNode(true) as HTMLElement;
+        if (clone.firstElementChild) clone.removeChild(clone.firstElementChild);
+        li.innerHTML = clone.innerHTML.replace(/^(&nbsp;|\s)+/i, "").trim();
+        ul.appendChild(li);
+      });
+      items[0].replaceWith(ul);
+      items.slice(1).forEach(pj => pj.remove());
+
+      i = j;
+      continue;
+    }
+    i++;
+  }
+
+  // Remove estilos inline que conflitam com o tema escuro (cor/fundo/fonte fixos, mso-*)
+  doc.body.querySelectorAll<HTMLElement>("[style]").forEach(el => {
+    const cleaned = (el.getAttribute("style") || "")
+      .split(";")
+      .filter(decl => {
+        const prop = decl.split(":")[0]?.trim().toLowerCase();
+        if (!prop) return false;
+        if (prop.startsWith("mso-")) return false;
+        if (["font-family", "color", "background", "background-color"].includes(prop)) return false;
+        return true;
+      })
+      .join(";");
+    if (cleaned.trim()) el.setAttribute("style", cleaned);
+    else el.removeAttribute("style");
+  });
+
+  doc.body.querySelectorAll("[class]").forEach(el => el.removeAttribute("class"));
+
+  return doc.body.innerHTML;
+}
 
 function ToolbarBtn({ onClick, active, title, children }: { onClick: () => void; active?: boolean; title: string; children: React.ReactNode }) {
   return (
@@ -57,12 +140,17 @@ export default function RichTextEditor({
       Color,
       Link.configure({ openOnClick: false, autolink: true }),
       TextAlign.configure({ types: ["heading", "paragraph"] }),
+      Table.configure({ resizable: true }),
+      TableRow,
+      TableHeader,
+      TableCell,
     ],
     content: value || "",
     editorProps: {
       attributes: {
         style: "min-height: 260px; outline: none; padding: 16px;",
       },
+      transformPastedHTML: (html) => cleanPastedHtml(html),
     },
     onUpdate: ({ editor }) => onChange(editor.getHTML()),
   });
@@ -238,6 +326,35 @@ export default function RichTextEditor({
           )}
         </div>
 
+        <div style={{ width: 1, height: 20, background: "rgba(201,169,122,0.15)", margin: "0 4px" }} />
+
+        <ToolbarBtn title="Inserir tabela" active={editor.isActive("table")} onClick={() => {
+          if (editor.isActive("table")) return;
+          editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
+        }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="12" y1="3" x2="12" y2="21"/></svg>
+        </ToolbarBtn>
+
+        {editor.isActive("table") && (
+          <>
+            <ToolbarBtn title="Add. coluna" onClick={() => editor.chain().focus().addColumnAfter().run()}>
+              <span style={{ fontSize: 10 }}>+Col</span>
+            </ToolbarBtn>
+            <ToolbarBtn title="Add. linha" onClick={() => editor.chain().focus().addRowAfter().run()}>
+              <span style={{ fontSize: 10 }}>+Lin</span>
+            </ToolbarBtn>
+            <ToolbarBtn title="Remover coluna" onClick={() => editor.chain().focus().deleteColumn().run()}>
+              <span style={{ fontSize: 10 }}>-Col</span>
+            </ToolbarBtn>
+            <ToolbarBtn title="Remover linha" onClick={() => editor.chain().focus().deleteRow().run()}>
+              <span style={{ fontSize: 10 }}>-Lin</span>
+            </ToolbarBtn>
+            <ToolbarBtn title="Excluir tabela" onClick={() => editor.chain().focus().deleteTable().run()}>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#FF8088" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+            </ToolbarBtn>
+          </>
+        )}
+
         <div style={{ flex: 1 }} />
 
         <ToolbarBtn title={fullscreen ? "Sair da tela cheia" : "Tela cheia"} onClick={() => setFullscreen(f => !f)}>
@@ -278,6 +395,15 @@ export default function RichTextEditor({
         .ka-rte .ProseMirror ul, .ka-rte .ProseMirror ol { padding-left: 1.4em; margin: 0 0 0.9em; }
         .ka-rte .ProseMirror a { color: #93C5FD; }
         .ka-rte .ProseMirror:focus { outline: none; }
+        .ka-rte .ProseMirror table { border-collapse: collapse; width: 100%; margin: 0 0 1em; table-layout: fixed; }
+        .ka-rte .ProseMirror table td, .ka-rte .ProseMirror table th {
+          border: 1px solid rgba(201,169,122,0.35); padding: 8px 10px; vertical-align: top;
+          position: relative; color: #E4D9CF; min-width: 60px;
+        }
+        .ka-rte .ProseMirror table th { background: rgba(201,169,122,0.15); font-weight: 700; color: #E8D5A8; text-align: left; }
+        .ka-rte .ProseMirror table td > *, .ka-rte .ProseMirror table th > * { margin: 0; }
+        .ka-rte .ProseMirror table .selectedCell { background: rgba(201,169,122,0.18); }
+        .ka-rte .ProseMirror table .column-resize-handle { background: rgba(201,169,122,0.6); width: 3px; }
       `}</style>
     </div>
   );
