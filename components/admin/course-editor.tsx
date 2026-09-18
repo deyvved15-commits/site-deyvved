@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { getYoutubeId, getGoogleDriveImageUrl } from "@/lib/utils";
 import { Plus, Trash2, ChevronDown, ChevronRight, Eye, EyeOff, Pencil, X, Check, Clock } from "lucide-react";
 import CertificateLayoutEditor, { type LayoutElement } from "@/components/admin/certificate-layout-editor";
+import RichTextEditor from "@/components/admin/rich-text-editor";
 
 type Lesson = { id: string; title: string; youtubeUrl: string; duration: string | null; content: string | null; apostilaTexto: string | null; apostilaTitulo: string | null; order: number; releaseAfterDays: number; attachments?: { title: string; url: string }[] };
 type Module = { id: string; title: string; description: string | null; thumbnail: string | null; isBonus: boolean; order: number; lessons: Lesson[]; releaseAfterDays: number | null; releaseAfterModuleId: string | null };
@@ -860,12 +861,13 @@ export default function CourseEditor({ course: initial, teachers: allTeachers, i
                         </div>
                         <div className="ka-field" style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                           <label className="ka-label">Apostila (Texto para Leitura)</label>
-                          <p style={{ fontSize: 11, color: "rgba(201,169,122,0.65)", lineHeight: 1.6, margin: 0 }}>
-                            <code># Título</code> · <code>## Subtítulo</code> · <code>### Tópico</code> · <code>- item</code> (marcador) · <code>1. item</code> (numerado) · <code>**negrito**</code> · <code>*itálico*</code> · linha em branco separa parágrafos
-                          </p>
-                          <textarea className="ka-textarea" value={editLesson.apostilaTexto} onChange={e => setEditLesson(l => ({ ...l, apostilaTexto: e.target.value }))} rows={14} placeholder={"# Título Principal\n\nTexto do parágrafo introdutório da apostila...\n\n## Subtítulo da Seção\n\n- Item com marcador\n- Outro item\n\n1. Item numerado\n2. Outro item numerado\n\n### Tópico menor\n\nMais um parágrafo com **negrito** e *itálico*."} style={{ fontFamily: "monospace" }} />
+                          <RichTextEditor
+                            value={editLesson.apostilaTexto}
+                            onChange={html => setEditLesson(l => ({ ...l, apostilaTexto: html }))}
+                            placeholder="Cole ou digite o texto da apostila..."
+                          />
                           {editLesson.apostilaTexto && (
-                            <span style={{ fontSize: 11, color: "rgba(201,169,122,0.6)" }}>{editLesson.apostilaTexto.length} caracteres — o aluno verá o botão "Ler Apostila" nesta aula</span>
+                            <span style={{ fontSize: 11, color: "rgba(201,169,122,0.6)" }}>O aluno verá o botão "Ler Apostila" nesta aula</span>
                           )}
                         </div>
                             

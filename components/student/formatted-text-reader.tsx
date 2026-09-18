@@ -14,7 +14,8 @@ type BlockType = "h1" | "h2" | "h3" | "li" | "oli" | "p";
 
 interface Block {
   type: BlockType;
-  text: string;
+  html: string; // HTML pronto para dangerouslySetInnerHTML
+  style?: string; // atributo style do elemento original (text-align, color, etc)
   num?: number;
 }
 
@@ -35,8 +36,58 @@ function renderInline(raw: string): string {
   return s;
 }
 
+/** Converte um atributo style="a: b; c: d" em objeto React.CSSProperties. */
+function parseStyleAttr(styleStr?: string): React.CSSProperties {
+  if (!styleStr) return {};
+  const result: Record<string, string> = {};
+  styleStr.split(";").forEach(decl => {
+    const [prop, val] = decl.split(":");
+    if (!prop || !val) return;
+    const camelProp = prop.trim().replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+    result[camelProp] = val.trim();
+  });
+  return result as React.CSSProperties;
+}
+
+function isHtmlContent(text: string): boolean {
+  return /<\/?[a-z][\s\S]*>/i.test(text);
+}
+
+/** Conteúdo novo: HTML gerado pelo editor rico (RichTextEditor / TipTap). */
+function parseBlocksFromHtml(html: string): Block[] {
+  const doc = new DOMParser().parseFromString(html, "text/html");
+  const blocks: Block[] = [];
+
+  Array.from(doc.body.children).forEach(el => {
+    const tag = el.tagName.toLowerCase();
+    const style = el.getAttribute("style") || undefined;
+    const innerHtml = (el as HTMLElement).innerHTML.trim();
+    if (!innerHtml) return;
+
+    if (tag === "h1") { blocks.push({ type: "h1", html: innerHtml, style }); return; }
+    if (tag === "h2") { blocks.push({ type: "h2", html: innerHtml, style }); return; }
+    if (/^h[3-6]$/.test(tag)) { blocks.push({ type: "h3", html: innerHtml, style }); return; }
+    if (tag === "ul") {
+      Array.from(el.children).forEach(li => {
+        blocks.push({ type: "li", html: (li as HTMLElement).innerHTML.trim(), style: (li as HTMLElement).getAttribute("style") || undefined });
+      });
+      return;
+    }
+    if (tag === "ol") {
+      let n = 1;
+      Array.from(el.children).forEach(li => {
+        blocks.push({ type: "oli", html: (li as HTMLElement).innerHTML.trim(), num: n++, style: (li as HTMLElement).getAttribute("style") || undefined });
+      });
+      return;
+    }
+    blocks.push({ type: "p", html: innerHtml, style });
+  });
+
+  return blocks;
+}
+
 /**
- * Sintaxe suportada:
+ * Conteúdo legado (antes do editor rico), sintaxe estilo markdown:
  *   # Título 1        -> h1
  *   ## Título 2       -> h2
  *   ### Título 3      -> h3
@@ -44,16 +95,16 @@ function renderInline(raw: string): string {
  *   1. item            -> lista numerada
  *   linha em branco     -> separa parágrafos
  *   **negrito** *itálico*
- * Fallback: linha toda em MAIÚSCULAS (conteúdo legado) vira h2.
+ * Fallback: linha toda em MAIÚSCULAS vira h2.
  */
-function parseBlocks(text: string): Block[] {
+function parseBlocksLegacy(text: string): Block[] {
   const rawLines = text.replace(/\r\n/g, "\n").split("\n");
   const blocks: Block[] = [];
   let paragraphBuffer: string[] = [];
 
   const flushParagraph = () => {
     if (paragraphBuffer.length > 0) {
-      blocks.push({ type: "p", text: paragraphBuffer.join(" ") });
+      blocks.push({ type: "p", html: renderInline(paragraphBuffer.join(" ")) });
       paragraphBuffer = [];
     }
   };
@@ -72,16 +123,16 @@ function parseBlocks(text: string): Block[] {
     const li = line.match(/^[-*]\s+(.*)/);
     const oli = line.match(/^(\d+)[.)]\s+(.*)/);
 
-    if (h1) { flushParagraph(); blocks.push({ type: "h1", text: h1[1] }); continue; }
-    if (h2) { flushParagraph(); blocks.push({ type: "h2", text: h2[1] }); continue; }
-    if (h3) { flushParagraph(); blocks.push({ type: "h3", text: h3[1] }); continue; }
-    if (li) { flushParagraph(); blocks.push({ type: "li", text: li[1] }); continue; }
-    if (oli) { flushParagraph(); blocks.push({ type: "oli", text: oli[2], num: parseInt(oli[1], 10) }); continue; }
+    if (h1) { flushParagraph(); blocks.push({ type: "h1", html: renderInline(h1[1]) }); continue; }
+    if (h2) { flushParagraph(); blocks.push({ type: "h2", html: renderInline(h2[1]) }); continue; }
+    if (h3) { flushParagraph(); blocks.push({ type: "h3", html: renderInline(h3[1]) }); continue; }
+    if (li) { flushParagraph(); blocks.push({ type: "li", html: renderInline(li[1]) }); continue; }
+    if (oli) { flushParagraph(); blocks.push({ type: "oli", html: renderInline(oli[2]), num: parseInt(oli[1], 10) }); continue; }
 
     // Fallback legado: linha toda em maiúsculas vira título
     if (line === line.toUpperCase() && /[A-ZÀ-Ú]/.test(line) && line.split(" ").length >= 2) {
       flushParagraph();
-      blocks.push({ type: "h2", text: line });
+      blocks.push({ type: "h2", html: renderInline(line) });
       continue;
     }
 
@@ -91,8 +142,12 @@ function parseBlocks(text: string): Block[] {
   return blocks;
 }
 
+function parseBlocks(text: string): Block[] {
+  return isHtmlContent(text) ? parseBlocksFromHtml(text) : parseBlocksLegacy(text);
+}
+
 function blockWeight(b: Block): number {
-  const base = b.text.length;
+  const base = b.html.length;
   if (b.type === "h1") return base + 220;
   if (b.type === "h2") return base + 140;
   if (b.type === "h3") return base + 90;
@@ -368,7 +423,8 @@ export default function FormattedTextReader({
         }}>
           {page ? (
             page.blocks.map((b, idx) => {
-              const html = { __html: renderInline(b.text) };
+              const html = { __html: b.html };
+              const overrides = parseStyleAttr(b.style);
 
               if (b.type === "h1") {
                 return (
@@ -379,6 +435,7 @@ export default function FormattedTextReader({
                     fontFamily: "'Cinzel',serif", lineHeight: 1.3,
                     borderBottom: `2px solid ${isDark ? "rgba(201,169,122,0.25)" : "rgba(201,169,122,0.35)"}`,
                     paddingBottom: "0.3em",
+                    ...overrides,
                   }} dangerouslySetInnerHTML={html} />
                 );
               }
@@ -389,6 +446,7 @@ export default function FormattedTextReader({
                     letterSpacing: "1px",
                     marginTop: idx === 0 ? 0 : "1.4em", marginBottom: "0.5em",
                     fontFamily: "'Cinzel',serif", lineHeight: 1.3,
+                    ...overrides,
                   }} dangerouslySetInnerHTML={html} />
                 );
               }
@@ -398,6 +456,7 @@ export default function FormattedTextReader({
                     fontSize: `${fontSize * 1.2}px`, fontWeight: "600", color: accentLight,
                     marginTop: idx === 0 ? 0 : "1.1em", marginBottom: "0.4em",
                     lineHeight: 1.3,
+                    ...overrides,
                   }} dangerouslySetInnerHTML={html} />
                 );
               }
@@ -405,7 +464,7 @@ export default function FormattedTextReader({
                 return (
                   <div key={idx} style={{ display: "flex", gap: "0.6em", marginBottom: "0.5em", paddingLeft: "0.2em" }}>
                     <span style={{ color: accentColor, flexShrink: 0 }}>▸</span>
-                    <span style={{ flex: 1 }} dangerouslySetInnerHTML={html} />
+                    <span style={{ flex: 1, ...overrides }} dangerouslySetInnerHTML={html} />
                   </div>
                 );
               }
@@ -413,12 +472,12 @@ export default function FormattedTextReader({
                 return (
                   <div key={idx} style={{ display: "flex", gap: "0.6em", marginBottom: "0.5em", paddingLeft: "0.2em" }}>
                     <span style={{ color: accentColor, fontWeight: 700, flexShrink: 0, minWidth: "1.4em" }}>{b.num}.</span>
-                    <span style={{ flex: 1 }} dangerouslySetInnerHTML={html} />
+                    <span style={{ flex: 1, ...overrides }} dangerouslySetInnerHTML={html} />
                   </div>
                 );
               }
               return (
-                <p key={idx} style={{ marginBottom: "1em", textAlign: "justify" }} dangerouslySetInnerHTML={html} />
+                <p key={idx} style={{ marginBottom: "1em", textAlign: "justify", ...overrides }} dangerouslySetInnerHTML={html} />
               );
             })
           ) : (
