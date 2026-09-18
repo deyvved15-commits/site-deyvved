@@ -10,45 +10,117 @@ interface FormattedTextReaderProps {
   logoUrl?: string; // URL da logo Kadima Academy
 }
 
+type BlockType = "h1" | "h2" | "h3" | "li" | "oli" | "p";
+
+interface Block {
+  type: BlockType;
+  text: string;
+  num?: number;
+}
+
 interface Page {
-  lines: string[];
+  blocks: Block[];
   pageNum: number;
 }
 
-function parseTextIntoPages(text: string, linesPerPage: number = 25): Page[] {
-  const lines = text.split("\n").map(line => line.trim()).filter(l => l.length > 0);
-  const pages: Page[] = [];
-  let currentPage: string[] = [];
-  let pageNum = 1;
-
-  lines.forEach(line => {
-    currentPage.push(line);
-    if (currentPage.length >= linesPerPage) {
-      pages.push({ lines: currentPage, pageNum });
-      currentPage = [];
-      pageNum++;
-    }
-  });
-
-  if (currentPage.length > 0) {
-    pages.push({ lines: currentPage, pageNum });
-  }
-
-  return pages;
+function escapeHtml(s: string): string {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-function formatLine(line: string): { text: string; type: "title" | "subtitle" | "body" } {
-  // Título: linha em MAIÚSCULAS com 3+ palavras
-  if (line === line.toUpperCase() && line.split(" ").length >= 2) {
-    return { text: line, type: "title" };
-  }
+/** Converte **negrito** e *itálico* em HTML seguro (escapa tudo antes). */
+function renderInline(raw: string): string {
+  let s = escapeHtml(raw);
+  s = s.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+  s = s.replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, "<em>$1</em>");
+  return s;
+}
 
-  // Subtítulo: começa com maiúscula, tem menos palavras
-  if (line[0] === line[0].toUpperCase() && !line.endsWith(".") && line.split(" ").length <= 4) {
-    return { text: line, type: "subtitle" };
-  }
+/**
+ * Sintaxe suportada:
+ *   # Título 1        -> h1
+ *   ## Título 2       -> h2
+ *   ### Título 3      -> h3
+ *   - item / * item    -> lista com marcador
+ *   1. item            -> lista numerada
+ *   linha em branco     -> separa parágrafos
+ *   **negrito** *itálico*
+ * Fallback: linha toda em MAIÚSCULAS (conteúdo legado) vira h2.
+ */
+function parseBlocks(text: string): Block[] {
+  const rawLines = text.replace(/\r\n/g, "\n").split("\n");
+  const blocks: Block[] = [];
+  let paragraphBuffer: string[] = [];
 
-  return { text: line, type: "body" };
+  const flushParagraph = () => {
+    if (paragraphBuffer.length > 0) {
+      blocks.push({ type: "p", text: paragraphBuffer.join(" ") });
+      paragraphBuffer = [];
+    }
+  };
+
+  for (const rawLine of rawLines) {
+    const line = rawLine.trim();
+
+    if (line === "") {
+      flushParagraph();
+      continue;
+    }
+
+    const h1 = line.match(/^#\s+(.*)/);
+    const h2 = line.match(/^##\s+(.*)/);
+    const h3 = line.match(/^###\s+(.*)/);
+    const li = line.match(/^[-*]\s+(.*)/);
+    const oli = line.match(/^(\d+)[.)]\s+(.*)/);
+
+    if (h1) { flushParagraph(); blocks.push({ type: "h1", text: h1[1] }); continue; }
+    if (h2) { flushParagraph(); blocks.push({ type: "h2", text: h2[1] }); continue; }
+    if (h3) { flushParagraph(); blocks.push({ type: "h3", text: h3[1] }); continue; }
+    if (li) { flushParagraph(); blocks.push({ type: "li", text: li[1] }); continue; }
+    if (oli) { flushParagraph(); blocks.push({ type: "oli", text: oli[2], num: parseInt(oli[1], 10) }); continue; }
+
+    // Fallback legado: linha toda em maiúsculas vira título
+    if (line === line.toUpperCase() && /[A-ZÀ-Ú]/.test(line) && line.split(" ").length >= 2) {
+      flushParagraph();
+      blocks.push({ type: "h2", text: line });
+      continue;
+    }
+
+    paragraphBuffer.push(line);
+  }
+  flushParagraph();
+  return blocks;
+}
+
+function blockWeight(b: Block): number {
+  const base = b.text.length;
+  if (b.type === "h1") return base + 220;
+  if (b.type === "h2") return base + 140;
+  if (b.type === "h3") return base + 90;
+  if (b.type === "li" || b.type === "oli") return base + 30;
+  return base + 20;
+}
+
+function paginateBlocks(blocks: Block[], fontSize: number): Page[] {
+  const budgetPerPage = Math.max(900, Math.floor(34000 / fontSize));
+  const pages: Page[] = [];
+  let current: Block[] = [];
+  let used = 0;
+  let pageNum = 1;
+
+  blocks.forEach(b => {
+    const w = blockWeight(b);
+    if (used + w > budgetPerPage && current.length > 0) {
+      pages.push({ blocks: current, pageNum });
+      current = [];
+      used = 0;
+      pageNum++;
+    }
+    current.push(b);
+    used += w;
+  });
+
+  if (current.length > 0) pages.push({ blocks: current, pageNum });
+  return pages;
 }
 
 export default function FormattedTextReader({
@@ -63,10 +135,10 @@ export default function FormattedTextReader({
   const [pages, setPages] = useState<Page[]>([]);
   const storageKey = `formatted-text-${btoa(title).slice(0, 40)}`;
 
-  // Parse text into pages
+  // Parse text into blocks, then paginate
   useEffect(() => {
-    const linesPerPage = Math.max(15, Math.floor(600 / fontSize));
-    setPages(parseTextIntoPages(text, linesPerPage));
+    const blocks = parseBlocks(text);
+    setPages(paginateBlocks(blocks, fontSize));
   }, [text, fontSize]);
 
   // Load saved preferences
@@ -295,37 +367,58 @@ export default function FormattedTextReader({
           zIndex: 1,
         }}>
           {page ? (
-            page.lines.map((line, idx) => {
-              const formatted = formatLine(line);
-              let lineStyle: React.CSSProperties = { marginBottom: "1em" };
+            page.blocks.map((b, idx) => {
+              const html = { __html: renderInline(b.text) };
 
-              if (formatted.type === "title") {
-                lineStyle = {
-                  ...lineStyle,
-                  fontSize: `${fontSize * 1.8}px`,
-                  fontWeight: "bold",
-                  color: accentColor,
-                  textTransform: "uppercase",
-                  letterSpacing: "2px",
-                  marginTop: "1.5em",
-                  marginBottom: "0.5em",
-                  fontFamily: "'Cinzel',serif",
-                };
-              } else if (formatted.type === "subtitle") {
-                lineStyle = {
-                  ...lineStyle,
-                  fontSize: `${fontSize * 1.3}px`,
-                  fontWeight: "600",
-                  color: accentLight,
-                  marginTop: "1em",
-                  marginBottom: "0.5em",
-                };
+              if (b.type === "h1") {
+                return (
+                  <h1 key={idx} style={{
+                    fontSize: `${fontSize * 2}px`, fontWeight: "bold", color: accentColor,
+                    textTransform: "uppercase", letterSpacing: "2px",
+                    marginTop: idx === 0 ? 0 : "1.6em", marginBottom: "0.6em",
+                    fontFamily: "'Cinzel',serif", lineHeight: 1.3,
+                    borderBottom: `2px solid ${isDark ? "rgba(201,169,122,0.25)" : "rgba(201,169,122,0.35)"}`,
+                    paddingBottom: "0.3em",
+                  }} dangerouslySetInnerHTML={html} />
+                );
               }
-
+              if (b.type === "h2") {
+                return (
+                  <h2 key={idx} style={{
+                    fontSize: `${fontSize * 1.5}px`, fontWeight: "bold", color: accentColor,
+                    letterSpacing: "1px",
+                    marginTop: idx === 0 ? 0 : "1.4em", marginBottom: "0.5em",
+                    fontFamily: "'Cinzel',serif", lineHeight: 1.3,
+                  }} dangerouslySetInnerHTML={html} />
+                );
+              }
+              if (b.type === "h3") {
+                return (
+                  <h3 key={idx} style={{
+                    fontSize: `${fontSize * 1.2}px`, fontWeight: "600", color: accentLight,
+                    marginTop: idx === 0 ? 0 : "1.1em", marginBottom: "0.4em",
+                    lineHeight: 1.3,
+                  }} dangerouslySetInnerHTML={html} />
+                );
+              }
+              if (b.type === "li") {
+                return (
+                  <div key={idx} style={{ display: "flex", gap: "0.6em", marginBottom: "0.5em", paddingLeft: "0.2em" }}>
+                    <span style={{ color: accentColor, flexShrink: 0 }}>▸</span>
+                    <span style={{ flex: 1 }} dangerouslySetInnerHTML={html} />
+                  </div>
+                );
+              }
+              if (b.type === "oli") {
+                return (
+                  <div key={idx} style={{ display: "flex", gap: "0.6em", marginBottom: "0.5em", paddingLeft: "0.2em" }}>
+                    <span style={{ color: accentColor, fontWeight: 700, flexShrink: 0, minWidth: "1.4em" }}>{b.num}.</span>
+                    <span style={{ flex: 1 }} dangerouslySetInnerHTML={html} />
+                  </div>
+                );
+              }
               return (
-                <p key={idx} style={lineStyle}>
-                  {formatted.text}
-                </p>
+                <p key={idx} style={{ marginBottom: "1em", textAlign: "justify" }} dangerouslySetInnerHTML={html} />
               );
             })
           ) : (

@@ -860,7 +860,10 @@ export default function CourseEditor({ course: initial, teachers: allTeachers, i
                         </div>
                         <div className="ka-field" style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                           <label className="ka-label">Apostila (Texto para Leitura)</label>
-                          <textarea className="ka-textarea" value={editLesson.apostilaTexto} onChange={e => setEditLesson(l => ({ ...l, apostilaTexto: e.target.value }))} rows={10} placeholder={"Cole aqui o texto da apostila.\n\nTÍTULOS EM MAIÚSCULAS viram títulos grandes.\nSubtítulos com Iniciais Maiúsculas viram subtítulos.\nO resto vira parágrafo normal."} />
+                          <p style={{ fontSize: 11, color: "rgba(201,169,122,0.65)", lineHeight: 1.6, margin: 0 }}>
+                            <code># Título</code> · <code>## Subtítulo</code> · <code>### Tópico</code> · <code>- item</code> (marcador) · <code>1. item</code> (numerado) · <code>**negrito**</code> · <code>*itálico*</code> · linha em branco separa parágrafos
+                          </p>
+                          <textarea className="ka-textarea" value={editLesson.apostilaTexto} onChange={e => setEditLesson(l => ({ ...l, apostilaTexto: e.target.value }))} rows={14} placeholder={"# Título Principal\n\nTexto do parágrafo introdutório da apostila...\n\n## Subtítulo da Seção\n\n- Item com marcador\n- Outro item\n\n1. Item numerado\n2. Outro item numerado\n\n### Tópico menor\n\nMais um parágrafo com **negrito** e *itálico*."} style={{ fontFamily: "monospace" }} />
                           {editLesson.apostilaTexto && (
                             <span style={{ fontSize: 11, color: "rgba(201,169,122,0.6)" }}>{editLesson.apostilaTexto.length} caracteres — o aluno verá o botão "Ler Apostila" nesta aula</span>
                           )}

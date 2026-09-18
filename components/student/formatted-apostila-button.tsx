@@ -14,7 +14,7 @@ interface FormattedApostilaButtonProps {
 export default function FormattedApostilaButton({
   title = "Ler Apostila",
   buttonText = "📖 Ler Apostila",
-  placeholder = "Cole aqui o texto da apostila formatado com títulos e subtítulos...",
+  placeholder = "# Título 1\n\nTexto do parágrafo introdutório...\n\n## Título 2\n\n- Item com marcador\n- Outro item\n\n1. Item numerado\n2. Outro item numerado",
   text,
 }: FormattedApostilaButtonProps) {
   const hasFixedText = typeof text === "string" && text.trim().length > 0;
@@ -141,9 +141,13 @@ export default function FormattedApostilaButton({
               >
                 <strong>📝 Dicas de formatação:</strong>
                 <br />
-                • Títulos: ESCREVA EM MAIÚSCULAS<br />
-                • Subtítulos: Comece com Maiúscula<br />
-                • Corpo: Texto normal (será formatado automaticamente)
+                • <code># Título</code> — título principal<br />
+                • <code>## Subtítulo</code> — título de seção<br />
+                • <code>### Tópico</code> — título menor<br />
+                • <code>- item</code> — lista com marcador<br />
+                • <code>1. item</code> — lista numerada<br />
+                • <code>**negrito**</code> e <code>*itálico*</code><br />
+                • Linha em branco separa parágrafos
               </p>
             </div>
 
