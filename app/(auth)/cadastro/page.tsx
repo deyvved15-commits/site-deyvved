@@ -320,7 +320,7 @@ export default function CadastroPage() {
               <div className="cad-row" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 <div>
                   <label style={{ fontFamily: "'Cinzel',serif", fontSize: 9, fontWeight: 600, letterSpacing: 3, textTransform: "uppercase", color: "#C9A97A", display: "block", marginBottom: 8 }}>
-                    Telefone <span style={{ opacity: 0.4, letterSpacing: 1 }}>(opc.)</span>
+                    WhatsApp <span style={{ opacity: 0.4, letterSpacing: 1 }}>(opc.)</span>
                   </label>
                   <div style={{ position: "relative" }}>
                     <div style={{ position: "absolute", left: 13, top: "50%", transform: "translateY(-50%)", color: "rgba(201,169,122,0.38)", pointerEvents: "none" }}>

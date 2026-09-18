@@ -59,7 +59,7 @@ function Alert({ type, msg }: { type: "error" | "success"; msg: string }) {
   );
 }
 
-interface UserData { id: string; name: string | null; email: string | null; bio: string | null; avatar: string | null; image: string | null; shippingCep: string | null; shippingAddress: string | null; shippingNumber: string | null; shippingCity: string | null; shippingState: string | null }
+interface UserData { id: string; name: string | null; email: string | null; phone: string | null; bio: string | null; avatar: string | null; image: string | null; shippingCep: string | null; shippingAddress: string | null; shippingNumber: string | null; shippingCity: string | null; shippingState: string | null }
 
 interface Enrollment {
   id: string;
@@ -72,6 +72,7 @@ export default function PerfilPage() {
   const { update: updateSession } = useSession();
   const [user, setUser] = useState<UserData | null>(null);
   const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
 
   // Avatar state
   const [avatarMode, setAvatarMode] = useState<"idle" | "file" | "url">("idle");
@@ -107,6 +108,7 @@ export default function PerfilPage() {
       .then((data: UserData) => {
         setUser(data);
         setName(data.name ?? "");
+        setPhone(data.phone ?? "");
         setBio(data.bio ?? "");
         setAddrCep(data.shippingCep ?? "");
         setAddrStreet(data.shippingAddress ?? "");
@@ -159,12 +161,12 @@ export default function PerfilPage() {
     const res = await fetch("/api/profile", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, bio: bio || null }),
+      body: JSON.stringify({ name, phone: phone || null, bio: bio || null }),
     });
     const data = await res.json();
     setInfoLoading(false);
     if (!res.ok) { setInfoMsg({ type: "error", msg: data.error ?? "Erro ao salvar." }); return; }
-    setUser(u => u ? { ...u, name: data.name, bio: data.bio } : u);
+    setUser(u => u ? { ...u, name: data.name, phone: data.phone, bio: data.bio } : u);
     await updateSession({ name: data.name });
     setInfoMsg({ type: "success", msg: "Perfil atualizado com sucesso!" });
   }
@@ -485,6 +487,10 @@ export default function PerfilPage() {
             <div style={S.field}>
               <label style={S.label}>Seu Nome</label>
               <input className="pf-input" style={S.input} value={name} onChange={e => setName(e.target.value)} placeholder="Seu nome completo" required />
+            </div>
+            <div style={S.field}>
+              <label style={S.label}>WhatsApp <span style={{ opacity: 0.5, fontWeight: 400 }}>(opcional)</span></label>
+              <input type="tel" className="pf-input" style={S.input} value={phone} onChange={e => setPhone(e.target.value)} placeholder="(00) 00000-0000" autoComplete="tel" />
             </div>
             <div style={S.field}>
               <label style={S.label}>Bio <span style={{ opacity: 0.5, fontWeight: 400 }}>(opcional)</span></label>

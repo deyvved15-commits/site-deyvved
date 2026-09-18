@@ -116,7 +116,7 @@ export default function NovoAlunoPage() {
                 />
               </div>
               <div style={S.field}>
-                <label style={S.label}>Telefone</label>
+                <label style={S.label}>WhatsApp</label>
                 <input
                   style={S.input}
                   placeholder="(21) 99999-9999"
