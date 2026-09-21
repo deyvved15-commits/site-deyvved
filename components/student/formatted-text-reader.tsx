@@ -273,6 +273,13 @@ export default function FormattedTextReader({
       flexDirection: "column",
       backdropFilter: "blur(8px)",
     }}>
+      <style>{`
+        .ftr-content { padding: 40px 60px; }
+        @media (max-width: 640px) {
+          .ftr-content { padding: 24px 16px; }
+        }
+      `}</style>
+
       {/* Top Bar */}
       <div style={{
         display: "flex",
@@ -400,13 +407,12 @@ export default function FormattedTextReader({
       </div>
 
       {/* Content Area */}
-      <div style={{
+      <div className="ftr-content" style={{
         flex: 1,
         overflowY: "auto",
         overflowX: "hidden",
         background: bgColor,
         color: textColor,
-        padding: "40px 60px",
         fontSize: fontSize + "px",
         lineHeight: 1.8,
         fontFamily: "'Merriweather', serif",
