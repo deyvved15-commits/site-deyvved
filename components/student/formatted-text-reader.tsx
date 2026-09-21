@@ -281,11 +281,11 @@ export default function FormattedTextReader({
       `}</style>
 
       {/* Top Bar */}
-      <div style={{
+      <div className="ftr-topbar" style={{
         display: "flex",
         alignItems: "center",
         gap: 16,
-        padding: "12px 24px",
+        padding: "14px 24px",
         background: isDark
           ? "linear-gradient(135deg, rgba(15,26,61,0.95) 0%, rgba(9,16,40,0.95) 100%)"
           : "linear-gradient(135deg, rgba(245,243,237,0.95) 0%, rgba(230,220,210,0.95) 100%)",
@@ -325,10 +325,10 @@ export default function FormattedTextReader({
             <span style={{ fontSize: 16, fontWeight: "bold" }}>−</span>
           </CtrlBtn>
           <span style={{
-            fontSize: 11,
+            fontSize: 12,
             color: isDark ? "rgba(201,169,122,0.7)" : "rgba(201,169,122,0.8)",
             fontFamily: "'Cinzel',serif",
-            minWidth: 40,
+            minWidth: 44,
             textAlign: "center",
           }}>
             {fontSize}px
@@ -381,9 +381,9 @@ export default function FormattedTextReader({
           title="Fechar (Esc)"
           style={{
             flexShrink: 0,
-            width: 34,
-            height: 34,
-            borderRadius: 10,
+            width: 40,
+            height: 40,
+            borderRadius: 11,
             background: "rgba(230,57,70,0.12)",
             border: "1px solid rgba(230,57,70,0.25)",
             color: "rgba(255,128,136,0.8)",
@@ -402,7 +402,7 @@ export default function FormattedTextReader({
             e.currentTarget.style.color = "rgba(255,128,136,0.8)";
           }}
         >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
 
@@ -653,10 +653,11 @@ function CtrlBtn({
     <button
       onClick={onClick}
       title={title}
+      className="ftr-ctrlbtn"
       style={{
-        width: 30,
-        height: 30,
-        borderRadius: 8,
+        width: 36,
+        height: 36,
+        borderRadius: 9,
         background: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)",
         border: isDark
           ? "1px solid rgba(201,169,122,0.15)"
@@ -667,6 +668,7 @@ function CtrlBtn({
         alignItems: "center",
         justifyContent: "center",
         transition: "all 0.15s",
+        flexShrink: 0,
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.background = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)";
