@@ -21,6 +21,8 @@ export default async function ProfessorFinanceiro() {
   });
 
   const totalCommission = earnings.reduce((sum, e) => sum + e.amount, 0);
+  const totalPending = earnings.filter(e => !e.paidAt).reduce((sum, e) => sum + e.amount, 0);
+  const totalPaid = earnings.filter(e => e.paidAt).reduce((sum, e) => sum + e.amount, 0);
 
   return (
     <div style={{ minHeight: "100%", background: "linear-gradient(180deg, var(--navy-darkest) 0%, var(--navy-mid) 100%)" }}>
@@ -38,23 +40,46 @@ export default async function ProfessorFinanceiro() {
 
       <div className="ka-section" style={{ padding: "0 44px 44px" }}>
         
-        {/* Summary Card */}
-        <div style={{
-          borderRadius: 20, padding: "32px",
-          background: "linear-gradient(135deg, rgba(201,169,122,0.15) 0%, rgba(201,169,122,0.05) 100%)",
-          border: "1px solid rgba(201,169,122,0.3)",
-          boxShadow: "0 8px 32px rgba(0,0,0,0.35)",
-          display: "flex", alignItems: "center", gap: 24,
-          marginBottom: 32
-        }}>
-          <div style={{ width: 64, height: 64, borderRadius: 20, background: "var(--gold)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--navy-darkest)", boxShadow: "0 0 20px rgba(201,169,122,0.4)" }}>
-            <DollarSign size={32} strokeWidth={2.5} />
+        {/* Summary Cards */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16, marginBottom: 32 }}>
+          <div style={{
+            borderRadius: 20, padding: "28px 32px",
+            background: "linear-gradient(135deg, rgba(201,169,122,0.15) 0%, rgba(201,169,122,0.05) 100%)",
+            border: "1px solid rgba(201,169,122,0.3)",
+            boxShadow: "0 8px 32px rgba(0,0,0,0.35)",
+            display: "flex", alignItems: "center", gap: 20,
+          }}>
+            <div style={{ width: 56, height: 56, borderRadius: 18, background: "var(--gold)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--navy-darkest)", boxShadow: "0 0 20px rgba(201,169,122,0.4)", flexShrink: 0 }}>
+              <DollarSign size={28} strokeWidth={2.5} />
+            </div>
+            <div>
+              <p style={{ fontFamily: "'Cinzel',serif", fontSize: 10, fontWeight: 700, letterSpacing: 4, textTransform: "uppercase", color: "var(--gold)", marginBottom: 4 }}>Total Acumulado</p>
+              <h2 style={{ fontFamily: "'Cinzel',serif", fontSize: 28, fontWeight: 800, color: "white", lineHeight: 1 }}>
+                R$ {totalCommission.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+              </h2>
+            </div>
           </div>
-          <div>
-            <p style={{ fontFamily: "'Cinzel',serif", fontSize: 10, fontWeight: 700, letterSpacing: 4, textTransform: "uppercase", color: "var(--gold)", marginBottom: 4 }}>Saldo Acumulado</p>
-            <h2 style={{ fontFamily: "'Cinzel',serif", fontSize: 36, fontWeight: 800, color: "white", lineHeight: 1 }}>
-              R$ {totalCommission.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-            </h2>
+
+          <div style={{
+            borderRadius: 20, padding: "24px 28px",
+            background: "linear-gradient(160deg, var(--navy-card) 0%, var(--navy-card-2) 100%)",
+            border: "1px solid rgba(251,191,36,0.20)",
+          }}>
+            <p style={{ fontFamily: "'Cinzel',serif", fontSize: 9, fontWeight: 700, letterSpacing: 3, textTransform: "uppercase", color: "#FBBF24", marginBottom: 8 }}>A Receber</p>
+            <p style={{ fontFamily: "'Cinzel',serif", fontSize: 24, fontWeight: 700, color: "white" }}>
+              R$ {totalPending.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+            </p>
+          </div>
+
+          <div style={{
+            borderRadius: 20, padding: "24px 28px",
+            background: "linear-gradient(160deg, var(--navy-card) 0%, var(--navy-card-2) 100%)",
+            border: "1px solid rgba(110,231,183,0.20)",
+          }}>
+            <p style={{ fontFamily: "'Cinzel',serif", fontSize: 9, fontWeight: 700, letterSpacing: 3, textTransform: "uppercase", color: "#6ee7b7", marginBottom: 8 }}>Já Recebido</p>
+            <p style={{ fontFamily: "'Cinzel',serif", fontSize: 24, fontWeight: 700, color: "white" }}>
+              R$ {totalPaid.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+            </p>
           </div>
         </div>
 
@@ -83,6 +108,7 @@ export default async function ProfessorFinanceiro() {
                   <th style={{ padding: "16px 24px", textAlign: "left", fontFamily: "'Cinzel',serif", fontSize: 10, color: "var(--gold)", letterSpacing: 2 }}>CURSO</th>
                   <th style={{ padding: "16px 24px", textAlign: "right", fontFamily: "'Cinzel',serif", fontSize: 10, color: "var(--gold)", letterSpacing: 2 }}>VALOR</th>
                   <th style={{ padding: "16px 24px", textAlign: "right", fontFamily: "'Cinzel',serif", fontSize: 10, color: "var(--gold)", letterSpacing: 2 }}>COMISSÃO</th>
+                  <th style={{ padding: "16px 24px", textAlign: "right", fontFamily: "'Cinzel',serif", fontSize: 10, color: "var(--gold)", letterSpacing: 2 }}>STATUS</th>
                 </tr>
               </thead>
               <tbody>
@@ -93,6 +119,17 @@ export default async function ProfessorFinanceiro() {
                     <td style={{ padding: "16px 24px", color: "var(--text-secondary)" }}>{e.payment.course?.title || "Curso removido"}</td>
                     <td style={{ padding: "16px 24px", textAlign: "right", color: "var(--text-muted)" }}>R$ {e.payment.amount.toFixed(2)}</td>
                     <td style={{ padding: "16px 24px", textAlign: "right", fontWeight: 700, color: "#6ee7b7" }}>+ R$ {e.amount.toFixed(2)}</td>
+                    <td style={{ padding: "16px 24px", textAlign: "right" }}>
+                      <span style={{
+                        display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 12px", borderRadius: 999,
+                        background: e.paidAt ? "rgba(110,231,183,0.08)" : "rgba(251,191,36,0.08)",
+                        color: e.paidAt ? "#6ee7b7" : "#FBBF24",
+                        fontSize: 9, fontWeight: 700, letterSpacing: 1, fontFamily: "'Cinzel',serif", textTransform: "uppercase",
+                        border: `1px solid ${e.paidAt ? "rgba(110,231,183,0.20)" : "rgba(251,191,36,0.20)"}`,
+                      }}>
+                        {e.paidAt ? "Pago" : "Pendente"}
+                      </span>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -112,8 +149,17 @@ export default async function ProfessorFinanceiro() {
                 </div>
                 <p style={{ fontSize: 14, fontWeight: 700, color: "white", marginBottom: 4 }}>{e.payment.user.name}</p>
                 <p style={{ fontSize: 12, color: "var(--text-secondary)", marginBottom: 8 }}>{e.payment.course?.title || "Curso removido"}</p>
-                <div style={{ paddingTop: 10, borderTop: "1px solid rgba(255,255,255,0.05)", fontSize: 11, color: "var(--text-muted)" }}>
-                  Valor da venda: R$ {e.payment.amount.toFixed(2)}
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: 10, borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+                  <span style={{ fontSize: 11, color: "var(--text-muted)" }}>Valor da venda: R$ {e.payment.amount.toFixed(2)}</span>
+                  <span style={{
+                    display: "inline-flex", alignItems: "center", gap: 6, padding: "3px 10px", borderRadius: 999,
+                    background: e.paidAt ? "rgba(110,231,183,0.08)" : "rgba(251,191,36,0.08)",
+                    color: e.paidAt ? "#6ee7b7" : "#FBBF24",
+                    fontSize: 9, fontWeight: 700, letterSpacing: 1, fontFamily: "'Cinzel',serif", textTransform: "uppercase",
+                    border: `1px solid ${e.paidAt ? "rgba(110,231,183,0.20)" : "rgba(251,191,36,0.20)"}`,
+                  }}>
+                    {e.paidAt ? "Pago" : "Pendente"}
+                  </span>
                 </div>
               </div>
             ))}

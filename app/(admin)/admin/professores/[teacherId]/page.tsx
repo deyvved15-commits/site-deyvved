@@ -2,26 +2,43 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import TeacherEditForm from "@/components/admin/teacher-edit-form";
+import TeacherEarningsPanel from "@/components/admin/teacher-earnings-panel";
 
 export default async function TeacherProfilePage({ params }: { params: Promise<{ teacherId: string }> }) {
   const { teacherId } = await params;
 
-  const teacher = await prisma.user.findUnique({
-    where: { id: teacherId },
-    include: {
-      taughtCourses: {
-        include: {
-          course: {
-            select: {
-              id: true,
-              title: true,
-              _count: { select: { enrollments: true } }
+  const [teacher, earnings] = await Promise.all([
+    prisma.user.findUnique({
+      where: { id: teacherId },
+      include: {
+        taughtCourses: {
+          include: {
+            course: {
+              select: {
+                id: true,
+                title: true,
+                _count: { select: { enrollments: true } }
+              }
             }
           }
         }
       }
-    }
-  });
+    }),
+    prisma.teacherEarning.findMany({
+      where: { teacherId },
+      orderBy: { createdAt: "desc" },
+      include: {
+        payment: {
+          select: {
+            createdAt: true,
+            course: { select: { title: true } },
+            product: { select: { title: true } },
+            user: { select: { name: true } },
+          },
+        },
+      },
+    }),
+  ]);
 
   if (!teacher || (teacher.role !== "TEACHER" && teacher.role !== "ADMIN")) notFound();
 
@@ -149,6 +166,21 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
             </div>
           )}
         </div>
+      </div>
+
+      {/* Comissões */}
+      <div style={{ padding: "0 44px 44px" }}>
+        <TeacherEarningsPanel
+          teacherId={teacherId}
+          earnings={earnings.map(e => ({
+            id: e.id,
+            amount: e.amount,
+            createdAt: e.createdAt.toISOString(),
+            paidAt: e.paidAt ? e.paidAt.toISOString() : null,
+            itemTitle: e.payment.course?.title || e.payment.product?.title || "Item removido",
+            buyerName: e.payment.user?.name || "—",
+          }))}
+        />
       </div>
     </div>
   );

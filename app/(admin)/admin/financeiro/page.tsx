@@ -43,7 +43,7 @@ export default async function FinanceiroPage({
         id: true,
         name: true,
         earnings: {
-          select: { amount: true }
+          select: { amount: true, paidAt: true }
         }
       }
     }),
@@ -52,10 +52,12 @@ export default async function FinanceiroPage({
 
   const teacherCommissions = teachers.map(t => {
     const total = t.earnings.reduce((sum, e) => sum + e.amount, 0);
-    return { ...t, totalCommission: total };
+    const pending = t.earnings.filter(e => !e.paidAt).reduce((sum, e) => sum + e.amount, 0);
+    return { ...t, totalCommission: total, pendingCommission: pending };
   }).filter(t => t.totalCommission > 0);
 
   const totalComissoes = totalCommissions._sum.commissionAmount ?? 0;
+  const totalComissoesPendentes = teacherCommissions.reduce((sum, t) => sum + t.pendingCommission, 0);
 
   const totalReceita   = totalApproved._sum.amount ?? 0;
   const mesReceita     = monthApproved._sum.amount ?? 0;
@@ -103,10 +105,10 @@ export default async function FinanceiroPage({
               accent: "#C9A97A",
             },
             {
-              eyebrow: "Comissões",
-              value: fmt(totalComissoes),
-              sub: "Total a pagar",
-              accent: "#63B3ED",
+              eyebrow: "Comissões a Pagar",
+              value: fmt(totalComissoesPendentes),
+              sub: `de ${fmt(totalComissoes)} no total`,
+              accent: "#FBBF24",
             },
             {
               eyebrow: "Pendentes",
@@ -265,12 +267,12 @@ export default async function FinanceiroPage({
 
             <div style={{ borderRadius: 20, overflow: "hidden", border: "1px solid rgba(99,179,237,0.12)", boxShadow: "0 8px 32px rgba(0,0,0,0.35)" }}>
               <div style={{
-                display: "grid", gridTemplateColumns: "1fr 200px 100px",
+                display: "grid", gridTemplateColumns: "1fr 160px 160px 100px",
                 padding: "12px 24px", gap: 12,
                 background: "rgba(99,179,237,0.04)",
                 borderBottom: "1px solid rgba(99,179,237,0.10)",
               }}>
-                {["Professor", "Total em Comissões", ""].map(h => (
+                {["Professor", "Total em Comissões", "Pendente", ""].map(h => (
                   <span key={h} style={{ fontFamily: "'Cinzel',serif", fontSize: 9, fontWeight: 600, letterSpacing: 3, textTransform: "uppercase", color: "#63B3ED" }}>
                     {h}
                   </span>
@@ -279,12 +281,15 @@ export default async function FinanceiroPage({
               <div style={{ background: "linear-gradient(160deg, var(--navy-card) 0%, var(--navy-card-2) 100%)" }}>
                 {teacherCommissions.map((tc, i) => (
                   <div key={tc.id} style={{
-                    display: "grid", gridTemplateColumns: "1fr 200px 100px",
+                    display: "grid", gridTemplateColumns: "1fr 160px 160px 100px",
                     padding: "14px 24px", gap: 12, alignItems: "center",
                     borderTop: i > 0 ? "1px solid rgba(99,179,237,0.06)" : "none",
                   }}>
                     <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)" }}>{tc.name}</span>
                     <span style={{ fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 15, color: "#6ee7b7" }}>{fmt(tc.totalCommission)}</span>
+                    <span style={{ fontFamily: "'Cinzel',serif", fontWeight: 700, fontSize: 15, color: tc.pendingCommission > 0 ? "#FBBF24" : "rgba(255,255,255,0.25)" }}>
+                      {fmt(tc.pendingCommission)}
+                    </span>
                     <Link href={`/admin/professores/${tc.id}`} style={{
                       fontSize: 10, color: "rgba(255,255,255,0.4)", textDecoration: "none", textAlign: "right"
                     }}>Ver Detalhes</Link>
