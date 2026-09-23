@@ -5,10 +5,12 @@ import HeroSection from "@/components/student/hero-section";
 import SectionHeader from "@/components/student/section-header";
 import CourseCard from "@/components/student/course-card";
 import { calcStreak } from "@/lib/streak";
+import { ensureFreeEnrollments } from "@/lib/free-enrollment";
 
 export default async function DashboardPage() {
   const session = await auth();
   if (!session) return null;
+  if (session.user.role === "STUDENT") await ensureFreeEnrollments(session.user.id);
 
   const lessonSelect = {
     select: {

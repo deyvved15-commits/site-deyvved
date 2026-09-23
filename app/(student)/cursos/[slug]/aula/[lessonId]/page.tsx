@@ -28,6 +28,7 @@ import LessonDrawer from "@/components/student/lesson-drawer";
 import ActivityTracker from "@/components/student/activity-tracker";
 import ApostilaButton from "@/components/student/apostila-button";
 import FormattedApostilaButton from "@/components/student/formatted-apostila-button";
+import { ensureFreeEnrollments } from "@/lib/free-enrollment";
 
 export default async function AulaPage({ params }: { params: Promise<{ slug: string; lessonId: string }> }) {
   const session = await auth();
@@ -57,6 +58,7 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
   // Verifica matrícula e expiração
   const isTeacher = course.teachers.some(t => t.teacherId === session.user.id);
   const isAdmin = session.user.role === "ADMIN";
+  if (session.user.role === "STUDENT") await ensureFreeEnrollments(session.user.id);
   const enrollment = await prisma.enrollment.findUnique({
     where: { userId_courseId: { userId: session.user.id, courseId: course.id } },
   });

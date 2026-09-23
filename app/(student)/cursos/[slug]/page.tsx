@@ -6,6 +6,7 @@ import { getGoogleDriveImageUrl } from "@/lib/utils";
 import CourseThumbnail from "@/components/student/course-thumbnail";
 import ModuleCarousel from "@/components/student/module-carousel";
 import { resolveModuleAccess } from "@/lib/module-access";
+import { ensureFreeEnrollments } from "@/lib/free-enrollment";
 import type { Metadata } from "next";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -57,6 +58,7 @@ export default async function CursoPage({ params }: { params: Promise<{ slug: st
   if (!course) notFound();
 
   const isTeacherOfCourse = course.teachers.some(t => t.teacherId === session.user.id);
+  if (session.user.role === "STUDENT") await ensureFreeEnrollments(session.user.id);
   const enrollment = await prisma.enrollment.findUnique({
     where: { userId_courseId: { userId: session.user.id, courseId: course.id } },
   });

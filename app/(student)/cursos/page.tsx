@@ -6,10 +6,12 @@ import ProductCard from "@/components/student/product-card";
 import SectionHeader from "@/components/student/section-header";
 import CategoryFilter from "@/components/student/category-filter";
 import { BookOpen, Package } from "lucide-react";
+import { ensureFreeEnrollments } from "@/lib/free-enrollment";
 
 export default async function MeusProdutosPage({ searchParams }: { searchParams: Promise<{ categoria?: string }> }) {
   const session = await auth();
   if (!session) return null;
+  if (session.user.role === "STUDENT") await ensureFreeEnrollments(session.user.id);
   const { categoria } = await searchParams;
 
   const isAdmin = session.user.role === "ADMIN";
