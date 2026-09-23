@@ -117,7 +117,8 @@ model Course {
   difficulty           String?       // BEGINNER | INTERMEDIATE | ADVANCED
   estimatedHours       Int?
   hasCertificate       Boolean       @default(false)
-  certificateBg        String?       // URL da imagem de fundo
+  isFree               Boolean       @default(false)
+  certificateBg       String?       // URL da imagem de fundo
   certificatePrimaryColor String?    // Cor principal (ex: #C9A97A)
   certificateSecondaryColor String?  // Cor secundária
   certificateCustomText String?      // Texto personalizado (ex: "concluiu com aproveitamento...")

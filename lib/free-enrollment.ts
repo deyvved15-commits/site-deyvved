@@ -1,11 +1,11 @@
 import { prisma } from "@/lib/prisma";
 
-/** Matricula o aluno em todos os cursos publicados gratuitos (price nulo ou 0) em que ainda não está. */
+/** Matricula o aluno em todos os cursos publicados marcados como gratuitos (isFree) em que ainda não está. */
 export async function ensureFreeEnrollments(userId: string): Promise<void> {
   const freeCourses = await prisma.course.findMany({
     where: {
       published: true,
-      OR: [{ price: null }, { price: 0 }],
+      isFree: true,
       enrollments: { none: { userId } },
     },
     select: { id: true },

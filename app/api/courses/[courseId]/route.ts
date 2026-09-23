@@ -16,6 +16,7 @@ const updateSchema = z.object({
     commissionPercentage: z.number().min(0).max(100)
   })).optional(),
   hasCertificate: z.boolean().optional(),
+  isFree: z.boolean().optional(),
   affiliatePercentage: z.number().min(0).max(100).optional(),
   certificateBg: z.string().nullable().optional(),
   certificatePrimaryColor: z.string().nullable().optional(),
@@ -78,6 +79,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ cour
   // Safety: Only admin can change teachers or commission
   if (!isAdmin) {
     delete data.teachers;
+    delete data.isFree;
   }
 
   if (data.teachers) {

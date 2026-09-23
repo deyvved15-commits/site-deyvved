@@ -12,7 +12,7 @@ import RichTextEditor from "@/components/admin/rich-text-editor";
 
 type Lesson = { id: string; title: string; youtubeUrl: string; duration: string | null; content: string | null; apostilaTexto: string | null; apostilaTitulo: string | null; order: number; releaseAfterDays: number; attachments?: { title: string; url: string }[] };
 type Module = { id: string; title: string; description: string | null; thumbnail: string | null; isBonus: boolean; order: number; lessons: Lesson[]; releaseAfterDays: number | null; releaseAfterModuleId: string | null };
-type Course = { id: string; slug: string; title: string; description: string | null; thumbnail: string | null; price: number | null; paymentType: "ONE_TIME" | "MONTHLY"; published: boolean; category: string | null; modules: Module[]; teachers: { teacherId: string; commissionPercentage: number; teacher: { id: string; name: string } }[]; hasCertificate: boolean; affiliatePercentage: number; certificateBg?: string | null; certificatePrimaryColor?: string | null; certificateSecondaryColor?: string | null; certificateCustomText?: string | null; certificateLayout?: LayoutElement[] | null; salesHeadline?: string | null; learningOutcomes?: string[]; targetAudience?: string | null; teacherBio?: string | null };
+type Course = { id: string; slug: string; title: string; description: string | null; thumbnail: string | null; price: number | null; paymentType: "ONE_TIME" | "MONTHLY"; published: boolean; category: string | null; modules: Module[]; teachers: { teacherId: string; commissionPercentage: number; teacher: { id: string; name: string } }[]; hasCertificate: boolean; isFree: boolean; affiliatePercentage: number; certificateBg?: string | null; certificatePrimaryColor?: string | null; certificateSecondaryColor?: string | null; certificateCustomText?: string | null; certificateLayout?: LayoutElement[] | null; salesHeadline?: string | null; learningOutcomes?: string[]; targetAudience?: string | null; teacherBio?: string | null };
 
 const textareaClass = "w-full bg-[rgba(255,255,255,0.04)] border border-[rgba(201,169,122,0.18)] rounded-xl px-4 py-3 text-sm text-white placeholder-[rgba(255,255,255,0.2)] outline-none resize-none focus:border-[rgba(201,169,122,0.5)] focus:bg-[rgba(255,255,255,0.06)] transition-all";
 const labelClass = "text-[10px] tracking-[3px] uppercase text-[rgba(201,169,122,0.7)] font-medium mb-2 block";
@@ -52,6 +52,7 @@ export default function CourseEditor({ course: initial, teachers: allTeachers, i
           commissionPercentage: t.commissionPercentage
         })),
         hasCertificate: course.hasCertificate,
+        isFree: course.isFree,
         affiliatePercentage: course.affiliatePercentage,
         certificateBg: course.certificateBg,
         certificatePrimaryColor: course.certificatePrimaryColor,
@@ -342,6 +343,14 @@ export default function CourseEditor({ course: initial, teachers: allTeachers, i
                   { value: "MONTHLY", label: "Mensalidade (30 dias)" },
                 ]}
               />
+            </div>
+          </div>
+
+          <div style={{ ...S.field, flexDirection: "row", alignItems: "center", gap: 10, padding: "12px 16px", background: "rgba(110,231,183,0.05)", borderRadius: 14, border: "1px solid rgba(110,231,183,0.20)" }}>
+            <input type="checkbox" id="isFree" checked={!!course.isFree} onChange={e => setCourse(c => ({ ...c, isFree: e.target.checked }))} style={{ width: 18, height: 18, cursor: "pointer", accentColor: "#6ee7b7" }} />
+            <div>
+              <label htmlFor="isFree" style={{ ...S.label, cursor: "pointer", fontSize: 11, display: "block", marginBottom: 2 }}>Curso Gratuito</label>
+              <p style={{ fontSize: 9, color: "var(--text-muted)", margin: 0 }}>Publicado e marcado como gratuito, fica liberado automaticamente para todo aluno ao logar.</p>
             </div>
           </div>
 
