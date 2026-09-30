@@ -212,11 +212,51 @@ Poppins (Google Fonts) — corpo de texto, inputs
 
 ---
 
+## Editor de Apostila em Texto — evolução (set/2026)
+
+- [x] Sintaxe estilo Markdown como alternativa ao texto simples (`#`, `##`, `-`, `1.`) — 2026-09-06
+- [x] Editor de texto rico (WYSIWYG) via TipTap substituindo o textarea — `components/admin/rich-text-editor.tsx`
+  - Toolbar: título 1/2/3, negrito, itálico, sublinhado, alinhamento, cor de texto, listas, link, tela cheia
+- [x] Suporte a tabelas no editor (extensões `@tiptap/extension-table*`) + botões de linha/coluna
+- [x] Limpeza automática de HTML colado do Word: bullets literais (Wingdings "Ø" etc) viram `<ul><li>` real; estilos conflitantes (cor/fundo/fonte fixos, `mso-*`) são removidos preservando alinhamento
+- [x] Leitor (`formatted-text-reader.tsx`) atualizado: parser via `DOMParser`, renderiza tabelas com bordas/header legíveis em dark e light mode; mantém fallback para conteúdo legado (markdown/maiúsculas)
+- [x] Botão do PDF antigo (anexos) renomeado de "Ler Apostila" para "Ver PDF" — evita confundir com o texto formatado
+- [x] Margens e controles do leitor ajustados para mobile
+
+---
+
+## Financeiro
+
+- [x] Controle de repasse de comissão do professor — 2026-09-23
+  - `TeacherEarning.paidAt`/`paidBy` (nullable) marca se a comissão já foi repassada
+  - Admin → Professores → [detalhe]: painel "Comissões" com cards A Receber/Já Pago + botão "Marcar como pagas"
+  - Admin → Financeiro: KPI de comissões agora mostra o valor pendente (antes mostrava total histórico, rótulo enganoso)
+  - Professor → Financeiro: cards A Receber / Já Recebido + status por venda
+
+**Mapeamento feito em 2026-09-23 (gaps ainda abertos, ver Pendente):** relatórios sem gráfico de tendência, sem exportação CSV, sem MRR real, `Payment.status` é string livre (não enum), webhook do MercadoPago aceita requisição sem validar assinatura quando faltam `x-signature`/`MP_WEBHOOK_SECRET`, sem reembolso/estorno, sem saque bancário da carteira.
+
+---
+
+## Matrícula Automática em Cursos Gratuitos — 2026-09-30
+
+- [x] Campo `Course.isFree` (boolean, default false) — checkbox "Curso Gratuito" no editor do curso, só admin pode alterar
+- [x] `lib/free-enrollment.ts` → `ensureFreeEnrollments(userId)`: matricula o aluno em todos os cursos publicados com `isFree: true` em que ainda não está
+- [x] Chamado em: dashboard, `/cursos`, página do curso e página da aula (cobre acesso direto por link)
+- [ ] **Nenhum curso existente foi marcado como `isFree` ainda** — precisa entrar em cada curso gratuito no admin e marcar o checkbox
+- [ ] Testar na prática: logar como aluno novo e conferir se o curso marcado aparece liberado sem precisar comprar
+
+---
+
 ## Pendente
 
-- [ ] Testar leitor de apostila em múltiplas páginas (paginação)
-- [ ] Criar apostilas das próximas aulas do curso de Teologia
+- [ ] Marcar os cursos gratuitos existentes com o checkbox "Curso Gratuito" no admin (feature pronta, falta aplicar)
+- [ ] Testar leitor de apostila em múltiplas páginas com tabelas/listas do editor novo
+- [ ] Criar/migrar apostilas das próximas aulas do curso de Teologia usando o editor rico
 - [ ] Decidir se remove sistema antigo de PDF (attachments) ou mantém em paralelo
+- [ ] Financeiro: dashboard unificado com gráfico de receita mensal (hoje fragmentado em Relatórios/Financeiro/Churn/Cupons)
+- [ ] Financeiro: exportação CSV (hoje só existe "imprimir" do navegador)
+- [ ] Financeiro: corrigir webhook do MercadoPago para sempre validar assinatura HMAC (brecha de segurança identificada)
+- [ ] Financeiro: trocar `Payment.status` de string livre para enum Prisma
 
 ---
 
