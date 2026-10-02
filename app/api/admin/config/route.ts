@@ -10,7 +10,7 @@ export async function GET() {
   }
 
   const config = await prisma.siteConfig.findUnique({ where: { id: "singleton" } });
-  return NextResponse.json(config ?? { pixelMeta: null, pixelGtm: null, pixelGa: null, pixelCustom: null });
+  return NextResponse.json(config ?? { pixelMeta: null, pixelGtm: null, pixelGa: null, pixelCustom: null, whatsappGroupUrl: null });
 }
 
 export async function PATCH(req: NextRequest) {
@@ -20,12 +20,12 @@ export async function PATCH(req: NextRequest) {
   }
 
   const body = await req.json();
-  const { pixelMeta, pixelGtm, pixelGa, pixelCustom } = body;
+  const { pixelMeta, pixelGtm, pixelGa, pixelCustom, whatsappGroupUrl } = body;
 
   const config = await prisma.siteConfig.upsert({
     where: { id: "singleton" },
-    create: { id: "singleton", pixelMeta, pixelGtm, pixelGa, pixelCustom },
-    update: { pixelMeta, pixelGtm, pixelGa, pixelCustom },
+    create: { id: "singleton", pixelMeta, pixelGtm, pixelGa, pixelCustom, whatsappGroupUrl },
+    update: { pixelMeta, pixelGtm, pixelGa, pixelCustom, whatsappGroupUrl },
   });
 
   revalidatePath("/", "layout");

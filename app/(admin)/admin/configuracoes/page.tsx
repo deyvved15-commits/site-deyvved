@@ -7,6 +7,7 @@ export default function ConfiguracoesPage() {
   const [pixelGtm, setPixelGtm] = useState("");
   const [pixelGa, setPixelGa] = useState("");
   const [pixelCustom, setPixelCustom] = useState("");
+  const [whatsappGroupUrl, setWhatsappGroupUrl] = useState("");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -19,6 +20,7 @@ export default function ConfiguracoesPage() {
         setPixelGtm(data.pixelGtm ?? "");
         setPixelGa(data.pixelGa ?? "");
         setPixelCustom(data.pixelCustom ?? "");
+        setWhatsappGroupUrl(data.whatsappGroupUrl ?? "");
         setLoading(false);
       });
   }, []);
@@ -34,6 +36,7 @@ export default function ConfiguracoesPage() {
         pixelGtm: pixelGtm || null,
         pixelGa: pixelGa || null,
         pixelCustom: pixelCustom || null,
+        whatsappGroupUrl: whatsappGroupUrl || null,
       }),
     });
     setSaving(false);
@@ -76,6 +79,27 @@ export default function ConfiguracoesPage() {
       </div>
 
       <div className="ka-section" style={{ padding: "0 44px 44px", maxWidth: 720 }}>
+
+        {/* Grupo do WhatsApp */}
+        <div style={cardStyle}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
+            <div style={{ width: 3, height: 16, background: "linear-gradient(180deg, #6ee7b7, #25D366)", borderRadius: 2 }} />
+            <h2 style={{ fontFamily: "'Cinzel',serif", fontWeight: 600, fontSize: 13, letterSpacing: 3, textTransform: "uppercase", color: "var(--text-primary)" }}>
+              Grupo do WhatsApp
+            </h2>
+          </div>
+          <label style={labelStyle}>Link de convite</label>
+          <input
+            type="text"
+            value={whatsappGroupUrl}
+            onChange={e => setWhatsappGroupUrl(e.target.value)}
+            placeholder="https://chat.whatsapp.com/XXXXXXXXXXXXXXXXXXXXXX"
+            style={inputStyle}
+          />
+          <p style={{ fontSize: 10, color: "rgba(255,255,255,0.25)", marginTop: 6, fontFamily: "'Poppins',sans-serif" }}>
+            Quando preenchido, um botão "Entrar no Grupo do WhatsApp" aparece na home dos alunos.
+          </p>
+        </div>
 
         {/* Facebook / Meta Pixel */}
         <div style={cardStyle}>

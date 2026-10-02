@@ -557,10 +557,11 @@ enum ActivityType {
 }
 
 model SiteConfig {
-  id           String   @id @default("singleton")
-  pixelMeta    String?
-  pixelGtm     String?
-  pixelGa      String?
-  pixelCustom  String?
-  updatedAt    DateTime @updatedAt
+  id               String   @id @default("singleton")
+  pixelMeta        String?
+  pixelGtm         String?
+  pixelGa          String?
+  pixelCustom      String?
+  whatsappGroupUrl String?
+  updatedAt        DateTime @updatedAt
 }
