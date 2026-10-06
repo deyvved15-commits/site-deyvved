@@ -28,6 +28,7 @@ import LessonDrawer from "@/components/student/lesson-drawer";
 import ActivityTracker from "@/components/student/activity-tracker";
 import ApostilaButton from "@/components/student/apostila-button";
 import FormattedApostilaButton from "@/components/student/formatted-apostila-button";
+import MiniPlayerVideo from "@/components/student/mini-player-video";
 import { ensureFreeEnrollments } from "@/lib/free-enrollment";
 
 export default async function AulaPage({ params }: { params: Promise<{ slug: string; lessonId: string }> }) {
@@ -152,29 +153,23 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
 
         {/* Video player */}
         <div style={{ padding: "24px 28px 0" }}>
-          <div style={{
-            borderRadius: 16, overflow: "hidden",
-            background: "#000",
-            border: "1px solid rgba(201,169,122,0.10)",
-            boxShadow: "0 20px 60px rgba(0,0,0,0.60)",
-            aspectRatio: "16/9",
-          }}>
-            {ytId ? (
-              <iframe
-                src={`https://www.youtube.com/embed/${ytId}?rel=0&modestbranding=1`}
-                style={{ width: "100%", height: "100%", display: "block" }}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
-            ) : (
-              <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 12 }}>
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ color: "rgba(201,169,122,0.20)" }}>
-                  <rect x="2" y="6" width="14" height="12" rx="2" /><path d="M22 8l-6 4 6 4V8z" />
-                </svg>
-                <p style={{ fontSize: 13, color: "var(--text-muted)" }}>Vídeo não disponível</p>
-              </div>
-            )}
-          </div>
+          {ytId ? (
+            <MiniPlayerVideo ytId={ytId} />
+          ) : (
+            <div style={{
+              borderRadius: 16, overflow: "hidden",
+              background: "#000",
+              border: "1px solid rgba(201,169,122,0.10)",
+              boxShadow: "0 20px 60px rgba(0,0,0,0.60)",
+              aspectRatio: "16/9",
+              display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 12,
+            }}>
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ color: "rgba(201,169,122,0.20)" }}>
+                <rect x="2" y="6" width="14" height="12" rx="2" /><path d="M22 8l-6 4 6 4V8z" />
+              </svg>
+              <p style={{ fontSize: 13, color: "var(--text-muted)" }}>Vídeo não disponível</p>
+            </div>
+          )}
         </div>
 
         {/* ── Navigation Bar ── */}
