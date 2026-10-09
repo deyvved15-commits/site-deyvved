@@ -30,7 +30,7 @@ export async function PATCH(
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const { enrollmentId } = await params;
-  const { expiresAt } = await req.json(); // null = vitalício, ISO string = data
+  const { expiresAt, amount, paymentMethod } = await req.json(); // null = vitalício, ISO string = data
 
   const enrollment = await prisma.enrollment.findUnique({ where: { id: enrollmentId } });
   if (!enrollment) return NextResponse.json({ error: "Matrícula não encontrada" }, { status: 404 });
@@ -39,6 +39,21 @@ export async function PATCH(
     where: { id: enrollmentId },
     data: { expiresAt: expiresAt ? new Date(expiresAt) : null },
   });
+
+  // Registra a movimentação financeira da renovação manual (dinheiro/cartão/pix/grátis)
+  if (paymentMethod) {
+    await prisma.payment.create({
+      data: {
+        userId: enrollment.userId,
+        courseId: enrollment.courseId,
+        amount: paymentMethod === "GRATIS" ? 0 : Number(amount) || 0,
+        method: paymentMethod, // DINHEIRO | CARTAO | PIX | GRATIS
+        status: "approved",
+        statusDetail: "Renovação manual registrada pelo admin",
+        externalReference: `manual-${enrollmentId}-${Date.now()}`,
+      },
+    });
+  }
 
   return NextResponse.json(updated);
 }

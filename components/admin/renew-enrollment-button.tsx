@@ -17,12 +17,21 @@ const QUICK_OPTIONS = [
   { label: "1 ano", days: 365 },
 ];
 
+const PAYMENT_METHODS = [
+  { value: "PIX", label: "Pix" },
+  { value: "DINHEIRO", label: "Dinheiro" },
+  { value: "CARTAO", label: "Cartão" },
+  { value: "GRATIS", label: "Grátis" },
+];
+
 export default function RenewEnrollmentButton({ enrollmentId, courseName, currentExpiresAt }: Props) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [customDate, setCustomDate] = useState("");
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState("PIX");
+  const [amount, setAmount] = useState("");
   const [dropPos, setDropPos] = useState({ top: 0, right: 0 });
   const btnRef = useRef<HTMLButtonElement>(null);
   const dropRef = useRef<HTMLDivElement>(null);
@@ -59,19 +68,22 @@ export default function RenewEnrollmentButton({ enrollmentId, courseName, curren
     };
   }, [open, calcPos]);
 
-  async function renew(expiresAt: string | null) {
+  async function renew(expiresAt: string | null, registerPayment: boolean) {
     setLoading(true);
     setMsg(null);
     const res = await fetch(`/api/admin/enrollments/${enrollmentId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ expiresAt }),
+      body: JSON.stringify({
+        expiresAt,
+        ...(registerPayment ? { paymentMethod, amount: paymentMethod === "GRATIS" ? 0 : Number(amount) || 0 } : {}),
+      }),
     });
     setLoading(false);
     if (res.ok) {
       setMsg({ ok: true, text: expiresAt ? `Renovado até ${new Date(expiresAt).toLocaleDateString("pt-BR")}` : "Acesso vitalício definido" });
       router.refresh();
-      setTimeout(() => { setOpen(false); setMsg(null); }, 2000);
+      setTimeout(() => { setOpen(false); setMsg(null); setAmount(""); }, 2000);
     } else {
       setMsg({ ok: false, text: "Erro ao renovar." });
     }
@@ -117,12 +129,41 @@ export default function RenewEnrollmentButton({ enrollmentId, courseName, curren
       </div>
 
       <div style={{ padding: "12px 14px", display: "flex", flexDirection: "column", gap: 8 }}>
+        {/* Forma de pagamento */}
+        <div style={{ display: "flex", gap: 6 }}>
+          <select
+            value={paymentMethod}
+            onChange={e => setPaymentMethod(e.target.value)}
+            style={{
+              flex: 1, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(201,169,122,0.20)",
+              borderRadius: 10, padding: "7px 10px", fontSize: 12, color: "#fff",
+              outline: "none", fontFamily: "'Poppins',sans-serif", cursor: "pointer",
+            }}
+          >
+            {PAYMENT_METHODS.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
+          </select>
+          {paymentMethod !== "GRATIS" && (
+            <input
+              type="number"
+              inputMode="decimal"
+              placeholder="Valor (R$)"
+              value={amount}
+              onChange={e => setAmount(e.target.value)}
+              style={{
+                width: 100, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(201,169,122,0.20)",
+                borderRadius: 10, padding: "7px 10px", fontSize: 12, color: "#fff",
+                outline: "none", fontFamily: "'Poppins',sans-serif",
+              }}
+            />
+          )}
+        </div>
+
         {/* Opções rápidas */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
           {QUICK_OPTIONS.map(opt => (
             <button
               key={opt.days}
-              onClick={() => renew(addDays(opt.days))}
+              onClick={() => renew(addDays(opt.days), true)}
               disabled={loading}
               style={{
                 padding: "8px 10px", borderRadius: 10, cursor: "pointer",
@@ -151,7 +192,7 @@ export default function RenewEnrollmentButton({ enrollmentId, courseName, curren
             }}
           />
           <button
-            onClick={() => customDate && renew(new Date(customDate).toISOString())}
+            onClick={() => customDate && renew(new Date(customDate).toISOString(), true)}
             disabled={!customDate || loading}
             style={{
               padding: "7px 12px", borderRadius: 10, cursor: "pointer",
@@ -167,7 +208,7 @@ export default function RenewEnrollmentButton({ enrollmentId, courseName, curren
 
         {/* Bloquear imediatamente */}
         <button
-          onClick={() => renew(new Date(Date.now() - 1000).toISOString())}
+          onClick={() => renew(new Date(Date.now() - 1000).toISOString(), false)}
           disabled={loading}
           style={{
             padding: "8px", borderRadius: 10, cursor: "pointer",
@@ -182,7 +223,7 @@ export default function RenewEnrollmentButton({ enrollmentId, courseName, curren
 
         {/* Vitalício */}
         <button
-          onClick={() => renew(null)}
+          onClick={() => renew(null, true)}
           disabled={loading}
           style={{
             padding: "8px", borderRadius: 10, cursor: "pointer",
