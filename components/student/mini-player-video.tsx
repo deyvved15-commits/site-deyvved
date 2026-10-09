@@ -1,6 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+
+declare global {
+  interface Window {
+    YT: any;
+    onYouTubeIframeAPIReady?: () => void;
+  }
+}
 
 interface Rect {
   top: number;
@@ -9,8 +17,20 @@ interface Rect {
   height: number;
 }
 
-export default function MiniPlayerVideo({ ytId }: { ytId: string }) {
+interface MiniPlayerVideoProps {
+  ytId: string;
+  /** Quando informado, marca a aula como concluída automaticamente ao chegar no fim do vídeo. */
+  lessonId?: string;
+  lessonTitle?: string;
+  completed?: boolean;
+}
+
+export default function MiniPlayerVideo({ ytId, lessonId, lessonTitle, completed }: MiniPlayerVideoProps) {
+  const router = useRouter();
   const anchorRef = useRef<HTMLDivElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const playerApiRef = useRef<any>(null);
+  const firedRef = useRef(false);
   const [rect, setRect] = useState<Rect | null>(null);
   const [isMini, setIsMini] = useState(false);
   const [dismissed, setDismissed] = useState(false);
@@ -47,6 +67,51 @@ export default function MiniPlayerVideo({ ytId }: { ytId: string }) {
   useEffect(() => {
     if (!isMini) setDismissed(false);
   }, [isMini]);
+
+  const markCompleted = useCallback(async () => {
+    if (!lessonId || firedRef.current || completed) return;
+    firedRef.current = true;
+    await fetch("/api/progress", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ lessonId, completed: true }),
+    });
+    fetch("/api/activity", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type: "LESSON_COMPLETE", metadata: lessonTitle ? { lesson: lessonTitle } : undefined }),
+    }).catch(() => {});
+    router.refresh();
+  }, [lessonId, lessonTitle, completed, router]);
+
+  // Escuta o fim do vídeo via YouTube IFrame API para marcar a aula como assistida.
+  useEffect(() => {
+    if (!lessonId || completed) return;
+
+    function initPlayer() {
+      if (!iframeRef.current || !window.YT?.Player || playerApiRef.current) return;
+      playerApiRef.current = new window.YT.Player(iframeRef.current, {
+        events: {
+          onStateChange: (event: any) => {
+            if (event.data === window.YT.PlayerState.ENDED) markCompleted();
+          },
+        },
+      });
+    }
+
+    if (window.YT?.Player) {
+      initPlayer();
+    } else {
+      const prev = window.onYouTubeIframeAPIReady;
+      window.onYouTubeIframeAPIReady = () => { prev?.(); initPlayer(); };
+      if (!document.getElementById("youtube-iframe-api")) {
+        const script = document.createElement("script");
+        script.id = "youtube-iframe-api";
+        script.src = "https://www.youtube.com/iframe_api";
+        document.body.appendChild(script);
+      }
+    }
+  }, [lessonId, completed, markCompleted]);
 
   const showMini = isMini && !dismissed;
 
@@ -103,7 +168,8 @@ export default function MiniPlayerVideo({ ytId }: { ytId: string }) {
           </div>
         )}
         <iframe
-          src={`https://www.youtube.com/embed/${ytId}?rel=0&modestbranding=1`}
+          ref={iframeRef}
+          src={`https://www.youtube.com/embed/${ytId}?rel=0&modestbranding=1&enablejsapi=1`}
           style={{ width: "100%", height: "100%", display: "block" }}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen

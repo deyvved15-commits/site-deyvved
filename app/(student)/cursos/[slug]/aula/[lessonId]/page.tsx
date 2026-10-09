@@ -154,7 +154,7 @@ export default async function AulaPage({ params }: { params: Promise<{ slug: str
         {/* Video player */}
         <div style={{ padding: "24px 28px 0" }}>
           {ytId ? (
-            <MiniPlayerVideo ytId={ytId} />
+            <MiniPlayerVideo ytId={ytId} lessonId={lesson.id} lessonTitle={lesson.title} completed={isCompleted} />
           ) : (
             <div style={{
               borderRadius: 16, overflow: "hidden",
