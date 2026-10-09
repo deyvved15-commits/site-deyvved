@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import RevenueChart from "@/components/admin/revenue-chart";
 
 const STATUS_LABEL: Record<string, { label: string; color: string; bg: string }> = {
   approved: { label: "Aprovado",  color: "#6ee7b7", bg: "rgba(110,231,183,0.08)" },
@@ -15,17 +16,35 @@ function fmt(v: number) {
 export default async function FinanceiroPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string }>;
+  searchParams: Promise<{ status?: string; q?: string; from?: string; to?: string }>;
 }) {
-  const { status } = await searchParams;
+  const { status, q, from, to } = await searchParams;
   const filterStatus = status && STATUS_LABEL[status] ? status : undefined;
+  const filterQ = q?.trim() || undefined;
 
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-  const [payments, totalApproved, monthApproved, totalCount, teachers, totalCommissions] = await Promise.all([
+  const paymentWhere: Record<string, unknown> = {};
+  if (filterStatus) paymentWhere.status = filterStatus;
+  if (filterQ) {
+    paymentWhere.user = {
+      OR: [
+        { name: { contains: filterQ, mode: "insensitive" } },
+        { email: { contains: filterQ, mode: "insensitive" } },
+      ],
+    };
+  }
+  if (from || to) {
+    const range: Record<string, Date> = {};
+    if (from) range.gte = new Date(`${from}T00:00:00`);
+    if (to) range.lte = new Date(`${to}T23:59:59`);
+    paymentWhere.createdAt = range;
+  }
+
+  const [payments, totalApproved, monthApproved, totalCount, filteredCount, teachers, totalCommissions, monthsRevenue] = await Promise.all([
     prisma.payment.findMany({
-      where: filterStatus ? { status: filterStatus } : undefined,
+      where: paymentWhere,
       orderBy: { createdAt: "desc" },
       take: 100,
       include: {
@@ -37,6 +56,7 @@ export default async function FinanceiroPage({
     prisma.payment.aggregate({ where: { status: "approved" }, _sum: { amount: true } }),
     prisma.payment.aggregate({ where: { status: "approved", createdAt: { gte: startOfMonth } }, _sum: { amount: true } }),
     prisma.payment.count(),
+    prisma.payment.count({ where: paymentWhere }),
     prisma.user.findMany({
       where: { role: { in: ["TEACHER", "ADMIN"] } },
       select: {
@@ -48,6 +68,17 @@ export default async function FinanceiroPage({
       }
     }),
     prisma.payment.aggregate({ where: { status: "approved" }, _sum: { commissionAmount: true } }),
+    Promise.all(
+      Array.from({ length: 6 }).map(async (_, i) => {
+        const monthStart = new Date(now.getFullYear(), now.getMonth() - (5 - i), 1);
+        const monthEnd = new Date(now.getFullYear(), now.getMonth() - (5 - i) + 1, 1);
+        const sum = await prisma.payment.aggregate({
+          where: { status: "approved", createdAt: { gte: monthStart, lt: monthEnd } },
+          _sum: { amount: true },
+        });
+        return { label: monthStart.toLocaleDateString("pt-BR", { month: "short" }), total: sum._sum.amount ?? 0 };
+      })
+    ),
   ]);
 
   const teacherCommissions = teachers.map(t => {
@@ -63,6 +94,13 @@ export default async function FinanceiroPage({
   const mesReceita     = monthApproved._sum.amount ?? 0;
   const totalPendente  = payments.filter(p => p.status === "pending").length;
 
+  const hasFilters = !!(filterStatus || filterQ || from || to);
+  const exportQs = new URLSearchParams();
+  if (filterStatus) exportQs.set("status", filterStatus);
+  if (filterQ) exportQs.set("q", filterQ);
+  if (from) exportQs.set("from", from);
+  if (to) exportQs.set("to", to);
+
   const cardStyle = {
     borderRadius: 18, padding: "22px 24px",
     background: "linear-gradient(160deg, var(--navy-card) 0%, var(--navy-card-2) 100%)",
@@ -75,6 +113,12 @@ export default async function FinanceiroPage({
     fontFamily: "'Cinzel',serif", fontWeight: 600, letterSpacing: 1.5,
     textTransform: "uppercase", textDecoration: "none", cursor: "pointer",
     border: "1px solid rgba(201,169,122,0.20)",
+  };
+
+  const inputStyle: React.CSSProperties = {
+    background: "rgba(255,255,255,0.04)", border: "1px solid rgba(201,169,122,0.18)",
+    borderRadius: 10, padding: "9px 12px", fontSize: 12, color: "#fff",
+    fontFamily: "'Poppins',sans-serif", outline: "none",
   };
 
   return (
@@ -129,10 +173,53 @@ export default async function FinanceiroPage({
           ))}
         </div>
 
-        {/* Filter bar */}
+        {/* Gráfico de receita */}
+        <div style={{ ...cardStyle, marginBottom: 28, padding: "22px 24px 18px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
+            <div style={{ width: 3, height: 16, background: "linear-gradient(180deg, var(--gold-light), var(--gold))", borderRadius: 2, boxShadow: "0 0 8px var(--gold)" }} />
+            <span style={{ fontFamily: "'Cinzel',serif", fontSize: 11, fontWeight: 600, letterSpacing: 3, textTransform: "uppercase", color: "var(--text-primary)" }}>
+              Receita — Últimos 6 Meses
+            </span>
+          </div>
+          <RevenueChart months={monthsRevenue} />
+        </div>
+
+        {/* Filtros */}
+        <form method="GET" style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-end", gap: 10, marginBottom: 16 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 5, flex: "1 1 220px" }}>
+            <label style={{ fontSize: 9, fontFamily: "'Cinzel',serif", letterSpacing: 2, color: "var(--text-muted)", textTransform: "uppercase" }}>Buscar aluno</label>
+            <input type="text" name="q" defaultValue={filterQ ?? ""} placeholder="Nome ou e-mail..." style={inputStyle} />
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+            <label style={{ fontSize: 9, fontFamily: "'Cinzel',serif", letterSpacing: 2, color: "var(--text-muted)", textTransform: "uppercase" }}>De</label>
+            <input type="date" name="from" defaultValue={from ?? ""} style={inputStyle} />
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+            <label style={{ fontSize: 9, fontFamily: "'Cinzel',serif", letterSpacing: 2, color: "var(--text-muted)", textTransform: "uppercase" }}>Até</label>
+            <input type="date" name="to" defaultValue={to ?? ""} style={inputStyle} />
+          </div>
+          {filterStatus && <input type="hidden" name="status" value={filterStatus} />}
+          <button type="submit" style={{ ...filterBtnBase, background: "linear-gradient(135deg, rgba(201,169,122,0.25), rgba(201,169,122,0.10))", color: "var(--gold-light)", borderColor: "rgba(201,169,122,0.40)" }}>
+            Filtrar
+          </button>
+          {hasFilters && (
+            <Link href="/admin/financeiro" style={{ ...filterBtnBase, background: "rgba(255,255,255,0.03)", color: "rgba(255,255,255,0.4)" }}>
+              Limpar
+            </Link>
+          )}
+          <a
+            href={`/api/admin/financeiro/export${exportQs.toString() ? `?${exportQs.toString()}` : ""}`}
+            style={{ ...filterBtnBase, display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(110,231,183,0.08)", color: "#6ee7b7", borderColor: "rgba(110,231,183,0.30)", marginLeft: "auto" }}
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Exportar CSV
+          </a>
+        </form>
+
+        {/* Status filter bar */}
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20, flexWrap: "wrap" }}>
           <span style={{ fontSize: 10, fontFamily: "'Cinzel',serif", letterSpacing: 2, color: "var(--text-muted)", textTransform: "uppercase", marginRight: 4 }}>
-            Filtrar:
+            Status:
           </span>
           {[
             { value: undefined, label: "Todos" },
@@ -142,10 +229,16 @@ export default async function FinanceiroPage({
             { value: "cancelled",label: "Cancelados" },
           ].map(opt => {
             const isActive = filterStatus === opt.value || (!filterStatus && !opt.value);
+            const qs = new URLSearchParams();
+            if (opt.value) qs.set("status", opt.value);
+            if (filterQ) qs.set("q", filterQ);
+            if (from) qs.set("from", from);
+            if (to) qs.set("to", to);
+            const href = qs.toString() ? `/admin/financeiro?${qs.toString()}` : "/admin/financeiro";
             return (
               <Link
                 key={opt.label}
-                href={opt.value ? `/admin/financeiro?status=${opt.value}` : "/admin/financeiro"}
+                href={href}
                 style={{
                   ...filterBtnBase,
                   background: isActive ? "linear-gradient(135deg, rgba(201,169,122,0.20), rgba(201,169,122,0.08))" : "rgba(255,255,255,0.03)",
@@ -157,6 +250,11 @@ export default async function FinanceiroPage({
               </Link>
             );
           })}
+          {hasFilters && (
+            <span style={{ fontSize: 11, color: "var(--text-muted)", marginLeft: 4 }}>
+              {filteredCount} resultado{filteredCount !== 1 ? "s" : ""}
+            </span>
+          )}
         </div>
 
         {/* Table */}
@@ -254,6 +352,11 @@ export default async function FinanceiroPage({
             </div>
           )}
         </div>
+        {payments.length === 100 && (
+          <p style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 10, textAlign: "center" }}>
+            Mostrando as 100 transações mais recentes. Use os filtros ou exporte o CSV para ver o histórico completo.
+          </p>
+        )}
 
         {/* Professores e Comissões */}
         {teacherCommissions.length > 0 && (

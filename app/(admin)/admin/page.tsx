@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import RevenueChart from "@/components/admin/revenue-chart";
 
 function fmt(v: number) {
   return "R$ " + v.toFixed(2).replace(".", ",");
@@ -70,7 +71,6 @@ export default async function AdminDashboard() {
   const total = totalRevenue._sum.amount ?? 0;
   const pendingComm = pendingCommissions._sum.amount ?? 0;
   const growthPct = lastMonth > 0 ? Math.round(((month - lastMonth) / lastMonth) * 100) : (month > 0 ? 100 : 0);
-  const maxMonth = Math.max(...monthsRevenue.map(m => m.total), 1);
 
   const attentionItems = [
     openTickets > 0 ? { label: `${openTickets} chamado${openTickets !== 1 ? "s" : ""} aberto${openTickets !== 1 ? "s" : ""}`, href: "/admin/tickets", color: "#f87171" } : null,
@@ -201,28 +201,7 @@ export default async function AdminDashboard() {
               Receita — Últimos 6 Meses
             </span>
           </div>
-          <div style={{ display: "flex", alignItems: "flex-end", gap: 14, height: 140 }}>
-            {monthsRevenue.map((m, i) => {
-              const h = Math.max(4, Math.round((m.total / maxMonth) * 110));
-              const isLast = i === monthsRevenue.length - 1;
-              return (
-                <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
-                  <span style={{ fontSize: 10, color: "var(--text-muted)", fontFamily: "'Poppins',sans-serif" }}>
-                    {m.total > 0 ? fmt(m.total).replace("R$ ", "").split(",")[0] : ""}
-                  </span>
-                  <div style={{
-                    width: "100%", maxWidth: 48, height: h, borderRadius: "6px 6px 2px 2px",
-                    background: isLast ? "linear-gradient(180deg, #E8D5A8, #C9A97A)" : "linear-gradient(180deg, rgba(201,169,122,0.45), rgba(201,169,122,0.18))",
-                    boxShadow: isLast ? "0 0 14px rgba(201,169,122,0.35)" : "none",
-                    transition: "height 0.3s",
-                  }} />
-                  <span style={{ fontSize: 10, fontFamily: "'Cinzel',serif", letterSpacing: 1, textTransform: "uppercase", color: isLast ? "var(--gold-light)" : "var(--text-muted)" }}>
-                    {m.label}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
+          <RevenueChart months={monthsRevenue} />
         </div>
 
         {/* Stats de conteúdo */}
