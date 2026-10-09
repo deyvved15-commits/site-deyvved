@@ -567,8 +567,59 @@ const ACTIVITY_CONFIG: Record<string, { label: string; color: string }> = {
   PAYMENT_FAILED:  { label: "Pagamento recusado",      color: "#f87171" },
 };
 
+function parseLogMeta(log: any) {
+  try { return log.metadata ? JSON.parse(log.metadata) : null; } catch { return null; }
+}
+
+// Tipos "repetitivos" (uma linha por aula vista) que ficam agrupados por aluno+dia.
+const GROUPABLE_TYPES = new Set(["LESSON_VIEW", "LESSON_COMPLETE"]);
+
+type FeedItem =
+  | { kind: "single"; key: string; log: any }
+  | { kind: "group"; key: string; type: string; user: any; dateKey: string; logs: any[] };
+
+function groupActivities(data: any[]): FeedItem[] {
+  const groups = new Map<string, FeedItem & { kind: "group" }>();
+  const items: FeedItem[] = [];
+
+  for (const log of data) {
+    if (GROUPABLE_TYPES.has(log.type)) {
+      const dateKey = new Date(log.createdAt).toLocaleDateString("pt-BR");
+      const groupKey = `${log.type}|${log.user?.id ?? log.userId}|${dateKey}`;
+      let g = groups.get(groupKey);
+      if (!g) {
+        g = { kind: "group", key: groupKey, type: log.type, user: log.user, dateKey, logs: [] };
+        groups.set(groupKey, g);
+        items.push(g);
+      }
+      g.logs.push(log);
+    } else {
+      items.push({ kind: "single", key: log.id, log });
+    }
+  }
+
+  // Dentro de cada grupo, mais recente primeiro; a lista geral já vem ordenada por createdAt desc.
+  for (const it of items) {
+    if (it.kind === "group") it.logs.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }
+
+  return items;
+}
+
 function AtividadesTable({ data, loading }: { data: any[]; loading: boolean }) {
+  const [openGroups, setOpenGroups] = useState<Set<string>>(new Set());
+
   if (!data.length) return <EmptyState loading={loading} />;
+
+  const feed = groupActivities(data);
+
+  function toggleGroup(key: string) {
+    setOpenGroups(prev => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key); else next.add(key);
+      return next;
+    });
+  }
 
   return (
     <>
@@ -576,40 +627,131 @@ function AtividadesTable({ data, loading }: { data: any[]; loading: boolean }) {
         {["Aluno", "Tipo", "Detalhes", "Data / Hora"].map(h => <TH key={h} label={h} />)}
       </div>
       <div style={bodyStyle}>
-        {data.map((log: any, i: number) => {
-          const meta = (() => { try { return log.metadata ? JSON.parse(log.metadata) : null; } catch { return null; } })();
-          const cfg = ACTIVITY_CONFIG[log.type] ?? { label: log.type, color: "rgba(255,255,255,0.4)" };
+        {feed.map((item, i) => {
+          if (item.kind === "single") {
+            const log = item.log;
+            const meta = parseLogMeta(log);
+            const cfg = ACTIVITY_CONFIG[log.type] ?? { label: log.type, color: "rgba(255,255,255,0.4)" };
+
+            return (
+              <div key={item.key} style={row(i)} className="rpt-row">
+                <div style={{ flex: 1.2 }}>
+                  <div style={primary} className="rpt-cell-primary">{log.user?.name ?? "—"}</div>
+                  <div style={muted}   className="rpt-cell-muted">{log.user?.email ?? "—"}</div>
+                </div>
+
+                <div style={{ flex: 1, display: "flex", alignItems: "center", gap: 8 }}>
+                  <span style={{
+                    display: "inline-block", width: 8, height: 8, borderRadius: "50%",
+                    background: cfg.color, boxShadow: `0 0 6px ${cfg.color}`, flexShrink: 0,
+                  }} />
+                  <span style={{ fontSize: 12, fontWeight: 600, color: cfg.color }}>{cfg.label}</span>
+                </div>
+
+                <div style={{ flex: 1.5 }}>
+                  {meta?.lesson  && <div style={muted} className="rpt-cell-muted">{meta.lesson}</div>}
+                  {meta?.title   && <div style={muted} className="rpt-cell-muted">{meta.title}</div>}
+                  {meta?.item    && <div style={muted} className="rpt-cell-muted">{meta.item}</div>}
+                  {!meta?.lesson && !meta?.title && !meta?.item && <div style={muted}>—</div>}
+                </div>
+
+                <div style={{ flex: 1, textAlign: "right" }}>
+                  <div style={{ ...primary, fontSize: 12 }} className="rpt-cell-primary">
+                    {new Date(log.createdAt).toLocaleDateString("pt-BR")}
+                  </div>
+                  <div style={{ ...muted, fontSize: 10 }} className="rpt-cell-muted">
+                    {new Date(log.createdAt).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
+                  </div>
+                </div>
+              </div>
+            );
+          }
+
+          // Grupo: várias aulas do mesmo tipo, mesmo aluno, mesmo dia
+          const cfg = ACTIVITY_CONFIG[item.type] ?? { label: item.type, color: "rgba(255,255,255,0.4)" };
+          const isOpen = openGroups.has(item.key);
+          const count = item.logs.length;
+
+          if (count === 1) {
+            // Grupo com uma única aula: mostra igual a uma linha normal, sem expand.
+            const log = item.logs[0];
+            const meta = parseLogMeta(log);
+            return (
+              <div key={item.key} style={row(i)} className="rpt-row">
+                <div style={{ flex: 1.2 }}>
+                  <div style={primary} className="rpt-cell-primary">{item.user?.name ?? "—"}</div>
+                  <div style={muted}   className="rpt-cell-muted">{item.user?.email ?? "—"}</div>
+                </div>
+                <div style={{ flex: 1, display: "flex", alignItems: "center", gap: 8 }}>
+                  <span style={{ display: "inline-block", width: 8, height: 8, borderRadius: "50%", background: cfg.color, boxShadow: `0 0 6px ${cfg.color}`, flexShrink: 0 }} />
+                  <span style={{ fontSize: 12, fontWeight: 600, color: cfg.color }}>{cfg.label}</span>
+                </div>
+                <div style={{ flex: 1.5 }}>
+                  <div style={muted} className="rpt-cell-muted">{meta?.lesson || meta?.title || meta?.item || "—"}</div>
+                </div>
+                <div style={{ flex: 1, textAlign: "right" }}>
+                  <div style={{ ...primary, fontSize: 12 }} className="rpt-cell-primary">{item.dateKey}</div>
+                  <div style={{ ...muted, fontSize: 10 }} className="rpt-cell-muted">
+                    {new Date(log.createdAt).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
+                  </div>
+                </div>
+              </div>
+            );
+          }
 
           return (
-            <div key={log.id} style={row(i)} className="rpt-row">
-              <div style={{ flex: 1.2 }}>
-                <div style={primary} className="rpt-cell-primary">{log.user?.name ?? "—"}</div>
-                <div style={muted}   className="rpt-cell-muted">{log.user?.email ?? "—"}</div>
-              </div>
-
-              <div style={{ flex: 1, display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{
-                  display: "inline-block", width: 8, height: 8, borderRadius: "50%",
-                  background: cfg.color, boxShadow: `0 0 6px ${cfg.color}`, flexShrink: 0,
-                }} />
-                <span style={{ fontSize: 12, fontWeight: 600, color: cfg.color }}>{cfg.label}</span>
-              </div>
-
-              <div style={{ flex: 1.5 }}>
-                {meta?.lesson  && <div style={muted} className="rpt-cell-muted">{meta.lesson}</div>}
-                {meta?.title   && <div style={muted} className="rpt-cell-muted">{meta.title}</div>}
-                {meta?.item    && <div style={muted} className="rpt-cell-muted">{meta.item}</div>}
-                {!meta?.lesson && !meta?.title && !meta?.item && <div style={muted}>—</div>}
-              </div>
-
-              <div style={{ flex: 1, textAlign: "right" }}>
-                <div style={{ ...primary, fontSize: 12 }} className="rpt-cell-primary">
-                  {new Date(log.createdAt).toLocaleDateString("pt-BR")}
+            <div key={item.key}>
+              <div
+                style={{ ...row(i), cursor: "pointer" }}
+                className="rpt-row"
+                onClick={() => toggleGroup(item.key)}
+              >
+                <div style={{ flex: 1.2 }}>
+                  <div style={primary} className="rpt-cell-primary">{item.user?.name ?? "—"}</div>
+                  <div style={muted}   className="rpt-cell-muted">{item.user?.email ?? "—"}</div>
                 </div>
-                <div style={{ ...muted, fontSize: 10 }} className="rpt-cell-muted">
-                  {new Date(log.createdAt).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
+
+                <div style={{ flex: 1, display: "flex", alignItems: "center", gap: 8 }}>
+                  <span style={{ display: "inline-block", width: 8, height: 8, borderRadius: "50%", background: cfg.color, boxShadow: `0 0 6px ${cfg.color}`, flexShrink: 0 }} />
+                  <span style={{ fontSize: 12, fontWeight: 600, color: cfg.color }}>{cfg.label}</span>
+                </div>
+
+                <div style={{ flex: 1.5, display: "flex", alignItems: "center", gap: 6 }}>
+                  <span style={{
+                    fontSize: 11, fontWeight: 700, color: "var(--navy-darkest)",
+                    background: cfg.color, borderRadius: 999, padding: "2px 8px",
+                  }}>
+                    {count} aulas
+                  </span>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                    style={{ transform: isOpen ? "rotate(180deg)" : "none", transition: "transform 0.15s" }}>
+                    <path d="M6 9l6 6 6-6"/>
+                  </svg>
+                </div>
+
+                <div style={{ flex: 1, textAlign: "right" }}>
+                  <div style={{ ...primary, fontSize: 12 }} className="rpt-cell-primary">{item.dateKey}</div>
+                  <div style={{ ...muted, fontSize: 10 }} className="rpt-cell-muted">{isOpen ? "ocultar" : "ver detalhes"}</div>
                 </div>
               </div>
+
+              {isOpen && (
+                <div style={{ background: "rgba(0,0,0,0.15)", padding: "4px 24px 10px 24px" }}>
+                  {item.logs.map(log => {
+                    const meta = parseLogMeta(log);
+                    return (
+                      <div key={log.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "7px 0", borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+                        <span style={{ fontSize: 12, color: "rgba(255,255,255,0.75)" }}>
+                          {meta?.lesson || meta?.title || meta?.item || "—"}
+                        </span>
+                        <span style={{ fontSize: 10, color: "rgba(255,255,255,0.35)" }}>
+                          {new Date(log.createdAt).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           );
         })}
