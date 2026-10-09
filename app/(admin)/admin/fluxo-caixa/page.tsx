@@ -1,17 +1,56 @@
 import { prisma } from "@/lib/prisma";
+import Link from "next/link";
 import ExpensesPanel from "@/components/admin/expenses-panel";
 import RevenueChart from "@/components/admin/revenue-chart";
+import { getMonthlyRevenueAndExpense } from "@/lib/monthly-finance";
 
 function fmt(v: number) {
   return "R$ " + v.toFixed(2).replace(".", ",");
 }
 
-export default async function FluxoCaixaPage() {
+const CATEGORIES = [
+  { value: "FERRAMENTAS", label: "Ferramentas" },
+  { value: "TRAFEGO", label: "Tráfego" },
+  { value: "SALARIO", label: "Salário" },
+  { value: "FREELANCER", label: "Freelancer" },
+  { value: "INFRAESTRUTURA", label: "Infraestrutura" },
+  { value: "IMPOSTOS", label: "Impostos" },
+  { value: "MARKETING", label: "Marketing" },
+  { value: "OUTROS", label: "Outros" },
+];
+
+const STATUSES = [
+  { value: "PENDENTE", label: "Pendente" },
+  { value: "PAGO", label: "Pago" },
+  { value: "CANCELADO", label: "Cancelado" },
+];
+
+export default async function FluxoCaixaPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; category?: string; status?: string; from?: string; to?: string }>;
+}) {
+  const { q, category, status, from, to } = await searchParams;
+  const filterQ = q?.trim() || undefined;
+  const filterCategory = category && CATEGORIES.some(c => c.value === category) ? category : undefined;
+  const filterStatus = status && STATUSES.some(s => s.value === status) ? status : undefined;
+
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
   const startOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
 
-  const [monthIncome, monthExpensesPaid, pendingExpenses, expenses, monthsRevenue, monthsExpense] = await Promise.all([
+  const expenseWhere: Record<string, unknown> = {};
+  if (filterQ) expenseWhere.title = { contains: filterQ, mode: "insensitive" };
+  if (filterCategory) expenseWhere.category = filterCategory;
+  if (filterStatus) expenseWhere.status = filterStatus;
+  if (from || to) {
+    const range: Record<string, Date> = {};
+    if (from) range.gte = new Date(`${from}T00:00:00`);
+    if (to) range.lte = new Date(`${to}T23:59:59`);
+    expenseWhere.dueDate = range;
+  }
+
+  const [monthIncome, monthExpensesPaid, pendingExpenses, expenses, monthlyData] = await Promise.all([
     prisma.payment.aggregate({
       where: { status: "approved", createdAt: { gte: startOfMonth, lt: startOfNextMonth } },
       _sum: { amount: true },
@@ -24,35 +63,15 @@ export default async function FluxoCaixaPage() {
       where: { status: "PENDENTE" },
       _sum: { amount: true },
     }),
-    prisma.expense.findMany({ orderBy: { dueDate: "desc" } }),
-    Promise.all(
-      Array.from({ length: 6 }).map(async (_, i) => {
-        const monthStart = new Date(now.getFullYear(), now.getMonth() - (5 - i), 1);
-        const monthEnd = new Date(now.getFullYear(), now.getMonth() - (5 - i) + 1, 1);
-        const sum = await prisma.payment.aggregate({
-          where: { status: "approved", createdAt: { gte: monthStart, lt: monthEnd } },
-          _sum: { amount: true },
-        });
-        return { label: monthStart.toLocaleDateString("pt-BR", { month: "short" }), total: sum._sum.amount ?? 0 };
-      })
-    ),
-    Promise.all(
-      Array.from({ length: 6 }).map(async (_, i) => {
-        const monthStart = new Date(now.getFullYear(), now.getMonth() - (5 - i), 1);
-        const monthEnd = new Date(now.getFullYear(), now.getMonth() - (5 - i) + 1, 1);
-        const sum = await prisma.expense.aggregate({
-          where: { status: "PAGO", paidAt: { gte: monthStart, lt: monthEnd } },
-          _sum: { amount: true },
-        });
-        return { label: monthStart.toLocaleDateString("pt-BR", { month: "short" }), total: sum._sum.amount ?? 0 };
-      })
-    ),
+    prisma.expense.findMany({ where: expenseWhere, orderBy: { dueDate: "desc" } }),
+    getMonthlyRevenueAndExpense(6),
   ]);
 
   const income = monthIncome._sum.amount ?? 0;
   const expensesPaid = monthExpensesPaid._sum.amount ?? 0;
   const pending = pendingExpenses._sum.amount ?? 0;
   const balance = income - expensesPaid;
+  const hasFilters = !!(filterQ || filterCategory || filterStatus || from || to);
 
   const expensesSerialized = expenses.map(e => ({
     id: e.id,
@@ -71,6 +90,19 @@ export default async function FluxoCaixaPage() {
     background: "linear-gradient(160deg, var(--navy-card) 0%, var(--navy-card-2) 100%)",
     border: "1px solid rgba(201,169,122,0.12)",
     boxShadow: "0 8px 32px rgba(0,0,0,0.35)",
+  };
+
+  const inputStyle: React.CSSProperties = {
+    background: "rgba(255,255,255,0.04)", border: "1px solid rgba(201,169,122,0.18)",
+    borderRadius: 10, padding: "9px 12px", fontSize: 12, color: "#fff",
+    fontFamily: "'Poppins',sans-serif", outline: "none",
+  };
+
+  const filterBtnBase: React.CSSProperties = {
+    padding: "7px 18px", borderRadius: 10, fontSize: 11,
+    fontFamily: "'Cinzel',serif", fontWeight: 600, letterSpacing: 1.5,
+    textTransform: "uppercase", textDecoration: "none", cursor: "pointer",
+    border: "1px solid rgba(201,169,122,0.20)",
   };
 
   return (
@@ -103,35 +135,61 @@ export default async function FluxoCaixaPage() {
           </div>
         </div>
 
-        {/* Gráficos lado a lado */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 32 }} className="fc-charts-grid">
-          <div style={{ ...cardStyle, padding: "22px 24px 18px" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
-              <div style={{ width: 3, height: 16, background: "linear-gradient(180deg, #6ee7b7, #34d399)", borderRadius: 2, boxShadow: "0 0 8px #6ee7b7" }} />
-              <span style={{ fontFamily: "'Cinzel',serif", fontSize: 11, fontWeight: 600, letterSpacing: 3, textTransform: "uppercase", color: "var(--text-primary)" }}>
-                Entradas — 6 Meses
-              </span>
-            </div>
-            <RevenueChart months={monthsRevenue} />
+        {/* Gráfico combinado */}
+        <div style={{ ...cardStyle, marginBottom: 28, padding: "22px 24px 18px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
+            <div style={{ width: 3, height: 16, background: "linear-gradient(180deg, var(--gold-light), var(--gold))", borderRadius: 2, boxShadow: "0 0 8px var(--gold)" }} />
+            <span style={{ fontFamily: "'Cinzel',serif", fontSize: 11, fontWeight: 600, letterSpacing: 3, textTransform: "uppercase", color: "var(--text-primary)" }}>
+              Receita x Despesa — Últimos 6 Meses
+            </span>
           </div>
-          <div style={{ ...cardStyle, padding: "22px 24px 18px" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
-              <div style={{ width: 3, height: 16, background: "linear-gradient(180deg, #FF8088, #E63946)", borderRadius: 2, boxShadow: "0 0 8px rgba(230,57,70,0.5)" }} />
-              <span style={{ fontFamily: "'Cinzel',serif", fontSize: 11, fontWeight: 600, letterSpacing: 3, textTransform: "uppercase", color: "var(--text-primary)" }}>
-                Despesas Pagas — 6 Meses
-              </span>
-            </div>
-            <RevenueChart months={monthsExpense} />
-          </div>
+          <RevenueChart months={monthlyData} />
         </div>
 
-        <ExpensesPanel expenses={expensesSerialized} />
+        {/* Filtros de despesas */}
+        <form method="GET" style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-end", gap: 10, marginBottom: 12 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 5, flex: "1 1 200px" }}>
+            <label style={{ fontSize: 9, fontFamily: "'Cinzel',serif", letterSpacing: 2, color: "var(--text-muted)", textTransform: "uppercase" }}>Buscar despesa</label>
+            <input type="text" name="q" defaultValue={filterQ ?? ""} placeholder="Título..." style={inputStyle} />
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+            <label style={{ fontSize: 9, fontFamily: "'Cinzel',serif", letterSpacing: 2, color: "var(--text-muted)", textTransform: "uppercase" }}>Categoria</label>
+            <select name="category" defaultValue={filterCategory ?? ""} style={{ ...inputStyle, cursor: "pointer" }}>
+              <option value="">Todas</option>
+              {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+            </select>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+            <label style={{ fontSize: 9, fontFamily: "'Cinzel',serif", letterSpacing: 2, color: "var(--text-muted)", textTransform: "uppercase" }}>Status</label>
+            <select name="status" defaultValue={filterStatus ?? ""} style={{ ...inputStyle, cursor: "pointer" }}>
+              <option value="">Todos</option>
+              {STATUSES.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+            </select>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+            <label style={{ fontSize: 9, fontFamily: "'Cinzel',serif", letterSpacing: 2, color: "var(--text-muted)", textTransform: "uppercase" }}>De</label>
+            <input type="date" name="from" defaultValue={from ?? ""} style={inputStyle} />
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+            <label style={{ fontSize: 9, fontFamily: "'Cinzel',serif", letterSpacing: 2, color: "var(--text-muted)", textTransform: "uppercase" }}>Até</label>
+            <input type="date" name="to" defaultValue={to ?? ""} style={inputStyle} />
+          </div>
+          <button type="submit" style={{ ...filterBtnBase, background: "linear-gradient(135deg, rgba(201,169,122,0.25), rgba(201,169,122,0.10))", color: "var(--gold-light)", borderColor: "rgba(201,169,122,0.40)" }}>
+            Filtrar
+          </button>
+          {hasFilters && (
+            <Link href="/admin/fluxo-caixa" style={{ ...filterBtnBase, background: "rgba(255,255,255,0.03)", color: "rgba(255,255,255,0.4)" }}>
+              Limpar
+            </Link>
+          )}
+        </form>
+        {hasFilters && (
+          <p style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 16 }}>
+            {expenses.length} resultado{expenses.length !== 1 ? "s" : ""}
+          </p>
+        )}
 
-        <style>{`
-          @media (max-width: 900px) {
-            .fc-charts-grid { grid-template-columns: 1fr !important; }
-          }
-        `}</style>
+        <ExpensesPanel expenses={expensesSerialized} />
       </div>
     </div>
   );

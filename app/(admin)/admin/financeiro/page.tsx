@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import RevenueChart from "@/components/admin/revenue-chart";
+import { getMonthlyRevenueAndExpense } from "@/lib/monthly-finance";
 
 const STATUS_LABEL: Record<string, { label: string; color: string; bg: string }> = {
   approved: { label: "Aprovado",  color: "#6ee7b7", bg: "rgba(110,231,183,0.08)" },
@@ -68,17 +69,7 @@ export default async function FinanceiroPage({
       }
     }),
     prisma.payment.aggregate({ where: { status: "approved" }, _sum: { commissionAmount: true } }),
-    Promise.all(
-      Array.from({ length: 6 }).map(async (_, i) => {
-        const monthStart = new Date(now.getFullYear(), now.getMonth() - (5 - i), 1);
-        const monthEnd = new Date(now.getFullYear(), now.getMonth() - (5 - i) + 1, 1);
-        const sum = await prisma.payment.aggregate({
-          where: { status: "approved", createdAt: { gte: monthStart, lt: monthEnd } },
-          _sum: { amount: true },
-        });
-        return { label: monthStart.toLocaleDateString("pt-BR", { month: "short" }), total: sum._sum.amount ?? 0 };
-      })
-    ),
+    getMonthlyRevenueAndExpense(6),
   ]);
 
   const teacherCommissions = teachers.map(t => {
@@ -178,7 +169,7 @@ export default async function FinanceiroPage({
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
             <div style={{ width: 3, height: 16, background: "linear-gradient(180deg, var(--gold-light), var(--gold))", borderRadius: 2, boxShadow: "0 0 8px var(--gold)" }} />
             <span style={{ fontFamily: "'Cinzel',serif", fontSize: 11, fontWeight: 600, letterSpacing: 3, textTransform: "uppercase", color: "var(--text-primary)" }}>
-              Receita — Últimos 6 Meses
+              Receita x Despesa — Últimos 6 Meses
             </span>
           </div>
           <RevenueChart months={monthsRevenue} />
